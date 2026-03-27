@@ -1,7 +1,5 @@
-import { router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Edit, MoreHorizontal, Trash2 } from 'lucide-react';
-import { toast } from 'sonner';
 
 import { DataTableColumnHeader } from '@/components/data-table/DataTableColumnHeader';
 import { Button } from '@/components/ui/button';
@@ -13,7 +11,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import userRoutes from '@/routes/users';
 
 export interface User {
   id: number;
@@ -30,14 +27,24 @@ export const getColumns = (
     accessorKey: 'id',
     header: '#',
     enableSorting: false,
+    meta: {
+      cellClassName: 'font-mono text-muted-foreground w-[50px]',
+    },
   },
   {
     accessorKey: 'name',
     header: (props) => <DataTableColumnHeader {...props} title="Name" />,
+    meta: {
+      cellClassName: (row) =>
+        row.original.id === 1 ? 'font-bold text-primary' : '',
+    },
   },
   {
     accessorKey: 'email',
     header: (props) => <DataTableColumnHeader {...props} title="Email" />,
+    meta: {
+      cellClassName: 'text-blue-500 font-medium',
+    },
   },
   {
     accessorKey: 'created_at',
@@ -54,6 +61,9 @@ export const getColumns = (
   },
   {
     id: 'actions',
+    meta: {
+      cellClassName: 'w-1',
+    },
     cell: ({ row }) => {
       const user = row.original;
 
@@ -61,14 +71,14 @@ export const getColumns = (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
+              <span className="sr-only font-normal">Open menu</span>
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem onClick={() => onEdit(user)}>
-              <Edit className="mr-2 h-4 w-4" />
+              <Edit className="h-4 w-4" />
               Edit User
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -76,7 +86,7 @@ export const getColumns = (
               className="text-destructive focus:text-destructive"
               onClick={() => onDelete(user)}
             >
-              <Trash2 className="mr-2 h-4 w-4" />
+              <Trash2 className="h-4 w-4" />
               Delete User
             </DropdownMenuItem>
           </DropdownMenuContent>

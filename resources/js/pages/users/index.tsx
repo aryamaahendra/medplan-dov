@@ -87,7 +87,7 @@ export default function UsersIndex({ users, filters }: UsersIndexProps) {
             </p>
           </div>
           <Button onClick={onCreate} variant="outline">
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="h-4 w-4" />
             Add User
           </Button>
         </div>

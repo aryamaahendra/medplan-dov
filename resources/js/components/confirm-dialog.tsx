@@ -10,7 +10,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { ReactNode } from 'react';
 
 interface ConfirmDialogProps {
   open: boolean;

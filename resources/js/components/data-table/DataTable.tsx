@@ -19,6 +19,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
+import { cn } from '@/lib/utils';
 import { DataTablePagination } from './DataTablePagination';
 import type { PaginationMeta } from './DataTablePagination';
 import { DataTableToolbar } from './DataTableToolbar';
@@ -112,14 +113,22 @@ export function DataTable<TData, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    const cellMeta = cell.column.columnDef.meta;
+                    const cellClassName =
+                      typeof cellMeta?.cellClassName === 'function'
+                        ? cellMeta.cellClassName(row)
+                        : cellMeta?.cellClassName;
+
+                    return (
+                      <TableCell key={cell.id} className={cn(cellClassName)}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    );
+                  })}
                 </TableRow>
               ))
             ) : (

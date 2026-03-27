@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
@@ -10,12 +11,8 @@ trait HasDataTable
     /**
      * Apply search, sort, and pagination to a query from request params.
      *
-     * @param  Builder  $query
-     * @param  Request  $request
      * @param  array<string>  $searchColumns  Columns to search across
      * @param  array<string>  $sortableColumns  Columns allowed for sorting
-     * @param  int  $defaultPerPage
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     protected function applyDataTable(
         Builder $query,
@@ -23,7 +20,7 @@ trait HasDataTable
         array $searchColumns = [],
         array $sortableColumns = [],
         int $defaultPerPage = 15,
-    ): \Illuminate\Contracts\Pagination\LengthAwarePaginator {
+    ): LengthAwarePaginator {
         $this->applySearch($query, $request, $searchColumns);
         $this->applySort($query, $request, $sortableColumns);
 

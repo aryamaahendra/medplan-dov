@@ -1,4 +1,5 @@
 import { XIcon } from 'lucide-react';
+import type { ReactNode } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +12,7 @@ interface DataTableToolbarProps {
   /** Placeholder text for the search input */
   searchPlaceholder?: string;
   /** Optional extra filter controls to render on the right */
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
 export function DataTableToolbar({
@@ -21,10 +22,7 @@ export function DataTableToolbar({
   searchPlaceholder = 'Search...',
   children,
 }: DataTableToolbarProps) {
-  const isFiltered =
-    Boolean(filters.search) ||
-    Boolean(filters.sort) ||
-    Boolean(filters.per_page);
+  const isFiltered = Boolean(filters.search) || Boolean(filters.sort);
 
   return (
     <div className="flex items-center justify-between gap-4">

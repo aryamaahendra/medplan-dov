@@ -1,6 +1,9 @@
 import { router } from '@inertiajs/react';
 import { useCallback, useRef } from 'react';
 
+/**
+ * Filter structure for the URL search params.
+ */
 export interface DataTableFilters {
   search?: string;
   sort?: string;
@@ -11,47 +14,37 @@ export interface DataTableFilters {
 }
 
 interface UseDataTableOptions {
-  /** The Inertia partial reload keys (must include your paginated data key and 'filters') */
+  /** The Inertia keys we want to partially reload (e.g. ['users', 'filters']) */
   only: string[];
-  /** Base URL for the request. Defaults to current URL. */
+  /** Optional base path. Defaults to current path. */
   url?: string;
-  /** Debounce delay in ms for search input (default: 300) */
+  /** Milliseconds to debounce the search input (defaults to 300) */
   searchDebounce?: number;
-}
-
-interface UseDataTableReturn {
-  setSearch: (value: string) => void;
-  setSort: (column: string, direction?: 'asc' | 'desc') => void;
-  setPage: (page: number) => void;
-  setPerPage: (perPage: number) => void;
-  setFilter: (filters: DataTableFilters) => void;
-  resetFilters: () => void;
 }
 
 /**
  * useDataTable
  *
- * A custom hook that bridges TanStack Table UI interactions with Inertia
- * partial reloads. All state lives in the URL — no duplicate React state.
- *
- * @example
- * const { setSearch, setSort, setPage, setPerPage } = useDataTable({
- *   only: ['users', 'filters'],
- * });
+ * A specialized hook for TanStack Table when backed by Laravel/Inertia
+ * server-side pagination, sorting, and filtering.
  */
-export function useDataTable(options: UseDataTableOptions): UseDataTableReturn {
-  const { only, url, searchDebounce = 300 } = options;
+export function useDataTable({
+  only,
+  url,
+  searchDebounce = 300,
+}: UseDataTableOptions) {
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  /** Send an Inertia partial reload with the given params merged into the URL. */
+  /**
+   * Performs the Inertia router visit.
+   */
   const visit = useCallback(
     (params: Record<string, string | number | undefined>) => {
-      // Strip undefined / empty string values so the URL stays clean.
+      // Clean up empty params
       const cleaned: Record<string, string | number> = {};
 
       for (const [key, value] of Object.entries(params)) {
-        if (value !== undefined && value !== '') {
+        if (value !== undefined && value !== null && value !== '') {
           cleaned[key] = value;
         }
       }
@@ -66,46 +59,52 @@ export function useDataTable(options: UseDataTableOptions): UseDataTableReturn {
     [only, url],
   );
 
-  /** Merge new params on top of the current URL search params. */
+  /**
+   * Merges new params into existing ones from the current URL.
+   */
   const mergeParams = useCallback(
     (newParams: DataTableFilters) => {
-      const current = new URLSearchParams(window.location.search);
-      const merged: Record<string, string | number | undefined> = {};
+      const searchParams = new URLSearchParams(window.location.search);
+      const currentParams: Record<string, string | number | undefined> = {};
 
-      current.forEach((value, key) => {
-        merged[key] = value;
+      searchParams.forEach((value, key) => {
+        currentParams[key] = value;
       });
 
-      Object.assign(merged, newParams);
-
-      visit(merged);
+      visit({ ...currentParams, ...newParams });
     },
     [visit],
   );
 
-  const setSearch = useCallback(
+  /**
+   * Search handling (with debounce)
+   */
+  const onSearch = useCallback(
     (value: string) => {
-      if (searchTimer.current) {
-        clearTimeout(searchTimer.current);
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
       }
 
-      searchTimer.current = setTimeout(() => {
+      searchTimeoutRef.current = setTimeout(() => {
         mergeParams({ search: value || undefined, page: 1 });
       }, searchDebounce);
     },
     [mergeParams, searchDebounce],
   );
 
-  const setSort = useCallback(
-    (column: string, direction: 'asc' | 'desc' = 'asc') => {
-      const current = new URLSearchParams(window.location.search);
-      const currentSort = current.get('sort');
-      const currentDir = current.get('direction') as 'asc' | 'desc' | null;
+  /**
+   * Sorting handling
+   */
+  const onSort = useCallback(
+    (column: string, direction?: 'asc' | 'desc') => {
+      const searchParams = new URLSearchParams(window.location.search);
+      const currentSort = searchParams.get('sort');
+      const currentDir = searchParams.get('direction');
 
-      // Toggle direction if clicking the same column
-      let newDirection: 'asc' | 'desc' = direction;
+      let newDirection: 'asc' | 'desc' = direction ?? 'asc';
 
-      if (currentSort === column) {
+      // Toggle logic if column is already sorted
+      if (!direction && currentSort === column) {
         newDirection = currentDir === 'asc' ? 'desc' : 'asc';
       }
 
@@ -114,30 +113,39 @@ export function useDataTable(options: UseDataTableOptions): UseDataTableReturn {
     [mergeParams],
   );
 
-  const setPage = useCallback(
+  /**
+   * Pagination: Page change
+   */
+  const onPageChange = useCallback(
     (page: number) => {
       mergeParams({ page });
     },
     [mergeParams],
   );
 
-  const setPerPage = useCallback(
+  /**
+   * Pagination: Per-page change
+   */
+  const onPerPageChange = useCallback(
     (perPage: number) => {
       mergeParams({ per_page: perPage, page: 1 });
     },
     [mergeParams],
   );
 
-  const setFilter = useCallback(
-    (filters: DataTableFilters) => {
-      mergeParams({ ...filters, page: 1 });
-    },
-    [mergeParams],
-  );
-
-  const resetFilters = useCallback(() => {
+  /**
+   * Reset all filters
+   */
+  const onReset = useCallback(() => {
     visit({});
   }, [visit]);
 
-  return { setSearch, setSort, setPage, setPerPage, setFilter, resetFilters };
+  return {
+    onSearch,
+    onSort,
+    onPageChange,
+    onPerPageChange,
+    onReset,
+    mergeParams,
+  };
 }

@@ -1,7 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table';
 
 import { DataTableColumnHeader } from '@/components/data-table/DataTableColumnHeader';
-import type { DataTableFilters } from '@/hooks/use-data-table';
 
 export interface User {
   id: number;
@@ -10,57 +9,31 @@ export interface User {
   created_at: string;
 }
 
-export function getUserColumns(
-  filters: DataTableFilters,
-  onSort: (column: string, direction: 'asc' | 'desc') => void,
-): ColumnDef<User>[] {
-  return [
-    {
-      accessorKey: 'id',
-      header: '#',
-      enableSorting: false,
+export const columns: ColumnDef<User>[] = [
+  {
+    accessorKey: 'id',
+    header: '#',
+    enableSorting: false,
+  },
+  {
+    accessorKey: 'name',
+    header: (props) => <DataTableColumnHeader {...props} title="Name" />,
+  },
+  {
+    accessorKey: 'email',
+    header: (props) => <DataTableColumnHeader {...props} title="Email" />,
+  },
+  {
+    accessorKey: 'created_at',
+    header: (props) => <DataTableColumnHeader {...props} title="Joined" />,
+    cell: ({ row }) => {
+      const date = new Date(row.getValue('created_at'));
+
+      return date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      });
     },
-    {
-      accessorKey: 'name',
-      header: ({ column }) => (
-        <DataTableColumnHeader
-          column={column}
-          title="Name"
-          currentSort={filters.sort ?? ''}
-          currentDirection={filters.direction ?? ''}
-          onSort={onSort}
-        />
-      ),
-    },
-    {
-      accessorKey: 'email',
-      header: ({ column }) => (
-        <DataTableColumnHeader
-          column={column}
-          title="Email"
-          currentSort={filters.sort ?? ''}
-          currentDirection={filters.direction ?? ''}
-          onSort={onSort}
-        />
-      ),
-    },
-    {
-      accessorKey: 'created_at',
-      header: ({ column }) => (
-        <DataTableColumnHeader
-          column={column}
-          title="Joined"
-          currentSort={filters.sort ?? ''}
-          currentDirection={filters.direction ?? ''}
-          onSort={onSort}
-        />
-      ),
-      cell: ({ row }) =>
-        new Date(row.getValue('created_at')).toLocaleDateString('en-GB', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-        }),
-    },
-  ];
-}
+  },
+];

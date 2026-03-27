@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-interface PaginationMeta {
+export interface PaginationMeta {
   current_page: number;
   last_page: number;
   per_page: number;
@@ -39,9 +39,8 @@ export function DataTablePagination({
   const { current_page, last_page, per_page, total, from, to } = meta;
 
   return (
-    <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-      {/* Result count */}
-      <p className="text-sm text-muted-foreground">
+    <div className="flex flex-col items-center justify-between gap-4 px-2 sm:flex-row">
+      <div className="flex-1 text-sm text-muted-foreground">
         {from !== null && to !== null ? (
           <>
             Showing <strong>{from}</strong>–<strong>{to}</strong> of{' '}
@@ -50,20 +49,17 @@ export function DataTablePagination({
         ) : (
           'No results'
         )}
-      </p>
+      </div>
 
-      <div className="flex items-center gap-6">
-        {/* Per-page selector */}
+      <div className="flex items-center gap-6 lg:gap-8">
         <div className="flex items-center gap-2">
-          <p className="text-sm whitespace-nowrap text-muted-foreground">
-            Rows per page
-          </p>
+          <p className="text-sm font-medium whitespace-nowrap">Rows per page</p>
           <Select
             value={String(per_page)}
             onValueChange={(value) => onPerPageChange(Number(value))}
           >
-            <SelectTrigger id="data-table-per-page" className="h-8 w-16">
-              <SelectValue />
+            <SelectTrigger className="h-8 w-[70px]">
+              <SelectValue placeholder={String(per_page)} />
             </SelectTrigger>
             <SelectContent side="top">
               {pageSizeOptions.map((size) => (
@@ -75,55 +71,45 @@ export function DataTablePagination({
           </Select>
         </div>
 
-        {/* Page counter */}
-        <p className="text-sm whitespace-nowrap text-muted-foreground">
+        <div className="flex w-[100px] items-center justify-center text-sm font-medium">
           Page {current_page} of {last_page}
-        </p>
+        </div>
 
-        {/* Navigation buttons */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <Button
-            id="data-table-first-page"
             variant="outline"
-            size="icon"
-            className="size-8"
+            className="hidden size-8 p-0 lg:flex"
             onClick={() => onPageChange(1)}
             disabled={current_page === 1}
-            aria-label="First page"
           >
+            <span className="sr-only">Go to first page</span>
             <ChevronFirstIcon className="size-4" />
           </Button>
           <Button
-            id="data-table-prev-page"
             variant="outline"
-            size="icon"
-            className="size-8"
+            className="size-8 p-0"
             onClick={() => onPageChange(current_page - 1)}
             disabled={current_page === 1}
-            aria-label="Previous page"
           >
+            <span className="sr-only">Go to previous page</span>
             <ChevronLeftIcon className="size-4" />
           </Button>
           <Button
-            id="data-table-next-page"
             variant="outline"
-            size="icon"
-            className="size-8"
+            className="size-8 p-0"
             onClick={() => onPageChange(current_page + 1)}
             disabled={current_page === last_page}
-            aria-label="Next page"
           >
+            <span className="sr-only">Go to next page</span>
             <ChevronRightIcon className="size-4" />
           </Button>
           <Button
-            id="data-table-last-page"
             variant="outline"
-            size="icon"
-            className="size-8"
+            className="hidden size-8 p-0 lg:flex"
             onClick={() => onPageChange(last_page)}
             disabled={current_page === last_page}
-            aria-label="Last page"
           >
+            <span className="sr-only">Go to last page</span>
             <ChevronLastIcon className="size-4" />
           </Button>
         </div>

@@ -3,7 +3,11 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import type { ColumnDef, VisibilityState } from '@tanstack/react-table';
+import type {
+  ColumnDef,
+  RowSelectionState,
+  VisibilityState,
+} from '@tanstack/react-table';
 import { useState } from 'react';
 
 import {
@@ -16,43 +20,27 @@ import {
 } from '@/components/ui/table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import { DataTablePagination } from './DataTablePagination';
+import type { PaginationMeta } from './DataTablePagination';
 import { DataTableToolbar } from './DataTableToolbar';
-
-interface PaginatedData<TData> {
-  data: TData[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-  from: number | null;
-  to: number | null;
-}
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
-  /** Laravel paginator result (data + meta) */
-  paginatedData: PaginatedData<TData>;
-  /** Current filters from the Inertia prop (passed from controller) */
+  data: TData[];
+  meta: PaginationMeta;
   filters: DataTableFilters;
-  /** Called when user types in the search box (debounced internally in useDataTable) */
   onSearch: (value: string) => void;
-  /** Called when user clicks a sortable column header */
   onSort: (column: string, direction: 'asc' | 'desc') => void;
-  /** Called when user navigates to a page */
   onPageChange: (page: number) => void;
-  /** Called when user changes rows-per-page */
   onPerPageChange: (perPage: number) => void;
-  /** Reset all filters */
   onReset: () => void;
-  /** Placeholder for the search input */
   searchPlaceholder?: string;
-  /** Optional extra elements in the toolbar (filters, export buttons, etc.) */
   toolbarChildren?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
   columns,
-  paginatedData,
+  data,
+  meta,
   filters,
   onSearch,
   onSort,
@@ -62,25 +50,32 @@ export function DataTable<TData, TValue>({
   searchPlaceholder,
   toolbarChildren,
 }: DataTableProps<TData, TValue>) {
+  // Local UI state
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
+  // TanStack Table Instance
+  // DO NOT useMemo this instance per user requirement to avoid React Compiler issues
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
-    data: paginatedData.data,
+    data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    // Disable built-in sorting/filtering — server handles these
-    manualSorting: true,
-    manualFiltering: true,
-    manualPagination: true,
     state: {
+      rowSelection,
       columnVisibility,
     },
+    enableRowSelection: true,
+    onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
+    getCoreRowModel: getCoreRowModel(),
+    // Handled on server
+    manualPagination: true,
+    manualSorting: true,
+    manualFiltering: true,
   });
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Toolbar */}
+    <div className="space-y-4">
       <DataTableToolbar
         filters={filters}
         onSearch={onSearch}
@@ -90,31 +85,28 @@ export function DataTable<TData, TValue>({
         {toolbarChildren}
       </DataTableToolbar>
 
-      {/* Table */}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className="whitespace-nowrap">
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, {
                           ...header.getContext(),
-                          // Pass sort state for DataTableColumnHeader
-                          currentSort: filters.sort ?? '',
-                          currentDirection: filters.direction ?? '',
                           onSort,
+                          currentSort: filters.sort,
+                          currentDirection: filters.direction,
                         })}
                   </TableHead>
                 ))}
               </TableRow>
             ))}
           </TableHeader>
-
           <TableBody>
-            {table.getRowModel().rows.length ? (
+            {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -136,7 +128,7 @@ export function DataTable<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results found.
+                  No results.
                 </TableCell>
               </TableRow>
             )}
@@ -144,9 +136,8 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
 
-      {/* Pagination */}
       <DataTablePagination
-        meta={paginatedData}
+        meta={meta}
         onPageChange={onPageChange}
         onPerPageChange={onPerPageChange}
       />

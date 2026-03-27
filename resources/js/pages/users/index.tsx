@@ -1,10 +1,11 @@
 import { Head } from '@inertiajs/react';
+import { useMemo } from 'react';
 
 import { DataTable } from '@/components/data-table/DataTable';
 import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import users from '@/routes/users';
-import { getUserColumns } from './columns';
+import { columns } from './columns';
 import type { User } from './columns';
 
 interface PaginatedUsers {
@@ -23,12 +24,14 @@ interface UsersIndexProps {
 }
 
 export default function UsersIndex({ users, filters }: UsersIndexProps) {
-  const { setSearch, setSort, setPage, setPerPage, resetFilters } =
+  // Use useDataTable to handle server-side state via Inertia URL updates
+  const { onSearch, onSort, onPageChange, onPerPageChange, onReset } =
     useDataTable({
       only: ['users', 'filters'],
     });
 
-  const columns = getUserColumns(filters, setSort);
+  // Safe to memoize columns
+  const stableColumns = useMemo(() => columns, []);
 
   return (
     <>
@@ -43,14 +46,15 @@ export default function UsersIndex({ users, filters }: UsersIndexProps) {
         </div>
 
         <DataTable
-          columns={columns}
-          paginatedData={users}
+          columns={stableColumns}
+          data={users.data}
+          meta={users} // The whole paginated object usually matches our PaginationMeta
           filters={filters}
-          onSearch={setSearch}
-          onSort={setSort}
-          onPageChange={setPage}
-          onPerPageChange={setPerPage}
-          onReset={resetFilters}
+          onSearch={onSearch}
+          onSort={onSort}
+          onPageChange={onPageChange}
+          onPerPageChange={onPerPageChange}
+          onReset={onReset}
           searchPlaceholder="Search by name or email..."
         />
       </div>

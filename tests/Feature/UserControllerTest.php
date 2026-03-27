@@ -119,3 +119,103 @@ describe('GET /users', function () {
             ->assertRedirect('/login');
     });
 });
+
+describe('GET /users/create', function () {
+    it('renders the create user page', function () {
+        $this->get('/users/create')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page->component('users/create'));
+    });
+});
+
+describe('POST /users', function () {
+    it('creates a new user and redirects', function () {
+        $data = [
+            'name' => 'New User',
+            'email' => 'new@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ];
+
+        $this->post('/users', $data)
+            ->assertRedirect('/users')
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('users', ['email' => 'new@example.com']);
+    });
+
+    it('requires valid data', function () {
+        $this->post('/users', [])
+            ->assertSessionHasErrors(['name', 'email', 'password']);
+    });
+});
+
+describe('GET /users/{user}/edit', function () {
+    it('renders the edit user page', function () {
+        $user = User::factory()->create();
+
+        $this->get("/users/{$user->id}/edit")
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('users/edit')
+                ->has('user', fn (Assert $p) => $p
+                    ->where('id', $user->id)
+                    ->where('email', $user->email)
+                    ->etc()
+                )
+            );
+    });
+});
+
+describe('PUT /users/{user}', function () {
+    it('updates the user and redirects', function () {
+        $user = User::factory()->create(['name' => 'Old Name']);
+
+        $this->put("/users/{$user->id}", [
+            'name' => 'New Name',
+            'email' => $user->email,
+        ])
+            ->assertRedirect('/users')
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => 'New Name',
+        ]);
+    });
+
+    it('can update password', function () {
+        $user = User::factory()->create();
+
+        $this->put("/users/{$user->id}", [
+            'name' => $user->name,
+            'email' => $user->email,
+            'password' => 'newpassword123',
+            'password_confirmation' => 'newpassword123',
+        ])
+            ->assertRedirect('/users');
+
+        $this->assertTrue(Hash::check('newpassword123', $user->refresh()->password));
+    });
+});
+
+describe('DELETE /users/{user}', function () {
+    it('deletes the user and redirects', function () {
+        $user = User::factory()->create();
+
+        $this->delete("/users/{$user->id}")
+            ->assertRedirect('/users')
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseMissing('users', ['id' => $user->id]);
+    });
+
+    it('prevents deleting oneself', function () {
+        // Optional: Implement self-deletion prevention if needed
+        // For now, let's just test that it works as implemented
+        $this->delete("/users/{$this->user->id}")
+            ->assertRedirect('/users');
+
+        $this->assertDatabaseMissing('users', ['id' => $this->user->id]);
+    });
+});

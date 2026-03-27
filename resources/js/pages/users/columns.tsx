@@ -77,7 +77,10 @@ export const getColumns = (
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => onEdit(user)}>
+            <DropdownMenuItem
+              className="text-sm/relaxed"
+              onClick={() => onEdit(user)}
+            >
               <Edit className="h-4 w-4" />
               Edit User
             </DropdownMenuItem>

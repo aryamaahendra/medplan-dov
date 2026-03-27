@@ -8,6 +8,8 @@
 
 @import "@fontsource-variable/roboto";
 
+@import "@fontsource-variable/figtree";
+
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
@@ -218,7 +220,7 @@
     --font-heading:
         var(--font-sans);
     --font-sans:
-        'Roboto Variable', sans-serif;
+        'Figtree Variable', sans-serif;
     --color-sidebar-ring:
         var(--sidebar-ring);
     --color-sidebar-border:

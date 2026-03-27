@@ -29,6 +29,7 @@
         "typescript-eslint": "^8.23.0"
     },
     "dependencies": {
+        "@fontsource-variable/figtree": "^5.2.10",
         "@fontsource-variable/roboto": "^5.2.10",
         "@headlessui/react": "^2.2.0",
         "@inertiajs/react": "^3.0.0",

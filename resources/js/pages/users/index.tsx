@@ -1,7 +1,9 @@
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
+import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/DataTable';
 import { Button } from '@/components/ui/button';
 
@@ -30,6 +32,8 @@ interface UsersIndexProps {
 export default function UsersIndex({ users, filters }: UsersIndexProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [deletingUser, setDeletingUser] = useState<User | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Use useDataTable to handle server-side state via Inertia URL updates
   const { onSearch, onSort, onPageChange, onPerPageChange, onReset } =
@@ -47,8 +51,28 @@ export default function UsersIndex({ users, filters }: UsersIndexProps) {
     setDialogOpen(true);
   };
 
+  const onDelete = (user: User) => {
+    setDeletingUser(user);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!deletingUser) {
+      return;
+    }
+
+    setIsDeleting(true);
+
+    router.delete(userRoutes.destroy.url({ user: deletingUser.id }), {
+      onSuccess: () => {
+        toast.success('User deleted successfully.');
+        setDeletingUser(null);
+      },
+      onFinish: () => setIsDeleting(false),
+    });
+  };
+
   // Safe to memoize columns
-  const stableColumns = useMemo(() => getColumns(onEdit), []);
+  const stableColumns = useMemo(() => getColumns(onEdit, onDelete), []);
 
   return (
     <>
@@ -86,6 +110,17 @@ export default function UsersIndex({ users, filters }: UsersIndexProps) {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         user={editingUser}
+      />
+
+      <ConfirmDialog
+        open={!!deletingUser}
+        onOpenChange={(open) => !open && setDeletingUser(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete User"
+        description={`Are you sure you want to delete ${deletingUser?.name}? This action cannot be undone.`}
+        confirmText="Delete User"
+        variant="destructive"
+        loading={isDeleting}
       />
     </>
   );

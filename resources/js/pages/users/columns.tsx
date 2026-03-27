@@ -22,7 +22,10 @@ export interface User {
   created_at: string;
 }
 
-export const getColumns = (onEdit: (user: User) => void): ColumnDef<User>[] => [
+export const getColumns = (
+  onEdit: (user: User) => void,
+  onDelete: (user: User) => void,
+): ColumnDef<User>[] => [
   {
     accessorKey: 'id',
     header: '#',
@@ -71,14 +74,7 @@ export const getColumns = (onEdit: (user: User) => void): ColumnDef<User>[] => [
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-destructive focus:text-destructive"
-              onClick={() => {
-                if (confirm('Are you sure you want to delete this user?')) {
-                  router.delete(userRoutes.destroy.url({ user: user.id }), {
-                    onSuccess: () =>
-                      toast.success('User deleted successfully.'),
-                  });
-                }
-              }}
+              onClick={() => onDelete(user)}
             >
               <Trash2 className="mr-2 h-4 w-4" />
               Delete User

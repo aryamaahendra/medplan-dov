@@ -1,10 +1,9 @@
 import {
-  type ColumnDef,
   flexRender,
   getCoreRowModel,
   useReactTable,
-  type VisibilityState,
 } from '@tanstack/react-table';
+import type { ColumnDef, VisibilityState } from '@tanstack/react-table';
 import { useState } from 'react';
 
 import {

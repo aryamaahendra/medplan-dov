@@ -1,4 +1,4 @@
-import { type ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
 
 import { DataTableColumnHeader } from '@/components/data-table/DataTableColumnHeader';
 import type { DataTableFilters } from '@/hooks/use-data-table';

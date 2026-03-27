@@ -4,7 +4,8 @@ import { DataTable } from '@/components/data-table/DataTable';
 import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import users from '@/routes/users';
-import { getUserColumns, type User } from './columns';
+import { getUserColumns } from './columns';
+import type { User } from './columns';
 
 interface PaginatedUsers {
   data: User[];

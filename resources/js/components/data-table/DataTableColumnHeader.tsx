@@ -1,4 +1,4 @@
-import { type Column } from '@tanstack/react-table';
+import type { Column } from '@tanstack/react-table';
 import {
   ArrowDownIcon,
   ArrowUpIcon,

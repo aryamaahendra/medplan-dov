@@ -49,6 +49,7 @@ export function useDataTable(options: UseDataTableOptions): UseDataTableReturn {
     (params: Record<string, string | number | undefined>) => {
       // Strip undefined / empty string values so the URL stays clean.
       const cleaned: Record<string, string | number> = {};
+
       for (const [key, value] of Object.entries(params)) {
         if (value !== undefined && value !== '') {
           cleaned[key] = value;
@@ -103,6 +104,7 @@ export function useDataTable(options: UseDataTableOptions): UseDataTableReturn {
 
       // Toggle direction if clicking the same column
       let newDirection: 'asc' | 'desc' = direction;
+
       if (currentSort === column) {
         newDirection = currentDir === 'asc' ? 'desc' : 'asc';
       }

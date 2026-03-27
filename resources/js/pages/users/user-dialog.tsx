@@ -28,7 +28,7 @@ export function UserDialog({ user, open, onOpenChange }: UserDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="pb-0 sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{isEditing ? 'Edit User' : 'Add User'}</DialogTitle>
           <DialogDescription>

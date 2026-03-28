@@ -9,13 +9,13 @@ import { Button } from '@/components/ui/button';
 
 import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
-import organizationalUnitRoutes from '@/routes/organizational-units';
+import needTypeRoutes from '@/routes/need-types';
 import { getColumns } from './columns';
-import type { OrganizationalUnit } from './columns';
-import { OrganizationalUnitDialog } from './organizational-unit-dialog';
+import type { NeedType } from './columns';
+import { NeedTypeDialog } from './need-type-dialog';
 
-interface PaginatedUnits {
-  data: OrganizationalUnit[];
+interface PaginatedNeedTypes {
+  data: NeedType[];
   current_page: number;
   last_page: number;
   per_page: number;
@@ -24,22 +24,18 @@ interface PaginatedUnits {
   to: number | null;
 }
 
-interface OrganizationalUnitsIndexProps {
-  units: PaginatedUnits;
-  allUnits: { id: number; name: string }[];
+interface NeedTypesIndexProps {
+  needTypes: PaginatedNeedTypes;
   filters: DataTableFilters;
 }
 
-export default function OrganizationalUnitsIndex({
-  units,
-  allUnits,
+export default function NeedTypesIndex({
+  needTypes,
   filters,
-}: OrganizationalUnitsIndexProps) {
+}: NeedTypesIndexProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingUnit, setEditingUnit] = useState<OrganizationalUnit | null>(
-    null,
-  );
-  const [deletingUnit, setDeletingUnit] = useState<OrganizationalUnit | null>(
+  const [editingNeedType, setEditingNeedType] = useState<NeedType | null>(null);
+  const [deletingNeedType, setDeletingNeedType] = useState<NeedType | null>(
     null,
   );
   const [isDeleting, setIsDeleting] = useState(false);
@@ -47,38 +43,38 @@ export default function OrganizationalUnitsIndex({
   // Use useDataTable to handle server-side state via Inertia URL updates
   const { onSearch, onSort, onPageChange, onPerPageChange, onReset } =
     useDataTable({
-      only: ['units', 'filters'],
+      only: ['needTypes', 'filters'],
     });
 
-  const onEdit = (unit: OrganizationalUnit) => {
-    setEditingUnit(unit);
+  const onEdit = (needType: NeedType) => {
+    setEditingNeedType(needType);
     setDialogOpen(true);
   };
 
   const onCreate = () => {
-    setEditingUnit(null);
+    setEditingNeedType(null);
     setDialogOpen(true);
   };
 
-  const onDelete = (unit: OrganizationalUnit) => {
-    setDeletingUnit(unit);
+  const onDelete = (needType: NeedType) => {
+    setDeletingNeedType(needType);
   };
 
   const handleConfirmDelete = () => {
-    if (!deletingUnit) {
+    if (!deletingNeedType) {
       return;
     }
 
     setIsDeleting(true);
 
     router.delete(
-      organizationalUnitRoutes.destroy.url({
-        organizational_unit: deletingUnit.id,
+      needTypeRoutes.destroy.url({
+        need_type: deletingNeedType.id,
       }),
       {
         onSuccess: () => {
-          toast.success('Unit organisasi berhasil dihapus.');
-          setDeletingUnit(null);
+          toast.success('Jenis kebutuhan berhasil dihapus.');
+          setDeletingNeedType(null);
         },
         onFinish: () => setIsDeleting(false),
       },
@@ -90,28 +86,28 @@ export default function OrganizationalUnitsIndex({
 
   return (
     <>
-      <Head title="Unit Organisasi" />
+      <Head title="Jenis Kebutuhan" />
 
       <div className="flex flex-col gap-6 p-4">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-foreground">
-              Unit Organisasi
+              Jenis Kebutuhan
             </h1>
             <p className="text-sm text-muted-foreground">
-              Kelola struktur organisasi, bidang, dan subbagian.
+              Kelola master data jenis kebutuhan.
             </p>
           </div>
           <Button onClick={onCreate} variant="outline" className="gap-2">
             <Plus className="h-4 w-4" />
-            Tambah Unit
+            Tambah Jenis Kebutuhan
           </Button>
         </div>
 
         <DataTable
           columns={stableColumns}
-          data={units.data}
-          meta={units}
+          data={needTypes.data}
+          meta={needTypes}
           filters={filters}
           onSearch={onSearch}
           onSort={onSort}
@@ -122,21 +118,20 @@ export default function OrganizationalUnitsIndex({
         />
       </div>
 
-      <OrganizationalUnitDialog
-        key={editingUnit?.id ?? 'new'}
+      <NeedTypeDialog
+        key={editingNeedType?.id ?? 'new'}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        unit={editingUnit}
-        allUnits={allUnits}
+        needType={editingNeedType}
       />
 
       <ConfirmDialog
-        open={!!deletingUnit}
-        onOpenChange={(open) => !open && setDeletingUnit(null)}
+        open={!!deletingNeedType}
+        onOpenChange={(open) => !open && setDeletingNeedType(null)}
         onConfirm={handleConfirmDelete}
-        title="Hapus Unit Organisasi"
-        description={`Apakah Anda yakin ingin menghapus "${deletingUnit?.name}"? Data yang dihapus akan dipindahkan ke tempat sampah (Soft Delete).`}
-        confirmText="Hapus Unit"
+        title="Hapus Jenis Kebutuhan"
+        description={`Apakah Anda yakin ingin menghapus "${deletingNeedType?.name}"? Data yang dihapus akan dipindahkan ke tempat sampah (Soft Delete).`}
+        confirmText="Hapus"
         variant="destructive"
         loading={isDeleting}
       />
@@ -144,11 +139,11 @@ export default function OrganizationalUnitsIndex({
   );
 }
 
-OrganizationalUnitsIndex.layout = {
+NeedTypesIndex.layout = {
   breadcrumbs: [
     {
-      title: 'Unit Organisasi',
-      href: organizationalUnitRoutes.index.url(),
+      title: 'Jenis Kebutuhan',
+      href: needTypeRoutes.index.url(),
     },
   ],
 };

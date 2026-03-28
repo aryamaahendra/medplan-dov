@@ -4,6 +4,7 @@ import {
   Building2,
   FolderGit2,
   LayoutGrid,
+  Layers,
   Users,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
@@ -20,6 +21,7 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import needTypes from '@/routes/need-types';
 import organizationalUnits from '@/routes/organizational-units';
 import users from '@/routes/users';
 import type { NavItem } from '@/types';
@@ -39,6 +41,11 @@ const mainNavItems: NavItem[] = [
     title: 'Unit Organisasi',
     href: organizationalUnits.index.url(),
     icon: Building2,
+  },
+  {
+    title: 'Jenis Kebutuhan',
+    href: needTypes.index.url(),
+    icon: Layers,
   },
 ];
 

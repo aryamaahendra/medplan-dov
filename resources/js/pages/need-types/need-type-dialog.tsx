@@ -32,22 +32,14 @@ export function NeedTypeDialog({
 }: NeedTypeDialogProps) {
   const isEditing = !!needType;
 
-  const {
-    data,
-    setData,
-    post,
-    patch,
-    processing,
-    errors,
-    reset,
-    clearErrors,
-  } = useForm({
-    name: needType?.name ?? '',
-    code: needType?.code ?? '',
-    description: needType?.description ?? '',
-    is_active: needType?.is_active ?? true,
-    order_column: needType?.order_column ?? 0,
-  });
+  const { data, setData, post, patch, processing, errors, reset, clearErrors } =
+    useForm({
+      name: needType?.name ?? '',
+      code: needType?.code ?? '',
+      description: needType?.description ?? '',
+      is_active: needType?.is_active ?? true,
+      order_column: needType?.order_column ?? 0,
+    });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,7 +144,9 @@ export function NeedTypeDialog({
               type="number"
               placeholder="0"
               value={data.order_column}
-              onChange={(e) => setData('order_column', parseInt(e.target.value, 10) || 0)}
+              onChange={(e) =>
+                setData('order_column', parseInt(e.target.value, 10) || 0)
+              }
               required
             />
             <InputError message={errors.order_column} />

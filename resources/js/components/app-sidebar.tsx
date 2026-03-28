@@ -2,6 +2,7 @@ import { Link } from '@inertiajs/react';
 import {
   BookOpen,
   Building2,
+  ClipboardList,
   FolderGit2,
   LayoutGrid,
   Layers,
@@ -22,6 +23,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import needTypes from '@/routes/need-types';
+import needs from '@/routes/needs';
 import organizationalUnits from '@/routes/organizational-units';
 import users from '@/routes/users';
 import type { NavItem } from '@/types';
@@ -46,6 +48,11 @@ const mainNavItems: NavItem[] = [
     title: 'Jenis Kebutuhan',
     href: needTypes.index.url(),
     icon: Layers,
+  },
+  {
+    title: 'Usulan Kebutuhan',
+    href: needs.index.url(),
+    icon: ClipboardList,
   },
 ];
 

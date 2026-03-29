@@ -31,12 +31,12 @@ export function DataTableToolbar({
       const value = filters[key];
 
       if (['page', 'per_page', 'sort', 'direction'].includes(key)) {
-return false;
-}
+        return false;
+      }
 
       if (Array.isArray(value)) {
-return value.length > 0;
-}
+        return value.length > 0;
+      }
 
       return value !== undefined && value !== null && value !== '';
     }) || Boolean(filters.sort);

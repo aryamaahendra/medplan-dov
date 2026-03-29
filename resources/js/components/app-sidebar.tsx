@@ -3,6 +3,7 @@ import {
   BookOpen,
   Building2,
   ClipboardList,
+  FileText,
   FolderGit2,
   LayoutGrid,
   Layers,
@@ -25,6 +26,7 @@ import { dashboard } from '@/routes';
 import needTypes from '@/routes/need-types';
 import needs from '@/routes/needs';
 import organizationalUnits from '@/routes/organizational-units';
+import renstras from '@/routes/renstras';
 import users from '@/routes/users';
 import type { NavItem } from '@/types';
 
@@ -56,6 +58,11 @@ const masterNavItems: NavItem[] = [
     title: 'Jenis Kebutuhan',
     href: needTypes.index.url(),
     icon: Layers,
+  },
+  {
+    title: 'Manajemen Renstra',
+    href: renstras.index.url(),
+    icon: FileText,
   },
 ];
 

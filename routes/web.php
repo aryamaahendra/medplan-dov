@@ -3,6 +3,7 @@
 use App\Http\Controllers\NeedController;
 use App\Http\Controllers\NeedTypeController;
 use App\Http\Controllers\OrganizationalUnitController;
+use App\Http\Controllers\RenstraController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
@@ -17,6 +18,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('organizational-units', OrganizationalUnitController::class)->except(['create', 'edit', 'show']);
     Route::resource('need-types', NeedTypeController::class)->except(['create', 'edit', 'show']);
     Route::resource('needs', NeedController::class)->except(['create', 'edit', 'show']);
+    Route::resource('renstras', RenstraController::class)->except(['create', 'edit', 'show']);
 });
 
 require __DIR__.'/settings.php';

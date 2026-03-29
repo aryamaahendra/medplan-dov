@@ -125,8 +125,8 @@ export default function NeedsIndex({
 
   const getFilterArray = (value: string | string[] | undefined) => {
     if (!value) {
-return [];
-}
+      return [];
+    }
 
     return Array.isArray(value) ? value : [value];
   };

@@ -76,6 +76,119 @@ test('index can search needs by title', function () {
         );
 });
 
+test('index can filter needs by year', function () {
+    $user = User::factory()->create();
+    $unit = OrganizationalUnit::factory()->create();
+    $needType = NeedType::factory()->create();
+
+    Need::factory()->create(['year' => 2024, 'organizational_unit_id' => $unit->id, 'need_type_id' => $needType->id]);
+    Need::factory()->create(['year' => 2025, 'organizational_unit_id' => $unit->id, 'need_type_id' => $needType->id]);
+    Need::factory()->create(['year' => 2026, 'organizational_unit_id' => $unit->id, 'need_type_id' => $needType->id]);
+
+    $this->actingAs($user)
+        ->get(route('needs.index', ['year' => [2024]]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('needs.data', 1)
+            ->where('needs.data.0.year', 2024)
+        );
+
+    $this->actingAs($user)
+        ->get(route('needs.index', ['year' => [2025, 2026]]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('needs.data', 2)
+        );
+});
+
+test('index can filter needs by status', function () {
+    $user = User::factory()->create();
+    $unit = OrganizationalUnit::factory()->create();
+    $needType = NeedType::factory()->create();
+
+    Need::factory()->create(['status' => 'draft', 'organizational_unit_id' => $unit->id, 'need_type_id' => $needType->id]);
+    Need::factory()->create(['status' => 'submitted', 'organizational_unit_id' => $unit->id, 'need_type_id' => $needType->id]);
+
+    $this->actingAs($user)
+        ->get(route('needs.index', ['status' => ['draft']]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('needs.data', 1)
+            ->where('needs.data.0.status', 'draft')
+        );
+});
+
+test('index can filter needs by need_type_id and organizational_unit_id', function () {
+    $user = User::factory()->create();
+    $unit1 = OrganizationalUnit::factory()->create();
+    $unit2 = OrganizationalUnit::factory()->create();
+    $type1 = NeedType::factory()->create();
+    $type2 = NeedType::factory()->create();
+
+    Need::factory()->create(['organizational_unit_id' => $unit1->id, 'need_type_id' => $type1->id]);
+    Need::factory()->create(['organizational_unit_id' => $unit2->id, 'need_type_id' => $type2->id]);
+
+    $this->actingAs($user)
+        ->get(route('needs.index', ['need_type_id' => [$type1->id]]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->has('needs.data', 1)->where('needs.data.0.need_type_id', $type1->id));
+
+    $this->actingAs($user)
+        ->get(route('needs.index', ['organizational_unit_id' => [$unit2->id]]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->has('needs.data', 1)->where('needs.data.0.organizational_unit_id', $unit2->id));
+});
+
+test('index props only include active need types', function () {
+    $user = User::factory()->create();
+    
+    $activeType = NeedType::factory()->create(['name' => 'Active Type', 'is_active' => true]);
+    NeedType::factory()->create(['name' => 'Inactive Type', 'is_active' => false]);
+
+    $this->actingAs($user)
+        ->get(route('needs.index'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('needTypes', 1)
+            ->where('needTypes.0.name', 'Active Type')
+        );
+});
+
+test('index loads relationships for needs', function () {
+    $user = User::factory()->create();
+    $unit = OrganizationalUnit::factory()->create();
+    $needType = NeedType::factory()->create();
+
+    Need::factory()->create([
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $needType->id,
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('needs.index'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('needs.data.0.organizational_unit')
+            ->has('needs.data.0.need_type')
+        );
+});
+
+test('index does not show soft-deleted needs', function () {
+    $user = User::factory()->create();
+    $unit = OrganizationalUnit::factory()->create();
+    $needType = NeedType::factory()->create();
+
+    $need = Need::factory()->create(['organizational_unit_id' => $unit->id, 'need_type_id' => $needType->id]);
+    $need->delete();
+
+    $this->actingAs($user)
+        ->get(route('needs.index'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('needs.data', 0)
+        );
+});
+
 // ─── Store ────────────────────────────────────────────────────────────────────
 
 test('store creates a new need', function () {
@@ -132,6 +245,22 @@ test('store validates status must be a valid value', function () {
         ->assertSessionHasErrors(['status']);
 });
 
+test('store validations on numeric fields ensuring values cannot be negative', function () {
+    $user = User::factory()->create();
+    $unit = OrganizationalUnit::factory()->create();
+    $needType = NeedType::factory()->create();
+
+    $payload = validNeedPayload($unit, $needType, [
+        'volume' => -5,
+        'unit_price' => -100,
+        'total_price' => -500,
+    ]);
+
+    $this->actingAs($user)
+        ->post(route('needs.store'), $payload)
+        ->assertSessionHasErrors(['volume', 'unit_price', 'total_price']);
+});
+
 // ─── Update ───────────────────────────────────────────────────────────────────
 
 test('update modifies an existing need', function () {
@@ -150,6 +279,49 @@ test('update modifies an existing need', function () {
         ->assertSessionHas('success', 'Usulan kebutuhan berhasil diperbarui.');
 
     expect($need->fresh()->title)->toBe('Judul Baru');
+});
+
+test('update validates required fields', function () {
+    $user = User::factory()->create();
+    $unit = OrganizationalUnit::factory()->create();
+    $needType = NeedType::factory()->create();
+    $need = Need::factory()->create([
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $needType->id,
+    ]);
+
+    $this->actingAs($user)
+        ->put(route('needs.update', $need), [])
+        ->assertSessionHasErrors([
+            'organizational_unit_id',
+            'need_type_id',
+            'year',
+            'title',
+            'volume',
+            'unit',
+            'unit_price',
+            'total_price',
+        ]);
+});
+
+test('update numerical fields cannot be negative', function () {
+    $user = User::factory()->create();
+    $unit = OrganizationalUnit::factory()->create();
+    $needType = NeedType::factory()->create();
+    $need = Need::factory()->create([
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $needType->id,
+    ]);
+
+    $payload = validNeedPayload($unit, $needType, [
+        'volume' => -5,
+        'unit_price' => -100,
+        'total_price' => -500,
+    ]);
+
+    $this->actingAs($user)
+        ->put(route('needs.update', $need), $payload)
+        ->assertSessionHasErrors(['volume', 'unit_price', 'total_price']);
 });
 
 // ─── Destroy ─────────────────────────────────────────────────────────────────

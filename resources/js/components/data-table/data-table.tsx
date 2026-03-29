@@ -20,9 +20,9 @@ import {
 } from '@/components/ui/table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import { cn } from '@/lib/utils';
-import { DataTablePagination } from './DataTablePagination';
-import type { PaginationMeta } from './DataTablePagination';
-import { DataTableToolbar } from './DataTableToolbar';
+import { DataTablePagination } from './data-table-pagination';
+import type { PaginationMeta } from './data-table-pagination';
+import { DataTableToolbar } from './data-table-toolbar';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

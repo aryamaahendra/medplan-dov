@@ -10,7 +10,7 @@ export interface DataTableFilters {
   direction?: 'asc' | 'desc' | '';
   per_page?: number;
   page?: number;
-  [key: string]: string | number | undefined;
+  [key: string]: string | number | string[] | undefined;
 }
 
 interface UseDataTableOptions {
@@ -39,13 +39,18 @@ export function useDataTable({
    * Performs the Inertia router visit.
    */
   const visit = useCallback(
-    (params: Record<string, string | number | undefined>) => {
+    (params: Record<string, string | number | string[] | undefined>) => {
       // Clean up empty params
-      const cleaned: Record<string, string | number> = {};
+      const cleaned: Record<string, string | number | string[]> = {};
 
       for (const [key, value] of Object.entries(params)) {
-        if (value !== undefined && value !== null && value !== '') {
-          cleaned[key] = value;
+        if (
+          value !== undefined &&
+          value !== null &&
+          value !== '' &&
+          !(Array.isArray(value) && value.length === 0)
+        ) {
+          cleaned[key] = value as string | number | string[];
         }
       }
 
@@ -65,12 +70,30 @@ export function useDataTable({
   const mergeParams = useCallback(
     (newParams: DataTableFilters) => {
       const searchParams = new URLSearchParams(window.location.search);
-      const currentParams: Record<string, string | number | undefined> = {};
 
-      searchParams.forEach((value, key) => {
-        currentParams[key] = value;
-      });
+      // Group all URL keys by their base name, stripping any bracket suffix.
+      // Inertia serializes arrays as year[0]=2024&year[1]=2025 (indexed) OR
+      // as year[]=2024&year[]=2025 (PHP-style). Both must collapse to "year"
+      // so that newParams can cleanly replace them without stale keys leaking.
+      const groupedParams = new Map<string, string[]>();
 
+      for (const rawKey of searchParams.keys()) {
+        const baseKey = rawKey.includes('[') ? rawKey.split('[')[0] : rawKey;
+        const values = searchParams.getAll(rawKey);
+        const existing = groupedParams.get(baseKey) ?? [];
+        groupedParams.set(baseKey, [...existing, ...values]);
+      }
+
+      const currentParams: Record<
+        string,
+        string | number | string[] | undefined
+      > = {};
+
+      for (const [baseKey, values] of groupedParams) {
+        currentParams[baseKey] = values.length > 1 ? values : values[0];
+      }
+
+      // newParams fully replaces any matching key from currentParams
       visit({ ...currentParams, ...newParams });
     },
     [visit],

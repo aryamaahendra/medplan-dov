@@ -27,6 +27,10 @@ class NeedController extends Controller
         $needs = $this->applyDataTable(
             Need::query()
                 ->with(['organizationalUnit:id,name', 'needType:id,name'])
+                ->when($request->input('year'), fn ($q, $v) => $q->whereIn('year', (array) $v))
+                ->when($request->input('status'), fn ($q, $v) => $q->whereIn('status', (array) $v))
+                ->when($request->input('need_type_id'), fn ($q, $v) => $q->whereIn('need_type_id', (array) $v))
+                ->when($request->input('organizational_unit_id'), fn ($q, $v) => $q->whereIn('organizational_unit_id', (array) $v))
                 ->orderBy('created_at', 'desc'),
             $request,
             self::SEARCH_COLUMNS,
@@ -37,7 +41,12 @@ class NeedController extends Controller
             'needs' => $needs,
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
-            'filters' => $this->dataTableFilters($request),
+            'filters' => array_merge($this->dataTableFilters($request), [
+                'year' => $request->input('year'),
+                'status' => $request->input('status'),
+                'need_type_id' => $request->input('need_type_id'),
+                'organizational_unit_id' => $request->input('organizational_unit_id'),
+            ]),
         ]);
     }
 

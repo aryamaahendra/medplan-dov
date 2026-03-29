@@ -26,7 +26,20 @@ export function DataTableToolbar({
   searchPlaceholder = 'Search...',
   children,
 }: DataTableToolbarProps) {
-  const isFiltered = Boolean(filters.search) || Boolean(filters.sort);
+  const isFiltered =
+    Object.keys(filters).some((key) => {
+      const value = filters[key];
+
+      if (['page', 'per_page', 'sort', 'direction'].includes(key)) {
+return false;
+}
+
+      if (Array.isArray(value)) {
+return value.length > 0;
+}
+
+      return value !== undefined && value !== null && value !== '';
+    }) || Boolean(filters.sort);
 
   return (
     <div className="flex items-center justify-between gap-4">

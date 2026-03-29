@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@/components/confirm-dialog';
-import { DataTable } from '@/components/data-table/DataTable';
+import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
 
 import { useDataTable } from '@/hooks/use-data-table';

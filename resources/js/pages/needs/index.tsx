@@ -91,8 +91,8 @@ export default function NeedsIndex({
               Kelola data usulan kebutuhan per unit kerja.
             </p>
           </div>
-          <Button onClick={onCreate} variant="outline" className="gap-2">
-            <Plus className="h-4 w-4" />
+          <Button onClick={onCreate}>
+            <Plus />
             Tambah Usulan
           </Button>
         </div>

@@ -86,9 +86,9 @@ export default function UsersIndex({ users, filters }: UsersIndexProps) {
               Manage and browse all registered users.
             </p>
           </div>
-          <Button onClick={onCreate} variant="outline">
-            <Plus className="h-4 w-4" />
-            Add User
+          <Button onClick={onCreate}>
+            <Plus />
+            Tambah User
           </Button>
         </div>
 

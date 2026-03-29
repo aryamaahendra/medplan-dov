@@ -35,6 +35,14 @@ const mainNavItems: NavItem[] = [
     icon: LayoutGrid,
   },
   {
+    title: 'Usulan Kebutuhan',
+    href: needs.index.url(),
+    icon: ClipboardList,
+  },
+];
+
+const masterNavItems: NavItem[] = [
+  {
     title: 'Users',
     href: users.index.url(),
     icon: Users,
@@ -48,11 +56,6 @@ const mainNavItems: NavItem[] = [
     title: 'Jenis Kebutuhan',
     href: needTypes.index.url(),
     icon: Layers,
-  },
-  {
-    title: 'Usulan Kebutuhan',
-    href: needs.index.url(),
-    icon: ClipboardList,
   },
 ];
 
@@ -85,7 +88,8 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        <NavMain items={mainNavItems} />
+        <NavMain items={mainNavItems} title="Main Menu" />
+        <NavMain items={masterNavItems} title="Master Data" />
       </SidebarContent>
 
       <SidebarFooter>

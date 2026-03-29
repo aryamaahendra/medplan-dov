@@ -1,8 +1,12 @@
-import { XIcon } from 'lucide-react';
+import { Search as SearchIcon, XIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from '@/components/ui/input-group';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 
 interface DataTableToolbarProps {
@@ -27,13 +31,17 @@ export function DataTableToolbar({
   return (
     <div className="flex items-center justify-between gap-4">
       <div className="flex flex-1 items-center gap-2">
-        <Input
-          id="data-table-search"
-          placeholder={searchPlaceholder}
-          defaultValue={filters.search ?? ''}
-          onChange={(e) => onSearch(e.target.value)}
-          className="h-8 w-full max-w-xs"
-        />
+        <InputGroup className="max-w-xs">
+          <InputGroupInput
+            id="data-table-search"
+            placeholder={searchPlaceholder}
+            defaultValue={filters.search ?? ''}
+            onChange={(e) => onSearch(e.target.value)}
+          />
+          <InputGroupAddon>
+            <SearchIcon />
+          </InputGroupAddon>
+        </InputGroup>
 
         {isFiltered && (
           <Button

@@ -70,4 +70,14 @@ class RenstraController extends Controller
         return redirect()->back()
             ->with('success', 'Renstra berhasil dihapus.');
     }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Renstra $renstra): Response
+    {
+        return Inertia::render('renstras/show', [
+            'renstra' => $renstra->load('indicators.targets'),
+        ]);
+    }
 }

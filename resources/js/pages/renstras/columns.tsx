@@ -1,5 +1,6 @@
+import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { Edit, MoreHorizontal, Trash2 } from 'lucide-react';
+import { Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
 
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import renstraRoutes from '@/routes/renstras';
 import type { Renstra } from '@/types';
 
 export const getColumns = (
@@ -82,6 +84,12 @@ export const getColumns = (
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+            <DropdownMenuItem asChild>
+              <Link href={renstraRoutes.show.url({ renstra: renstra.id })}>
+                <Eye className="h-4 w-4" />
+                Lihat Detail
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onEdit(renstra)}>
               <Edit className="h-4 w-4" />
               Edit

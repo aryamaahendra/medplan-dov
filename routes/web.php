@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\IndicatorController;
 use App\Http\Controllers\NeedController;
 use App\Http\Controllers\NeedTypeController;
 use App\Http\Controllers\OrganizationalUnitController;
@@ -18,7 +19,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('organizational-units', OrganizationalUnitController::class)->except(['create', 'edit', 'show']);
     Route::resource('need-types', NeedTypeController::class)->except(['create', 'edit', 'show']);
     Route::resource('needs', NeedController::class)->except(['create', 'edit', 'show']);
-    Route::resource('renstras', RenstraController::class)->except(['create', 'edit', 'show']);
+    Route::resource('renstras', RenstraController::class)->except(['create', 'edit']);
+    Route::resource('indicators', IndicatorController::class)->except(['index', 'create', 'edit', 'show']);
 });
 
 require __DIR__.'/settings.php';

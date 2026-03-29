@@ -21,6 +21,11 @@ class Renstra extends Model
         'is_active' => 'boolean',
     ];
 
+    public function indicators()
+    {
+        return $this->hasMany(Indicator::class);
+    }
+
     protected static function boot()
     {
         parent::boot();

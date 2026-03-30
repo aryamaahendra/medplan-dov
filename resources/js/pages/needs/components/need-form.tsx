@@ -1,18 +1,10 @@
-import { useForm } from '@inertiajs/react';
-import type { FormEvent } from 'react';
+import { router, useForm } from '@inertiajs/react';
 import { toast } from 'sonner';
 
 import NeedController from '@/actions/App/Http/Controllers/NeedController';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -24,8 +16,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
+import needRoutes from '@/routes/needs';
 
-import type { Need } from './columns';
+import type { Need } from '../columns';
 
 const UNIT_OPTIONS = [
   'pcs',
@@ -47,24 +41,22 @@ const STATUS_OPTIONS = [
   { value: 'rejected', label: 'Ditolak' },
 ] as const;
 
-interface NeedDialogProps {
+interface NeedFormProps {
   need?: Need | null;
   organizationalUnits: { id: number; name: string }[];
   needTypes: { id: number; name: string }[];
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  className?: string;
 }
 
-export function NeedDialog({
+export function NeedForm({
   need,
   organizationalUnits,
   needTypes,
-  open,
-  onOpenChange,
-}: NeedDialogProps) {
+  className,
+}: NeedFormProps) {
   const isEditing = !!need;
 
-  const { data, setData, submit, processing, errors, reset } = useForm({
+  const { data, setData, post, patch, processing, errors } = useForm({
     organizational_unit_id: need?.organizational_unit_id?.toString() ?? '',
     need_type_id: need?.need_type_id?.toString() ?? '',
     year: need?.year?.toString() ?? new Date().getFullYear().toString(),
@@ -79,68 +71,52 @@ export function NeedDialog({
     status: need?.status ?? 'draft',
   });
 
-  const handleVolumeChange = (value: string) => {
-    const vol = parseFloat(value) || 0;
-    const price = parseFloat(data.unit_price) || 0;
-    setData({
-      ...data,
-      volume: value,
-      total_price: (vol * price).toFixed(2),
-    });
-  };
-
-  const handleUnitPriceChange = (value: string) => {
-    const price = parseFloat(value) || 0;
-    const vol = parseFloat(data.volume) || 0;
-    setData({
-      ...data,
-      unit_price: value,
-      total_price: (vol * price).toFixed(2),
-    });
-  };
-
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const options = isEditing
-      ? NeedController.update.form({ need: need.id })
-      : NeedController.store.form();
 
-    submit(options.method as 'post' | 'put' | 'patch', options.action, {
+    const options = {
       onSuccess: () => {
-        onOpenChange(false);
-        reset();
         toast.success(
           isEditing
             ? 'Usulan kebutuhan berhasil diperbarui.'
             : 'Usulan kebutuhan berhasil dibuat.',
         );
       },
-    });
+    };
+
+    if (isEditing) {
+      patch(NeedController.update.url({ need: need.id }), options);
+    } else {
+      post(NeedController.store.url(), options);
+    }
+  };
+
+  const handleVolumeChange = (value: string) => {
+    const vol = parseFloat(value) || 0;
+    const price = parseFloat(data.unit_price) || 0;
+    setData((d: typeof data) => ({
+      ...d,
+      volume: value,
+      total_price: (vol * price).toFixed(2),
+    }));
+  };
+
+  const handleUnitPriceChange = (value: string) => {
+    const price = parseFloat(value) || 0;
+    const vol = parseFloat(data.volume) || 0;
+    setData((d: typeof data) => ({
+      ...d,
+      unit_price: value,
+      total_price: (vol * price).toFixed(2),
+    }));
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(open) => {
-        onOpenChange(open);
-      }}
-    >
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>
-            {isEditing ? 'Edit Usulan Kebutuhan' : 'Tambah Usulan Kebutuhan'}
-          </DialogTitle>
-          <DialogDescription>
-            {isEditing
-              ? `Perbarui detail untuk usulan "${need.title}".`
-              : 'Tambahkan usulan kebutuhan baru ke dalam sistem.'}
-          </DialogDescription>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4 py-2">
-          {/* Unit Kerja & Jenis Kebutuhan */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="grid gap-2">
+    <Card className={cn('w-full max-w-3xl', className)}>
+      <form onSubmit={handleSubmit}>
+        <CardContent className="space-y-4 py-4">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <div className="space-y-2">
               <Label htmlFor="organizational_unit_id">Unit Kerja</Label>
               <Select
                 value={data.organizational_unit_id}
@@ -160,7 +136,7 @@ export function NeedDialog({
               <InputError message={errors.organizational_unit_id} />
             </div>
 
-            <div className="grid gap-2">
+            <div className="space-y-2">
               <Label htmlFor="need_type_id">Jenis Kebutuhan</Label>
               <Select
                 value={data.need_type_id}
@@ -181,9 +157,8 @@ export function NeedDialog({
             </div>
           </div>
 
-          {/* Tahun & Status */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="grid gap-2">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <div className="space-y-2">
               <Label htmlFor="year">Tahun</Label>
               <Input
                 id="year"
@@ -198,7 +173,7 @@ export function NeedDialog({
               <InputError message={errors.year} />
             </div>
 
-            <div className="grid gap-2">
+            <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
               <Select
                 value={data.status}
@@ -219,8 +194,7 @@ export function NeedDialog({
             </div>
           </div>
 
-          {/* Judul Usulan */}
-          <div className="grid gap-2">
+          <div className="space-y-2">
             <Label htmlFor="title">Judul Usulan</Label>
             <Input
               id="title"
@@ -229,13 +203,11 @@ export function NeedDialog({
               value={data.title}
               onChange={(e) => setData('title', e.target.value)}
               required
-              autoFocus
             />
             <InputError message={errors.title} />
           </div>
 
-          {/* Deskripsi */}
-          <div className="grid gap-2">
+          <div className="space-y-2">
             <Label htmlFor="description">Detail Usulan</Label>
             <Textarea
               id="description"
@@ -243,14 +215,13 @@ export function NeedDialog({
               placeholder="Uraikan detail usulan kebutuhan..."
               value={data.description}
               onChange={(e) => setData('description', e.target.value)}
-              rows={3}
+              rows={4}
             />
             <InputError message={errors.description} />
           </div>
 
-          {/* Kondisi Saat Ini & Kondisi Yang Dibutuhkan */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="grid gap-2">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <div className="space-y-2">
               <Label htmlFor="current_condition">Kondisi Saat Ini</Label>
               <Textarea
                 id="current_condition"
@@ -258,12 +229,12 @@ export function NeedDialog({
                 placeholder="Jelaskan kondisi saat ini..."
                 value={data.current_condition}
                 onChange={(e) => setData('current_condition', e.target.value)}
-                rows={3}
+                rows={4}
               />
               <InputError message={errors.current_condition} />
             </div>
 
-            <div className="grid gap-2">
+            <div className="space-y-2">
               <Label htmlFor="required_condition">
                 Kondisi Yang Dibutuhkan
               </Label>
@@ -273,22 +244,21 @@ export function NeedDialog({
                 placeholder="Jelaskan kondisi yang dibutuhkan..."
                 value={data.required_condition}
                 onChange={(e) => setData('required_condition', e.target.value)}
-                rows={3}
+                rows={4}
               />
               <InputError message={errors.required_condition} />
             </div>
           </div>
 
-          {/* Satuan (Radio) */}
-          <div className="grid gap-2">
+          <div className="space-y-3">
             <Label>Satuan</Label>
             <RadioGroup
               value={data.unit}
               onValueChange={(v) => setData('unit', v)}
-              className="flex flex-wrap gap-x-4 gap-y-2"
+              className="flex flex-wrap gap-x-3 gap-y-3"
             >
               {UNIT_OPTIONS.map((u) => (
-                <div key={u} className="flex items-center gap-1.5">
+                <div key={u} className="flex items-center space-x-2">
                   <RadioGroupItem value={u} id={`unit-${u}`} />
                   <Label
                     htmlFor={`unit-${u}`}
@@ -302,9 +272,8 @@ export function NeedDialog({
             <InputError message={errors.unit} />
           </div>
 
-          {/* Volume, Harga Satuan, Total */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="grid gap-2">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            <div className="space-y-2">
               <Label htmlFor="volume">Jumlah (Volume)</Label>
               <Input
                 id="volume"
@@ -320,7 +289,7 @@ export function NeedDialog({
               <InputError message={errors.volume} />
             </div>
 
-            <div className="grid gap-2">
+            <div className="space-y-2">
               <Label htmlFor="unit_price">Harga Satuan (Rp)</Label>
               <Input
                 id="unit_price"
@@ -336,7 +305,7 @@ export function NeedDialog({
               <InputError message={errors.unit_price} />
             </div>
 
-            <div className="grid gap-2">
+            <div className="space-y-2">
               <Label htmlFor="total_price">Total Harga (Rp)</Label>
               <Input
                 id="total_price"
@@ -350,21 +319,20 @@ export function NeedDialog({
               <InputError message={errors.total_price} />
             </div>
           </div>
-
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              Batal
-            </Button>
-            <Button type="submit" disabled={processing}>
-              {isEditing ? 'Simpan Perubahan' : 'Tambah Usulan'}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </CardContent>
+        <CardFooter className="flex justify-end gap-3 border-t bg-muted/50">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.visit(needRoutes.index.url())}
+          >
+            Batal
+          </Button>
+          <Button type="submit" disabled={processing} size="lg">
+            {isEditing ? 'Simpan Perubahan' : 'Tambah Usulan'}
+          </Button>
+        </CardFooter>
+      </form>
+    </Card>
   );
 }

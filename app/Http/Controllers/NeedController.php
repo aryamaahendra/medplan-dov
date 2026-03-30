@@ -58,6 +58,23 @@ class NeedController extends Controller
             ->with('success', 'Usulan kebutuhan berhasil dibuat.');
     }
 
+    public function create(): Response
+    {
+        return Inertia::render('needs/create', [
+            'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name'])->get(),
+            'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
+        ]);
+    }
+
+    public function edit(Need $need): Response
+    {
+        return Inertia::render('needs/edit', [
+            'need' => $need,
+            'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name'])->get(),
+            'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
+        ]);
+    }
+
     public function update(UpdateNeedRequest $request, Need $need)
     {
         $need->update($request->validated());

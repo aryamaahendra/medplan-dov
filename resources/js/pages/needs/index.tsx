@@ -14,7 +14,6 @@ import needRoutes from '@/routes/needs';
 
 import { getColumns } from './columns';
 import type { Need } from './columns';
-import { NeedDialog } from './need-dialog';
 
 interface PaginatedNeeds {
   data: Need[];
@@ -44,8 +43,6 @@ export default function NeedsIndex({
   needTypes,
   filters,
 }: NeedsIndexProps) {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingNeed, setEditingNeed] = useState<Need | null>(null);
   const [deletingNeed, setDeletingNeed] = useState<Need | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -59,13 +56,11 @@ export default function NeedsIndex({
   } = useDataTable({ only: ['needs', 'filters'] });
 
   const onEdit = (need: Need) => {
-    setEditingNeed(need);
-    setDialogOpen(true);
+    router.visit(needRoutes.edit.url({ need: need.id }));
   };
 
   const onCreate = () => {
-    setEditingNeed(null);
-    setDialogOpen(true);
+    router.visit(needRoutes.create.url());
   };
 
   const onDelete = (need: Need) => {
@@ -196,15 +191,6 @@ export default function NeedsIndex({
           }
         />
       </div>
-
-      <NeedDialog
-        key={editingNeed?.id ?? 'new'}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        need={editingNeed}
-        organizationalUnits={organizationalUnits}
-        needTypes={needTypes}
-      />
 
       <ConfirmDialog
         open={!!deletingNeed}

@@ -93,10 +93,7 @@ export function IndicatorTable({
             </TableRow>
             <TableRow className="hover:bg-background">
               {years.map((year) => (
-                <TableHead
-                  key={year}
-                  className="w-1 border-r text-center text-xs"
-                >
+                <TableHead key={year} className="w-1 border-r text-center">
                   {year}
                 </TableHead>
               ))}
@@ -126,7 +123,7 @@ export function IndicatorTable({
                       </div>
                     )}
                   </TableCell>
-                  <TableCell className="border-r text-center text-sm">
+                  <TableCell className="border-r text-center font-mono">
                     {indicator.baseline || '-'}
                   </TableCell>
                   {years.map((year) => {
@@ -137,7 +134,7 @@ export function IndicatorTable({
                     return (
                       <TableCell
                         key={year}
-                        className="border-r text-center font-mono text-xs"
+                        className="border-r text-center font-mono"
                       >
                         {target?.target || '-'}
                       </TableCell>

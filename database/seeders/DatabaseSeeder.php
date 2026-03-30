@@ -25,8 +25,7 @@ class DatabaseSeeder extends Seeder
             NeedTypeSeeder::class,
             RenstraSeeder::class,
             TujuanSeeder::class,
-            IndicatorSeeder::class,
-            SasaranSeeder::class,
+            RenstraRSUDSeeder::class,
         ]);
     }
 }

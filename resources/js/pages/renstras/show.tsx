@@ -1,18 +1,22 @@
 import { Head, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
+import { LayoutGrid, Table as TableIcon } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 import SasaranController from '@/actions/App/Http/Controllers/SasaranController';
 import TujuanController from '@/actions/App/Http/Controllers/TujuanController';
 import { ConfirmDialog } from '@/components/confirm-dialog';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import renstraRoutes from '@/routes/renstras';
 import type { Indicator, Renstra, Sasaran, Tujuan } from '@/types';
 
 import { IndicatorDialog } from '../indicators/components/indicator-dialog';
 import { RenstraInfo } from './components/renstra-info';
 import { RenstraSection } from './components/renstra-section';
+import { RenstraTable } from './components/renstra-table';
 import { SasaranDialog } from './components/sasaran-dialog';
 import { TujuanCard } from './components/tujuan-card';
 import { TujuanDialog } from './components/tujuan-dialog';
@@ -44,6 +48,8 @@ export default function RenstraShow({ renstra }: RenstraShowProps) {
 
   const [deletingTujuan, setDeletingTujuan] = useState<Tujuan | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const [view, setView] = useState<'card' | 'table'>('card');
 
   // Tujuan Handlers
   const onCreateTujuan = () => {
@@ -158,37 +164,62 @@ export default function RenstraShow({ renstra }: RenstraShowProps) {
         <RenstraSection
           title="Tujuan dan Indikator Kinerja"
           description="Daftar Tujuan strategis beserta indikatornya."
-          action={{
-            label: 'Tambah Tujuan',
-            icon: <Plus className="mr-2 h-4 w-4" />,
-            onClick: onCreateTujuan,
-          }}
-        >
-          <div className="flex flex-col gap-6">
-            {!renstra.tujuans || renstra.tujuans.length === 0 ? (
-              <div className="rounded-md border p-8 text-center text-muted-foreground">
-                Belum ada tujuan strategis.
+          action={
+            <div className="flex items-center gap-2">
+              <ToggleGroup
+                type="single"
+                value={view}
+                onValueChange={(val) => val && setView(val as 'card' | 'table')}
+                variant="outline"
+              >
+                <ToggleGroupItem value="card" aria-label="Card View">
+                  <LayoutGrid className="mr-2 h-4 w-4" />
+                  Card
+                </ToggleGroupItem>
+                <ToggleGroupItem value="table" aria-label="Table View">
+                  <TableIcon className="mr-2 h-4 w-4" />
+                  Table
+                </ToggleGroupItem>
+              </ToggleGroup>
+              <div className="flex items-center">
+                <Separator orientation="vertical" className="h-4" />
               </div>
-            ) : (
-              renstra.tujuans.map((tujuan) => (
-                <TujuanCard
-                  key={tujuan.id}
-                  tujuan={tujuan}
-                  yearStart={renstra.year_start}
-                  yearEnd={renstra.year_end}
-                  onCreateSasaran={onCreateSasaran}
-                  onCreateIndicator={onCreateIndicator}
-                  onEditTujuan={onEditTujuan}
-                  onDeleteTujuan={setDeletingTujuan}
-                  onEditIndicator={onEditIndicator}
-                  onCreateSasaranIndicator={onCreateIndicatorForSasaran}
-                  onEditSasaran={onEditSasaran}
-                  onDeleteSasaran={setDeletingSasaran}
-                  onEditSasaranIndicator={onEditIndicatorForSasaran}
-                />
-              ))
-            )}
-          </div>
+              <Button onClick={onCreateTujuan}>
+                <Plus />
+                Tambah Tujuan
+              </Button>
+            </div>
+          }
+        >
+          {view === 'card' ? (
+            <div className="flex flex-col gap-6">
+              {!renstra.tujuans || renstra.tujuans.length === 0 ? (
+                <div className="rounded-md border p-8 text-center text-muted-foreground">
+                  Belum ada tujuan strategis.
+                </div>
+              ) : (
+                renstra.tujuans.map((tujuan) => (
+                  <TujuanCard
+                    key={tujuan.id}
+                    tujuan={tujuan}
+                    yearStart={renstra.year_start}
+                    yearEnd={renstra.year_end}
+                    onCreateSasaran={onCreateSasaran}
+                    onCreateIndicator={onCreateIndicator}
+                    onEditTujuan={onEditTujuan}
+                    onDeleteTujuan={setDeletingTujuan}
+                    onEditIndicator={onEditIndicator}
+                    onCreateSasaranIndicator={onCreateIndicatorForSasaran}
+                    onEditSasaran={onEditSasaran}
+                    onDeleteSasaran={setDeletingSasaran}
+                    onEditSasaranIndicator={onEditIndicatorForSasaran}
+                  />
+                ))
+              )}
+            </div>
+          ) : (
+            <RenstraTable renstra={renstra} />
+          )}
         </RenstraSection>
       </div>
 

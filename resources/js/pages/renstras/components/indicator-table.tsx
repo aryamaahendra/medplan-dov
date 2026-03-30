@@ -87,9 +87,7 @@ export function IndicatorTable({
               >
                 Target
               </TableHead>
-              <TableHead rowSpan={2} className="w-1 text-center font-semibold">
-                Aksi
-              </TableHead>
+              <TableHead rowSpan={2} className="w-1 text-center"></TableHead>
             </TableRow>
             <TableRow className="hover:bg-background">
               {years.map((year) => (

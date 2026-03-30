@@ -13,6 +13,7 @@ class Indicator extends Model
 
     protected $fillable = [
         'tujuan_id',
+        'sasaran_id',
         'name',
         'baseline',
         'description',
@@ -21,6 +22,11 @@ class Indicator extends Model
     public function tujuan(): BelongsTo
     {
         return $this->belongsTo(Tujuan::class);
+    }
+
+    public function sasaran(): BelongsTo
+    {
+        return $this->belongsTo(Sasaran::class);
     }
 
     public function targets(): HasMany

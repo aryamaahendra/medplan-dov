@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             RenstraSeeder::class,
             TujuanSeeder::class,
             IndicatorSeeder::class,
+            SasaranSeeder::class,
         ]);
     }
 }

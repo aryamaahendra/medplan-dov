@@ -2,33 +2,34 @@
 
 namespace App\Models;
 
-use Database\Factories\TujuanFactory;
+use Database\Factories\SasaranFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Tujuan extends Model
+class Sasaran extends Model
 {
-    /** @use HasFactory<TujuanFactory> */
+    /** @use HasFactory<SasaranFactory> */
     use HasFactory;
 
     protected $fillable = [
-        'renstra_id',
+        'tujuan_id',
         'name',
         'description',
     ];
 
-    public function renstra()
+    /**
+     * Get the tujuan that owns the sasaran.
+     */
+    public function tujuan()
     {
-        return $this->belongsTo(Renstra::class);
+        return $this->belongsTo(Tujuan::class);
     }
 
+    /**
+     * Get the indicators for the sasaran.
+     */
     public function indicators()
     {
         return $this->hasMany(Indicator::class);
-    }
-
-    public function sasarans()
-    {
-        return $this->hasMany(Sasaran::class);
     }
 }

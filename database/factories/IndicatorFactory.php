@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Indicator;
+use App\Models\Sasaran;
 use App\Models\Tujuan;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -18,8 +19,11 @@ class IndicatorFactory extends Factory
      */
     public function definition(): array
     {
+        $forTujuan = $this->faker->boolean();
+
         return [
-            'tujuan_id' => Tujuan::factory(),
+            'tujuan_id' => $forTujuan ? Tujuan::factory() : null,
+            'sasaran_id' => ! $forTujuan ? Sasaran::factory() : null,
             'name' => $this->faker->sentence(3),
             'baseline' => $this->faker->randomDigit().'%',
             'description' => $this->faker->paragraph(),

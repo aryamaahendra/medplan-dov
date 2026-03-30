@@ -15,10 +15,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import type { Indicator, Tujuan } from '@/types';
+import type { Indicator, Sasaran, Tujuan } from '@/types';
 
 interface IndicatorDialogProps {
-  tujuan: Tujuan;
+  tujuan?: Tujuan | null;
+  sasaran?: Sasaran | null;
   indicator?: Indicator | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -28,6 +29,7 @@ interface IndicatorDialogProps {
 
 export function IndicatorDialog({
   tujuan,
+  sasaran,
   indicator,
   open,
   onOpenChange,
@@ -51,7 +53,7 @@ export function IndicatorDialog({
           <DialogDescription>
             {isEditing
               ? `Perbarui detail untuk indikator "${indicator.name}".`
-              : `Tambahkan indikator baru untuk tujuan "${tujuan.name}".`}
+              : `Tambahkan indikator baru untuk ${sasaran ? `sasaran "${sasaran.name}"` : `tujuan "${tujuan?.name}"`}.`}
           </DialogDescription>
         </DialogHeader>
 
@@ -72,7 +74,12 @@ export function IndicatorDialog({
         >
           {({ processing, errors }) => (
             <div className="space-y-4 px-4 py-2">
-              <input type="hidden" name="tujuan_id" value={tujuan.id} />
+              {tujuan && (
+                <input type="hidden" name="tujuan_id" value={tujuan.id} />
+              )}
+              {sasaran && (
+                <input type="hidden" name="sasaran_id" value={sasaran.id} />
+              )}
 
               <div className="grid gap-2">
                 <Label htmlFor="name">Nama Indikator</Label>

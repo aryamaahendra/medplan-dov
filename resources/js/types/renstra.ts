@@ -9,11 +9,22 @@ export type IndicatorTarget = {
 
 export type Indicator = {
   id: number;
-  tujuan_id: number;
+  tujuan_id: number | null;
+  sasaran_id: number | null;
   name: string;
   baseline: string | null;
   description: string | null;
   targets?: IndicatorTarget[];
+  created_at: string;
+  updated_at: string;
+};
+
+export type Sasaran = {
+  id: number;
+  tujuan_id: number;
+  name: string;
+  description: string | null;
+  indicators?: Indicator[];
   created_at: string;
   updated_at: string;
 };
@@ -23,6 +34,7 @@ export type Tujuan = {
   renstra_id: number;
   name: string;
   description: string | null;
+  sasarans?: Sasaran[];
   indicators?: Indicator[];
   created_at: string;
   updated_at: string;

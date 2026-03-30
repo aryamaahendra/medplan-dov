@@ -1,24 +1,20 @@
 import { Head, router } from '@inertiajs/react';
-import { Edit, Plus, Trash2 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+import SasaranController from '@/actions/App/Http/Controllers/SasaranController';
 import TujuanController from '@/actions/App/Http/Controllers/TujuanController';
 import { ConfirmDialog } from '@/components/confirm-dialog';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import renstraRoutes from '@/routes/renstras';
-import type { Indicator, Renstra, Tujuan } from '@/types';
+import type { Indicator, Renstra, Sasaran, Tujuan } from '@/types';
 
 import { IndicatorDialog } from '../indicators/components/indicator-dialog';
-import { IndicatorTable } from './components/indicator-table';
+import { RenstraInfo } from './components/renstra-info';
+import { RenstraSection } from './components/renstra-section';
+import { SasaranDialog } from './components/sasaran-dialog';
+import { TujuanCard } from './components/tujuan-card';
 import { TujuanDialog } from './components/tujuan-dialog';
 
 interface RenstraShowProps {
@@ -35,6 +31,16 @@ export default function RenstraShow({ renstra }: RenstraShowProps) {
   );
   const [activeTujuanForIndicator, setActiveTujuanForIndicator] =
     useState<Tujuan | null>(null);
+  const [activeSasaranForIndicator, setActiveSasaranForIndicator] =
+    useState<Sasaran | null>(null);
+
+  const [sasaranDialogOpen, setSasaranDialogOpen] = useState(false);
+  const [editingSasaran, setEditingSasaran] = useState<Sasaran | null>(null);
+  const [activeTujuanForSasaran, setActiveTujuanForSasaran] =
+    useState<Tujuan | null>(null);
+
+  const [deletingSasaran, setDeletingSasaran] = useState<Sasaran | null>(null);
+  const [isDeletingSasaran, setIsDeletingSasaran] = useState(false);
 
   const [deletingTujuan, setDeletingTujuan] = useState<Tujuan | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -52,8 +58,8 @@ export default function RenstraShow({ renstra }: RenstraShowProps) {
 
   const handleDeleteTujuan = () => {
     if (!deletingTujuan) {
-return;
-}
+      return;
+    }
 
     setIsDeleting(true);
     router.delete(TujuanController.destroy.url({ tujuan: deletingTujuan.id }), {
@@ -65,15 +71,65 @@ return;
     });
   };
 
+  // Sasaran Handlers
+  const onCreateSasaran = (tujuan: Tujuan) => {
+    setActiveTujuanForSasaran(tujuan);
+    setEditingSasaran(null);
+    setSasaranDialogOpen(true);
+  };
+
+  const onEditSasaran = (sasaran: Sasaran, tujuan: Tujuan) => {
+    setActiveTujuanForSasaran(tujuan);
+    setEditingSasaran(sasaran);
+    setSasaranDialogOpen(true);
+  };
+
+  const handleDeleteSasaran = () => {
+    if (!deletingSasaran) {
+      return;
+    }
+
+    setIsDeletingSasaran(true);
+    router.delete(
+      SasaranController.destroy.url({ sasaran: deletingSasaran.id }),
+      {
+        onSuccess: () => {
+          toast.success('Sasaran berhasil dihapus.');
+          setDeletingSasaran(null);
+        },
+        onFinish: () => setIsDeletingSasaran(false),
+      },
+    );
+  };
+
   // Indicator Handlers
   const onCreateIndicator = (tujuan: Tujuan) => {
+    setActiveSasaranForIndicator(null);
     setActiveTujuanForIndicator(tujuan);
     setEditingIndicator(null);
     setIndicatorDialogOpen(true);
   };
 
   const onEditIndicator = (indicator: Indicator, tujuan: Tujuan) => {
+    setActiveSasaranForIndicator(null);
     setActiveTujuanForIndicator(tujuan);
+    setEditingIndicator(indicator);
+    setIndicatorDialogOpen(true);
+  };
+
+  const onCreateIndicatorForSasaran = (sasaran: Sasaran) => {
+    setActiveTujuanForIndicator(null);
+    setActiveSasaranForIndicator(sasaran);
+    setEditingIndicator(null);
+    setIndicatorDialogOpen(true);
+  };
+
+  const onEditIndicatorForSasaran = (
+    indicator: Indicator,
+    sasaran: Sasaran,
+  ) => {
+    setActiveTujuanForIndicator(null);
+    setActiveSasaranForIndicator(sasaran);
     setEditingIndicator(indicator);
     setIndicatorDialogOpen(true);
   };
@@ -95,52 +151,19 @@ return;
           </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{renstra.name}</CardTitle>
-            <CardDescription>
-              Periode: {renstra.year_start} - {renstra.year_end} | Status:{' '}
-              <span
-                className={
-                  renstra.is_active
-                    ? 'font-medium text-primary'
-                    : 'text-muted-foreground'
-                }
-              >
-                {renstra.is_active ? 'Aktif' : 'Tidak Aktif'}
-              </span>
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4">
-              <div>
-                <h4 className="mb-1 text-sm font-medium">Deskripsi</h4>
-                <p className="text-sm text-muted-foreground">
-                  {renstra.description || 'Tidak ada deskripsi.'}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <RenstraInfo renstra={renstra} />
 
         <Separator />
 
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-semibold">
-                Tujuan dan Indikator Kinerja
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Daftar Tujuan strategis beserta indikatornya.
-              </p>
-            </div>
-            <Button onClick={onCreateTujuan}>
-              <Plus className="mr-2 h-4 w-4" />
-              Tambah Tujuan
-            </Button>
-          </div>
-
+        <RenstraSection
+          title="Tujuan dan Indikator Kinerja"
+          description="Daftar Tujuan strategis beserta indikatornya."
+          action={{
+            label: 'Tambah Tujuan',
+            icon: <Plus className="mr-2 h-4 w-4" />,
+            onClick: onCreateTujuan,
+          }}
+        >
           <div className="flex flex-col gap-6">
             {!renstra.tujuans || renstra.tujuans.length === 0 ? (
               <div className="rounded-md border p-8 text-center text-muted-foreground">
@@ -148,54 +171,25 @@ return;
               </div>
             ) : (
               renstra.tujuans.map((tujuan) => (
-                <Card key={tujuan.id} className="gap-0 overflow-hidden py-0">
-                  <div className="flex flex-col border-b bg-muted/40 p-4 md:flex-row">
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{tujuan.name}</h3>
-                      {tujuan.description && (
-                        <p className="mt-1 max-w-[75ch] text-sm whitespace-normal text-muted-foreground">
-                          {tujuan.description}
-                        </p>
-                      )}
-                    </div>
-                    <div className="mt-4 flex items-start justify-end gap-2 md:mt-0">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => onCreateIndicator(tujuan)}
-                      >
-                        <Plus className="mr-1 h-3.5 w-3.5" />
-                        Indikator
-                      </Button>
-                      <Button
-                        size="icon-sm"
-                        variant="outline"
-                        onClick={() => onEditTujuan(tujuan)}
-                      >
-                        <Edit />
-                      </Button>
-                      <Button
-                        size="icon-sm"
-                        variant="destructive"
-                        onClick={() => setDeletingTujuan(tujuan)}
-                      >
-                        <Trash2 />
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="p-0">
-                    <IndicatorTable
-                      indicators={tujuan.indicators || []}
-                      onEdit={(indicator) => onEditIndicator(indicator, tujuan)}
-                      yearStart={renstra.year_start}
-                      yearEnd={renstra.year_end}
-                    />
-                  </div>
-                </Card>
+                <TujuanCard
+                  key={tujuan.id}
+                  tujuan={tujuan}
+                  yearStart={renstra.year_start}
+                  yearEnd={renstra.year_end}
+                  onCreateSasaran={onCreateSasaran}
+                  onCreateIndicator={onCreateIndicator}
+                  onEditTujuan={onEditTujuan}
+                  onDeleteTujuan={setDeletingTujuan}
+                  onEditIndicator={onEditIndicator}
+                  onCreateSasaranIndicator={onCreateIndicatorForSasaran}
+                  onEditSasaran={onEditSasaran}
+                  onDeleteSasaran={setDeletingSasaran}
+                  onEditSasaranIndicator={onEditIndicatorForSasaran}
+                />
               ))
             )}
           </div>
-        </div>
+        </RenstraSection>
       </div>
 
       <TujuanDialog
@@ -205,11 +199,21 @@ return;
         tujuan={editingTujuan}
       />
 
-      {activeTujuanForIndicator && (
+      {activeTujuanForSasaran && (
+        <SasaranDialog
+          tujuan={activeTujuanForSasaran}
+          sasaran={editingSasaran}
+          open={sasaranDialogOpen}
+          onOpenChange={setSasaranDialogOpen}
+        />
+      )}
+
+      {(activeTujuanForIndicator || activeSasaranForIndicator) && (
         <IndicatorDialog
           open={indicatorDialogOpen}
           onOpenChange={setIndicatorDialogOpen}
           tujuan={activeTujuanForIndicator}
+          sasaran={activeSasaranForIndicator}
           indicator={editingIndicator}
           yearStart={renstra.year_start}
           yearEnd={renstra.year_end}
@@ -221,10 +225,21 @@ return;
         onOpenChange={(open) => !open && setDeletingTujuan(null)}
         onConfirm={handleDeleteTujuan}
         title="Hapus Tujuan"
-        description={`Apakah Anda yakin ingin menghapus tujuan "${deletingTujuan?.name}" beserta seluruh indikatornya? Tindakan ini tidak dapat dibatalkan.`}
+        description={`Apakah Anda yakin ingin menghapus tujuan "${deletingTujuan?.name}" beserta seluruh sasaran dan indikatornya? Tindakan ini tidak dapat dibatalkan.`}
         confirmText="Hapus"
         variant="destructive"
         loading={isDeleting}
+      />
+
+      <ConfirmDialog
+        open={!!deletingSasaran}
+        onOpenChange={(open) => !open && setDeletingSasaran(null)}
+        onConfirm={handleDeleteSasaran}
+        title="Hapus Sasaran"
+        description={`Apakah Anda yakin ingin menghapus sasaran "${deletingSasaran?.name}" beserta indikatornya? Tindakan ini tidak dapat dibatalkan.`}
+        confirmText="Hapus"
+        variant="destructive"
+        loading={isDeletingSasaran}
       />
     </>
   );

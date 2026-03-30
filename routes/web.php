@@ -5,6 +5,7 @@ use App\Http\Controllers\NeedController;
 use App\Http\Controllers\NeedTypeController;
 use App\Http\Controllers\OrganizationalUnitController;
 use App\Http\Controllers\RenstraController;
+use App\Http\Controllers\SasaranController;
 use App\Http\Controllers\TujuanController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('needs', NeedController::class)->except(['create', 'edit', 'show']);
     Route::resource('renstras', RenstraController::class)->except(['create', 'edit']);
     Route::resource('tujuans', TujuanController::class)->except(['index', 'create', 'edit', 'show']);
+    Route::resource('sasarans', SasaranController::class)->except(['index', 'create', 'edit', 'show']);
     Route::resource('indicators', IndicatorController::class)->except(['index', 'create', 'edit', 'show']);
 });
 

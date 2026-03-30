@@ -26,8 +26,8 @@ export function SasaranCard({
   onEditIndicator,
 }: SasaranCardProps) {
   return (
-    <Card className="gap-0 overflow-hidden rounded-none border border-t-0 py-0 ring-0 last:border-b-0">
-      <div className="flex flex-col border-b bg-muted/40 p-4 md:flex-row">
+    <Card className="gap-0 overflow-hidden rounded-none py-0 ring-0 last:border-b-0">
+      <div className="flex flex-col border-b bg-muted/30 p-4 md:flex-row">
         <div className="flex-1">
           <h4 className="font-semibold">Sasaran: {sasaran.name}</h4>
           {sasaran.description && (
@@ -42,7 +42,7 @@ export function SasaranCard({
             variant="outline"
             onClick={() => onCreateIndicator(sasaran)}
           >
-            <Plus className="mr-1 h-3.5 w-3.5" />
+            <Plus />
             Indikator
           </Button>
           <Button
@@ -50,18 +50,18 @@ export function SasaranCard({
             variant="outline"
             onClick={() => onEditSasaran(sasaran)}
           >
-            <Edit className="h-4 w-4" />
+            <Edit />
           </Button>
           <Button
             size="icon-sm"
             variant="destructive"
             onClick={() => onDeleteSasaran(sasaran)}
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 />
           </Button>
         </div>
       </div>
-      <div className="border-t p-0">
+      <div className="p-0">
         <IndicatorTable
           indicators={sasaran.indicators || []}
           onEdit={(indicator) => onEditIndicator(indicator, sasaran)}

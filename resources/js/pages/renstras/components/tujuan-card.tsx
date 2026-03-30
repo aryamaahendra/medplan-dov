@@ -2,6 +2,12 @@ import { Edit, Plus, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import type { Indicator, Sasaran, Tujuan } from '@/types';
 
 import { IndicatorTable } from './indicator-table';
@@ -49,35 +55,37 @@ export function TujuanCard({
           )}
         </div>
         <div className="mt-4 flex flex-wrap items-start justify-end gap-2 md:mt-0">
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={() => onCreateSasaran(tujuan)}
-          >
-            <Plus className="mr-1 h-3.5 w-3.5" />
-            Sasaran
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => onCreateIndicator(tujuan)}
-          >
-            <Plus className="mr-1 h-3.5 w-3.5" />
-            Indikator
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm" variant="outline">
+                <Plus />
+                Tambah
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => onCreateSasaran(tujuan)}>
+                <Plus className="mr-1" />
+                Sasaran
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onCreateIndicator(tujuan)}>
+                <Plus className="mr-1" />
+                Indikator
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button
             size="icon-sm"
             variant="outline"
             onClick={() => onEditTujuan(tujuan)}
           >
-            <Edit className="h-4 w-4" />
+            <Edit />
           </Button>
           <Button
             size="icon-sm"
             variant="destructive"
             onClick={() => onDeleteTujuan(tujuan)}
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 />
           </Button>
         </div>
       </div>
@@ -93,17 +101,23 @@ export function TujuanCard({
 
         {tujuan.sasarans && tujuan.sasarans.length > 0 && (
           <div className="bg-muted/40 pl-4">
-            {tujuan.sasarans.map((sasaran) => (
-              <SasaranCard
-                key={sasaran.id}
-                sasaran={sasaran}
-                yearStart={yearStart}
-                yearEnd={yearEnd}
-                onCreateIndicator={onCreateSasaranIndicator}
-                onEditSasaran={(s) => onEditSasaran(s, tujuan)}
-                onDeleteSasaran={onDeleteSasaran}
-                onEditIndicator={onEditSasaranIndicator}
-              />
+            {tujuan.sasarans.map((sasaran, idx) => (
+              <div className="border-l">
+                <SasaranCard
+                  key={sasaran.id}
+                  sasaran={sasaran}
+                  yearStart={yearStart}
+                  yearEnd={yearEnd}
+                  onCreateIndicator={onCreateSasaranIndicator}
+                  onEditSasaran={(s) => onEditSasaran(s, tujuan)}
+                  onDeleteSasaran={onDeleteSasaran}
+                  onEditIndicator={onEditSasaranIndicator}
+                />
+
+                {tujuan.sasarans && tujuan.sasarans.length - 1 !== idx && (
+                  <div className="h-4 border-y bg-background"></div>
+                )}
+              </div>
             ))}
           </div>
         )}

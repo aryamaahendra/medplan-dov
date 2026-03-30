@@ -68,7 +68,7 @@ export function IndicatorTable({
 
   return (
     <>
-      <div className="overflow-hidden bg-card">
+      <div className="overflow-hidden bg-background">
         <Table className="border-collapse">
           <TableHeader>
             <TableRow className="hover:bg-background">

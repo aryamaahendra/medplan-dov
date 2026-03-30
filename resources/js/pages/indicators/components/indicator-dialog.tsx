@@ -15,31 +15,35 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import type { Indicator, Renstra } from '@/types';
+import type { Indicator, Tujuan } from '@/types';
 
 interface IndicatorDialogProps {
-  renstra: Renstra;
+  tujuan: Tujuan;
   indicator?: Indicator | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  yearStart: number;
+  yearEnd: number;
 }
 
 export function IndicatorDialog({
-  renstra,
+  tujuan,
   indicator,
   open,
   onOpenChange,
+  yearStart,
+  yearEnd,
 }: IndicatorDialogProps) {
   const isEditing = !!indicator;
 
   const years = Array.from(
-    { length: renstra.year_end - renstra.year_start + 1 },
-    (_, i) => renstra.year_start + i,
+    { length: yearEnd - yearStart + 1 },
+    (_, i) => yearStart + i,
   );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[600px]">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>
             {isEditing ? 'Edit Indikator' : 'Tambah Indikator'}
@@ -47,7 +51,7 @@ export function IndicatorDialog({
           <DialogDescription>
             {isEditing
               ? `Perbarui detail untuk indikator "${indicator.name}".`
-              : `Tambahkan indikator baru untuk renstra "${renstra.name}".`}
+              : `Tambahkan indikator baru untuk tujuan "${tujuan.name}".`}
           </DialogDescription>
         </DialogHeader>
 
@@ -64,11 +68,11 @@ export function IndicatorDialog({
                 : 'Indikator berhasil dibuat.',
             );
           }}
-          className="space-y-4 py-2"
+          className="-mx-4 no-scrollbar max-h-[calc(100vh-10rem)] overflow-y-auto"
         >
           {({ processing, errors }) => (
-            <>
-              <input type="hidden" name="renstra_id" value={renstra.id} />
+            <div className="space-y-4 px-4 py-2">
+              <input type="hidden" name="tujuan_id" value={tujuan.id} />
 
               <div className="grid gap-2">
                 <Label htmlFor="name">Nama Indikator</Label>
@@ -149,7 +153,7 @@ export function IndicatorDialog({
                 </div>
               </div>
 
-              <DialogFooter className="sticky bottom-0 mt-4 border-t bg-background pt-4">
+              <DialogFooter className="-mb-2">
                 <Button
                   type="button"
                   variant="outline"
@@ -161,7 +165,7 @@ export function IndicatorDialog({
                   {isEditing ? 'Simpan Perubahan' : 'Tambah Indikator'}
                 </Button>
               </DialogFooter>
-            </>
+            </div>
           )}
         </Form>
       </DialogContent>

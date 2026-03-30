@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Indicator;
-use App\Models\Renstra;
+use App\Models\Tujuan;
 use Illuminate\Database\Seeder;
 
 class IndicatorSeeder extends Seeder
@@ -13,17 +13,17 @@ class IndicatorSeeder extends Seeder
      */
     public function run(): void
     {
-        $renstras = Renstra::all();
+        $tujuans = Tujuan::all();
 
-        if ($renstras->isEmpty()) {
-            $renstras = Renstra::factory()->count(2)->create();
+        if ($tujuans->isEmpty()) {
+            $tujuans = Tujuan::factory()->count(2)->create();
         }
 
-        foreach ($renstras as $renstra) {
+        foreach ($tujuans as $tujuan) {
             Indicator::factory()
                 ->count(3)
                 ->create([
-                    'renstra_id' => $renstra->id,
+                    'tujuan_id' => $tujuan->id,
                 ]);
         }
     }

@@ -77,7 +77,7 @@ class RenstraController extends Controller
     public function show(Renstra $renstra): Response
     {
         return Inertia::render('renstras/show', [
-            'renstra' => $renstra->load('indicators.targets'),
+            'renstra' => $renstra->load('tujuans.indicators.targets'),
         ]);
     }
 }

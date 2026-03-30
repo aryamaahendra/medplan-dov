@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('indicators', function (Blueprint $table) {
+        Schema::create('tujuans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tujuan_id')->constrained('tujuans')->cascadeOnDelete();
+            $table->foreignId('renstra_id')->constrained()->cascadeOnDelete();
             $table->string('name');
-            $table->string('baseline')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
         });
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('indicators');
+        Schema::dropIfExists('tujuans');
     }
 };

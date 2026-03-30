@@ -141,7 +141,7 @@ test('index can filter needs by need_type_id and organizational_unit_id', functi
 
 test('index props only include active need types', function () {
     $user = User::factory()->create();
-    
+
     $activeType = NeedType::factory()->create(['name' => 'Active Type', 'is_active' => true]);
     NeedType::factory()->create(['name' => 'Inactive Type', 'is_active' => false]);
 

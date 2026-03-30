@@ -248,7 +248,7 @@ test('show renders the correct component and props', function () {
 test('show loads indicators and targets relationships', function () {
     $user = User::factory()->create();
     $renstra = Renstra::factory()->create();
-    
+
     // As per previous conversation, IndicatorFactory and Indicator Targets table exist.
     // However, to keep this self-contained to just RenstraController tests, we just verify the load operation if the relation is present or not.
     // If the actual Indicator relationships are populated, they will appear nested under the `renstra` prop.

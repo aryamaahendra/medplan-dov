@@ -9,11 +9,21 @@ export type IndicatorTarget = {
 
 export type Indicator = {
   id: number;
-  renstra_id: number;
+  tujuan_id: number;
   name: string;
   baseline: string | null;
   description: string | null;
   targets?: IndicatorTarget[];
+  created_at: string;
+  updated_at: string;
+};
+
+export type Tujuan = {
+  id: number;
+  renstra_id: number;
+  name: string;
+  description: string | null;
+  indicators?: Indicator[];
   created_at: string;
   updated_at: string;
 };
@@ -25,7 +35,7 @@ export type Renstra = {
   year_end: number;
   description: string | null;
   is_active: boolean;
-  indicators?: Indicator[];
+  tujuans?: Tujuan[];
   created_at: string;
   updated_at: string;
 };

@@ -2,14 +2,14 @@
 
 namespace Database\Factories;
 
-use App\Models\Indicator;
+use App\Models\Renstra;
 use App\Models\Tujuan;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Indicator>
+ * @extends Factory<Tujuan>
  */
-class IndicatorFactory extends Factory
+class TujuanFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -19,9 +19,8 @@ class IndicatorFactory extends Factory
     public function definition(): array
     {
         return [
-            'tujuan_id' => Tujuan::factory(),
-            'name' => $this->faker->sentence(3),
-            'baseline' => $this->faker->randomDigit().'%',
+            'renstra_id' => Renstra::factory(),
+            'name' => $this->faker->sentence(4),
             'description' => $this->faker->paragraph(),
         ];
     }

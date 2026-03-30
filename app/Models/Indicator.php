@@ -12,15 +12,15 @@ class Indicator extends Model
     use HasFactory;
 
     protected $fillable = [
-        'renstra_id',
+        'tujuan_id',
         'name',
         'baseline',
         'description',
     ];
 
-    public function renstra(): BelongsTo
+    public function tujuan(): BelongsTo
     {
-        return $this->belongsTo(Renstra::class);
+        return $this->belongsTo(Tujuan::class);
     }
 
     public function targets(): HasMany

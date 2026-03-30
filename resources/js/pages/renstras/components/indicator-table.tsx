@@ -68,22 +68,38 @@ export function IndicatorTable({
 
   return (
     <>
-      <div className="rounded-md border bg-card">
-        <Table>
+      <div className="overflow-hidden bg-card">
+        <Table className="border-collapse">
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-[50px]">No</TableHead>
-              <TableHead className="min-w-[200px]">Indikator</TableHead>
-              <TableHead className="w-[120px]">Baseline</TableHead>
+            <TableRow className="hover:bg-background">
+              <TableHead rowSpan={2} className="w-[50px] border-r text-center">
+                No
+              </TableHead>
+              <TableHead rowSpan={2} className="min-w-[200px] border-r">
+                Indikator
+              </TableHead>
+              <TableHead rowSpan={2} className="w-[120px] border-r">
+                Baseline
+              </TableHead>
+              <TableHead
+                colSpan={years.length}
+                className="border-r border-b text-center"
+              >
+                Target
+              </TableHead>
+              <TableHead rowSpan={2} className="w-1 text-center font-semibold">
+                Aksi
+              </TableHead>
+            </TableRow>
+            <TableRow className="hover:bg-background">
               {years.map((year) => (
                 <TableHead
                   key={year}
-                  className="w-[100px] bg-muted/30 text-center"
+                  className="w-1 border-r text-center text-xs"
                 >
-                  Target {year}
+                  {year}
                 </TableHead>
               ))}
-              <TableHead className="w-1"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -99,18 +115,18 @@ export function IndicatorTable({
             ) : (
               indicators.map((indicator, index) => (
                 <TableRow key={indicator.id}>
-                  <TableCell className="font-mono text-muted-foreground">
+                  <TableCell className="border-r text-center font-mono text-muted-foreground">
                     {index + 1}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="border-r">
                     <div className="font-medium">{indicator.name}</div>
                     {indicator.description && (
-                      <div className="text-xs text-muted-foreground">
+                      <div className="w-[85ch] max-w-[85ch] text-xs whitespace-normal text-muted-foreground">
                         {indicator.description}
                       </div>
                     )}
                   </TableCell>
-                  <TableCell className="text-sm">
+                  <TableCell className="border-r text-center text-sm">
                     {indicator.baseline || '-'}
                   </TableCell>
                   {years.map((year) => {
@@ -121,13 +137,13 @@ export function IndicatorTable({
                     return (
                       <TableCell
                         key={year}
-                        className="text-center font-mono text-xs"
+                        className="border-r text-center font-mono text-xs"
                       >
                         {target?.target || '-'}
                       </TableCell>
                     );
                   })}
-                  <TableCell>
+                  <TableCell className="text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">

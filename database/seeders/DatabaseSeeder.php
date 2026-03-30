@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             OrganizationalUnitSeeder::class,
             NeedTypeSeeder::class,
             RenstraSeeder::class,
+            TujuanSeeder::class,
             IndicatorSeeder::class,
         ]);
     }

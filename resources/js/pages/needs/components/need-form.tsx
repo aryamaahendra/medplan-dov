@@ -5,6 +5,15 @@ import NeedController from '@/actions/App/Http/Controllers/NeedController';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldTitle,
+} from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -15,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
@@ -39,6 +49,12 @@ const STATUS_OPTIONS = [
   { value: 'submitted', label: 'Diajukan' },
   { value: 'approved', label: 'Disetujui' },
   { value: 'rejected', label: 'Ditolak' },
+] as const;
+
+const PRIORITY_LEVELS = [
+  { value: 'high', label: 'Tinggi (High)' },
+  { value: 'medium', label: 'Sedang (Medium)' },
+  { value: 'low', label: 'Rendah (Low)' },
 ] as const;
 
 interface NeedFormProps {
@@ -68,6 +84,9 @@ export function NeedForm({
     volume: need?.volume ?? '',
     unit_price: need?.unit_price ?? '',
     total_price: need?.total_price ?? '',
+    urgency: need?.urgency ?? 'medium',
+    impact: need?.impact ?? 'medium',
+    is_priority: need?.is_priority ?? false,
     status: need?.status ?? 'draft',
   });
 
@@ -122,7 +141,7 @@ export function NeedForm({
                 value={data.organizational_unit_id}
                 onValueChange={(v) => setData('organizational_unit_id', v)}
               >
-                <SelectTrigger id="organizational_unit_id">
+                <SelectTrigger id="organizational_unit_id" className="w-full">
                   <SelectValue placeholder="Pilih unit kerja" />
                 </SelectTrigger>
                 <SelectContent>
@@ -142,7 +161,7 @@ export function NeedForm({
                 value={data.need_type_id}
                 onValueChange={(v) => setData('need_type_id', v)}
               >
-                <SelectTrigger id="need_type_id">
+                <SelectTrigger id="need_type_id" className="w-full">
                   <SelectValue placeholder="Pilih jenis kebutuhan" />
                 </SelectTrigger>
                 <SelectContent>
@@ -179,7 +198,7 @@ export function NeedForm({
                 value={data.status}
                 onValueChange={(v) => setData('status', v as Need['status'])}
               >
-                <SelectTrigger id="status">
+                <SelectTrigger id="status" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -250,19 +269,19 @@ export function NeedForm({
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="mb-5! space-y-3">
             <Label>Satuan</Label>
             <RadioGroup
               value={data.unit}
               onValueChange={(v) => setData('unit', v)}
-              className="flex flex-wrap gap-x-3 gap-y-3"
+              className="flex flex-wrap gap-x-6 gap-y-3"
             >
               {UNIT_OPTIONS.map((u) => (
                 <div key={u} className="flex items-center space-x-2">
                   <RadioGroupItem value={u} id={`unit-${u}`} />
                   <Label
                     htmlFor={`unit-${u}`}
-                    className="cursor-pointer font-normal"
+                    className="cursor-pointer font-normal capitalize"
                   >
                     {u}
                   </Label>
@@ -319,6 +338,100 @@ export function NeedForm({
               <InputError message={errors.total_price} />
             </div>
           </div>
+
+          <div className="space-y-6 rounded-md border border-dashed p-4">
+            <div className="space-y-3">
+              <Label>Urgensi</Label>
+              <RadioGroup
+                value={data.urgency}
+                onValueChange={(v) => setData('urgency', v as Need['urgency'])}
+                className="flex flex-col gap-2 sm:flex-row sm:gap-4"
+              >
+                {PRIORITY_LEVELS.map((level) => (
+                  <div
+                    key={level.value}
+                    className="flex items-center space-x-2"
+                  >
+                    <RadioGroupItem
+                      value={level.value}
+                      id={`urgency-${level.value}`}
+                    />
+                    <Label
+                      htmlFor={`urgency-${level.value}`}
+                      className="cursor-pointer font-normal"
+                    >
+                      {level.label}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+              <InputError message={errors.urgency} />
+            </div>
+
+            <div className="mb-4! space-y-3">
+              <Label>Dampak</Label>
+              <RadioGroup
+                value={data.impact}
+                onValueChange={(v) => setData('impact', v as Need['impact'])}
+                className="flex flex-col gap-2 sm:flex-row sm:gap-4"
+              >
+                {PRIORITY_LEVELS.map((level) => (
+                  <div
+                    key={level.value}
+                    className="flex items-center space-x-2"
+                  >
+                    <RadioGroupItem
+                      value={level.value}
+                      id={`impact-${level.value}`}
+                    />
+                    <Label
+                      htmlFor={`impact-${level.value}`}
+                      className="cursor-pointer font-normal"
+                    >
+                      {level.label}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+              <InputError message={errors.impact} />
+            </div>
+
+            <div className="pt-2">
+              <FieldGroup className="w-full max-sm:gap-4!">
+                <FieldLabel
+                  htmlFor="is_priority"
+                  className={cn(
+                    'transition-colors duration-200',
+                    data.is_priority
+                      ? 'border-green-900/20! bg-green-200/40! dark:border-green-900/30! dark:bg-green-800/40!'
+                      : 'border-yellow-900/20! bg-yellow-200/40! dark:border-yellow-900/30! dark:bg-yellow-800/40!',
+                  )}
+                >
+                  <Field orientation="horizontal">
+                    <FieldContent>
+                      <FieldTitle>
+                        {data.is_priority
+                          ? 'Prioritas Utama'
+                          : 'Bukan Prioritas'}
+                      </FieldTitle>
+                      <FieldDescription>
+                        Tandai jika usulan ini merupakan prioritas utama yang
+                        harus segera dipenuhi.
+                      </FieldDescription>
+                    </FieldContent>
+                    <Switch
+                      id="is_priority"
+                      checked={data.is_priority}
+                      onCheckedChange={(checked) =>
+                        setData('is_priority', checked)
+                      }
+                    />
+                  </Field>
+                </FieldLabel>
+                <FieldError errors={[{ message: errors.is_priority }]} />
+              </FieldGroup>
+            </div>
+          </div>
         </CardContent>
         <CardFooter className="flex justify-end gap-3 border-t bg-muted/50">
           <Button
@@ -328,7 +441,7 @@ export function NeedForm({
           >
             Batal
           </Button>
-          <Button type="submit" disabled={processing} size="lg">
+          <Button type="submit" disabled={processing}>
             {isEditing ? 'Simpan Perubahan' : 'Tambah Usulan'}
           </Button>
         </CardFooter>

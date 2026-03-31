@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\Impact;
+use App\Enums\Urgency;
 use Database\Factories\NeedFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,6 +23,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'unit',
     'unit_price',
     'total_price',
+    'urgency',
+    'impact',
+    'is_priority',
     'status',
 ])]
 class Need extends Model
@@ -35,6 +40,9 @@ class Need extends Model
             'volume' => 'decimal:4',
             'unit_price' => 'decimal:2',
             'total_price' => 'decimal:2',
+            'is_priority' => 'boolean',
+            'urgency' => Urgency::class,
+            'impact' => Impact::class,
         ];
     }
 

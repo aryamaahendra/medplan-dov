@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\Impact;
+use App\Enums\Urgency;
 use App\Models\Need;
 use App\Models\NeedType;
 use App\Models\OrganizationalUnit;
@@ -25,6 +27,9 @@ function validNeedPayload(OrganizationalUnit $unit, NeedType $needType, array $o
         'unit' => 'unit',
         'unit_price' => 10000000,
         'total_price' => 50000000,
+        'urgency' => Urgency::Medium->value,
+        'impact' => Impact::Medium->value,
+        'is_priority' => false,
         'status' => 'draft',
     ], $overrides);
 }
@@ -222,6 +227,8 @@ test('store validates required fields', function () {
             'unit',
             'unit_price',
             'total_price',
+            'urgency',
+            'impact',
         ]);
 });
 
@@ -301,6 +308,8 @@ test('update validates required fields', function () {
             'unit',
             'unit_price',
             'total_price',
+            'urgency',
+            'impact',
         ]);
 });
 

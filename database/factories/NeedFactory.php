@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Enums\Impact;
+use App\Enums\Urgency;
 use App\Models\Need;
 use App\Models\NeedType;
 use App\Models\OrganizationalUnit;
@@ -34,6 +36,9 @@ class NeedFactory extends Factory
             'unit' => $this->faker->randomElement(['pcs', 'unit', 'orang', 'paket', 'set', 'buah', 'lembar', 'kg', 'liter', 'meter']),
             'unit_price' => $unitPrice,
             'total_price' => round($volume * $unitPrice, 2),
+            'urgency' => $this->faker->randomElement(Urgency::cases()),
+            'impact' => $this->faker->randomElement(Impact::cases()),
+            'is_priority' => $this->faker->boolean(20), // 20% chance to be true
             'status' => $this->faker->randomElement(['draft', 'submitted', 'approved', 'rejected']),
         ];
     }

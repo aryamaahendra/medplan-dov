@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\Impact;
+use App\Enums\Urgency;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -35,6 +37,9 @@ class UpdateNeedRequest extends FormRequest
             'unit' => ['required', 'string', Rule::in(['pcs', 'unit', 'orang', 'paket', 'set', 'buah', 'lembar', 'kg', 'liter', 'meter'])],
             'unit_price' => ['required', 'numeric', 'min:0'],
             'total_price' => ['required', 'numeric', 'min:0'],
+            'urgency' => ['required', Rule::enum(Urgency::class)],
+            'impact' => ['required', Rule::enum(Impact::class)],
+            'is_priority' => ['boolean'],
             'status' => ['sometimes', 'string', Rule::in(['draft', 'submitted', 'approved', 'rejected'])],
         ];
     }

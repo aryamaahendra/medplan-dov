@@ -26,6 +26,9 @@ export interface Need {
   unit: string;
   unit_price: string;
   total_price: string;
+  urgency: 'high' | 'medium' | 'low';
+  impact: 'high' | 'medium' | 'low';
+  is_priority: boolean;
   status: 'draft' | 'submitted' | 'approved' | 'rejected';
   created_at: string;
   organizational_unit?: { id: number; name: string };

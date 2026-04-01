@@ -23,7 +23,8 @@ class UpdateIndicatorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'tujuan_id' => ['required', 'exists:tujuans,id'],
+            'tujuan_id' => ['required_without:sasaran_id', 'nullable', 'exists:tujuans,id'],
+            'sasaran_id' => ['required_without:tujuan_id', 'nullable', 'exists:sasarans,id'],
             'name' => ['required', 'string', 'max:255'],
             'baseline' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],

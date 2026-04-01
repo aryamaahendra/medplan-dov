@@ -1,6 +1,13 @@
 import { Head, router } from '@inertiajs/react';
-import { CheckCheck, Plus, SendIcon, TriangleAlert } from 'lucide-react';
-import { Clock } from 'lucide-react';
+import {
+  CheckCheck,
+  Clock,
+  LayoutGrid,
+  List,
+  Plus,
+  SendIcon,
+  TriangleAlert,
+} from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -8,12 +15,15 @@ import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import { DataTableFacetedFilter } from '@/components/data-table/data-table-faceted-filter';
 import { Button } from '@/components/ui/button';
+import { ButtonGroup } from '@/components/ui/button-group';
 import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
+import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
 
 import { getColumns } from './columns';
 import type { Need } from './columns';
+import { NeedGridView } from './components/need-grid-view';
 
 interface PaginatedNeeds {
   data: Need[];
@@ -45,6 +55,7 @@ export default function NeedsIndex({
 }: NeedsIndexProps) {
   const [deletingNeed, setDeletingNeed] = useState<Need | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('grid');
 
   const {
     onSearch,
@@ -140,10 +151,34 @@ export default function NeedsIndex({
               Kelola data usulan kebutuhan per unit kerja.
             </p>
           </div>
-          <Button onClick={onCreate}>
-            <Plus />
-            Tambah Usulan
-          </Button>
+          <div className="flex gap-2">
+            <ButtonGroup>
+              <Button
+                variant={'outline'}
+                onClick={() => setViewMode('table')}
+                className={cn({
+                  'bg-muted': viewMode === 'table',
+                })}
+              >
+                <List />
+                <span className="sr-only">Table view</span>
+              </Button>
+              <Button
+                variant={'outline'}
+                onClick={() => setViewMode('grid')}
+                className={cn({
+                  'bg-muted': viewMode === 'grid',
+                })}
+              >
+                <LayoutGrid />
+                <span className="sr-only">Grid view</span>
+              </Button>
+            </ButtonGroup>
+            <Button onClick={onCreate}>
+              <Plus />
+              Tambah Usulan
+            </Button>
+          </div>
         </div>
 
         <DataTable
@@ -157,6 +192,10 @@ export default function NeedsIndex({
           onPerPageChange={onPerPageChange}
           onReset={onReset}
           searchPlaceholder="Cari berdasarkan judul atau deskripsi..."
+          view={viewMode}
+          renderGrid={(data) => (
+            <NeedGridView data={data} onEdit={onEdit} onDelete={onDelete} />
+          )}
           toolbarChildren={
             <>
               <DataTableFacetedFilter

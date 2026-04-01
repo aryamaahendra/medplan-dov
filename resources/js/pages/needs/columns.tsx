@@ -1,7 +1,16 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import { Edit, MoreHorizontal, Trash2 } from 'lucide-react';
+import {
+  CheckCircle2,
+  Edit,
+  FileText,
+  MoreHorizontal,
+  Send,
+  Trash2,
+  XCircle,
+} from 'lucide-react';
 
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
+import { PriorityBadge } from '@/components/priority-badge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -35,14 +44,14 @@ export interface Need {
   need_type?: { id: number; name: string };
 }
 
-const STATUS_LABELS: Record<Need['status'], string> = {
+export const STATUS_LABELS: Record<Need['status'], string> = {
   draft: 'Draft',
   submitted: 'Diajukan',
   approved: 'Disetujui',
   rejected: 'Ditolak',
 };
 
-const STATUS_VARIANTS: Record<
+export const STATUS_VARIANTS: Record<
   Need['status'],
   'secondary' | 'default' | 'destructive' | 'outline'
 > = {
@@ -52,7 +61,35 @@ const STATUS_VARIANTS: Record<
   rejected: 'destructive',
 };
 
-const formatCurrency = (value: string | number) =>
+export const STATUS_ICONS: Record<Need['status'], React.ElementType> = {
+  draft: FileText,
+  submitted: Send,
+  approved: CheckCircle2,
+  rejected: XCircle,
+};
+
+export const PRIORITY_LABELS: Record<string, string> = {
+  high: 'Tinggi',
+  medium: 'Sedang',
+  low: 'Rendah',
+  High: 'Tinggi',
+  Medium: 'Sedang',
+  Low: 'Rendah',
+};
+
+export const PRIORITY_VARIANTS: Record<
+  string,
+  'destructive' | 'default' | 'outline' | 'secondary'
+> = {
+  high: 'destructive',
+  medium: 'default',
+  low: 'outline',
+  High: 'destructive',
+  Medium: 'default',
+  Low: 'outline',
+};
+
+export const formatCurrency = (value: string | number) =>
   new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
@@ -99,22 +136,51 @@ export const getColumns = (
     cell: ({ row }) =>
       `${Number(row.original.volume).toLocaleString('id-ID')} ${row.original.unit}`,
     enableSorting: false,
-    meta: { cellClassName: 'text-right tabular-nums' },
+    meta: { cellClassName: 'tabular-nums font-mono' },
   },
   {
     accessorKey: 'total_price',
     header: (props) => <DataTableColumnHeader {...props} title="Total Harga" />,
     cell: ({ row }) => formatCurrency(row.original.total_price),
-    meta: { cellClassName: 'text-right tabular-nums' },
+    meta: { cellClassName: 'tabular-nums font-mono' },
+  },
+  {
+    accessorKey: 'urgency',
+    header: (props) => <DataTableColumnHeader {...props} title="Urgensi" />,
+    cell: ({ row }) => <PriorityBadge level={row.original.urgency} />,
+  },
+  {
+    accessorKey: 'impact',
+    header: (props) => <DataTableColumnHeader {...props} title="Dampak" />,
+    cell: ({ row }) => <PriorityBadge level={row.original.impact} />,
+  },
+  {
+    accessorKey: 'is_priority',
+    header: (props) => <DataTableColumnHeader {...props} title="Prioritas" />,
+    cell: ({ row }) =>
+      row.original.is_priority ? (
+        <PriorityBadge level="urgent" fallback="Prioritas" />
+      ) : (
+        <PriorityBadge level="normal" fallback="Biasa" />
+      ),
   },
   {
     accessorKey: 'status',
     header: (props) => <DataTableColumnHeader {...props} title="Status" />,
-    cell: ({ row }) => (
-      <Badge variant={STATUS_VARIANTS[row.original.status]}>
-        {STATUS_LABELS[row.original.status]}
-      </Badge>
-    ),
+    cell: ({ row }) => {
+      const status = row.original.status;
+      const Icon = STATUS_ICONS[status];
+
+      return (
+        <Badge
+          variant={STATUS_VARIANTS[status]}
+          className="flex w-fit items-center gap-1"
+        >
+          {Icon && <Icon className="h-3.5 w-3.5" />}
+          {STATUS_LABELS[status]}
+        </Badge>
+      );
+    },
   },
   {
     id: 'actions',

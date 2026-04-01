@@ -36,6 +36,8 @@ interface DataTableProps<TData, TValue> {
   onReset: () => void;
   searchPlaceholder?: string;
   toolbarChildren?: React.ReactNode;
+  view?: 'table' | 'grid';
+  renderGrid?: (rows: TData[]) => React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
@@ -50,6 +52,8 @@ export function DataTable<TData, TValue>({
   onReset,
   searchPlaceholder,
   toolbarChildren,
+  view = 'table',
+  renderGrid,
 }: DataTableProps<TData, TValue>) {
   // Local UI state
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
@@ -86,64 +90,68 @@ export function DataTable<TData, TValue>({
         {toolbarChildren}
       </DataTableToolbar>
 
-      <div className="rounded-md border">
-        <Table className="text-sm">
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="whitespace-nowrap">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, {
-                          ...header.getContext(),
-                          onSort,
-                          currentSort: filters.sort,
-                          currentDirection: filters.direction,
-                        })}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
-                  {row.getVisibleCells().map((cell) => {
-                    const cellMeta = cell.column.columnDef.meta;
-                    const cellClassName =
-                      typeof cellMeta?.cellClassName === 'function'
-                        ? cellMeta.cellClassName(row)
-                        : cellMeta?.cellClassName;
-
-                    return (
-                      <TableCell key={cell.id} className={cn(cellClassName)}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    );
-                  })}
+      {view === 'table' ? (
+        <div className="rounded-md border">
+          <Table className="text-sm">
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id} className="whitespace-nowrap">
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, {
+                            ...header.getContext(),
+                            onSort,
+                            currentSort: filters.sort,
+                            currentDirection: filters.direction,
+                          })}
+                    </TableHead>
+                  ))}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && 'selected'}
+                  >
+                    {row.getVisibleCells().map((cell) => {
+                      const cellMeta = cell.column.columnDef.meta;
+                      const cellClassName =
+                        typeof cellMeta?.cellClassName === 'function'
+                          ? cellMeta.cellClassName(row)
+                          : cellMeta?.cellClassName;
+
+                      return (
+                        <TableCell key={cell.id} className={cn(cellClassName)}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      ) : (
+        renderGrid?.(data)
+      )}
 
       <DataTablePagination
         meta={meta}

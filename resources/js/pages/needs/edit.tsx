@@ -1,18 +1,20 @@
 import { Head } from '@inertiajs/react';
 import needRoutes from '@/routes/needs';
-import type { Need } from './columns';
+import type { Need, Tujuan } from './columns';
 import { NeedForm } from './components/need-form';
 
 interface EditProps {
   need: Need;
   organizationalUnits: { id: number; name: string }[];
   needTypes: { id: number; name: string }[];
+  tujuans: Tujuan[];
 }
 
 export default function Edit({
   need,
   organizationalUnits,
   needTypes,
+  tujuans,
 }: EditProps) {
   return (
     <>
@@ -32,6 +34,7 @@ export default function Edit({
             need={need}
             organizationalUnits={organizationalUnits}
             needTypes={needTypes}
+            tujuans={tujuans}
           />
         </div>
       </div>

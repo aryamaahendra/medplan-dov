@@ -1,15 +1,18 @@
 import { Head } from '@inertiajs/react';
 import needRoutes from '@/routes/needs';
+import type { Tujuan } from './columns';
 import { NeedForm } from './components/need-form';
 
 interface CreateProps {
   organizationalUnits: { id: number; name: string }[];
   needTypes: { id: number; name: string }[];
+  tujuans: Tujuan[];
 }
 
 export default function Create({
   organizationalUnits,
   needTypes,
+  tujuans,
 }: CreateProps) {
   return (
     <>
@@ -28,6 +31,7 @@ export default function Create({
           <NeedForm
             organizationalUnits={organizationalUnits}
             needTypes={needTypes}
+            tujuans={tujuans}
           />
         </div>
       </div>

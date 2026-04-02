@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\Impact;
 use App\Enums\Urgency;
+use App\Models\Indicator;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -41,6 +42,18 @@ class StoreNeedRequest extends FormRequest
             'impact' => ['required', Rule::enum(Impact::class)],
             'is_priority' => ['boolean'],
             'status' => ['sometimes', 'string', Rule::in(['draft', 'submitted', 'approved', 'rejected'])],
+            'sasaran_ids' => ['required', 'array', 'min:1'],
+            'sasaran_ids.*' => ['exists:sasarans,id'],
+            'indicator_ids' => ['nullable', 'array'],
+            'indicator_ids.*' => [
+                'exists:indicators,id',
+                function ($attribute, $value, $fail) {
+                    $indicator = Indicator::find($value);
+                    if ($indicator && ! in_array($indicator->sasaran_id, $this->sasaran_ids ?? [])) {
+                        $fail(__('Indikator yang dipilih harus sesuai dengan sasaran yang dipilih.'));
+                    }
+                },
+            ],
         ];
     }
 }

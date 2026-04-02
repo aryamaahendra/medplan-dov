@@ -1,4 +1,4 @@
-import { Edit, Trash2 } from 'lucide-react';
+import { Component, Edit, Tag, Trash2 } from 'lucide-react';
 import * as React from 'react';
 import { PriorityBadge } from '@/components/priority-badge';
 import { Badge } from '@/components/ui/badge';
@@ -25,9 +25,15 @@ interface NeedCardProps {
   need: Need;
   onEdit: (need: Need) => void;
   onDelete: (need: Need) => void;
+  onShowDetails: (need: Need) => void;
 }
 
-export function NeedCard({ need, onEdit, onDelete }: NeedCardProps) {
+export function NeedCard({
+  need,
+  onEdit,
+  onDelete,
+  onShowDetails,
+}: NeedCardProps) {
   return (
     <Card className="w-full">
       <CardHeader>
@@ -100,6 +106,34 @@ export function NeedCard({ need, onEdit, onDelete }: NeedCardProps) {
               <PriorityBadge level="Urgent" fallback="Prioritas" />
             ) : (
               <PriorityBadge level="Normal" fallback="Biasa" />
+            )}
+          </InfoItem>
+
+          <InfoItem label="Penyelarasan" className="col-span-3">
+            {need.sasarans_count ? (
+              <div
+                className="group flex cursor-pointer items-center gap-3 transition-colors hover:text-primary"
+                onClick={() => onShowDetails(need)}
+              >
+                <div className="flex items-center gap-1.5">
+                  <Component className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-medium">
+                    {need.sasarans_count} Sasaran
+                  </span>
+                </div>
+                {need.indicators_count ? (
+                  <div className="flex items-center gap-1.5 opacity-80 group-hover:opacity-100">
+                    <Tag className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
+                    <span className="text-sm">
+                      {need.indicators_count} Indikator
+                    </span>
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <span className="text-sm text-muted-foreground italic">
+                Belum ada penyelarasan strategis
+              </span>
             )}
           </InfoItem>
         </div>

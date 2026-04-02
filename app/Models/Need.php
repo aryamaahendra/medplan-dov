@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
@@ -60,5 +61,21 @@ class Need extends Model
     public function needType(): BelongsTo
     {
         return $this->belongsTo(NeedType::class);
+    }
+
+    /**
+     * Get the sasarans for this need.
+     */
+    public function sasarans(): BelongsToMany
+    {
+        return $this->belongsToMany(Sasaran::class);
+    }
+
+    /**
+     * Get the indicators for this need.
+     */
+    public function indicators(): BelongsToMany
+    {
+        return $this->belongsToMany(Indicator::class, 'need_indicator', 'need_id', 'indicator_id');
     }
 }

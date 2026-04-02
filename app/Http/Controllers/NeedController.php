@@ -7,8 +7,10 @@ use App\Http\Requests\UpdateNeedRequest;
 use App\Models\Need;
 use App\Models\NeedType;
 use App\Models\OrganizationalUnit;
+use App\Models\Tujuan;
 use App\Traits\HasDataTable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -26,7 +28,16 @@ class NeedController extends Controller
     {
         $needs = $this->applyDataTable(
             Need::query()
-                ->with(['organizationalUnit:id,name', 'needType:id,name'])
+                ->with([
+                    'organizationalUnit:id,name',
+                    'needType:id,name',
+                    'sasarans:id,tujuan_id,name',
+                    'sasarans.tujuan:id,name',
+                    'indicators:id,sasaran_id,name,baseline',
+                    'indicators.sasaran:id,name',
+                    'indicators.targets:id,indicator_id,year,target',
+                ])
+                ->withCount(['sasarans', 'indicators'])
                 ->when($request->input('year'), fn ($q, $v) => $q->whereIn('year', (array) $v))
                 ->when($request->input('status'), fn ($q, $v) => $q->whereIn('status', (array) $v))
                 ->when($request->input('need_type_id'), fn ($q, $v) => $q->whereIn('need_type_id', (array) $v))
@@ -52,7 +63,11 @@ class NeedController extends Controller
 
     public function store(StoreNeedRequest $request)
     {
-        Need::create($request->validated());
+        DB::transaction(function () use ($request) {
+            $need = Need::create($request->validated());
+            $need->sasarans()->sync($request->sasaran_ids);
+            $need->indicators()->sync($request->indicator_ids ?? []);
+        });
 
         return redirect()->route('needs.index')
             ->with('success', 'Usulan kebutuhan berhasil dibuat.');
@@ -63,21 +78,41 @@ class NeedController extends Controller
         return Inertia::render('needs/create', [
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
+            'tujuans' => Tujuan::query()
+                ->whereHas('renstra', fn ($q) => $q->where('is_active', true))
+                ->select(['id', 'name'])
+                ->with([
+                    'sasarans' => fn ($q) => $q->select(['id', 'tujuan_id', 'name']),
+                    'sasarans.indicators' => fn ($q) => $q->select(['id', 'sasaran_id', 'name']),
+                ])
+                ->get(),
         ]);
     }
 
     public function edit(Need $need): Response
     {
         return Inertia::render('needs/edit', [
-            'need' => $need,
+            'need' => $need->load(['sasarans:id', 'indicators:id']),
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
+            'tujuans' => Tujuan::query()
+                ->whereHas('renstra', fn ($q) => $q->where('is_active', true))
+                ->select(['id', 'name'])
+                ->with([
+                    'sasarans' => fn ($q) => $q->select(['id', 'tujuan_id', 'name']),
+                    'sasarans.indicators' => fn ($q) => $q->select(['id', 'sasaran_id', 'name']),
+                ])
+                ->get(),
         ]);
     }
 
     public function update(UpdateNeedRequest $request, Need $need)
     {
-        $need->update($request->validated());
+        DB::transaction(function () use ($request, $need) {
+            $need->update($request->validated());
+            $need->sasarans()->sync($request->sasaran_ids);
+            $need->indicators()->sync($request->indicator_ids ?? []);
+        });
 
         return redirect()->route('needs.index')
             ->with('success', 'Usulan kebutuhan berhasil diperbarui.');

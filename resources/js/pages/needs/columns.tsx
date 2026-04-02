@@ -1,10 +1,12 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import {
   CheckCircle2,
+  Component,
   Edit,
   FileText,
   MoreHorizontal,
   Send,
+  Tag,
   Trash2,
   XCircle,
 } from 'lucide-react';
@@ -21,6 +23,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+
+export interface Sasaran {
+  id: number;
+  name: string;
+  tujuan_id: number;
+  tujuan?: { id: number; name: string };
+  indicators?: Indicator[];
+}
+
+export interface Indicator {
+  id: number;
+  name: string;
+  baseline: string | null;
+  sasaran_id: number;
+  sasaran?: { id: number; name: string };
+  targets?: { id: number; year: number; target: string }[];
+}
+
+export interface Tujuan {
+  id: number;
+  name: string;
+  sasarans: Sasaran[];
+}
 
 export interface Need {
   id: number;
@@ -42,6 +67,10 @@ export interface Need {
   created_at: string;
   organizational_unit?: { id: number; name: string };
   need_type?: { id: number; name: string };
+  sasarans?: Sasaran[];
+  indicators?: Indicator[];
+  sasarans_count?: number;
+  indicators_count?: number;
 }
 
 export const STATUS_LABELS: Record<Need['status'], string> = {
@@ -99,6 +128,7 @@ export const formatCurrency = (value: string | number) =>
 export const getColumns = (
   onEdit: (need: Need) => void,
   onDelete: (need: Need) => void,
+  onShowDetails: (need: Need) => void,
 ): ColumnDef<Need>[] => [
   {
     accessorKey: 'id',
@@ -181,6 +211,46 @@ export const getColumns = (
         </Badge>
       );
     },
+  },
+  {
+    id: 'alignment',
+    header: 'Penyelarasan Strategis',
+    cell: ({ row }) => {
+      const { sasarans_count, indicators_count } = row.original;
+
+      if (!sasarans_count) {
+        return (
+          <span className="text-xs text-muted-foreground italic">
+            Belum ada penyelarasan
+          </span>
+        );
+      }
+
+      return (
+        <div
+          className="group flex cursor-pointer items-center space-x-1"
+          onClick={() => onShowDetails(row.original)}
+        >
+          <Badge
+            variant="outline"
+            className="h-6 transition-colors group-hover:border-primary/30 group-hover:bg-primary/10 group-hover:text-primary"
+          >
+            <Component className="h-3.5 w-3.5" />
+            {sasarans_count} Sasaran
+          </Badge>
+          {indicators_count ? (
+            <Badge
+              variant="outline"
+              className="h-6 transition-colors group-hover:border-primary/30 group-hover:bg-primary/10 group-hover:text-primary"
+            >
+              <Tag className="h-3.5 w-3.5" />
+              {indicators_count} Indikator
+            </Badge>
+          ) : null}
+        </div>
+      );
+    },
+    enableSorting: false,
   },
   {
     id: 'actions',

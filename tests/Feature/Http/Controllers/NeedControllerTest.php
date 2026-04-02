@@ -5,6 +5,7 @@ use App\Enums\Urgency;
 use App\Models\Need;
 use App\Models\NeedType;
 use App\Models\OrganizationalUnit;
+use App\Models\Sasaran;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -15,6 +16,8 @@ uses(RefreshDatabase::class);
 
 function validNeedPayload(OrganizationalUnit $unit, NeedType $needType, array $overrides = []): array
 {
+    $sasaran = Sasaran::factory()->create();
+
     return array_merge([
         'organizational_unit_id' => $unit->id,
         'need_type_id' => $needType->id,
@@ -31,6 +34,7 @@ function validNeedPayload(OrganizationalUnit $unit, NeedType $needType, array $o
         'impact' => Impact::Medium->value,
         'is_priority' => false,
         'status' => 'draft',
+        'sasaran_ids' => [$sasaran->id],
     ], $overrides);
 }
 
@@ -229,6 +233,7 @@ test('store validates required fields', function () {
             'total_price',
             'urgency',
             'impact',
+            'sasaran_ids',
         ]);
 });
 
@@ -310,6 +315,7 @@ test('update validates required fields', function () {
             'total_price',
             'urgency',
             'impact',
+            'sasaran_ids',
         ]);
 });
 

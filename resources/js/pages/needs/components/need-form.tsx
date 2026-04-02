@@ -8,14 +8,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
 
-import type { Need } from '../columns';
+import type { Need, Tujuan } from '../columns';
 import { GeneralInfoSection } from './general-info-section';
 import { PriorityStatusSection } from './priority-status-section';
+import { StrategicAlignmentSection } from './strategic-alignment-section';
 
 interface NeedFormProps {
   need?: Need | null;
   organizationalUnits: { id: number; name: string }[];
   needTypes: { id: number; name: string }[];
+  tujuans: Tujuan[];
   className?: string;
 }
 
@@ -23,6 +25,7 @@ export function NeedForm({
   need,
   organizationalUnits,
   needTypes,
+  tujuans,
   className,
 }: NeedFormProps) {
   const isEditing = !!need;
@@ -43,6 +46,10 @@ export function NeedForm({
     impact: need?.impact ?? 'medium',
     is_priority: need?.is_priority ?? false,
     status: need?.status ?? 'draft',
+    sasaran_ids:
+      need?.sasarans?.map((s) => s.id.toString()) ?? ([] as string[]),
+    indicator_ids:
+      need?.indicators?.map((i) => i.id.toString()) ?? ([] as string[]),
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -97,6 +104,9 @@ export function NeedForm({
               <TabsTrigger value="urgency" className="">
                 Urgensi & Status
               </TabsTrigger>
+              <TabsTrigger value="alignment" className="">
+                Penyelarasan Strategis
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent
@@ -122,6 +132,18 @@ export function NeedForm({
                 data={data}
                 setData={setData}
                 errors={errors}
+              />
+            </TabsContent>
+
+            <TabsContent
+              value="alignment"
+              className="mt-0 focus-visible:outline-none"
+            >
+              <StrategicAlignmentSection
+                data={data}
+                setData={setData}
+                errors={errors}
+                tujuans={tujuans}
               />
             </TabsContent>
           </Tabs>

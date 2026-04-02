@@ -23,6 +23,7 @@ import needRoutes from '@/routes/needs';
 
 import { getColumns } from './columns';
 import type { Need } from './columns';
+import { NeedAlignmentDetails } from './components/need-alignment-details';
 import { NeedGridView } from './components/need-grid-view';
 
 interface PaginatedNeeds {
@@ -54,6 +55,7 @@ export default function NeedsIndex({
   filters,
 }: NeedsIndexProps) {
   const [deletingNeed, setDeletingNeed] = useState<Need | null>(null);
+  const [detailNeed, setDetailNeed] = useState<Need | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('grid');
 
@@ -78,6 +80,10 @@ export default function NeedsIndex({
     setDeletingNeed(need);
   };
 
+  const onShowDetails = (need: Need) => {
+    setDetailNeed(need);
+  };
+
   const handleConfirmDelete = () => {
     if (!deletingNeed) {
       return;
@@ -94,7 +100,10 @@ export default function NeedsIndex({
     });
   };
 
-  const stableColumns = useMemo(() => getColumns(onEdit, onDelete), []);
+  const stableColumns = useMemo(
+    () => getColumns(onEdit, onDelete, onShowDetails),
+    [],
+  );
 
   const statusOptions = [
     { label: 'Draft', value: 'draft', icon: Clock },
@@ -194,7 +203,12 @@ export default function NeedsIndex({
           searchPlaceholder="Cari berdasarkan judul atau deskripsi..."
           view={viewMode}
           renderGrid={(data) => (
-            <NeedGridView data={data} onEdit={onEdit} onDelete={onDelete} />
+            <NeedGridView
+              data={data}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onShowDetails={onShowDetails}
+            />
           )}
           toolbarChildren={
             <>
@@ -240,6 +254,12 @@ export default function NeedsIndex({
         confirmText="Hapus"
         variant="destructive"
         loading={isDeleting}
+      />
+
+      <NeedAlignmentDetails
+        need={detailNeed}
+        open={!!detailNeed}
+        onOpenChange={(open) => !open && setDetailNeed(null)}
       />
     </>
   );

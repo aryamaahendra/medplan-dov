@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\IndicatorController;
+use App\Http\Controllers\KpiGroupController;
+use App\Http\Controllers\KpiIndicatorController;
 use App\Http\Controllers\NeedController;
 use App\Http\Controllers\NeedTypeController;
 use App\Http\Controllers\OrganizationalUnitController;
@@ -25,6 +27,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('tujuans', TujuanController::class)->except(['index', 'create', 'edit', 'show']);
     Route::resource('sasarans', SasaranController::class)->except(['index', 'create', 'edit', 'show']);
     Route::resource('indicators', IndicatorController::class)->except(['index', 'create', 'edit', 'show']);
+
+    Route::prefix('kpis')->name('kpis.')->group(function () {
+        Route::resource('groups', KpiGroupController::class);
+        Route::post('groups/{group}/activate', [KpiGroupController::class, 'activate'])->name('groups.activate');
+        Route::resource('indicators', KpiIndicatorController::class)->except(['index', 'show', 'create', 'edit']);
+    });
 });
 
 require __DIR__.'/settings.php';

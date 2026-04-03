@@ -24,7 +24,7 @@ class KpiGroupFactory extends Factory
             'description' => $this->faker->paragraph(),
             'start_year' => (int) $startYear,
             'end_year' => (int) $startYear + 5,
-            'is_active' => $this->faker->boolean(80),
+            'is_active' => false,
         ];
     }
 }

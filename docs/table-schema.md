@@ -13,6 +13,10 @@ This document provides a comprehensive overview of the database tables and their
   - [sasarans](#sasarans)
   - [indicators](#indicators)
   - [indicator_targets](#indicator_targets)
+- [KPI Management Tables](#kpi-management-tables)
+  - [kpi_groups](#kpi_groups)
+  - [kpi_indicators](#kpi_indicators)
+  - [kpi_annual_targets](#kpi_annual_targets)
 - [System Tables](#system-tables)
   - [users](#users)
   - [password_reset_tokens](#password_reset_tokens)
@@ -134,6 +138,48 @@ Stores annual targets for performance indicators.
 | indicator_id | bigint | No | Foreign Key (indicators), cascadeOnDelete |
 | year | integer | No | |
 | target | string | No | |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+
+---
+
+## KPI Management Tables
+
+### `kpi_groups`
+Stores planning periods for KPIs.
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| name | string(255) | No | |
+| description | text | Yes | |
+| start_year | smallint | No | |
+| end_year | smallint | No | |
+| is_active | boolean | No | Default: true, Unique partial index |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+
+### `kpi_indicators`
+Stores the hierarchical performance indicators.
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| group_id | bigint | No | Foreign Key (kpi_groups), cascadeOnDelete |
+| parent_indicator_id | bigint | Yes | Self-reference (kpi_indicators), cascadeOnDelete |
+| name | text | No | |
+| unit | string(100) | Yes | |
+| is_category | boolean | No | Default: false |
+| baseline_value | string(32) | Yes | |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+
+### `kpi_annual_targets`
+Stores yearly target values for indicators.
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| indicator_id | bigint | No | Foreign Key (kpi_indicators), cascadeOnDelete |
+| year | smallint | No | |
+| target_value | string(32) | Yes | |
 | created_at | timestamp | Yes | |
 | updated_at | timestamp | Yes | |
 

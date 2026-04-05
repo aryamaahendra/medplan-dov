@@ -20,12 +20,13 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        // $this->call([
-        //     OrganizationalUnitSeeder::class,
-        //     NeedTypeSeeder::class,
-        //     RenstraSeeder::class,
-        //     TujuanSeeder::class,
-        //     RenstraRSUDSeeder::class,
-        // ]);
+        $this->call([
+            // OrganizationalUnitSeeder::class,
+            // NeedTypeSeeder::class,
+            // RenstraSeeder::class,
+            // TujuanSeeder::class,
+            // RenstraRSUDSeeder::class,
+            StrategicServicePlanSeeder::class,
+        ]);
     }
 }

@@ -13,6 +13,7 @@ This document provides a comprehensive overview of the database tables and their
   - [sasarans](#sasarans)
   - [indicators](#indicators)
   - [indicator_targets](#indicator_targets)
+  - [strategic_service_plans](#strategic_service_plans)
 - [KPI Management Tables](#kpi-management-tables)
   - [kpi_groups](#kpi_groups)
   - [kpi_indicators](#kpi_indicators)
@@ -140,6 +141,20 @@ Stores annual targets for performance indicators.
 | target | string | No | |
 | created_at | timestamp | Yes | |
 | updated_at | timestamp | Yes | |
+
+### `strategic_service_plans`
+Stores strategic service plans including programs, targets, and policy directions.
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| year | unsignedSmallInteger | No | CHECK (year >= 2000) |
+| strategic_program | string(255) | No | |
+| service_plan | text | No | |
+| target | text | No | |
+| policy_direction | text | No | |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+| deleted_at | timestamp | Yes | Soft Deletes |
 
 ---
 

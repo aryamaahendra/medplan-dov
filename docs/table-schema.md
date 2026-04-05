@@ -7,6 +7,8 @@ This document provides a comprehensive overview of the database tables and their
   - [organizational_units](#organizational_units)
   - [need_types](#need_types)
   - [needs](#needs)
+  - [need_sasaran](#need_sasaran)
+  - [need_indicator](#need_indicator)
 - [Strategic Planning Tables](#strategic-planning-tables)
   - [renstras](#renstras)
   - [tujuans](#tujuans)
@@ -78,6 +80,26 @@ Stores the actual requests or needs from organizational units.
 | created_at | timestamp | Yes | |
 | updated_at | timestamp | Yes | |
 | deleted_at | timestamp | Yes | Soft Deletes |
+
+### `need_sasaran`
+Pivot table connecting needs and strategic targets.
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| need_id | bigint | No | Foreign Key (needs), cascadeOnDelete |
+| sasaran_id | bigint | No | Foreign Key (sasarans), cascadeOnDelete |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+
+### `need_indicator`
+Pivot table connecting needs and performance indicators.
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| need_id | bigint | No | Foreign Key (needs), cascadeOnDelete |
+| indicator_id | bigint | No | Foreign Key (indicators), cascadeOnDelete |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
 
 ---
 

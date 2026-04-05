@@ -29,6 +29,7 @@ import needTypes from '@/routes/need-types';
 import needs from '@/routes/needs';
 import organizationalUnits from '@/routes/organizational-units';
 import renstras from '@/routes/renstras';
+import strategicServicePlans from '@/routes/strategic-service-plans';
 import users from '@/routes/users';
 import type { NavItem } from '@/types';
 
@@ -70,6 +71,11 @@ const masterNavItems: NavItem[] = [
     title: 'Manajemen IKK',
     href: kpis.groups.index.url(),
     icon: BookKey,
+  },
+  {
+    title: 'Rencana Layanan Strategis',
+    href: strategicServicePlans.index.url(),
+    icon: ClipboardList,
   },
 ];
 

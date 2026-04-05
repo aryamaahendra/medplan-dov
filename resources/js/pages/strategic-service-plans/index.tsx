@@ -63,8 +63,8 @@ export default function StrategicServicePlansIndex({
 
   const handleConfirmDelete = () => {
     if (!deletingPlan) {
-return;
-}
+      return;
+    }
 
     setIsDeleting(true);
 
@@ -84,7 +84,7 @@ return;
 
   const stableColumns = useMemo(
     () => getColumns(onEdit, onDelete),
-     
+
     [],
   );
 

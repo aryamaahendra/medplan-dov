@@ -78,4 +78,20 @@ class Need extends Model
     {
         return $this->belongsToMany(Indicator::class, 'need_indicator', 'need_id', 'indicator_id');
     }
+
+    /**
+     * Get the KPI indicators for this need.
+     */
+    public function kpiIndicators(): BelongsToMany
+    {
+        return $this->belongsToMany(KpiIndicator::class, 'kpi_indicator_need', 'need_id', 'kpi_indicator_id');
+    }
+
+    /**
+     * Get the strategic service plans for this need.
+     */
+    public function strategicServicePlans(): BelongsToMany
+    {
+        return $this->belongsToMany(StrategicServicePlan::class, 'need_strategic_service_plan', 'need_id', 'strategic_service_plan_id');
+    }
 }

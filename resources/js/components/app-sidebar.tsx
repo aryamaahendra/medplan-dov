@@ -8,6 +8,7 @@ import {
   LayoutGrid,
   Layers,
   Users,
+  BookKey,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
@@ -23,6 +24,7 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import kpis from '@/routes/kpis';
 import needTypes from '@/routes/need-types';
 import needs from '@/routes/needs';
 import organizationalUnits from '@/routes/organizational-units';
@@ -63,6 +65,11 @@ const masterNavItems: NavItem[] = [
     title: 'Manajemen Renstra',
     href: renstras.index.url(),
     icon: FileText,
+  },
+  {
+    title: 'Manajemen IKK',
+    href: kpis.groups.index.url(),
+    icon: BookKey,
   },
 ];
 

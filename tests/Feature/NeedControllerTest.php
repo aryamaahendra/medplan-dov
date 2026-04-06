@@ -156,3 +156,19 @@ it('can filter needs by urgency, impact, and priority', function () {
         ->where('needs.data.0.is_priority', true)
     );
 });
+
+it('can view a need detail page', function () {
+    $need = Need::factory()->create();
+    $sasaran = Sasaran::factory()->create();
+    $need->sasarans()->attach($sasaran);
+
+    $response = $this->get(route('needs.show', $need));
+
+    $response->assertStatus(200)
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('needs/show')
+            ->has('need')
+            ->where('need.id', $need->id)
+            ->has('need.sasarans', 1)
+        );
+});

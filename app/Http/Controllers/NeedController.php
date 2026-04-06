@@ -146,6 +146,23 @@ class NeedController extends Controller
             ->with('success', 'Usulan kebutuhan berhasil diperbarui.');
     }
 
+    public function show(Need $need): Response
+    {
+        return Inertia::render('needs/show', [
+            'need' => $need->load([
+                'organizationalUnit:id,name',
+                'needType:id,name',
+                'sasarans:id,tujuan_id,name',
+                'sasarans.tujuan:id,name',
+                'indicators:id,sasaran_id,name,baseline',
+                'indicators.sasaran:id,name',
+                'indicators.targets:id,indicator_id,year,target',
+                'kpiIndicators:id,name,unit,is_category,parent_indicator_id',
+                'strategicServicePlans:id,strategic_program,service_plan,year',
+            ]),
+        ]);
+    }
+
     public function destroy(Need $need)
     {
         $need->delete();

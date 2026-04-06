@@ -1,3 +1,4 @@
+import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
   CheckCircle2,
@@ -8,6 +9,7 @@ import {
   Trash2,
   XCircle,
 } from 'lucide-react';
+
 
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { PriorityBadge } from '@/components/priority-badge';
@@ -21,6 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import needRoutes from '@/routes/needs';
 
 export interface Sasaran {
   id: number;
@@ -247,6 +250,12 @@ export const getColumns = (
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+            <DropdownMenuItem className="text-sm/relaxed" asChild>
+              <Link href={needRoutes.show.url({ need: need.id })}>
+                <FileText className="h-4 w-4" />
+                Detail
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem
               className="text-sm/relaxed"
               onClick={() => onEdit(need)}

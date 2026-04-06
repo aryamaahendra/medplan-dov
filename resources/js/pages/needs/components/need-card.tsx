@@ -1,4 +1,5 @@
-import { Edit, Trash2 } from 'lucide-react';
+import { Link } from '@inertiajs/react';
+import { Edit, FileText, Trash2 } from 'lucide-react';
 import * as React from 'react';
 import { PriorityBadge } from '@/components/priority-badge';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +13,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import needRoutes from '@/routes/needs';
 
 import {
   formatCurrency,
@@ -36,6 +38,12 @@ export function NeedCard({ need, onEdit, onDelete }: NeedCardProps) {
           {need.description}
         </CardDescription>
         <CardAction className="space-x-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link href={needRoutes.show.url({ need: need.id })}>
+              <FileText />
+              Detail
+            </Link>
+          </Button>
           <Button variant="outline" size="sm" onClick={() => onEdit(need)}>
             <Edit />
             Edit

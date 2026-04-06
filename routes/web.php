@@ -23,7 +23,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('users', UserController::class)->except(['create', 'edit']);
     Route::resource('organizational-units', OrganizationalUnitController::class)->except(['create', 'edit', 'show']);
     Route::resource('need-types', NeedTypeController::class)->except(['create', 'edit', 'show']);
-    Route::resource('needs', NeedController::class)->except(['show']);
+    Route::resource('needs', NeedController::class);
     Route::resource('renstras', RenstraController::class)->except(['create', 'edit']);
     Route::resource('tujuans', TujuanController::class)->except(['index', 'create', 'edit', 'show']);
     Route::resource('sasarans', SasaranController::class)->except(['index', 'create', 'edit', 'show']);

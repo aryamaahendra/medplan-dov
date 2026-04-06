@@ -1,12 +1,10 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import {
   CheckCircle2,
-  Component,
   Edit,
   FileText,
   MoreHorizontal,
   Send,
-  Tag,
   Trash2,
   XCircle,
 } from 'lucide-react';
@@ -147,7 +145,6 @@ export const formatCurrency = (value: string | number) =>
 export const getColumns = (
   onEdit: (need: Need) => void,
   onDelete: (need: Need) => void,
-  onShowDetails: (need: Need) => void,
 ): ColumnDef<Need>[] => [
   {
     accessorKey: 'id',
@@ -166,6 +163,9 @@ export const getColumns = (
       <DataTableColumnHeader {...props} title="Usulan Kebutuhan" />
     ),
     meta: { cellClassName: 'font-medium' },
+    cell: ({ row }) => (
+      <p className="w-[36ch] whitespace-normal">{row.original.title}</p>
+    ),
   },
   {
     id: 'organizational_unit',
@@ -208,9 +208,9 @@ export const getColumns = (
     header: (props) => <DataTableColumnHeader {...props} title="Prioritas" />,
     cell: ({ row }) =>
       row.original.is_priority ? (
-        <PriorityBadge level="urgent" fallback="Prioritas" />
+        <PriorityBadge level="Urgent" fallback="Prioritas" />
       ) : (
-        <PriorityBadge level="normal" fallback="Biasa" />
+        <PriorityBadge level="Normal" fallback="Biasa" />
       ),
   },
   {
@@ -223,82 +223,13 @@ export const getColumns = (
       return (
         <Badge
           variant={STATUS_VARIANTS[status]}
-          className="flex w-fit items-center gap-1"
+          className="flex w-fit items-center gap-1 capitalize"
         >
           {Icon && <Icon className="h-3.5 w-3.5" />}
           {STATUS_LABELS[status]}
         </Badge>
       );
     },
-  },
-  {
-    id: 'alignment',
-    header: 'Penyelarasan Strategis',
-    cell: ({ row }) => {
-      const {
-        sasarans_count,
-        indicators_count,
-        kpi_indicators_count,
-        strategic_service_plans_count,
-      } = row.original;
-
-      if (
-        !sasarans_count &&
-        !kpi_indicators_count &&
-        !strategic_service_plans_count
-      ) {
-        return (
-          <span className="text-xs text-muted-foreground italic">
-            Belum ada penyelarasan
-          </span>
-        );
-      }
-
-      return (
-        <div
-          className="group flex cursor-pointer flex-wrap items-center gap-1"
-          onClick={() => onShowDetails(row.original)}
-        >
-          {sasarans_count ? (
-            <Badge
-              variant="outline"
-              className="h-6 transition-colors group-hover:border-primary/30 group-hover:bg-primary/10 group-hover:text-primary"
-            >
-              <Component className="h-3.5 w-3.5" />
-              {sasarans_count} Sasaran
-            </Badge>
-          ) : null}
-          {indicators_count ? (
-            <Badge
-              variant="outline"
-              className="h-6 transition-colors group-hover:border-primary/30 group-hover:bg-primary/10 group-hover:text-primary"
-            >
-              <Tag className="h-3.5 w-3.5" />
-              {indicators_count} Indikator
-            </Badge>
-          ) : null}
-          {kpi_indicators_count ? (
-            <Badge
-              variant="outline"
-              className="h-6 transition-colors group-hover:border-primary/30 group-hover:bg-primary/10 group-hover:text-primary"
-            >
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              {kpi_indicators_count} KPI
-            </Badge>
-          ) : null}
-          {strategic_service_plans_count ? (
-            <Badge
-              variant="outline"
-              className="h-6 transition-colors group-hover:border-primary/30 group-hover:bg-primary/10 group-hover:text-primary"
-            >
-              <FileText className="h-3.5 w-3.5" />
-              {strategic_service_plans_count} Plan
-            </Badge>
-          ) : null}
-        </div>
-      );
-    },
-    enableSorting: false,
   },
   {
     id: 'actions',

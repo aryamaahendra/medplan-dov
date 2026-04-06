@@ -36,34 +36,34 @@ export function PriorityBadge({
     case 'high':
       // Orange (Soft)
       customClasses =
-        'bg-orange-50 text-orange-700 border-orange-200/50 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20 px-2.5 py-0.5';
+        'bg-orange-50 text-orange-700 border-orange-200/50 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20';
       break;
     case 'medium':
       // Blue (Soft)
       customClasses =
-        'bg-blue-50 text-blue-700 border-blue-200/50 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20 px-2.5 py-0.5';
+        'bg-blue-50 text-blue-700 border-blue-200/50 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20';
       break;
     case 'low':
       // Gray (Soft)
       customClasses =
-        'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 px-2.5 py-0.5';
+        'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
       break;
     case 'urgent':
     case 'extreme':
       // Red (Soft)
       customClasses =
-        'bg-red-50 text-red-700 border-red-200/50 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20 px-2.5 py-0.5';
+        'bg-red-50 text-red-700 border-red-200/50 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20';
       break;
     case 'normal':
     case 'safe':
       // Green (Soft)
       customClasses =
-        'bg-green-50 text-green-700 border-green-200/50 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20 px-2.5 py-0.5';
+        'bg-green-50 text-green-700 border-green-200/50 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20';
       break;
     default:
       // Generic gray fallback
       customClasses =
-        'bg-secondary/50 text-secondary-foreground border-transparent px-2.5 py-0.5';
+        'bg-secondary/50 text-secondary-foreground border-transparent';
   }
 
   const label = PRIORITY_LABELS[level] ?? level ?? fallback;
@@ -71,7 +71,7 @@ export function PriorityBadge({
   return (
     <Badge
       variant="outline"
-      className={cn('rounded-full font-semibold', customClasses, className)}
+      className={cn(customClasses, className)}
       {...props}
     >
       {label}

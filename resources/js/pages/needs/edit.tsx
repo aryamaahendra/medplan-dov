@@ -8,6 +8,8 @@ interface EditProps {
   organizationalUnits: { id: number; name: string }[];
   needTypes: { id: number; name: string }[];
   tujuans: Tujuan[];
+  kpiGroups: any[];
+  strategicServicePlans: any[];
 }
 
 export default function Edit({
@@ -15,6 +17,8 @@ export default function Edit({
   organizationalUnits,
   needTypes,
   tujuans,
+  kpiGroups,
+  strategicServicePlans,
 }: EditProps) {
   return (
     <>
@@ -35,6 +39,8 @@ export default function Edit({
             organizationalUnits={organizationalUnits}
             needTypes={needTypes}
             tujuans={tujuans}
+            kpiGroups={kpiGroups}
+            strategicServicePlans={strategicServicePlans}
           />
         </div>
       </div>

@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreNeedRequest;
 use App\Http\Requests\UpdateNeedRequest;
+use App\Models\KpiGroup;
 use App\Models\Need;
 use App\Models\NeedType;
 use App\Models\OrganizationalUnit;
+use App\Models\StrategicServicePlan;
 use App\Models\Tujuan;
 use App\Traits\HasDataTable;
 use Illuminate\Http\Request;
@@ -36,8 +38,10 @@ class NeedController extends Controller
                     'indicators:id,sasaran_id,name,baseline',
                     'indicators.sasaran:id,name',
                     'indicators.targets:id,indicator_id,year,target',
+                    'kpiIndicators:id,name,unit',
+                    'strategicServicePlans:id,strategic_program,service_plan',
                 ])
-                ->withCount(['sasarans', 'indicators'])
+                ->withCount(['sasarans', 'indicators', 'kpiIndicators', 'strategicServicePlans'])
                 ->when($request->input('year'), fn ($q, $v) => $q->whereIn('year', (array) $v))
                 ->when($request->input('status'), fn ($q, $v) => $q->whereIn('status', (array) $v))
                 ->when($request->input('need_type_id'), fn ($q, $v) => $q->whereIn('need_type_id', (array) $v))
@@ -67,6 +71,8 @@ class NeedController extends Controller
             $need = Need::create($request->validated());
             $need->sasarans()->sync($request->sasaran_ids);
             $need->indicators()->sync($request->indicator_ids ?? []);
+            $need->kpiIndicators()->sync($request->kpi_indicator_ids ?? []);
+            $need->strategicServicePlans()->sync($request->strategic_service_plan_ids ?? []);
         });
 
         return redirect()->route('needs.index')
@@ -86,13 +92,20 @@ class NeedController extends Controller
                     'sasarans.indicators' => fn ($q) => $q->select(['id', 'sasaran_id', 'name']),
                 ])
                 ->get(),
+            'kpiGroups' => KpiGroup::query()
+                ->where('is_active', true)
+                ->with(['indicators' => fn ($q) => $q->select(['id', 'group_id', 'parent_indicator_id', 'name', 'unit', 'is_category'])])
+                ->get(),
+            'strategicServicePlans' => StrategicServicePlan::query()
+                ->select(['id', 'strategic_program', 'service_plan', 'year'])
+                ->get(),
         ]);
     }
 
     public function edit(Need $need): Response
     {
         return Inertia::render('needs/edit', [
-            'need' => $need->load(['sasarans:id', 'indicators:id']),
+            'need' => $need->load(['sasarans:id', 'indicators:id', 'kpiIndicators:id', 'strategicServicePlans:id']),
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
             'tujuans' => Tujuan::query()
@@ -103,6 +116,13 @@ class NeedController extends Controller
                     'sasarans.indicators' => fn ($q) => $q->select(['id', 'sasaran_id', 'name']),
                 ])
                 ->get(),
+            'kpiGroups' => KpiGroup::query()
+                ->where('is_active', true)
+                ->with(['indicators' => fn ($q) => $q->select(['id', 'group_id', 'parent_indicator_id', 'name', 'unit', 'is_category'])])
+                ->get(),
+            'strategicServicePlans' => StrategicServicePlan::query()
+                ->select(['id', 'strategic_program', 'service_plan', 'year'])
+                ->get(),
         ]);
     }
 
@@ -112,6 +132,8 @@ class NeedController extends Controller
             $need->update($request->validated());
             $need->sasarans()->sync($request->sasaran_ids);
             $need->indicators()->sync($request->indicator_ids ?? []);
+            $need->kpiIndicators()->sync($request->kpi_indicator_ids ?? []);
+            $need->strategicServicePlans()->sync($request->strategic_service_plan_ids ?? []);
         });
 
         return redirect()->route('needs.index')

@@ -7,12 +7,16 @@ interface CreateProps {
   organizationalUnits: { id: number; name: string }[];
   needTypes: { id: number; name: string }[];
   tujuans: Tujuan[];
+  kpiGroups: any[];
+  strategicServicePlans: any[];
 }
 
 export default function Create({
   organizationalUnits,
   needTypes,
   tujuans,
+  kpiGroups,
+  strategicServicePlans,
 }: CreateProps) {
   return (
     <>
@@ -32,6 +36,8 @@ export default function Create({
             organizationalUnits={organizationalUnits}
             needTypes={needTypes}
             tujuans={tujuans}
+            kpiGroups={kpiGroups}
+            strategicServicePlans={strategicServicePlans}
           />
         </div>
       </div>

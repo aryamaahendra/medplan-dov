@@ -27,4 +27,24 @@ class KpiGroupFactory extends Factory
             'is_active' => false,
         ];
     }
+
+    /**
+     * @return $this
+     */
+    public function active(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => true,
+        ]);
+    }
+
+    /**
+     * @return $this
+     */
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => false,
+        ]);
+    }
 }

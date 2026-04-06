@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
 
-import type { Need, Tujuan } from '../columns';
+import type { Need, StrategicServicePlan, Tujuan } from '../columns';
 import { GeneralInfoSection } from './general-info-section';
 import { PriorityStatusSection } from './priority-status-section';
 import { StrategicAlignmentSection } from './strategic-alignment-section';
@@ -18,6 +18,8 @@ interface NeedFormProps {
   organizationalUnits: { id: number; name: string }[];
   needTypes: { id: number; name: string }[];
   tujuans: Tujuan[];
+  kpiGroups: any[];
+  strategicServicePlans: StrategicServicePlan[];
   className?: string;
 }
 
@@ -26,6 +28,8 @@ export function NeedForm({
   organizationalUnits,
   needTypes,
   tujuans,
+  kpiGroups,
+  strategicServicePlans,
   className,
 }: NeedFormProps) {
   const isEditing = !!need;
@@ -50,6 +54,11 @@ export function NeedForm({
       need?.sasarans?.map((s) => s.id.toString()) ?? ([] as string[]),
     indicator_ids:
       need?.indicators?.map((i) => i.id.toString()) ?? ([] as string[]),
+    kpi_indicator_ids:
+      need?.kpi_indicators?.map((i) => i.id.toString()) ?? ([] as string[]),
+    strategic_service_plan_ids:
+      need?.strategic_service_plans?.map((i) => i.id.toString()) ??
+      ([] as string[]),
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -144,6 +153,8 @@ export function NeedForm({
                 setData={setData}
                 errors={errors}
                 tujuans={tujuans}
+                kpiGroups={kpiGroups}
+                strategicServicePlans={strategicServicePlans}
               />
             </TabsContent>
           </Tabs>

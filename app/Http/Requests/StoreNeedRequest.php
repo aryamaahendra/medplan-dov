@@ -54,6 +54,10 @@ class StoreNeedRequest extends FormRequest
                     }
                 },
             ],
+            'kpi_indicator_ids' => ['nullable', 'array'],
+            'kpi_indicator_ids.*' => ['exists:kpi_indicators,id'],
+            'strategic_service_plan_ids' => ['nullable', 'array'],
+            'strategic_service_plan_ids.*' => ['exists:strategic_service_plans,id'],
         ];
     }
 }

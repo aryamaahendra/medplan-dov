@@ -47,6 +47,21 @@ export interface Tujuan {
   sasarans: Sasaran[];
 }
 
+export interface KpiIndicator {
+  id: number;
+  name: string;
+  unit: string | null;
+  is_category: boolean;
+  parent_indicator_id: number | null;
+}
+
+export interface StrategicServicePlan {
+  id: number;
+  strategic_program: string;
+  service_plan: string;
+  year: number;
+}
+
 export interface Need {
   id: number;
   organizational_unit_id: number;
@@ -69,8 +84,12 @@ export interface Need {
   need_type?: { id: number; name: string };
   sasarans?: Sasaran[];
   indicators?: Indicator[];
+  kpi_indicators?: KpiIndicator[];
+  strategic_service_plans?: StrategicServicePlan[];
   sasarans_count?: number;
   indicators_count?: number;
+  kpi_indicators_count?: number;
+  strategic_service_plans_count?: number;
 }
 
 export const STATUS_LABELS: Record<Need['status'], string> = {
@@ -216,9 +235,18 @@ export const getColumns = (
     id: 'alignment',
     header: 'Penyelarasan Strategis',
     cell: ({ row }) => {
-      const { sasarans_count, indicators_count } = row.original;
+      const {
+        sasarans_count,
+        indicators_count,
+        kpi_indicators_count,
+        strategic_service_plans_count,
+      } = row.original;
 
-      if (!sasarans_count) {
+      if (
+        !sasarans_count &&
+        !kpi_indicators_count &&
+        !strategic_service_plans_count
+      ) {
         return (
           <span className="text-xs text-muted-foreground italic">
             Belum ada penyelarasan
@@ -228,16 +256,18 @@ export const getColumns = (
 
       return (
         <div
-          className="group flex cursor-pointer items-center space-x-1"
+          className="group flex cursor-pointer flex-wrap items-center gap-1"
           onClick={() => onShowDetails(row.original)}
         >
-          <Badge
-            variant="outline"
-            className="h-6 transition-colors group-hover:border-primary/30 group-hover:bg-primary/10 group-hover:text-primary"
-          >
-            <Component className="h-3.5 w-3.5" />
-            {sasarans_count} Sasaran
-          </Badge>
+          {sasarans_count ? (
+            <Badge
+              variant="outline"
+              className="h-6 transition-colors group-hover:border-primary/30 group-hover:bg-primary/10 group-hover:text-primary"
+            >
+              <Component className="h-3.5 w-3.5" />
+              {sasarans_count} Sasaran
+            </Badge>
+          ) : null}
           {indicators_count ? (
             <Badge
               variant="outline"
@@ -245,6 +275,24 @@ export const getColumns = (
             >
               <Tag className="h-3.5 w-3.5" />
               {indicators_count} Indikator
+            </Badge>
+          ) : null}
+          {kpi_indicators_count ? (
+            <Badge
+              variant="outline"
+              className="h-6 transition-colors group-hover:border-primary/30 group-hover:bg-primary/10 group-hover:text-primary"
+            >
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              {kpi_indicators_count} KPI
+            </Badge>
+          ) : null}
+          {strategic_service_plans_count ? (
+            <Badge
+              variant="outline"
+              className="h-6 transition-colors group-hover:border-primary/30 group-hover:bg-primary/10 group-hover:text-primary"
+            >
+              <FileText className="h-3.5 w-3.5" />
+              {strategic_service_plans_count} Plan
             </Badge>
           ) : null}
         </div>

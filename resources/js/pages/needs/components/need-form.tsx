@@ -10,8 +10,10 @@ import needRoutes from '@/routes/needs';
 
 import type { Need, StrategicServicePlan, Tujuan } from '../columns';
 import { GeneralInfoSection } from './general-info-section';
+import { IkkAlignmentSection } from './ikk-alignment-section';
 import { PriorityStatusSection } from './priority-status-section';
-import { StrategicAlignmentSection } from './strategic-alignment-section';
+import { RenstraAlignmentSection } from './renstra-alignment-section';
+import { RlsAlignmentSection } from './rls-alignment-section';
 
 interface NeedFormProps {
   need?: Need | null;
@@ -113,8 +115,14 @@ export function NeedForm({
               <TabsTrigger value="urgency" className="">
                 Urgensi & Status
               </TabsTrigger>
-              <TabsTrigger value="alignment" className="">
-                Penyelarasan Strategis
+              <TabsTrigger value="renstra" className="">
+                Renstra
+              </TabsTrigger>
+              <TabsTrigger value="ikk" className="">
+                IKK
+              </TabsTrigger>
+              <TabsTrigger value="rls" className="">
+                RLS
               </TabsTrigger>
             </TabsList>
 
@@ -145,15 +153,37 @@ export function NeedForm({
             </TabsContent>
 
             <TabsContent
-              value="alignment"
+              value="renstra"
               className="mt-0 focus-visible:outline-none"
             >
-              <StrategicAlignmentSection
+              <RenstraAlignmentSection
                 data={data}
                 setData={setData}
                 errors={errors}
                 tujuans={tujuans}
+              />
+            </TabsContent>
+
+            <TabsContent
+              value="ikk"
+              className="mt-0 focus-visible:outline-none"
+            >
+              <IkkAlignmentSection
+                data={data}
+                setData={setData}
+                errors={errors}
                 kpiGroups={kpiGroups}
+              />
+            </TabsContent>
+
+            <TabsContent
+              value="rls"
+              className="mt-0 focus-visible:outline-none"
+            >
+              <RlsAlignmentSection
+                data={data}
+                setData={setData}
+                errors={errors}
                 strategicServicePlans={strategicServicePlans}
               />
             </TabsContent>

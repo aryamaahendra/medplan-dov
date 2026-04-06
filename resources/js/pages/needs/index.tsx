@@ -44,6 +44,9 @@ interface NeedsIndexProps {
     status?: string | string[];
     need_type_id?: string | string[];
     organizational_unit_id?: string | string[];
+    urgency?: string | string[];
+    impact?: string | string[];
+    is_priority?: string | string[];
   };
 }
 
@@ -128,6 +131,23 @@ export default function NeedsIndex({
       })),
     [organizationalUnits],
   );
+
+  const urgencyOptions = [
+    { label: 'Tinggi', value: 'high' },
+    { label: 'Sedang', value: 'medium' },
+    { label: 'Rendah', value: 'low' },
+  ];
+
+  const impactOptions = [
+    { label: 'Tinggi', value: 'high' },
+    { label: 'Sedang', value: 'medium' },
+    { label: 'Rendah', value: 'low' },
+  ];
+
+  const priorityOptions = [
+    { label: 'Ya', value: '1' },
+    { label: 'Tidak', value: '0' },
+  ];
 
   const getFilterArray = (value: string | string[] | undefined) => {
     if (!value) {
@@ -224,6 +244,26 @@ export default function NeedsIndex({
                 selectedValues={getFilterArray(filters.organizational_unit_id)}
                 onSelect={(values) =>
                   mergeParams({ organizational_unit_id: values, page: 1 })
+                }
+              />
+              <DataTableFacetedFilter
+                title="Urgensi"
+                options={urgencyOptions}
+                selectedValues={getFilterArray(filters.urgency)}
+                onSelect={(values) => mergeParams({ urgency: values, page: 1 })}
+              />
+              <DataTableFacetedFilter
+                title="Dampak"
+                options={impactOptions}
+                selectedValues={getFilterArray(filters.impact)}
+                onSelect={(values) => mergeParams({ impact: values, page: 1 })}
+              />
+              <DataTableFacetedFilter
+                title="Prioritas"
+                options={priorityOptions}
+                selectedValues={getFilterArray(filters.is_priority)}
+                onSelect={(values) =>
+                  mergeParams({ is_priority: values, page: 1 })
                 }
               />
             </>

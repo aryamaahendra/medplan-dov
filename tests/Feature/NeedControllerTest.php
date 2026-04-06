@@ -115,3 +115,44 @@ it('provides active kpi groups and strategic plans to create view', function () 
             ->where('strategicServicePlans.0.strategic_program', 'Strategic Program X')
         );
 });
+
+it('can filter needs by urgency, impact, and priority', function () {
+    Need::factory()->create([
+        'urgency' => Urgency::High,
+        'impact' => Impact::High,
+        'is_priority' => true,
+    ]);
+
+    Need::factory()->create([
+        'urgency' => Urgency::Low,
+        'impact' => Impact::Low,
+        'is_priority' => false,
+    ]);
+
+    $response = $this->get(route('needs.index', [
+        'urgency' => [Urgency::High->value],
+    ]));
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('needs/index')
+        ->has('needs.data', 1)
+        ->where('needs.data.0.urgency', Urgency::High->value)
+    );
+
+    $response = $this->get(route('needs.index', [
+        'impact' => [Impact::High->value],
+    ]));
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('needs/index')
+        ->has('needs.data', 1)
+        ->where('needs.data.0.impact', Impact::High->value)
+    );
+
+    $response = $this->get(route('needs.index', [
+        'is_priority' => ['1'],
+    ]));
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('needs/index')
+        ->has('needs.data', 1)
+        ->where('needs.data.0.is_priority', true)
+    );
+});

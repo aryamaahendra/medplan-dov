@@ -46,6 +46,9 @@ class NeedController extends Controller
                 ->when($request->input('status'), fn ($q, $v) => $q->whereIn('status', (array) $v))
                 ->when($request->input('need_type_id'), fn ($q, $v) => $q->whereIn('need_type_id', (array) $v))
                 ->when($request->input('organizational_unit_id'), fn ($q, $v) => $q->whereIn('organizational_unit_id', (array) $v))
+                ->when($request->input('urgency'), fn ($q, $v) => $q->whereIn('urgency', (array) $v))
+                ->when($request->input('impact'), fn ($q, $v) => $q->whereIn('impact', (array) $v))
+                ->when($request->input('is_priority'), fn ($q, $v) => $q->whereIn('is_priority', (array) $v))
                 ->orderBy('created_at', 'desc'),
             $request,
             self::SEARCH_COLUMNS,
@@ -61,6 +64,9 @@ class NeedController extends Controller
                 'status' => $request->input('status'),
                 'need_type_id' => $request->input('need_type_id'),
                 'organizational_unit_id' => $request->input('organizational_unit_id'),
+                'urgency' => $request->input('urgency'),
+                'impact' => $request->input('impact'),
+                'is_priority' => $request->input('is_priority'),
             ]),
         ]);
     }

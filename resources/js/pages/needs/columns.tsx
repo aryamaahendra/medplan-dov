@@ -10,7 +10,6 @@ import {
   XCircle,
 } from 'lucide-react';
 
-
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { PriorityBadge } from '@/components/priority-badge';
 import { Badge } from '@/components/ui/badge';
@@ -24,7 +23,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import needRoutes from '@/routes/needs';
-import type { KpiGroup, KpiIndicator, StrategicServicePlan as BaseStrategicServicePlan } from '@/types';
+import type {
+  KpiIndicator,
+  StrategicServicePlan as BaseStrategicServicePlan,
+} from '@/types';
 
 export interface Sasaran {
   id: number;
@@ -49,9 +51,7 @@ export interface Tujuan {
   sasarans: Sasaran[];
 }
 
-export interface StrategicServicePlan extends BaseStrategicServicePlan {
-  // Add any additional fields if needed, but Base already has strategic_program etc.
-}
+export type StrategicServicePlan = BaseStrategicServicePlan;
 
 export interface Need {
   id: number;

@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import type { KpiIndicator } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { buildIndicatorTree, classifyIndicators } from '@/lib/kpi-utils';
+import type { KpiIndicator } from '@/types';
 import { IndicatorCard } from './indicator-card';
 import { IndicatorTable } from './indicator-table';
 
@@ -30,6 +30,7 @@ export function KpiIndicatorTree({
   const { categories, standaloneIndicators, treeLength } = useMemo(() => {
     const tree = buildIndicatorTree(indicators);
     const { categories, standaloneIndicators } = classifyIndicators(tree);
+
     return { categories, standaloneIndicators, treeLength: tree.length };
   }, [indicators]);
 

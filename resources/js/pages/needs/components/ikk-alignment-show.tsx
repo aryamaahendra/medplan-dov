@@ -1,27 +1,29 @@
 import { Target } from 'lucide-react';
 import { useMemo } from 'react';
 
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import type { KpiIndicator } from '@/types';
 import type { Need } from '../columns';
-import { Badge } from '@/components/ui/badge';
 
 interface IkkAlignmentShowProps {
   need: Need;
 }
 
 export function IkkAlignmentShow({ need }: IkkAlignmentShowProps) {
-  const kpis = need.kpi_indicators || [];
-
   const groups = useMemo(() => {
-    if (kpis.length === 0) return [];
+    const kpis = need.kpi_indicators || [];
+
+    if (kpis.length === 0) {
+      return [];
+    }
 
     // Group by KPI Group (Period)
     const groupMap = new Map<number, { group: any; categories: any[] }>();
 
     kpis.forEach((kpi) => {
       const groupId = kpi.group?.id || 0;
+
       if (!groupMap.has(groupId)) {
         groupMap.set(groupId, {
           group: kpi.group,
@@ -36,6 +38,7 @@ export function IkkAlignmentShow({ need }: IkkAlignmentShowProps) {
       let category = currentGroup.categories.find(
         (c) => c.parentId === parentId,
       );
+
       if (!category) {
         category = {
           parentId,
@@ -44,11 +47,12 @@ export function IkkAlignmentShow({ need }: IkkAlignmentShowProps) {
         };
         currentGroup.categories.push(category);
       }
+
       category.indicators.push(kpi);
     });
 
     return Array.from(groupMap.values());
-  }, [kpis]);
+  }, [need.kpi_indicators]);
 
   return (
     <div className="space-y-4">
@@ -122,12 +126,11 @@ function CategoryItem({ category, years }: { category: any; years: number[] }) {
 
       <div className="bg-muted pl-4">
         <div className="border-l bg-background">
-          {category.indicators.map((indicator: KpiIndicator, idx: number) => (
+          {category.indicators.map((indicator: KpiIndicator) => (
             <KpiIndicatorItem
               key={indicator.id}
               indicator={indicator}
               years={years}
-              isLast={idx === category.indicators.length - 1}
             />
           ))}
         </div>
@@ -139,11 +142,9 @@ function CategoryItem({ category, years }: { category: any; years: number[] }) {
 function KpiIndicatorItem({
   indicator,
   years,
-  isLast,
 }: {
   indicator: KpiIndicator;
   years: number[];
-  isLast: boolean;
 }) {
   return (
     <div className="group/indicator border-b last:border-b-0">
@@ -167,6 +168,7 @@ function KpiIndicatorItem({
             const target = indicator.annual_targets?.find(
               (t) => t.year === year,
             );
+
             return (
               <IndicatorMetric
                 key={year}

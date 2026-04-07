@@ -16,7 +16,9 @@ export function RlsAlignmentShow({ need }: RlsAlignmentShowProps) {
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <ClipboardList className="h-5 w-5 text-primary" />
-        <h2 className="text-xl font-semibold">Rencana Layanan Strategis (RLS)</h2>
+        <h2 className="text-xl font-semibold">
+          Rencana Layanan Strategis (RLS)
+        </h2>
       </div>
       <p className="text-sm text-muted-foreground">
         Kaitan usulan dengan rencana layanan dan program strategis organisasi.
@@ -26,20 +28,23 @@ export function RlsAlignmentShow({ need }: RlsAlignmentShowProps) {
         <div className="space-y-4">
           {plans.map((plan) => (
             <Card key={plan.id} className="overflow-hidden">
-              <div className="bg-muted/30 border-b px-4 py-3">
+              <div className="border-b bg-muted/30 px-4 py-3">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-sm font-semibold tracking-wide">
                     Program: {plan.strategic_program}
                   </span>
                   {plan.year && (
-                    <Badge variant="outline" className="font-mono text-[10px] shrink-0">
+                    <Badge
+                      variant="outline"
+                      className="shrink-0 font-mono text-[10px]"
+                    >
                       Tahun {plan.year}
                     </Badge>
                   )}
                 </div>
               </div>
               <CardContent className="p-0">
-                <div className="p-4 bg-background">
+                <div className="bg-background p-4">
                   <div className="space-y-1">
                     <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
                       Rencana Layanan

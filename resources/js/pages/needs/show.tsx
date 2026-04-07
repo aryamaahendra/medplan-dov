@@ -3,14 +3,14 @@ import { useMemo } from 'react';
 
 import needRoutes from '@/routes/needs';
 
+import type { Need, Sasaran, Tujuan } from './columns';
+import { IkkAlignmentShow } from './components/ikk-alignment-show';
 import { NeedContextConditions } from './components/need-context-conditions';
 import { NeedGeneralInfo } from './components/need-general-info';
-import { IkkAlignmentShow } from './components/ikk-alignment-show';
-import { RlsAlignmentShow } from './components/rls-alignment-show';
 import { NeedHeader } from './components/need-header';
 import { NeedSidebar } from './components/need-sidebar';
+import { RlsAlignmentShow } from './components/rls-alignment-show';
 import { StrategicAlignmentSection } from './components/strategic-alignment-section';
-import type { Need, Sasaran, Tujuan } from './columns';
 
 interface NeedShowProps {
   need: Need;

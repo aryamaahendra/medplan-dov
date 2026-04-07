@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { ArrowLeft, ChevronRight, Edit } from 'lucide-react';
+import { ArrowLeft, Edit } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import needRoutes from '@/routes/needs';

@@ -1,14 +1,12 @@
 import { Head } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
+import { KpiIndicatorTree } from '@/components/kpis/kpi-indicator-tree';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import groupRoutes from '@/routes/kpis/groups';
 import type { KpiGroup, KpiIndicator } from '@/types';
-
-import { KpiIndicatorTree } from '@/components/kpis/kpi-indicator-tree';
 
 import { KpiGroupInfo } from './components/kpi-group-info';
 import { KpiIndicatorDialog } from './components/kpi-indicator-dialog';
@@ -93,7 +91,6 @@ export default function KpiGroupShow({ group }: KpiGroupShowProps) {
           />
         </div>
       </div>
-
 
       <KpiIndicatorDialog
         open={indicatorDialogOpen}

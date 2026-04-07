@@ -64,6 +64,7 @@ export function IndicatorCard({
     if (onDelete) {
       onDelete(deletingIndicator);
       setDeletingIndicator(null);
+
       return;
     }
 

@@ -1,5 +1,3 @@
-import { Target, TrendingUp } from 'lucide-react';
-
 import { PriorityBadge } from '@/components/priority-badge';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -36,7 +34,11 @@ export function NeedStatusOverview({ need }: NeedStatusOverviewProps) {
           </div>
           <div className="flex justify-between px-4 py-3">
             <div className="">Status</div>
-            <Badge variant={STATUS_VARIANTS[need.status]}>
+            <Badge
+              variant={STATUS_VARIANTS[need.status]}
+              className="flex items-center gap-1"
+            >
+              {StatusIcon && <StatusIcon className="h-3.5 w-3.5" />}
               {STATUS_LABELS[need.status]}
             </Badge>
           </div>

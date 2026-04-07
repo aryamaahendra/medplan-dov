@@ -47,10 +47,7 @@ export function IndicatorTable({
 
   const years =
     yearStart && yearEnd
-      ? Array.from(
-          { length: yearEnd - yearStart + 1 },
-          (_, i) => yearStart + i,
-        )
+      ? Array.from({ length: yearEnd - yearStart + 1 }, (_, i) => yearStart + i)
       : [];
 
   const handleDelete = () => {
@@ -61,6 +58,7 @@ export function IndicatorTable({
     if (onDelete) {
       onDelete(deletingIndicator);
       setDeletingIndicator(null);
+
       return;
     }
 
@@ -116,7 +114,10 @@ export function IndicatorTable({
                   </TableHead>
                 )}
                 {showActions && (
-                  <TableHead rowSpan={2} className="w-1 text-center"></TableHead>
+                  <TableHead
+                    rowSpan={2}
+                    className="w-1 text-center"
+                  ></TableHead>
                 )}
               </TableRow>
               {years.length > 0 && (

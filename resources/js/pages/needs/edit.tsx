@@ -52,31 +52,23 @@ export default function Edit({
   );
 }
 
-Edit.layout = (page: React.ReactNode) => {
-  const { currentGroup } = (page as any).props as EditProps;
-
-  return (
-    <AppLayout
-      breadcrumbs={[
-        {
-          title: 'Usulan Kebutuhan',
-          href: '#',
-        },
-        {
-          title: currentGroup?.name || 'Kelompok',
-          href: currentGroup
-            ? needRoutes.index.url({
-                query: { need_group_id: currentGroup.id },
-              })
-            : '#',
-        },
-        {
-          title: 'Edit Usulan',
-          href: '#',
-        },
-      ]}
-    >
-      {page}
-    </AppLayout>
-  );
-};
+Edit.layout = (props: EditProps) => ({
+  breadcrumbs: [
+    {
+      title: 'Usulan Kebutuhan',
+      href: '#',
+    },
+    {
+      title: props.currentGroup?.name || 'Kelompok',
+      href: props.currentGroup
+        ? needRoutes.index.url({
+            query: { need_group_id: props.currentGroup.id },
+          })
+        : '#',
+    },
+    {
+      title: 'Edit Usulan',
+      href: '#',
+    },
+  ],
+});

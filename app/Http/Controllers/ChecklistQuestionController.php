@@ -4,51 +4,68 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreChecklistQuestionRequest;
 use App\Http\Resources\ChecklistQuestionResource;
-use App\Models\ChecklistQuestion;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\Response;
+use App\Traits\HasDataTable;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class ChecklistQuestionController extends Controller
 {
+    use HasDataTable;
+
+    private const array SEARCH_COLUMNS = ['question', 'description'];
+
+    private const array SORTABLE_COLUMNS = ['question', 'is_active', 'order_column', 'created_at'];
+
     /**
      * Display a listing of the resource.
      */
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): InertiaResponse
     {
-        return ChecklistQuestionResource::collection(
-            ChecklistQuestion::orderBy('order_column')
-                ->orderBy('created_at')
-                ->get()
+        $questions = $this->applyDataTable(
+            ChecklistQuestion::query(),
+            $request,
+            self::SEARCH_COLUMNS,
+            self::SORTABLE_COLUMNS,
         );
+
+        return Inertia::render('checklist-questions/index', [
+            'questions' => ChecklistQuestionResource::collection($questions),
+            'filters' => $this->dataTableFilters($request),
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreChecklistQuestionRequest $request): ChecklistQuestionResource
+    public function store(StoreChecklistQuestionRequest $request): RedirectResponse
     {
-        $question = ChecklistQuestion::create($request->validated());
+        ChecklistQuestion::create($request->validated());
 
-        return new ChecklistQuestionResource($question);
+        return redirect()->route('checklist-questions.index')
+            ->with('success', 'Pertanyaan checklist berhasil dibuat.');
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(StoreChecklistQuestionRequest $request, ChecklistQuestion $question): ChecklistQuestionResource
+    public function update(StoreChecklistQuestionRequest $request, ChecklistQuestion $checklistQuestion): RedirectResponse
     {
-        $question->update($request->validated());
+        $checklistQuestion->update($request->validated());
 
-        return new ChecklistQuestionResource($question);
+        return redirect()->route('checklist-questions.index')
+            ->with('success', 'Pertanyaan checklist berhasil diperbarui.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ChecklistQuestion $question): Response
+    public function destroy(ChecklistQuestion $checklistQuestion): RedirectResponse
     {
-        $question->delete();
+        $checklistQuestion->delete();
 
-        return response()->noContent();
+        return redirect()->route('checklist-questions.index')
+            ->with('success', 'Pertanyaan checklist berhasil dihapus.');
     }
 }

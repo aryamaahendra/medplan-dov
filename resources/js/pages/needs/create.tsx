@@ -49,31 +49,23 @@ export default function Create({
   );
 }
 
-Create.layout = (page: React.ReactNode) => {
-  const { currentGroup } = (page as any).props as CreateProps;
-
-  return (
-    <AppLayout
-      breadcrumbs={[
-        {
-          title: 'Usulan Kebutuhan',
-          href: '#',
-        },
-        {
-          title: currentGroup?.name || 'Kelompok',
-          href: currentGroup
-            ? needRoutes.index.url({
-                query: { need_group_id: currentGroup.id },
-              })
-            : '#',
-        },
-        {
-          title: 'Tambah Usulan',
-          href: '#',
-        },
-      ]}
-    >
-      {page}
-    </AppLayout>
-  );
-};
+Create.layout = (props: CreateProps) => ({
+  breadcrumbs: [
+    {
+      title: 'Usulan Kebutuhan',
+      href: '#',
+    },
+    {
+      title: props.currentGroup?.name || 'Kelompok',
+      href: props.currentGroup
+        ? needRoutes.index.url({
+            query: { need_group_id: props.currentGroup.id },
+          })
+        : '#',
+    },
+    {
+      title: 'Tambah Usulan',
+      href: '#',
+    },
+  ],
+});

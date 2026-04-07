@@ -1,8 +1,10 @@
+
 import { Head } from '@inertiajs/react';
 import { useMemo } from 'react';
-
+import { ChecklistForm } from '@/components/needs/checklist-form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import needRoutes from '@/routes/needs';
+import type { ChecklistQuestion, ChecklistAnswer } from '@/types';
 
 import type { Need, Sasaran, Tujuan } from './columns';
 import { IkkAlignmentShow } from './components/ikk-alignment-show';
@@ -14,9 +16,15 @@ import { StrategicAlignmentSection } from './components/strategic-alignment-sect
 
 interface NeedShowProps {
   need: Need;
+  checklistQuestions: { data: ChecklistQuestion[] };
+  existingAnswers: { data: ChecklistAnswer[] };
 }
 
-export default function NeedShow({ need }: NeedShowProps) {
+export default function NeedShow({
+  need,
+  checklistQuestions,
+  existingAnswers,
+}: NeedShowProps) {
   const groupedRenstra = useMemo(() => {
     if (!need.sasarans) {
       return [];
@@ -63,6 +71,7 @@ export default function NeedShow({ need }: NeedShowProps) {
                 <TabsTrigger value="strategic">Renstra</TabsTrigger>
                 <TabsTrigger value="ikk">IKK</TabsTrigger>
                 <TabsTrigger value="rls">RLS</TabsTrigger>
+                <TabsTrigger value="checklist">Checklist</TabsTrigger>
               </TabsList>
               <TabsContent value="general" className="mt-0">
                 <div className="mt-4">
@@ -84,6 +93,13 @@ export default function NeedShow({ need }: NeedShowProps) {
               </TabsContent>
               <TabsContent value="rls" className="mt-0">
                 <RlsAlignmentShow need={need} />
+              </TabsContent>
+              <TabsContent value="checklist" className="mt-0">
+                <ChecklistForm
+                  needId={need.id}
+                  questions={checklistQuestions.data}
+                  existingAnswers={existingAnswers.data}
+                />
               </TabsContent>
             </Tabs>
           </div>

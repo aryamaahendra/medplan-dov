@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreNeedRequest;
 use App\Http\Requests\UpdateNeedRequest;
+use App\Http\Resources\ChecklistQuestionResource;
+use App\Http\Resources\NeedChecklistAnswerResource;
 use App\Models\KpiGroup;
 use App\Models\Need;
 use App\Models\NeedGroup;
@@ -187,6 +189,15 @@ class NeedController extends Controller
                 'kpiIndicators.annualTargets:id,indicator_id,year,target_value',
                 'strategicServicePlans:id,strategic_program,service_plan,year,target,policy_direction',
             ]),
+            'checklistQuestions' => ChecklistQuestionResource::collection(
+                $need->needGroup->checklistQuestions()
+                    ->wherePivot('is_active', true)
+                    ->orderByPivot('order_column')
+                    ->get()
+            ),
+            'existingAnswers' => NeedChecklistAnswerResource::collection(
+                $need->checklistAnswers
+            ),
         ]);
     }
 

@@ -32,7 +32,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('sasarans', SasaranController::class)->except(['index', 'create', 'edit', 'show']);
     Route::resource('indicators', IndicatorController::class)->except(['index', 'create', 'edit', 'show']);
     Route::resource('strategic-service-plans', StrategicServicePlanController::class)->except(['create', 'edit', 'show']);
-    Route::apiResource('checklist-questions', ChecklistQuestionController::class)->except(['show']);
+    Route::resource('checklist-questions', ChecklistQuestionController::class)->except(['show']);
+    Route::post('needs/{need}/checklist-answers', [NeedChecklistAnswerController::class, 'store'])->name('needs.checklist-answers.store');
     Route::prefix('kpis')->name('kpis.')->group(function () {
         Route::resource('groups', KpiGroupController::class);
         Route::post('groups/{group}/activate', [KpiGroupController::class, 'activate'])->name('groups.activate');

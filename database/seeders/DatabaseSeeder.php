@@ -28,6 +28,8 @@ class DatabaseSeeder extends Seeder
             // RenstraRSUDSeeder::class,
             NeedGroupSeeder::class,
             StrategicServicePlanSeeder::class,
+            ChecklistQuestionSeeder::class,
+            NeedChecklistAnswerSeeder::class,
         ]);
     }
 }

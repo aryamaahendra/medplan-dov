@@ -2,49 +2,38 @@
 
 namespace App\Models;
 
-use Database\Factories\NeedGroupFactory;
+use Database\Factories\ChecklistQuestionFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
-    'name',
+    'question',
     'description',
-    'year',
     'is_active',
-    'need_count',
+    'order_column',
 ])]
-class NeedGroup extends Model
+class ChecklistQuestion extends Model
 {
-    /** @use HasFactory<NeedGroupFactory> */
+    /** @use HasFactory<ChecklistQuestionFactory> */
     use HasFactory, SoftDeletes;
 
     protected function casts(): array
     {
         return [
-            'year' => 'integer',
             'is_active' => 'boolean',
-            'need_count' => 'integer',
+            'order_column' => 'integer',
         ];
     }
 
     /**
-     * Get the needs for this group.
+     * Get the need groups that use this question.
      */
-    /**
-     * Get the needs for this group.
-     */
-    public function needs(): HasMany
+    public function needGroups(): BelongsToMany
     {
-        return $this->hasMany(Need::class);
-    }
-
-    public function checklistQuestions(): BelongsToMany
-    {
-        return $this->belongsToMany(ChecklistQuestion::class, 'need_group_checklist_question')
+        return $this->belongsToMany(NeedGroup::class, 'need_group_checklist_question')
             ->withPivot(['order_column', 'is_required', 'is_active'])
             ->withTimestamps();
     }

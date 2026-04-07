@@ -6,6 +6,7 @@ This document provides a comprehensive overview of the database tables and their
 - [Core Application Tables](#core-application-tables)
   - [organizational_units](#organizational_units)
   - [need_types](#need_types)
+  - [need_groups](#need_groups)
   - [needs](#needs)
   - [need_sasaran](#need_sasaran)
   - [need_indicator](#need_indicator)
@@ -59,11 +60,26 @@ Stores categories or types of needs.
 | updated_at | timestamp | Yes | |
 | deleted_at | timestamp | Yes | Soft Deletes |
 
+### `need_groups`
+Stores groups of needs for a specific year.
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| name | string | No | |
+| description | text | Yes | |
+| year | unsignedSmallInteger | No | |
+| is_active | boolean | No | Default: true |
+| need_count | unsignedInteger | No | Default: 0 |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+| deleted_at | timestamp | Yes | Soft Deletes |
+
 ### `needs`
 Stores the actual requests or needs from organizational units.
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
 | id | bigint | No | Primary Key |
+| need_group_id | bigint | No | Foreign Key (need_groups), cascadeOnDelete |
 | organizational_unit_id | bigint | No | Foreign Key (organizational_units) |
 | need_type_id | bigint | No | Foreign Key (need_types) |
 | year | unsignedSmallInteger | No | |

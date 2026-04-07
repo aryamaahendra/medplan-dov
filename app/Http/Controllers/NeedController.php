@@ -12,6 +12,7 @@ use App\Models\OrganizationalUnit;
 use App\Models\StrategicServicePlan;
 use App\Models\Tujuan;
 use App\Traits\HasDataTable;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -27,8 +28,19 @@ class NeedController extends Controller
     /** Columns sortable by */
     private const array SORTABLE_COLUMNS = ['title', 'year', 'status', 'total_price', 'created_at'];
 
-    public function index(Request $request): Response
+    public function index(Request $request): Response|RedirectResponse
     {
+        $groupId = $request->input('need_group_id');
+
+        if (! $groupId) {
+            $firstGroup = NeedGroup::query()->where('is_active', true)->orderByDesc('year')->first();
+            if ($firstGroup) {
+                return redirect()->route('needs.index', ['need_group_id' => $firstGroup->id]);
+            }
+        }
+
+        $currentGroup = $groupId ? NeedGroup::find($groupId) : null;
+
         $needs = $this->applyDataTable(
             Need::query()
                 ->with([
@@ -51,7 +63,7 @@ class NeedController extends Controller
                 ->when($request->input('urgency'), fn ($q, $v) => $q->whereIn('urgency', (array) $v))
                 ->when($request->input('impact'), fn ($q, $v) => $q->whereIn('impact', (array) $v))
                 ->when($request->input('is_priority'), fn ($q, $v) => $q->whereIn('is_priority', (array) $v))
-                ->when($request->input('need_group_id'), fn ($q, $v) => $q->whereIn('need_group_id', (array) $v))
+                ->where('need_group_id', $groupId)
                 ->orderBy('created_at', 'desc'),
             $request,
             self::SEARCH_COLUMNS,
@@ -60,9 +72,9 @@ class NeedController extends Controller
 
         return Inertia::render('needs/index', [
             'needs' => $needs,
+            'currentGroup' => $currentGroup,
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
-            'needGroups' => NeedGroup::query()->where('is_active', true)->select(['id', 'name', 'year'])->get(),
             'filters' => array_merge($this->dataTableFilters($request), [
                 'year' => $request->input('year'),
                 'status' => $request->input('status'),
@@ -71,28 +83,34 @@ class NeedController extends Controller
                 'urgency' => $request->input('urgency'),
                 'impact' => $request->input('impact'),
                 'is_priority' => $request->input('is_priority'),
-                'need_group_id' => $request->input('need_group_id'),
+                'need_group_id' => $groupId,
             ]),
         ]);
     }
 
     public function store(StoreNeedRequest $request)
     {
-        DB::transaction(function () use ($request) {
+        $need = DB::transaction(function () use ($request) {
             $need = Need::create($request->validated());
             $need->sasarans()->sync($request->sasaran_ids);
             $need->indicators()->sync($request->indicator_ids ?? []);
             $need->kpiIndicators()->sync($request->kpi_indicator_ids ?? []);
             $need->strategicServicePlans()->sync($request->strategic_service_plan_ids ?? []);
+
+            return $need;
         });
 
-        return redirect()->route('needs.index')
+        return redirect()->route('needs.index', ['need_group_id' => $need->need_group_id])
             ->with('success', 'Usulan kebutuhan berhasil dibuat.');
     }
 
-    public function create(): Response
+    public function create(Request $request): Response|RedirectResponse
     {
+        $groupId = $request->input('need_group_id');
+        $currentGroup = $groupId ? NeedGroup::findOrFail($groupId) : null;
+
         return Inertia::render('needs/create', [
+            'currentGroup' => $currentGroup,
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
             'tujuans' => Tujuan::query()
@@ -110,7 +128,6 @@ class NeedController extends Controller
             'strategicServicePlans' => StrategicServicePlan::query()
                 ->select(['id', 'strategic_program', 'service_plan', 'year'])
                 ->get(),
-            'needGroups' => NeedGroup::query()->where('is_active', true)->select(['id', 'name', 'year'])->get(),
         ]);
     }
 
@@ -118,6 +135,7 @@ class NeedController extends Controller
     {
         return Inertia::render('needs/edit', [
             'need' => $need->load(['sasarans:id', 'indicators:id', 'kpiIndicators:id', 'strategicServicePlans:id']),
+            'currentGroup' => $need->needGroup,
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
             'tujuans' => Tujuan::query()
@@ -135,7 +153,6 @@ class NeedController extends Controller
             'strategicServicePlans' => StrategicServicePlan::query()
                 ->select(['id', 'strategic_program', 'service_plan', 'year'])
                 ->get(),
-            'needGroups' => NeedGroup::query()->where('is_active', true)->select(['id', 'name', 'year'])->get(),
         ]);
     }
 
@@ -149,7 +166,7 @@ class NeedController extends Controller
             $need->strategicServicePlans()->sync($request->strategic_service_plan_ids ?? []);
         });
 
-        return redirect()->route('needs.index')
+        return redirect()->route('needs.index', ['need_group_id' => $need->need_group_id])
             ->with('success', 'Usulan kebutuhan berhasil diperbarui.');
     }
 
@@ -173,11 +190,12 @@ class NeedController extends Controller
         ]);
     }
 
-    public function destroy(Need $need)
+    public function destroy(Need $need): RedirectResponse
     {
+        $groupId = $need->need_group_id;
         $need->delete();
 
-        return redirect()->route('needs.index')
+        return redirect()->route('needs.index', ['need_group_id' => $groupId])
             ->with('success', 'Usulan kebutuhan berhasil dihapus.');
     }
 }

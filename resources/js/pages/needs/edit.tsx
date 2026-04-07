@@ -1,49 +1,50 @@
 import { Head } from '@inertiajs/react';
+import AppLayout from '@/layouts/app-layout';
 import needRoutes from '@/routes/needs';
 import type { Need, Tujuan } from './columns';
 import { NeedForm } from './components/need-form';
 
 interface EditProps {
   need: Need;
+  currentGroup: { id: number; name: string; year: number };
   organizationalUnits: { id: number; name: string }[];
   needTypes: { id: number; name: string }[];
   tujuans: Tujuan[];
   kpiGroups: any[];
   strategicServicePlans: any[];
-  needGroups: { id: number; name: string; year: number }[];
 }
 
 export default function Edit({
   need,
+  currentGroup,
   organizationalUnits,
   needTypes,
   tujuans,
   kpiGroups,
   strategicServicePlans,
-  needGroups,
 }: EditProps) {
   return (
     <>
-      <Head title={`Edit Usulan: ${need.title}`} />
+      <Head title={`${currentGroup.name}: Edit Usulan`} />
       <div className="flex h-full flex-1 flex-col gap-4 p-4 md:p-8">
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-bold tracking-tight">
-            Edit Usulan Kebutuhan
+            Edit Usulan: {currentGroup.name}
           </h1>
           <p className="text-muted-foreground">
-            Perbarui detail untuk usulan &quot;{need.title}&quot;.
+            Perbarui detail usulan pada tahun anggaran {currentGroup.year}.
           </p>
         </div>
 
         <div className="flex-1">
           <NeedForm
             need={need}
+            currentGroup={currentGroup}
             organizationalUnits={organizationalUnits}
             needTypes={needTypes}
             tujuans={tujuans}
             kpiGroups={kpiGroups}
             strategicServicePlans={strategicServicePlans}
-            needGroups={needGroups}
           />
         </div>
       </div>
@@ -51,14 +52,31 @@ export default function Edit({
   );
 }
 
-Edit.layout = {
-  breadcrumbs: [
-    {
-      title: 'Usulan Kebutuhan',
-      href: needRoutes.index.url(),
-    },
-    {
-      title: 'Edit Usulan',
-    },
-  ],
+Edit.layout = (page: React.ReactNode) => {
+  const { currentGroup } = (page as any).props as EditProps;
+
+  return (
+    <AppLayout
+      breadcrumbs={[
+        {
+          title: 'Usulan Kebutuhan',
+          href: '#',
+        },
+        {
+          title: currentGroup?.name || 'Kelompok',
+          href: currentGroup
+            ? needRoutes.index.url({
+                query: { need_group_id: currentGroup.id },
+              })
+            : '#',
+        },
+        {
+          title: 'Edit Usulan',
+          href: '#',
+        },
+      ]}
+    >
+      {page}
+    </AppLayout>
+  );
 };

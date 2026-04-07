@@ -6,6 +6,7 @@ use App\Models\Indicator;
 use App\Models\KpiGroup;
 use App\Models\KpiIndicator;
 use App\Models\Need;
+use App\Models\NeedGroup;
 use App\Models\NeedType;
 use App\Models\OrganizationalUnit;
 use App\Models\Sasaran;
@@ -19,6 +20,7 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     $this->user = User::factory()->create();
     $this->be($this->user);
+    $this->group = NeedGroup::factory()->create(['name' => 'Test Group', 'year' => 2026, 'is_active' => true]);
 });
 
 it('can store a need with kpi indicators and strategic service plans', function () {
@@ -33,6 +35,7 @@ it('can store a need with kpi indicators and strategic service plans', function 
     $strategicPlan = StrategicServicePlan::factory()->create(['year' => 2026]);
 
     $data = [
+        'need_group_id' => $this->group->id,
         'organizational_unit_id' => $unit->id,
         'need_type_id' => $type->id,
         'year' => 2026,
@@ -54,7 +57,7 @@ it('can store a need with kpi indicators and strategic service plans', function 
 
     $response = $this->post(route('needs.store'), $data);
 
-    $response->assertRedirect(route('needs.index'));
+    $response->assertRedirect(route('needs.index', ['need_group_id' => $this->group->id]));
 
     $need = Need::where('title', 'Test Need')->first();
     expect($need->kpiIndicators)->toHaveCount(1)
@@ -64,7 +67,7 @@ it('can store a need with kpi indicators and strategic service plans', function 
 });
 
 it('can update a need with kpi indicators and strategic service plans', function () {
-    $need = Need::factory()->create();
+    $need = Need::factory()->create(['need_group_id' => $this->group->id]);
 
     $sasaran = Sasaran::factory()->create();
     $renstraIndicator = Indicator::factory()->create(['sasaran_id' => $sasaran->id]);
@@ -73,6 +76,7 @@ it('can update a need with kpi indicators and strategic service plans', function
     $strategicPlan = StrategicServicePlan::factory()->create();
 
     $data = [
+        'need_group_id' => $this->group->id,
         'organizational_unit_id' => $need->organizational_unit_id,
         'need_type_id' => $need->need_type_id,
         'year' => 2026,
@@ -91,7 +95,7 @@ it('can update a need with kpi indicators and strategic service plans', function
 
     $response = $this->patch(route('needs.update', $need), $data);
 
-    $response->assertRedirect(route('needs.index'));
+    $response->assertRedirect(route('needs.index', ['need_group_id' => $this->group->id]));
 
     $need->refresh();
     expect($need->title)->toBe('Updated Need')
@@ -104,7 +108,7 @@ it('provides active kpi groups and strategic plans to create view', function () 
     KpiGroup::factory()->inactive()->create(['name' => 'Inactive Group']);
     StrategicServicePlan::factory()->create(['strategic_program' => 'Strategic Program X']);
 
-    $response = $this->get(route('needs.create'));
+    $response = $this->get(route('needs.create', ['need_group_id' => $this->group->id]));
 
     $response->assertStatus(200)
         ->assertInertia(fn (Assert $page) => $page
@@ -113,23 +117,33 @@ it('provides active kpi groups and strategic plans to create view', function () 
             ->where('kpiGroups.0.name', 'Active Group')
             ->has('strategicServicePlans', 1)
             ->where('strategicServicePlans.0.strategic_program', 'Strategic Program X')
+            ->has('currentGroup')
+            ->where('currentGroup.id', $this->group->id)
         );
+});
+
+it('redirects to latest group if no group provided to index', function () {
+    $response = $this->get(route('needs.index'));
+    $response->assertRedirect(route('needs.index', ['need_group_id' => $this->group->id]));
 });
 
 it('can filter needs by urgency, impact, and priority', function () {
     Need::factory()->create([
+        'need_group_id' => $this->group->id,
         'urgency' => Urgency::High,
         'impact' => Impact::High,
         'is_priority' => true,
     ]);
 
     Need::factory()->create([
+        'need_group_id' => $this->group->id,
         'urgency' => Urgency::Low,
         'impact' => Impact::Low,
         'is_priority' => false,
     ]);
 
     $response = $this->get(route('needs.index', [
+        'need_group_id' => $this->group->id,
         'urgency' => [Urgency::High->value],
     ]));
     $response->assertInertia(fn (Assert $page) => $page
@@ -139,6 +153,7 @@ it('can filter needs by urgency, impact, and priority', function () {
     );
 
     $response = $this->get(route('needs.index', [
+        'need_group_id' => $this->group->id,
         'impact' => [Impact::High->value],
     ]));
     $response->assertInertia(fn (Assert $page) => $page
@@ -148,6 +163,7 @@ it('can filter needs by urgency, impact, and priority', function () {
     );
 
     $response = $this->get(route('needs.index', [
+        'need_group_id' => $this->group->id,
         'is_priority' => ['1'],
     ]));
     $response->assertInertia(fn (Assert $page) => $page
@@ -158,7 +174,7 @@ it('can filter needs by urgency, impact, and priority', function () {
 });
 
 it('can view a need detail page', function () {
-    $need = Need::factory()->create();
+    $need = Need::factory()->create(['need_group_id' => $this->group->id]);
     $sasaran = Sasaran::factory()->create();
     $need->sasarans()->attach($sasaran);
 

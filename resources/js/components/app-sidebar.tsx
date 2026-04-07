@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
   BookOpen,
   Building2,
@@ -9,6 +9,8 @@ import {
   Layers,
   Users,
   BookKey,
+  Database,
+  Tag,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
@@ -25,6 +27,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import kpis from '@/routes/kpis';
+import needGroups from '@/routes/need-groups';
 import needTypes from '@/routes/need-types';
 import needs from '@/routes/needs';
 import organizationalUnits from '@/routes/organizational-units';
@@ -38,11 +41,6 @@ const mainNavItems: NavItem[] = [
     title: 'Dashboard',
     href: dashboard(),
     icon: LayoutGrid,
-  },
-  {
-    title: 'Usulan Kebutuhan',
-    href: needs.index.url(),
-    icon: ClipboardList,
   },
 ];
 
@@ -61,6 +59,11 @@ const masterNavItems: NavItem[] = [
     title: 'Jenis Kebutuhan',
     href: needTypes.index.url(),
     icon: Layers,
+  },
+  {
+    title: 'Kelompok Usulan',
+    href: needGroups.index.url(),
+    icon: Database,
   },
   {
     title: 'Manajemen Renstra',
@@ -93,6 +96,18 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+  const { activeNeedGroups } = usePage<{
+    activeNeedGroups: { id: number; name: string; year: number }[];
+  }>().props;
+
+  const dynamicNeedNavItems: NavItem[] = (activeNeedGroups || []).map(
+    (group) => ({
+      title: `${group.name} (${group.year})`,
+      href: needs.index.url({ query: { need_group_id: group.id } }),
+      icon: Tag,
+    }),
+  );
+
   return (
     <Sidebar collapsible="icon" variant="inset">
       <SidebarHeader>
@@ -109,6 +124,7 @@ export function AppSidebar() {
 
       <SidebarContent>
         <NavMain items={mainNavItems} title="Main Menu" />
+        <NavMain items={dynamicNeedNavItems} title="Usulan Kebutuhan" />
         <NavMain items={masterNavItems} title="Master Data" />
       </SidebarContent>
 

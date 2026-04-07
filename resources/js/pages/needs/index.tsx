@@ -37,9 +37,9 @@ interface PaginatedNeeds {
 
 interface NeedsIndexProps {
   needs: PaginatedNeeds;
+  currentGroup: { id: number; name: string; year: number };
   organizationalUnits: { id: number; name: string }[];
   needTypes: { id: number; name: string }[];
-  needGroups: { id: number; name: string; year: number }[];
   filters: DataTableFilters & {
     year?: string | string[];
     status?: string | string[];
@@ -54,9 +54,9 @@ interface NeedsIndexProps {
 
 export default function NeedsIndex({
   needs,
+  currentGroup,
   organizationalUnits,
   needTypes,
-  needGroups,
   filters,
 }: NeedsIndexProps) {
   const [deletingNeed, setDeletingNeed] = useState<Need | null>(null);
@@ -77,7 +77,9 @@ export default function NeedsIndex({
   };
 
   const onCreate = () => {
-    router.visit(needRoutes.create.url());
+    router.visit(
+      needRoutes.create.url({ query: { need_group_id: currentGroup.id } }),
+    );
   };
 
   const onDelete = (need: Need) => {
@@ -126,15 +128,6 @@ export default function NeedsIndex({
     [needTypes],
   );
 
-  const groupOptions = useMemo(
-    () =>
-      (needGroups || []).map((group) => ({
-        label: group.name,
-        value: group.id.toString(),
-      })),
-    [needGroups],
-  );
-
   const unitOptions = useMemo(
     () =>
       organizationalUnits.map((unit) => ({
@@ -171,16 +164,17 @@ export default function NeedsIndex({
 
   return (
     <>
-      <Head title="Usulan Kebutuhan" />
+      <Head title={`Usulan: ${currentGroup.name}`} />
+      <Head title={`Usulan: ${currentGroup.name}`} />
 
       <div className="flex flex-col gap-6 p-4">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-foreground">
-              Usulan Kebutuhan
+              {currentGroup.name}
             </h1>
             <p className="text-sm text-muted-foreground">
-              Kelola data usulan kebutuhan per unit kerja.
+              Tahun Anggaran {currentGroup.year}
             </p>
           </div>
           <div className="flex gap-2">
@@ -251,14 +245,6 @@ export default function NeedsIndex({
                 }
               />
               <DataTableFacetedFilter
-                title="Kelompok"
-                options={groupOptions}
-                selectedValues={getFilterArray(filters.need_group_id)}
-                onSelect={(values) =>
-                  mergeParams({ need_group_id: values, page: 1 })
-                }
-              />
-              <DataTableFacetedFilter
                 title="Unit Kerja"
                 options={unitOptions}
                 selectedValues={getFilterArray(filters.organizational_unit_id)}
@@ -305,11 +291,19 @@ export default function NeedsIndex({
   );
 }
 
-NeedsIndex.layout = {
+NeedsIndex.layout = (props: NeedsIndexProps) => ({
   breadcrumbs: [
     {
       title: 'Usulan Kebutuhan',
-      href: needRoutes.index.url(),
+      href: '#',
+    },
+    {
+      title: props.currentGroup?.name || 'Loading...',
+      href: props.currentGroup
+        ? needRoutes.index.url({
+            query: { need_group_id: props.currentGroup.id },
+          })
+        : '#',
     },
   ],
-};
+});

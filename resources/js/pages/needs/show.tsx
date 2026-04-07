@@ -106,6 +106,7 @@ NeedShow.layout = {
     },
     {
       title: 'Detail Usulan',
+      href: '#',
     },
   ],
 };

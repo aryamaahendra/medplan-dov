@@ -16,10 +16,12 @@ This document provides a comprehensive overview of the database tables and their
   - [indicators](#indicators)
   - [indicator_targets](#indicator_targets)
   - [strategic_service_plans](#strategic_service_plans)
+  - [need_strategic_service_plan](#need_strategic_service_plan)
 - [KPI Management Tables](#kpi-management-tables)
   - [kpi_groups](#kpi_groups)
   - [kpi_indicators](#kpi_indicators)
   - [kpi_annual_targets](#kpi_annual_targets)
+  - [kpi_indicator_need](#kpi_indicator_need)
 - [System Tables](#system-tables)
   - [users](#users)
   - [password_reset_tokens](#password_reset_tokens)
@@ -178,6 +180,16 @@ Stores strategic service plans including programs, targets, and policy direction
 | updated_at | timestamp | Yes | |
 | deleted_at | timestamp | Yes | Soft Deletes |
 
+### `need_strategic_service_plan`
+Pivot table connecting needs and strategic service plans.
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| need_id | bigint | No | Foreign Key (needs), cascadeOnDelete |
+| strategic_service_plan_id | bigint | No | Foreign Key (strategic_service_plans), cascadeOnDelete |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+
 ---
 
 ## KPI Management Tables
@@ -190,7 +202,7 @@ Stores planning periods for KPIs.
 | name | string(255) | No | |
 | description | text | Yes | |
 | start_year | smallint | No | |
-| end_year | smallint | No | |
+| end_year | smallint | No | CHECK (end_year >= start_year) |
 | is_active | boolean | No | Default: true, Unique partial index |
 | created_at | timestamp | Yes | |
 | updated_at | timestamp | Yes | |
@@ -204,7 +216,7 @@ Stores the hierarchical performance indicators.
 | parent_indicator_id | bigint | Yes | Self-reference (kpi_indicators), cascadeOnDelete |
 | name | text | No | |
 | unit | string(100) | Yes | |
-| is_category | boolean | No | Default: false |
+| is_category | boolean | No | Default: false, CHECK constraints apply |
 | baseline_value | string(32) | Yes | |
 | created_at | timestamp | Yes | |
 | updated_at | timestamp | Yes | |
@@ -215,8 +227,18 @@ Stores yearly target values for indicators.
 | :--- | :--- | :---: | :--- |
 | id | bigint | No | Primary Key |
 | indicator_id | bigint | No | Foreign Key (kpi_indicators), cascadeOnDelete |
-| year | smallint | No | |
+| year | smallint | No | Distinct year per indicator |
 | target_value | string(32) | Yes | |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+
+### `kpi_indicator_need`
+Pivot table connecting KPI indicators and needs.
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| kpi_indicator_id | bigint | No | Foreign Key (kpi_indicators), cascadeOnDelete |
+| need_id | bigint | No | Foreign Key (needs), cascadeOnDelete |
 | created_at | timestamp | Yes | |
 | updated_at | timestamp | Yes | |
 

@@ -21,7 +21,7 @@ Route::inertia('/', 'welcome', [
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
-    Route::resource('users', UserController::class)->except(['create', 'edit']);
+    Route::resource('users', UserController::class)->except(['create', 'edit', 'show']);
     Route::resource('organizational-units', OrganizationalUnitController::class)->except(['create', 'edit', 'show']);
     Route::resource('need-types', NeedTypeController::class)->except(['create', 'edit', 'show']);
     Route::resource('need-groups', NeedGroupController::class)->except(['create', 'edit', 'show']);

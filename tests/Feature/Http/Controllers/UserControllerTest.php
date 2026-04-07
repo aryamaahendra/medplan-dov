@@ -120,14 +120,6 @@ describe('GET /users', function () {
     });
 });
 
-describe('GET /users/create', function () {
-    it('renders the create user page', function () {
-        $this->get('/users/create')
-            ->assertOk()
-            ->assertInertia(fn (Assert $page) => $page->component('users/create'));
-    });
-});
-
 describe('POST /users', function () {
     it('creates a new user and redirects', function () {
         $data = [
@@ -147,23 +139,6 @@ describe('POST /users', function () {
     it('requires valid data', function () {
         $this->post('/users', [])
             ->assertSessionHasErrors(['name', 'email', 'password']);
-    });
-});
-
-describe('GET /users/{user}/edit', function () {
-    it('renders the edit user page', function () {
-        $user = User::factory()->create();
-
-        $this->get("/users/{$user->id}/edit")
-            ->assertOk()
-            ->assertInertia(fn (Assert $page) => $page
-                ->component('users/edit')
-                ->has('user', fn (Assert $p) => $p
-                    ->where('id', $user->id)
-                    ->where('email', $user->email)
-                    ->etc()
-                )
-            );
     });
 });
 

@@ -1,5 +1,4 @@
 import { Head } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
 import needRoutes from '@/routes/needs';
 import type { Tujuan } from './columns';
 import { NeedForm } from './components/need-form';

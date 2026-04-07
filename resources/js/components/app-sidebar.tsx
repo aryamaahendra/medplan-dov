@@ -27,6 +27,7 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import checklistQuestions from '@/routes/checklist-questions';
 import kpis from '@/routes/kpis';
 import needGroups from '@/routes/need-groups';
 import needTypes from '@/routes/need-types';
@@ -35,7 +36,6 @@ import organizationalUnits from '@/routes/organizational-units';
 import renstras from '@/routes/renstras';
 import strategicServicePlans from '@/routes/strategic-service-plans';
 import users from '@/routes/users';
-import checklistQuestions from '@/routes/checklist-questions';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [

@@ -21,11 +21,11 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([
-            // OrganizationalUnitSeeder::class,
-            // NeedTypeSeeder::class,
+            OrganizationalUnitSeeder::class,
+            NeedTypeSeeder::class,
             // RenstraSeeder::class,
             // TujuanSeeder::class,
-            // RenstraRSUDSeeder::class,
+            RenstraRSUDSeeder::class,
             NeedGroupSeeder::class,
             StrategicServicePlanSeeder::class,
             ChecklistQuestionSeeder::class,

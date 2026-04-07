@@ -39,6 +39,7 @@ interface NeedsIndexProps {
   needs: PaginatedNeeds;
   organizationalUnits: { id: number; name: string }[];
   needTypes: { id: number; name: string }[];
+  needGroups: { id: number; name: string; year: number }[];
   filters: DataTableFilters & {
     year?: string | string[];
     status?: string | string[];
@@ -47,6 +48,7 @@ interface NeedsIndexProps {
     urgency?: string | string[];
     impact?: string | string[];
     is_priority?: string | string[];
+    need_group_id?: string | string[];
   };
 }
 
@@ -54,6 +56,7 @@ export default function NeedsIndex({
   needs,
   organizationalUnits,
   needTypes,
+  needGroups,
   filters,
 }: NeedsIndexProps) {
   const [deletingNeed, setDeletingNeed] = useState<Need | null>(null);
@@ -121,6 +124,15 @@ export default function NeedsIndex({
         value: type.id.toString(),
       })),
     [needTypes],
+  );
+
+  const groupOptions = useMemo(
+    () =>
+      (needGroups || []).map((group) => ({
+        label: group.name,
+        value: group.id.toString(),
+      })),
+    [needGroups],
   );
 
   const unitOptions = useMemo(
@@ -236,6 +248,14 @@ export default function NeedsIndex({
                 selectedValues={getFilterArray(filters.need_type_id)}
                 onSelect={(values) =>
                   mergeParams({ need_type_id: values, page: 1 })
+                }
+              />
+              <DataTableFacetedFilter
+                title="Kelompok"
+                options={groupOptions}
+                selectedValues={getFilterArray(filters.need_group_id)}
+                onSelect={(values) =>
+                  mergeParams({ need_group_id: values, page: 1 })
                 }
               />
               <DataTableFacetedFilter

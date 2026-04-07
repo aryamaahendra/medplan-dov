@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Enums\Impact;
 use App\Enums\Urgency;
 use App\Models\Need;
+use App\Models\NeedGroup;
 use App\Models\NeedType;
 use App\Models\OrganizationalUnit;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -25,6 +26,7 @@ class NeedFactory extends Factory
         $unitPrice = $this->faker->randomFloat(2, 10000, 5000000);
 
         return [
+            'need_group_id' => NeedGroup::factory(),
             'organizational_unit_id' => OrganizationalUnit::factory(),
             'need_type_id' => NeedType::factory(),
             'year' => $this->faker->numberBetween(2024, 2027),

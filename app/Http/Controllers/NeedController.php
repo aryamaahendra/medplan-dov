@@ -6,6 +6,7 @@ use App\Http\Requests\StoreNeedRequest;
 use App\Http\Requests\UpdateNeedRequest;
 use App\Models\KpiGroup;
 use App\Models\Need;
+use App\Models\NeedGroup;
 use App\Models\NeedType;
 use App\Models\OrganizationalUnit;
 use App\Models\StrategicServicePlan;
@@ -31,6 +32,7 @@ class NeedController extends Controller
         $needs = $this->applyDataTable(
             Need::query()
                 ->with([
+                    'needGroup:id,name',
                     'organizationalUnit:id,name',
                     'needType:id,name',
                     'sasarans:id,tujuan_id,name',
@@ -49,6 +51,7 @@ class NeedController extends Controller
                 ->when($request->input('urgency'), fn ($q, $v) => $q->whereIn('urgency', (array) $v))
                 ->when($request->input('impact'), fn ($q, $v) => $q->whereIn('impact', (array) $v))
                 ->when($request->input('is_priority'), fn ($q, $v) => $q->whereIn('is_priority', (array) $v))
+                ->when($request->input('need_group_id'), fn ($q, $v) => $q->whereIn('need_group_id', (array) $v))
                 ->orderBy('created_at', 'desc'),
             $request,
             self::SEARCH_COLUMNS,
@@ -59,6 +62,7 @@ class NeedController extends Controller
             'needs' => $needs,
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
+            'needGroups' => NeedGroup::query()->where('is_active', true)->select(['id', 'name', 'year'])->get(),
             'filters' => array_merge($this->dataTableFilters($request), [
                 'year' => $request->input('year'),
                 'status' => $request->input('status'),
@@ -67,6 +71,7 @@ class NeedController extends Controller
                 'urgency' => $request->input('urgency'),
                 'impact' => $request->input('impact'),
                 'is_priority' => $request->input('is_priority'),
+                'need_group_id' => $request->input('need_group_id'),
             ]),
         ]);
     }
@@ -105,6 +110,7 @@ class NeedController extends Controller
             'strategicServicePlans' => StrategicServicePlan::query()
                 ->select(['id', 'strategic_program', 'service_plan', 'year'])
                 ->get(),
+            'needGroups' => NeedGroup::query()->where('is_active', true)->select(['id', 'name', 'year'])->get(),
         ]);
     }
 
@@ -129,6 +135,7 @@ class NeedController extends Controller
             'strategicServicePlans' => StrategicServicePlan::query()
                 ->select(['id', 'strategic_program', 'service_plan', 'year'])
                 ->get(),
+            'needGroups' => NeedGroup::query()->where('is_active', true)->select(['id', 'name', 'year'])->get(),
         ]);
     }
 

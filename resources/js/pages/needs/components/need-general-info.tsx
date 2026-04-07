@@ -40,6 +40,12 @@ export function NeedGeneralInfo({ need }: NeedGeneralInfoProps) {
   return (
     <Card className="gap-0 p-0">
       <CardContent className="divide-y p-0">
+        <InfoRow label="Kelompok Kebutuhan">
+          <p className="text-sm font-medium">
+            {need.needGroup ? `${need.needGroup.name}` : '-'}
+          </p>
+        </InfoRow>
+
         <InfoRow label="Unit Kerja">
           <p className="text-sm font-medium">
             {need.organizational_unit?.name}

@@ -9,6 +9,7 @@ interface CreateProps {
   tujuans: Tujuan[];
   kpiGroups: any[];
   strategicServicePlans: any[];
+  needGroups: { id: number; name: string; year: number }[];
 }
 
 export default function Create({
@@ -17,6 +18,7 @@ export default function Create({
   tujuans,
   kpiGroups,
   strategicServicePlans,
+  needGroups,
 }: CreateProps) {
   return (
     <>
@@ -38,6 +40,7 @@ export default function Create({
             tujuans={tujuans}
             kpiGroups={kpiGroups}
             strategicServicePlans={strategicServicePlans}
+            needGroups={needGroups}
           />
         </div>
       </div>

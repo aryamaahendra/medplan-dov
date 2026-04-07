@@ -27,6 +27,7 @@ class StoreNeedRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'need_group_id' => ['required', 'integer', 'exists:need_groups,id'],
             'organizational_unit_id' => ['required', 'integer', 'exists:organizational_units,id'],
             'need_type_id' => ['required', 'integer', 'exists:need_types,id'],
             'year' => ['required', 'integer', 'min:2000', 'max:2100'],

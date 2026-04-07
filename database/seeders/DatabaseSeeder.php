@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             // RenstraSeeder::class,
             // TujuanSeeder::class,
             // RenstraRSUDSeeder::class,
+            NeedGroupSeeder::class,
             StrategicServicePlanSeeder::class,
         ]);
     }

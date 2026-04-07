@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
+    'need_group_id',
     'organizational_unit_id',
     'need_type_id',
     'year',
@@ -53,6 +54,14 @@ class Need extends Model
     public function organizationalUnit(): BelongsTo
     {
         return $this->belongsTo(OrganizationalUnit::class);
+    }
+
+    /**
+     * Get the need group this need belongs to.
+     */
+    public function needGroup(): BelongsTo
+    {
+        return $this->belongsTo(NeedGroup::class);
     }
 
     /**

@@ -19,6 +19,7 @@ interface NeedFormProps {
   need?: Need | null;
   organizationalUnits: { id: number; name: string }[];
   needTypes: { id: number; name: string }[];
+  needGroups: { id: number; name: string; year: number }[];
   tujuans: Tujuan[];
   kpiGroups: any[];
   strategicServicePlans: StrategicServicePlan[];
@@ -29,6 +30,7 @@ export function NeedForm({
   need,
   organizationalUnits,
   needTypes,
+  needGroups,
   tujuans,
   kpiGroups,
   strategicServicePlans,
@@ -37,6 +39,7 @@ export function NeedForm({
   const isEditing = !!need;
 
   const { data, setData, post, patch, processing, errors } = useForm({
+    need_group_id: need?.need_group_id?.toString() ?? '',
     organizational_unit_id: need?.organizational_unit_id?.toString() ?? '',
     need_type_id: need?.need_type_id?.toString() ?? '',
     year: need?.year?.toString() ?? new Date().getFullYear().toString(),
@@ -136,6 +139,7 @@ export function NeedForm({
                 errors={errors}
                 organizationalUnits={organizationalUnits}
                 needTypes={needTypes}
+                needGroups={needGroups}
                 handleVolumeChange={handleVolumeChange}
                 handleUnitPriceChange={handleUnitPriceChange}
               />

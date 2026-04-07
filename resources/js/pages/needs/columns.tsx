@@ -55,6 +55,11 @@ export type StrategicServicePlan = BaseStrategicServicePlan;
 
 export interface Need {
   id: number;
+  need_group_id: number;
+  needGroup?: {
+    id: number;
+    name: string;
+  };
   organizational_unit_id: number;
   need_type_id: number;
   year: number;

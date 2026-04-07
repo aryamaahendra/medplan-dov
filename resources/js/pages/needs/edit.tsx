@@ -10,6 +10,7 @@ interface EditProps {
   tujuans: Tujuan[];
   kpiGroups: any[];
   strategicServicePlans: any[];
+  needGroups: { id: number; name: string; year: number }[];
 }
 
 export default function Edit({
@@ -19,6 +20,7 @@ export default function Edit({
   tujuans,
   kpiGroups,
   strategicServicePlans,
+  needGroups,
 }: EditProps) {
   return (
     <>
@@ -41,6 +43,7 @@ export default function Edit({
             tujuans={tujuans}
             kpiGroups={kpiGroups}
             strategicServicePlans={strategicServicePlans}
+            needGroups={needGroups}
           />
         </div>
       </div>

@@ -30,6 +30,7 @@ interface GeneralInfoSectionProps {
   errors: any;
   organizationalUnits: { id: number; name: string }[];
   needTypes: { id: number; name: string }[];
+  needGroups: { id: number; name: string; year: number }[];
   handleVolumeChange: (value: string) => void;
   handleUnitPriceChange: (value: string) => void;
 }
@@ -40,11 +41,35 @@ export function GeneralInfoSection({
   errors,
   organizationalUnits,
   needTypes,
+  needGroups,
   handleVolumeChange,
   handleUnitPriceChange,
 }: GeneralInfoSectionProps) {
   return (
     <div className="space-y-5 py-6">
+      <div className="space-y-1.5">
+        <Label htmlFor="need_group_id">Pengelompokan (Need Group)</Label>
+        <Select
+          value={data.need_group_id}
+          onValueChange={(v) => setData('need_group_id', v)}
+        >
+          <SelectTrigger
+            id="need_group_id"
+            className="w-full bg-muted/20 transition-colors hover:bg-muted/40"
+          >
+            <SelectValue placeholder="Pilih kelompok usulan" />
+          </SelectTrigger>
+          <SelectContent>
+            {(needGroups || []).map((g) => (
+              <SelectItem key={g.id} value={g.id.toString()}>
+                {g.name} (Tahun {g.year})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <InputError message={errors.need_group_id} />
+      </div>
+
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="organizational_unit_id">Unit Kerja</Label>

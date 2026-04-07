@@ -157,7 +157,10 @@ class NeedController extends Controller
                 'indicators:id,sasaran_id,name,baseline',
                 'indicators.sasaran:id,name',
                 'indicators.targets:id,indicator_id,year,target',
-                'kpiIndicators:id,name,unit,is_category,parent_indicator_id',
+                'kpiIndicators:id,name,unit,is_category,parent_indicator_id,group_id',
+                'kpiIndicators.group:id,name,start_year,end_year',
+                'kpiIndicators.parentIndicator:id,name,is_category',
+                'kpiIndicators.annualTargets:id,indicator_id,year,target_value',
                 'strategicServicePlans:id,strategic_program,service_plan,year',
             ]),
         ]);

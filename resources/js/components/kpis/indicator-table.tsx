@@ -26,15 +26,17 @@ import type { KpiIndicator } from '@/types';
 
 interface IndicatorTableProps {
   indicators: KpiIndicator[];
-  onEdit: (indicator: KpiIndicator) => void;
-  yearStart: number;
-  yearEnd: number;
+  onEdit?: (indicator: KpiIndicator) => void;
+  onDelete?: (indicator: KpiIndicator) => void;
+  yearStart?: number;
+  yearEnd?: number;
   hideHeader?: boolean;
 }
 
 export function IndicatorTable({
   indicators,
   onEdit,
+  onDelete,
   yearStart,
   yearEnd,
   hideHeader = false,
@@ -43,18 +45,26 @@ export function IndicatorTable({
     useState<KpiIndicator | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const years = Array.from(
-    { length: yearEnd - yearStart + 1 },
-    (_, i) => yearStart + i,
-  );
+  const years =
+    yearStart && yearEnd
+      ? Array.from(
+          { length: yearEnd - yearStart + 1 },
+          (_, i) => yearStart + i,
+        )
+      : [];
 
   const handleDelete = () => {
     if (!deletingIndicator) {
       return;
     }
 
-    setIsDeleting(true);
+    if (onDelete) {
+      onDelete(deletingIndicator);
+      setDeletingIndicator(null);
+      return;
+    }
 
+    setIsDeleting(true);
     router.delete(
       KpiIndicatorController.destroy.url({ indicator: deletingIndicator.id }),
       {
@@ -66,6 +76,8 @@ export function IndicatorTable({
       },
     );
   };
+
+  const showActions = !!onEdit || !!onDelete;
 
   return (
     <>
@@ -95,28 +107,34 @@ export function IndicatorTable({
                 >
                   Baseline
                 </TableHead>
-                <TableHead
-                  colSpan={years.length}
-                  className="border-r border-b text-center"
-                >
-                  Target Tahunan
-                </TableHead>
-                <TableHead rowSpan={2} className="w-1 text-center"></TableHead>
-              </TableRow>
-              <TableRow className="hover:bg-background">
-                {years.map((year) => (
-                  <TableHead key={year} className="w-1 border-r text-center">
-                    {year}
+                {years.length > 0 && (
+                  <TableHead
+                    colSpan={years.length}
+                    className="border-r border-b text-center"
+                  >
+                    Target Tahunan
                   </TableHead>
-                ))}
+                )}
+                {showActions && (
+                  <TableHead rowSpan={2} className="w-1 text-center"></TableHead>
+                )}
               </TableRow>
+              {years.length > 0 && (
+                <TableRow className="hover:bg-background">
+                  {years.map((year) => (
+                    <TableHead key={year} className="w-1 border-r text-center">
+                      {year}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              )}
             </TableHeader>
           )}
           <TableBody>
             {indicators.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={4 + years.length + 1}
+                  colSpan={4 + years.length + (showActions ? 1 : 0)}
                   className="h-24 text-center text-muted-foreground"
                 >
                   Belum ada indikator.
@@ -164,7 +182,7 @@ export function IndicatorTable({
                     );
                   })}
 
-                  {!hideHeader && (
+                  {showActions && (
                     <TableCell className="text-center">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -174,11 +192,13 @@ export function IndicatorTable({
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => onEdit(indicator)}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
+                          {onEdit && (
+                            <DropdownMenuItem onClick={() => onEdit(indicator)}>
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                          )}
+                          {(onEdit || onDelete) && <DropdownMenuSeparator />}
                           <DropdownMenuItem
                             className="text-destructive"
                             onClick={() => setDeletingIndicator(indicator)}

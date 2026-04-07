@@ -15,21 +15,25 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import type { KpiGroup, KpiIndicator } from '@/types';
+import type { KpiIndicator } from '@/types';
 import { IndicatorTable } from './indicator-table';
 
 interface IndicatorCardProps {
-  group: KpiGroup;
   indicator: KpiIndicator;
-  onEdit: (indicator: KpiIndicator) => void;
-  onCreateChild: (parent: KpiIndicator) => void;
+  yearStart?: number;
+  yearEnd?: number;
+  onEdit?: (indicator: KpiIndicator) => void;
+  onDelete?: (indicator: KpiIndicator) => void;
+  onCreateChild?: (parent: KpiIndicator) => void;
   depth?: number;
 }
 
 export function IndicatorCard({
-  group,
   indicator,
+  yearStart,
+  yearEnd,
   onEdit,
+  onDelete,
   onCreateChild,
   depth = 0,
 }: IndicatorCardProps) {
@@ -57,6 +61,12 @@ export function IndicatorCard({
       return;
     }
 
+    if (onDelete) {
+      onDelete(deletingIndicator);
+      setDeletingIndicator(null);
+      return;
+    }
+
     setIsDeleting(true);
     router.delete(
       KpiIndicatorController.destroy.url({ indicator: deletingIndicator.id }),
@@ -70,36 +80,46 @@ export function IndicatorCard({
     );
   };
 
+  const showActions = !!onEdit || !!onCreateChild || !!onDelete;
+
   if (indicator.is_category) {
     return (
       <Card className={cn('overflow-hidden', depth > 0 && 'rounded-none')}>
         <CardHeader>
           <CardTitle>{indicator.name}</CardTitle>
           <CardDescription>Kategori Level {depth + 1}</CardDescription>
-          <CardAction>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onCreateChild(indicator)}
-            >
-              <Plus /> Tambah Sub
-            </Button>
-            <Button
-              size="icon-sm"
-              variant="ghost"
-              onClick={() => onEdit(indicator)}
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
-            <Button
-              size="icon-sm"
-              variant="ghost"
-              className="text-destructive"
-              onClick={() => setDeletingIndicator(indicator)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </CardAction>
+          {showActions && (
+            <CardAction>
+              {onCreateChild && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => onCreateChild(indicator)}
+                >
+                  <Plus /> Tambah Sub
+                </Button>
+              )}
+              {onEdit && (
+                <Button
+                  size="icon-sm"
+                  variant="ghost"
+                  onClick={() => onEdit(indicator)}
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+              )}
+              {onDelete && (
+                <Button
+                  size="icon-sm"
+                  variant="ghost"
+                  className="text-destructive"
+                  onClick={() => setDeletingIndicator(indicator)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </CardAction>
+          )}
         </CardHeader>
 
         <CardContent className="p-0">
@@ -110,8 +130,9 @@ export function IndicatorCard({
                   <IndicatorTable
                     indicators={leafIndicators}
                     onEdit={onEdit}
-                    yearStart={group.start_year}
-                    yearEnd={group.end_year}
+                    onDelete={onDelete}
+                    yearStart={yearStart}
+                    yearEnd={yearEnd}
                   />
                 </div>
               )}
@@ -121,9 +142,11 @@ export function IndicatorCard({
                   {childCategories.map((child) => (
                     <IndicatorCard
                       key={child.id}
-                      group={group}
                       indicator={child}
+                      yearStart={yearStart}
+                      yearEnd={yearEnd}
                       onEdit={onEdit}
+                      onDelete={onDelete}
                       onCreateChild={onCreateChild}
                       depth={depth + 1}
                     />
@@ -161,30 +184,37 @@ export function IndicatorCard({
             Indikator
           </span>
         </div>
-        <div className="flex items-center gap-1">
-          <Button
-            size="icon-sm"
-            variant="ghost"
-            onClick={() => onEdit(indicator)}
-          >
-            <Edit className="h-3 w-3" />
-          </Button>
-          <Button
-            size="icon-sm"
-            variant="ghost"
-            className="text-destructive"
-            onClick={() => setDeletingIndicator(indicator)}
-          >
-            <Trash2 className="h-3 w-3" />
-          </Button>
-        </div>
+        {(onEdit || onDelete) && (
+          <div className="flex items-center gap-1">
+            {onEdit && (
+              <Button
+                size="icon-sm"
+                variant="ghost"
+                onClick={() => onEdit(indicator)}
+              >
+                <Edit className="h-3 w-3" />
+              </Button>
+            )}
+            {onDelete && (
+              <Button
+                size="icon-sm"
+                variant="ghost"
+                className="text-destructive"
+                onClick={() => setDeletingIndicator(indicator)}
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            )}
+          </div>
+        )}
       </div>
 
       <IndicatorTable
         indicators={[indicator]}
         onEdit={onEdit}
-        yearStart={group.start_year}
-        yearEnd={group.end_year}
+        onDelete={onDelete}
+        yearStart={yearStart}
+        yearEnd={yearEnd}
         hideHeader={true}
       />
 

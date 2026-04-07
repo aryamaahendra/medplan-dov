@@ -15,6 +15,9 @@ export type KpiIndicator = {
   unit: string | null;
   is_category: boolean;
   baseline_value: string | null;
+  group?: KpiGroup;
+  parent_indicator?: KpiIndicator;
+  parentIndicator?: KpiIndicator;
   indicators?: KpiIndicator[];
   annual_targets?: KpiAnnualTarget[];
   created_at: string;

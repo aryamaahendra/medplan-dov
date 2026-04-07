@@ -24,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import needRoutes from '@/routes/needs';
+import type { KpiGroup, KpiIndicator, StrategicServicePlan as BaseStrategicServicePlan } from '@/types';
 
 export interface Sasaran {
   id: number;
@@ -48,19 +49,8 @@ export interface Tujuan {
   sasarans: Sasaran[];
 }
 
-export interface KpiIndicator {
-  id: number;
-  name: string;
-  unit: string | null;
-  is_category: boolean;
-  parent_indicator_id: number | null;
-}
-
-export interface StrategicServicePlan {
-  id: number;
-  strategic_program: string;
-  service_plan: string;
-  year: number;
+export interface StrategicServicePlan extends BaseStrategicServicePlan {
+  // Add any additional fields if needed, but Base already has strategic_program etc.
 }
 
 export interface Need {

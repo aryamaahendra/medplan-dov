@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreChecklistQuestionRequest;
 use App\Http\Resources\ChecklistQuestionResource;
+use App\Models\ChecklistQuestion;
 use App\Traits\HasDataTable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

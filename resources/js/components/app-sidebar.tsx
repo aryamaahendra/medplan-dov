@@ -11,6 +11,7 @@ import {
   BookKey,
   Database,
   Pin,
+  ClipboardCheck,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
@@ -34,6 +35,7 @@ import organizationalUnits from '@/routes/organizational-units';
 import renstras from '@/routes/renstras';
 import strategicServicePlans from '@/routes/strategic-service-plans';
 import users from '@/routes/users';
+import checklistQuestions from '@/routes/checklist-questions';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -74,6 +76,11 @@ const masterNavItems: NavItem[] = [
     title: 'Rencana Layanan Strategis',
     href: strategicServicePlans.index.url(),
     icon: ClipboardList,
+  },
+  {
+    title: 'Bank Pertanyaan Checklist',
+    href: checklistQuestions.index.url(),
+    icon: ClipboardCheck,
   },
 ];
 

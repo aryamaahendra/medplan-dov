@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 import { formatCurrency } from '../columns';
@@ -20,9 +20,7 @@ function InfoRow({
   labelClassName,
 }: InfoRowProps) {
   return (
-    <div
-      className={cn('flex items-center justify-between px-4 py-3', className)}
-    >
+    <div className={cn('grid grid-cols-2 px-4 py-3', className)}>
       <div className={cn('text-sm text-muted-foreground', labelClassName)}>
         {label}
       </div>
@@ -41,9 +39,6 @@ interface NeedGeneralInfoProps {
 export function NeedGeneralInfo({ need }: NeedGeneralInfoProps) {
   return (
     <Card className="gap-0 p-0">
-      <CardHeader className="border-b bg-muted/30 px-4 py-3">
-        <CardTitle className="text-sm font-semibold">Informasi Umum</CardTitle>
-      </CardHeader>
       <CardContent className="divide-y p-0">
         <InfoRow label="Unit Kerja">
           <p className="text-sm font-medium">
@@ -57,6 +52,24 @@ export function NeedGeneralInfo({ need }: NeedGeneralInfoProps) {
 
         <InfoRow label="Jenis Kebutuhan">
           <p className="text-sm font-medium">{need.need_type?.name}</p>
+        </InfoRow>
+
+        <InfoRow label="Kondisi Saat Ini">
+          <p className="text-sm">{need.current_condition}</p>
+        </InfoRow>
+
+        <InfoRow label="Kebutuhan Kondisi">
+          <p className="text-sm">{need.required_condition}</p>
+        </InfoRow>
+
+        <InfoRow label="Deskripsi / Justifikasi">
+          <p className="text-sm">
+            {need.description || (
+              <span className="text-muted-foreground/60 italic">
+                Tidak ada deskripsi
+              </span>
+            )}
+          </p>
         </InfoRow>
 
         <InfoRow label="Volume & Satuan">

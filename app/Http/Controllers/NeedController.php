@@ -161,7 +161,7 @@ class NeedController extends Controller
                 'kpiIndicators.group:id,name,start_year,end_year',
                 'kpiIndicators.parentIndicator:id,name,is_category',
                 'kpiIndicators.annualTargets:id,indicator_id,year,target_value',
-                'strategicServicePlans:id,strategic_program,service_plan,year',
+                'strategicServicePlans:id,strategic_program,service_plan,year,target,policy_direction',
             ]),
         ]);
     }

@@ -1,4 +1,3 @@
-import { Target } from 'lucide-react';
 import { useMemo } from 'react';
 
 import { Badge } from '@/components/ui/badge';
@@ -55,62 +54,63 @@ export function IkkAlignmentShow({ need }: IkkAlignmentShowProps) {
   }, [need.kpi_indicators]);
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Target className="h-5 w-5 text-primary" />
+    <div className="pt-4">
+      <div className="space-y-1">
         <h2 className="text-xl font-semibold">Penyelarasan KPI (IKK)</h2>
+        <p className="text-sm text-muted-foreground">
+          Hubungan usulan dengan Indikator Kinerja Kunci (IKK) organisasi.
+        </p>
       </div>
-      <p className="text-sm text-muted-foreground">
-        Hubungan usulan dengan Indikator Kinerja Kunci (IKK) organisasi.
-      </p>
 
-      {groups.length > 0 ? (
-        <div className="space-y-4">
-          {groups.map((groupData) => (
-            <Card
-              key={groupData.group?.id || 0}
-              className="gap-0 overflow-hidden p-0"
-            >
-              <CardHeader className="border-b bg-muted/30 p-4">
-                <CardTitle className="text-sm">
-                  Periode KPI: {groupData.group?.name || 'Tidak Ada'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="divide-y">
-                  {groupData.categories.map((category) => (
-                    <CategoryItem
-                      key={category.parentId || 'standalone'}
-                      category={category}
-                      years={
-                        groupData.group
-                          ? Array.from(
-                              {
-                                length:
-                                  groupData.group.end_year -
-                                  groupData.group.start_year +
-                                  1,
-                              },
-                              (_, i) => groupData.group.start_year + i,
-                            )
-                          : []
-                      }
-                    />
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-sm text-muted-foreground italic">
-              Belum ada Indikator KPI (IKK) yang dipilih.
-            </p>
-          </CardContent>
-        </Card>
-      )}
+      <div className="mt-6 space-y-4">
+        {groups.length > 0 ? (
+          <div className="space-y-4">
+            {groups.map((groupData) => (
+              <Card
+                key={groupData.group?.id || 0}
+                className="gap-0 overflow-hidden p-0"
+              >
+                <CardHeader className="border-b bg-muted/30 p-4">
+                  <CardTitle className="text-sm">
+                    Periode KPI: {groupData.group?.name || 'Tidak Ada'}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="divide-y">
+                    {groupData.categories.map((category) => (
+                      <CategoryItem
+                        key={category.parentId || 'standalone'}
+                        category={category}
+                        years={
+                          groupData.group
+                            ? Array.from(
+                                {
+                                  length:
+                                    groupData.group.end_year -
+                                    groupData.group.start_year +
+                                    1,
+                                },
+                                (_, i) => groupData.group.start_year + i,
+                              )
+                            : []
+                        }
+                      />
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card className="border-dashed">
+            <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+              <p className="text-sm text-muted-foreground italic">
+                Belum ada Indikator KPI (IKK) yang dipilih.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }

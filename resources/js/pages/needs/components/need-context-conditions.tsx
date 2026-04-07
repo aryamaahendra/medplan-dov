@@ -9,13 +9,11 @@ interface NeedContextConditionsProps {
 export function NeedContextConditions({ need }: NeedContextConditionsProps) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium tracking-wider text-muted-foreground uppercase">
-            Kondisi Saat Ini
-          </CardTitle>
+      <Card className="gap-0 p-0">
+        <CardHeader className="border-b bg-muted/30 px-4 py-3!">
+          <CardTitle className="text-sm">Kondisi Saat Ini</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4">
           <p className="text-sm/relaxed whitespace-pre-wrap">
             {need.current_condition || (
               <span className="text-muted-foreground/60 italic">
@@ -26,13 +24,11 @@ export function NeedContextConditions({ need }: NeedContextConditionsProps) {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium tracking-wider text-muted-foreground uppercase">
-            Kebutuhan Kondisi
-          </CardTitle>
+      <Card className="gap-0 p-0">
+        <CardHeader className="border-b bg-muted/30 px-4 py-3!">
+          <CardTitle className="text-sm">Kebutuhan Kondisi</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4">
           <p className="text-sm/relaxed whitespace-pre-wrap">
             {need.required_condition || (
               <span className="text-muted-foreground/60 italic">
@@ -43,13 +39,11 @@ export function NeedContextConditions({ need }: NeedContextConditionsProps) {
         </CardContent>
       </Card>
 
-      <Card className="sm:col-span-2">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium tracking-wider text-muted-foreground uppercase">
-            Deskripsi / Justifikasi
-          </CardTitle>
+      <Card className="gap-0 p-0 sm:col-span-2">
+        <CardHeader className="border-b bg-muted/30 px-4 py-3!">
+          <CardTitle className="text-sm">Deskripsi / Justifikasi</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4">
           <p className="text-sm/relaxed whitespace-pre-wrap">
             {need.description || (
               <span className="text-muted-foreground/60 italic">

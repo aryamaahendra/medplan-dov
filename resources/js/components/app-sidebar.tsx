@@ -10,7 +10,7 @@ import {
   Users,
   BookKey,
   Database,
-  Tag,
+  Pin,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
@@ -61,11 +61,6 @@ const masterNavItems: NavItem[] = [
     icon: Layers,
   },
   {
-    title: 'Kelompok Usulan',
-    href: needGroups.index.url(),
-    icon: Database,
-  },
-  {
     title: 'Manajemen Renstra',
     href: renstras.index.url(),
     icon: FileText,
@@ -104,9 +99,15 @@ export function AppSidebar() {
     (group) => ({
       title: `${group.name} (${group.year})`,
       href: needs.index.url({ query: { need_group_id: group.id } }),
-      icon: Tag,
+      icon: Pin,
     }),
   );
+
+  dynamicNeedNavItems.push({
+    title: 'Semua Usulan',
+    href: needGroups.index.url(),
+    icon: Database,
+  });
 
   return (
     <Sidebar collapsible="icon" variant="inset">

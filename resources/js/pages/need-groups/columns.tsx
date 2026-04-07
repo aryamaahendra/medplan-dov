@@ -3,7 +3,6 @@ import { MoreHorizontal, PencilLine, Trash2 } from 'lucide-react';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,28 +26,12 @@ export const getColumns = (
   onDelete: (group: NeedGroup) => void,
 ): ColumnDef<NeedGroup>[] => [
   {
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate')
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
+    id: 'number',
+    header: () => <div className="text-center">#</div>,
+    cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
     enableSorting: false,
     enableHiding: false,
+    meta: { cellClassName: 'w-1' },
   },
   {
     accessorKey: 'name',
@@ -87,6 +70,7 @@ export const getColumns = (
   },
   {
     id: 'actions',
+    meta: { cellClassName: 'w-1' },
     cell: ({ row }) => {
       const group = row.original;
 

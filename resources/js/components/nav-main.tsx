@@ -19,7 +19,7 @@ export function NavMain({
   const { isCurrentUrl } = useCurrentUrl();
 
   return (
-    <SidebarGroup className="px-2 py-0">
+    <SidebarGroup className="mt-2 px-2 py-0 first:mt-0">
       {title && <SidebarGroupLabel>{title}</SidebarGroupLabel>}
       <SidebarMenu>
         {items.map((item) => (

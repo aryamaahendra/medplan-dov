@@ -1,6 +1,12 @@
 import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { CheckCircle2, Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
+import {
+  CheckCircle2,
+  Eye,
+  MoreHorizontal,
+  PencilLine,
+  Trash2,
+} from 'lucide-react';
 
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
@@ -39,7 +45,7 @@ export const getColumns = (
     id: 'period',
     header: 'Periode',
     cell: ({ row }) => `${row.original.start_year} - ${row.original.end_year}`,
-    meta: { cellClassName: 'font-mono text-xs w-[100px]' },
+    meta: { cellClassName: 'font-mono w-[100px]' },
   },
   {
     accessorKey: 'description',
@@ -68,7 +74,7 @@ export const getColumns = (
     header: (props) => <DataTableColumnHeader {...props} title="Dibuat Pada" />,
     cell: ({ row }) =>
       new Date(row.original.created_at).toLocaleDateString('id-ID'),
-    meta: { cellClassName: 'font-mono text-xs w-[120px]' },
+    meta: { cellClassName: 'font-mono w-[120px]' },
   },
   {
     id: 'actions',
@@ -81,15 +87,15 @@ export const getColumns = (
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
               <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
+              <MoreHorizontal />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Aksi</DropdownMenuLabel>
             <DropdownMenuItem asChild>
               <Link href={groupRoutes.show.url({ group: group.id })}>
-                <Eye className="h-4 w-4" />
-                Lihat Detail
+                <Eye />
+                Detail
               </Link>
             </DropdownMenuItem>
             {!group.is_active && (
@@ -97,20 +103,20 @@ export const getColumns = (
                 onClick={() => onActivate(group)}
                 disabled={isActivating}
               >
-                <CheckCircle2 className="h-4 w-4" />
+                <CheckCircle2 />
                 {isActivating ? 'Mengaktifkan...' : 'Aktifkan'}
               </DropdownMenuItem>
             )}
             <DropdownMenuItem onClick={() => onEdit(group)}>
-              <Edit className="h-4 w-4" />
+              <PencilLine />
               Edit
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              className="text-destructive focus:text-destructive"
+              variant="destructive"
               onClick={() => onDelete(group)}
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 />
               Hapus
             </DropdownMenuItem>
           </DropdownMenuContent>

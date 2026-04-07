@@ -1,5 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import { Edit, MoreHorizontal, Trash2 } from 'lucide-react';
+import { MoreHorizontal, PencilLine, Trash2 } from 'lucide-react';
 
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { Button } from '@/components/ui/button';
@@ -78,7 +78,7 @@ export const getColumns = (
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
               <span className="sr-only font-normal">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
+              <MoreHorizontal />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -87,16 +87,16 @@ export const getColumns = (
               className="text-sm/relaxed"
               onClick={() => onEdit(unit)}
             >
-              <Edit className="h-4 w-4" />
-              Edit Unit
+              <PencilLine />
+              Edit
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              className="text-destructive focus:text-destructive"
+              variant="destructive"
               onClick={() => onDelete(unit)}
             >
-              <Trash2 className="h-4 w-4" />
-              Hapus Unit
+              <Trash2 />
+              Hapus
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

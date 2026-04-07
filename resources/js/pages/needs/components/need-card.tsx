@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { Edit, FileText, Trash2 } from 'lucide-react';
+import { FileText, PencilLine, Trash2 } from 'lucide-react';
 import * as React from 'react';
 import { PriorityBadge } from '@/components/priority-badge';
 import { Badge } from '@/components/ui/badge';
@@ -45,7 +45,7 @@ export function NeedCard({ need, onEdit, onDelete }: NeedCardProps) {
             </Link>
           </Button>
           <Button variant="outline" size="sm" onClick={() => onEdit(need)}>
-            <Edit />
+            <PencilLine />
             Edit
           </Button>
           <Button

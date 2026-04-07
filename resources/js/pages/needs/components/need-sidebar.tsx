@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { ArrowLeft, Edit } from 'lucide-react';
+import { ArrowLeft, PencilLine } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import needRoutes from '@/routes/needs';
@@ -22,7 +22,7 @@ export function NeedSidebar({ need }: NeedSidebarProps) {
         </Button>
         <Button asChild>
           <Link href={needRoutes.edit.url({ need: need.id })}>
-            <Edit />
+            <PencilLine />
             Edit Usulan
           </Link>
         </Button>

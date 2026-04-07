@@ -2,9 +2,9 @@ import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
   CheckCircle2,
-  Edit,
   FileText,
   MoreHorizontal,
+  PencilLine,
   Send,
   Trash2,
   XCircle,
@@ -250,15 +250,15 @@ export const getColumns = (
               className="text-sm/relaxed"
               onClick={() => onEdit(need)}
             >
-              <Edit className="h-4 w-4" />
+              <PencilLine className="h-4 w-4" />
               Edit
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              className="text-destructive focus:text-destructive"
+              variant="destructive"
               onClick={() => onDelete(need)}
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 />
               Hapus
             </DropdownMenuItem>
           </DropdownMenuContent>

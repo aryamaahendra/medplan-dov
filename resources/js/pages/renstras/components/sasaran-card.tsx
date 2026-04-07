@@ -1,4 +1,4 @@
-import { Edit, Plus, Trash2 } from 'lucide-react';
+import { PencilLine, Plus, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -50,7 +50,7 @@ export function SasaranCard({
             variant="outline"
             onClick={() => onEditSasaran(sasaran)}
           >
-            <Edit />
+            <PencilLine />
           </Button>
           <Button
             size="icon-sm"

@@ -6,6 +6,7 @@ use App\Http\Controllers\KpiGroupController;
 use App\Http\Controllers\KpiIndicatorController;
 use App\Http\Controllers\NeedChecklistAnswerController;
 use App\Http\Controllers\NeedController;
+use App\Http\Controllers\NeedGroupChecklistController;
 use App\Http\Controllers\NeedGroupController;
 use App\Http\Controllers\NeedTypeController;
 use App\Http\Controllers\OrganizationalUnitController;
@@ -27,6 +28,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('organizational-units', OrganizationalUnitController::class)->except(['create', 'edit', 'show']);
     Route::resource('need-types', NeedTypeController::class)->except(['create', 'edit', 'show']);
     Route::resource('need-groups', NeedGroupController::class)->except(['create', 'edit', 'show']);
+    Route::get('need-groups/{need_group}/checklists', [NeedGroupChecklistController::class, 'index'])->name('need-groups.checklists.index');
+    Route::put('need-groups/{need_group}/checklists', [NeedGroupChecklistController::class, 'update'])->name('need-groups.checklists.update');
     Route::resource('needs', NeedController::class);
     Route::resource('renstras', RenstraController::class)->except(['create', 'edit']);
     Route::resource('tujuans', TujuanController::class)->except(['index', 'create', 'edit', 'show']);

@@ -1,5 +1,12 @@
+import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal, PencilLine, Trash2 } from 'lucide-react';
+import {
+  ClipboardList,
+  MoreHorizontal,
+  PencilLine,
+  Trash2,
+} from 'lucide-react';
+import needGroupChecklistActions from '@/actions/App/Http/Controllers/NeedGroupChecklistController';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -90,6 +97,16 @@ export const getColumns = (
             >
               <PencilLine className="h-4 w-4" />
               Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-sm/relaxed" asChild>
+              <Link
+                href={needGroupChecklistActions.index.url({
+                  need_group: group.id,
+                })}
+              >
+                <ClipboardList className="h-4 w-4" />
+                Kelola Checklist
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-sm/relaxed text-destructive focus:text-destructive"

@@ -1,22 +1,9 @@
-import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import {
-  ClipboardList,
-  MoreHorizontal,
-  PencilLine,
-  Trash2,
-} from 'lucide-react';
+import { ClipboardList, PencilLine, Trash2 } from 'lucide-react';
 import needGroupChecklistActions from '@/actions/App/Http/Controllers/NeedGroupChecklistController';
+import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 export interface NeedGroup {
   id: number;
@@ -82,41 +69,29 @@ export const getColumns = (
       const group = row.original;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-            <DropdownMenuItem
-              className="text-sm/relaxed"
-              onClick={() => onEdit(group)}
-            >
-              <PencilLine className="h-4 w-4" />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem className="text-sm/relaxed" asChild>
-              <Link
-                href={needGroupChecklistActions.index.url({
-                  need_group: group.id,
-                })}
-              >
-                <ClipboardList className="h-4 w-4" />
-                Kelola Checklist
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="text-sm/relaxed text-destructive focus:text-destructive"
-              onClick={() => onDelete(group)}
-            >
-              <Trash2 className="h-4 w-4" />
-              Hapus
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ActionDropdown
+          actions={[
+            {
+              label: 'Edit',
+              icon: PencilLine,
+              onClick: () => onEdit(group),
+            },
+            {
+              label: 'Checklist',
+              icon: ClipboardList,
+              href: needGroupChecklistActions.index.url({
+                need_group: group.id,
+              }),
+            },
+            'separator',
+            {
+              label: 'Hapus',
+              icon: Trash2,
+              onClick: () => onDelete(group),
+              variant: 'destructive',
+            },
+          ]}
+        />
       );
     },
   },

@@ -1,19 +1,11 @@
 import { router } from '@inertiajs/react';
-import { Edit, MoreHorizontal, Trash2 } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 import IndicatorController from '@/actions/App/Http/Controllers/IndicatorController';
+import { ActionDropdown } from '@/components/action-dropdown';
 import { ConfirmDialog } from '@/components/confirm-dialog';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
   Table,
   TableBody,
@@ -139,28 +131,22 @@ export function IndicatorTable({
                     );
                   })}
                   <TableCell className="text-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => onEdit(indicator)}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="text-destructive"
-                          onClick={() => setDeletingIndicator(indicator)}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Hapus
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <ActionDropdown
+                      actions={[
+                        {
+                          label: 'Edit',
+                          icon: Edit,
+                          onClick: () => onEdit(indicator),
+                        },
+                        'separator',
+                        {
+                          label: 'Hapus',
+                          icon: Trash2,
+                          onClick: () => setDeletingIndicator(indicator),
+                          variant: 'destructive',
+                        },
+                      ]}
+                    />
                   </TableCell>
                 </TableRow>
               ))

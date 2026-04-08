@@ -1,24 +1,10 @@
-import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import {
-  CheckCircle2,
-  Eye,
-  MoreHorizontal,
-  PencilLine,
-  Trash2,
-} from 'lucide-react';
+import { CheckCircle2, Eye, PencilLine, Trash2 } from 'lucide-react';
 
+import { ActionDropdown } from '@/components/action-dropdown';
+import type { ActionItem } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import groupRoutes from '@/routes/kpis/groups';
 import type { KpiGroup } from '@/types';
 
@@ -83,44 +69,35 @@ export const getColumns = (
       const group = row.original;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-            <DropdownMenuItem asChild>
-              <Link href={groupRoutes.show.url({ group: group.id })}>
-                <Eye />
-                Detail
-              </Link>
-            </DropdownMenuItem>
-            {!group.is_active && (
-              <DropdownMenuItem
-                onClick={() => onActivate(group)}
-                disabled={isActivating}
-              >
-                <CheckCircle2 />
-                {isActivating ? 'Mengaktifkan...' : 'Aktifkan'}
-              </DropdownMenuItem>
-            )}
-            <DropdownMenuItem onClick={() => onEdit(group)}>
-              <PencilLine />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              variant="destructive"
-              onClick={() => onDelete(group)}
-            >
-              <Trash2 />
-              Hapus
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ActionDropdown
+          actions={
+            [
+              {
+                label: 'Detail',
+                icon: Eye,
+                href: groupRoutes.show.url({ group: group.id }),
+              },
+              !group.is_active && {
+                label: isActivating ? 'Mengaktifkan...' : 'Aktifkan',
+                icon: CheckCircle2,
+                onClick: () => onActivate(group),
+                disabled: isActivating,
+              },
+              {
+                label: 'Edit',
+                icon: PencilLine,
+                onClick: () => onEdit(group),
+              },
+              'separator',
+              {
+                label: 'Hapus',
+                icon: Trash2,
+                onClick: () => onDelete(group),
+                variant: 'destructive',
+              },
+            ].filter(Boolean) as (ActionItem | 'separator')[]
+          }
+        />
       );
     },
   },

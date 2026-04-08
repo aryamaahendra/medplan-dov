@@ -1,16 +1,22 @@
 import { Head, router } from '@inertiajs/react';
 import {
   CheckCheck,
+  ClipboardList,
   Clock,
+  Ellipsis,
   LayoutGrid,
   List,
+  PencilLine,
   Plus,
   SendIcon,
+  Trash2,
   TriangleAlert,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
+import needGroupChecklistActions from '@/actions/App/Http/Controllers/NeedGroupChecklistController';
+import { ActionDropdown } from '@/components/action-dropdown';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import { DataTableFacetedFilter } from '@/components/data-table/data-table-faceted-filter';
@@ -19,8 +25,10 @@ import { ButtonGroup } from '@/components/ui/button-group';
 import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import { cn } from '@/lib/utils';
+import needGroupRoutes from '@/routes/need-groups';
 import needRoutes from '@/routes/needs';
 
+import { NeedGroupDialog } from '../need-groups/need-group-dialog';
 import { getColumns } from './columns';
 import type { Need } from './columns';
 import { NeedGridView } from './components/need-grid-view';
@@ -62,6 +70,9 @@ export default function NeedsIndex({
   const [deletingNeed, setDeletingNeed] = useState<Need | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('grid');
+  const [isGroupDialogOpen, setIsGroupDialogOpen] = useState(false);
+  const [isDeletingGroup, setIsDeletingGroup] = useState(false);
+  const [isDeletingGroupLoading, setIsDeletingGroupLoading] = useState(false);
 
   const {
     onSearch,
@@ -100,6 +111,21 @@ export default function NeedsIndex({
       },
       onFinish: () => setIsDeleting(false),
     });
+  };
+
+  const handleConfirmDeleteGroup = () => {
+    setIsDeletingGroupLoading(true);
+
+    router.delete(
+      needGroupRoutes.destroy.url({ need_group: currentGroup.id }),
+      {
+        onSuccess: () => {
+          toast.success('Kelompok usulan berhasil dihapus.');
+          router.visit(needGroupRoutes.index.url());
+        },
+        onFinish: () => setIsDeletingGroupLoading(false),
+      },
+    );
   };
 
   const stableColumns = useMemo(() => getColumns(onEdit, onDelete), []);
@@ -165,7 +191,6 @@ export default function NeedsIndex({
   return (
     <>
       <Head title={`Usulan: ${currentGroup.name}`} />
-      <Head title={`Usulan: ${currentGroup.name}`} />
 
       <div className="flex flex-col gap-6 p-4">
         <div className="flex items-center justify-between">
@@ -204,8 +229,53 @@ export default function NeedsIndex({
               <Plus />
               Tambah Usulan
             </Button>
+            <ActionDropdown
+              trigger={
+                <Button variant={'outline'} size={'icon'}>
+                  <Ellipsis />
+                </Button>
+              }
+              actions={[
+                {
+                  label: 'Edit',
+                  icon: PencilLine,
+                  onClick: () => setIsGroupDialogOpen(true),
+                },
+                {
+                  label: 'Checklist',
+                  icon: ClipboardList,
+                  href: needGroupChecklistActions.index.url({
+                    need_group: currentGroup.id,
+                  }),
+                },
+                'separator',
+                {
+                  label: 'Hapus',
+                  icon: Trash2,
+                  onClick: () => setIsDeletingGroup(true),
+                  variant: 'destructive',
+                },
+              ]}
+            />
           </div>
         </div>
+
+        <NeedGroupDialog
+          open={isGroupDialogOpen}
+          onOpenChange={setIsGroupDialogOpen}
+          needGroup={currentGroup as any}
+        />
+
+        <ConfirmDialog
+          open={isDeletingGroup}
+          onOpenChange={setIsDeletingGroup}
+          onConfirm={handleConfirmDeleteGroup}
+          title="Hapus Kelompok Usulan"
+          description={`Apakah Anda yakin ingin menghapus "${currentGroup.name}"? Data usulan di dalam kelompok ini juga akan terdampak.`}
+          confirmText="Hapus"
+          variant="destructive"
+          loading={isDeletingGroupLoading}
+        />
 
         <DataTable
           columns={stableColumns}

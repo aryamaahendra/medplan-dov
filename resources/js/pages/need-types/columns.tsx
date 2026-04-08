@@ -1,17 +1,9 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal, PencilLine, Trash2 } from 'lucide-react';
+import { PencilLine, Trash2 } from 'lucide-react';
 
+import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 export interface NeedType {
   id: number;
@@ -92,32 +84,22 @@ export const getColumns = (
       const needType = row.original;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only font-normal">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-            <DropdownMenuItem
-              className="text-sm/relaxed"
-              onClick={() => onEdit(needType)}
-            >
-              <PencilLine />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="text-destructive focus:text-destructive"
-              onClick={() => onDelete(needType)}
-            >
-              <Trash2 />
-              Hapus
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ActionDropdown
+          actions={[
+            {
+              label: 'Edit',
+              icon: PencilLine,
+              onClick: () => onEdit(needType),
+            },
+            'separator',
+            {
+              label: 'Hapus',
+              icon: Trash2,
+              onClick: () => onDelete(needType),
+              variant: 'destructive',
+            },
+          ]}
+        />
       );
     },
   },

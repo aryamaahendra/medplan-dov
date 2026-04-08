@@ -1,27 +1,17 @@
-import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
   CheckCircle2,
   FileText,
-  MoreHorizontal,
   PencilLine,
   Send,
   Trash2,
   XCircle,
 } from 'lucide-react';
 
+import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { PriorityBadge } from '@/components/priority-badge';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import needRoutes from '@/routes/needs';
 import type {
   KpiIndicator,
@@ -236,38 +226,27 @@ export const getColumns = (
       const need = row.original;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only font-normal">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-            <DropdownMenuItem className="text-sm/relaxed" asChild>
-              <Link href={needRoutes.show.url({ need: need.id })}>
-                <FileText className="h-4 w-4" />
-                Detail
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="text-sm/relaxed"
-              onClick={() => onEdit(need)}
-            >
-              <PencilLine className="h-4 w-4" />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              variant="destructive"
-              onClick={() => onDelete(need)}
-            >
-              <Trash2 />
-              Hapus
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ActionDropdown
+          actions={[
+            {
+              label: 'Detail',
+              icon: FileText,
+              href: needRoutes.show.url({ need: need.id }),
+            },
+            {
+              label: 'Edit',
+              icon: PencilLine,
+              onClick: () => onEdit(need),
+            },
+            'separator',
+            {
+              label: 'Hapus',
+              icon: Trash2,
+              onClick: () => onDelete(need),
+              variant: 'destructive',
+            },
+          ]}
+        />
       );
     },
   },

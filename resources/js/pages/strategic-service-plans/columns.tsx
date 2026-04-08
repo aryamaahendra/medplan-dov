@@ -1,16 +1,8 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal, PencilLine, Trash2 } from 'lucide-react';
+import { PencilLine, Trash2 } from 'lucide-react';
 
+import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import type { StrategicServicePlan } from '@/types';
 
 export const getColumns = (
@@ -62,29 +54,22 @@ export const getColumns = (
       const plan = row.original;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Buka menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => onEdit(plan)}>
-              <PencilLine />
-              Edit Rencana
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              variant="destructive"
-              onClick={() => onDelete(plan)}
-            >
-              <Trash2 />
-              Hapus Rencana
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ActionDropdown
+          actions={[
+            {
+              label: 'Edit Rencana',
+              icon: PencilLine,
+              onClick: () => onEdit(plan),
+            },
+            'separator',
+            {
+              label: 'Hapus Rencana',
+              icon: Trash2,
+              onClick: () => onDelete(plan),
+              variant: 'destructive',
+            },
+          ]}
+        />
       );
     },
   },

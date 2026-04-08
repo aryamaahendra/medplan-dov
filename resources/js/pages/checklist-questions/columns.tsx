@@ -1,15 +1,8 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal, PencilLine, Trash2 } from 'lucide-react';
+import { PencilLine, Trash2 } from 'lucide-react';
+import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 export interface ChecklistQuestion {
   id: number;
@@ -73,31 +66,22 @@ export const getColumns = (
       const question = row.original;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-            <DropdownMenuItem
-              className="text-sm/relaxed"
-              onClick={() => onEdit(question)}
-            >
-              <PencilLine className="h-4 w-4" />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="text-sm/relaxed text-destructive focus:text-destructive"
-              onClick={() => onDelete(question)}
-            >
-              <Trash2 className="h-4 w-4" />
-              Hapus
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ActionDropdown
+          actions={[
+            {
+              label: 'Edit',
+              icon: PencilLine,
+              onClick: () => onEdit(question),
+            },
+            'separator',
+            {
+              label: 'Hapus',
+              icon: Trash2,
+              onClick: () => onDelete(question),
+              variant: 'destructive',
+            },
+          ]}
+        />
       );
     },
   },

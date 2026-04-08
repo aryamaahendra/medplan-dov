@@ -51,7 +51,7 @@ export function UserDialog({ user, open, onOpenChange }: UserDialogProps) {
                 : 'User created successfully.',
             );
           }}
-          className="space-y-4 py-4"
+          className="space-y-4"
         >
           {({ processing, errors }) => (
             <>
@@ -111,7 +111,7 @@ export function UserDialog({ user, open, onOpenChange }: UserDialogProps) {
                 <InputError message={errors.password_confirmation} />
               </div>
 
-              <DialogFooter>
+              <DialogFooter className="mb-0!">
                 <Button
                   type="button"
                   variant="outline"

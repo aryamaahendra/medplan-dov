@@ -32,7 +32,7 @@ export function NeedGroupDialog({
 }: NeedGroupDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="pb-0 sm:max-w-[425px]">
         <NeedGroupForm
           key={needGroup?.id ?? 'new-need-group'}
           needGroup={needGroup}
@@ -141,7 +141,7 @@ function NeedGroupForm({
         </div>
       </div>
 
-      <DialogFooter>
+      <DialogFooter className="mb-0!">
         <Button type="button" variant="outline" onClick={onClose}>
           Batal
         </Button>

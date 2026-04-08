@@ -34,7 +34,7 @@ export function KpiIndicatorDialog({
 }: KpiIndicatorDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[600px]">
+      <DialogContent className="no-scrollbar max-h-[90vh] overflow-y-auto pb-0 sm:max-w-[600px]">
         {open && (
           <KpiIndicatorForm
             key={`${indicator?.id ?? 'new'}-${parentIndicator?.id ?? 'none'}`}
@@ -106,7 +106,7 @@ function KpiIndicatorForm({
         </DialogDescription>
       </DialogHeader>
 
-      <form onSubmit={submit} className="space-y-6 py-2">
+      <form onSubmit={submit} className="space-y-6">
         {/* Hidden Fields */}
         <input type="hidden" name="group_id" value={data.group_id} />
         {data.parent_indicator_id && (
@@ -231,7 +231,7 @@ function KpiIndicatorForm({
           )}
         </div>
 
-        <DialogFooter className="sticky bottom-0 bg-background pt-2">
+        <DialogFooter className="mb-0!">
           <Button
             type="button"
             variant="outline"

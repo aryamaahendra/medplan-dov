@@ -32,7 +32,7 @@ export function ChecklistQuestionDialog({
 }: ChecklistQuestionDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="pb-0 sm:max-w-[425px]">
         <ChecklistQuestionForm
           key={question?.id ?? 'new-question'}
           question={question}
@@ -144,7 +144,7 @@ function ChecklistQuestionForm({
         </div>
       </div>
 
-      <DialogFooter>
+      <DialogFooter className="mb-0!">
         <Button type="button" variant="outline" onClick={onClose}>
           Batal
         </Button>

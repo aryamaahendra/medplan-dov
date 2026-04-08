@@ -32,7 +32,7 @@ export function StrategicServicePlanDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[600px]">
+      <DialogContent className="no-scrollbar max-h-[90vh] overflow-y-auto pb-0 sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>
             {isEditing ? 'Edit Rencana Pelayanan' : 'Tambah Rencana Pelayanan'}
@@ -57,7 +57,7 @@ export function StrategicServicePlanDialog({
               isEditing ? 'Rencana diperbarui.' : 'Rencana dibuat.',
             );
           }}
-          className="space-y-4 py-4"
+          className="space-y-4"
         >
           {({ processing, errors }) => (
             <>
@@ -125,7 +125,7 @@ export function StrategicServicePlanDialog({
                 <InputError message={errors.policy_direction} />
               </div>
 
-              <DialogFooter>
+              <DialogFooter className="mb-0!">
                 <Button
                   type="button"
                   variant="outline"

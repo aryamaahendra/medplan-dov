@@ -72,7 +72,7 @@ export function OrganizationalUnitDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="pb-0 sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
             {isEditing ? 'Edit Unit Organisasi' : 'Tambah Unit Organisasi'}
@@ -84,7 +84,7 @@ export function OrganizationalUnitDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-2">
             <Label htmlFor="name">Nama Unit</Label>
             <Input
@@ -142,7 +142,7 @@ export function OrganizationalUnitDialog({
             <InputError message={errors.parent_id} />
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="mb-0!">
             <Button
               type="button"
               variant="outline"

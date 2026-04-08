@@ -34,7 +34,7 @@ export function NeedTypeDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="pb-0 sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
             {isEditing ? 'Edit Jenis Kebutuhan' : 'Tambah Jenis Kebutuhan'}
@@ -59,7 +59,7 @@ export function NeedTypeDialog({
                 : 'Jenis kebutuhan berhasil dibuat.',
             );
           }}
-          className="space-y-4 py-4"
+          className="space-y-4"
         >
           {({ setData, processing, errors }: any) => (
             <>
@@ -122,7 +122,7 @@ export function NeedTypeDialog({
                 <InputError message={errors.order_column} />
               </div>
 
-              <DialogFooter>
+              <DialogFooter className="mb-0!">
                 <Button
                   type="button"
                   variant="outline"

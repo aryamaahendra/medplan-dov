@@ -33,7 +33,7 @@ export function RenstraDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="pb-0 sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
             {isEditing ? 'Edit Renstra' : 'Tambah Renstra'}
@@ -58,7 +58,7 @@ export function RenstraDialog({
                 : 'Renstra berhasil dibuat.',
             );
           }}
-          className="space-y-4 py-2"
+          className="space-y-4"
         >
           {({ setData, processing, errors }: any) => (
             <>
@@ -133,7 +133,7 @@ export function RenstraDialog({
               </div>
               <InputError message={errors.is_active} />
 
-              <DialogFooter>
+              <DialogFooter className="mb-0!">
                 <Button
                   type="button"
                   variant="outline"

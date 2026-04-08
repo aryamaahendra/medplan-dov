@@ -31,12 +31,26 @@ export const getColumns = (
       <DataTableColumnHeader column={column} title="Pertanyaan" />
     ),
     cell: ({ row }) => (
-      <div
-        className="max-w-[400px] truncate font-medium"
+      <p
+        className="max-w-[400px] font-medium whitespace-normal"
         title={row.getValue('question')}
       >
         {row.getValue('question')}
-      </div>
+      </p>
+    ),
+  },
+  {
+    accessorKey: 'description',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Deskripsi" />
+    ),
+    cell: ({ row }) => (
+      <p
+        className="line-clamp-2 max-w-[400px] whitespace-normal text-muted-foreground"
+        title={row.getValue('description')}
+      >
+        {row.getValue('description')}
+      </p>
     ),
   },
   {

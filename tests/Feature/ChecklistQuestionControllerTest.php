@@ -5,7 +5,7 @@ use App\Models\User;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\assertDatabaseMissing;
+use function Pest\Laravel\assertSoftDeleted;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
@@ -71,7 +71,7 @@ it('can delete a checklist question', function () {
         ->assertRedirect(route('checklist-questions.index'))
         ->assertSessionHas('success');
 
-    assertDatabaseMissing('checklist_questions', [
+    assertSoftDeleted('checklist_questions', [
         'id' => $question->id,
     ]);
 });

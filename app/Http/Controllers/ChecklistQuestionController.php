@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreChecklistQuestionRequest;
-use App\Http\Resources\ChecklistQuestionResource;
 use App\Models\ChecklistQuestion;
 use App\Traits\HasDataTable;
 use Illuminate\Http\RedirectResponse;
@@ -25,14 +24,14 @@ class ChecklistQuestionController extends Controller
     public function index(Request $request): InertiaResponse
     {
         $questions = $this->applyDataTable(
-            ChecklistQuestion::query(),
+            ChecklistQuestion::query()->orderBy('order_column'),
             $request,
             self::SEARCH_COLUMNS,
             self::SORTABLE_COLUMNS,
         );
 
         return Inertia::render('checklist-questions/index', [
-            'questions' => ChecklistQuestionResource::collection($questions),
+            'questions' => $questions,
             'filters' => $this->dataTableFilters($request),
         ]);
     }

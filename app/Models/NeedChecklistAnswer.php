@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ChecklistAnswer;
 use Database\Factories\NeedChecklistAnswerFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,6 +19,13 @@ class NeedChecklistAnswer extends Model
 {
     /** @use HasFactory<NeedChecklistAnswerFactory> */
     use HasFactory;
+
+    protected function casts(): array
+    {
+        return [
+            'answer' => ChecklistAnswer::class,
+        ];
+    }
 
     /**
      * Get the need this answer belongs to.

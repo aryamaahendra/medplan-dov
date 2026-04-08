@@ -24,6 +24,7 @@ class NeedGroupChecklistController extends Controller
                 ->map(fn ($question) => [
                     'id' => $question->id,
                     'question' => $question->question,
+                    'description' => $question->description,
                     'is_active' => $question->pivot->is_active,
                     'is_required' => $question->pivot->is_required,
                     'order_column' => $question->pivot->order_column,

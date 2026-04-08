@@ -6,5 +6,5 @@ enum ChecklistAnswer: string
 {
     case Yes = 'yes';
     case No = 'no';
-    case NotApplicable = 'na';
+    case NotApplicable = 'skip';
 }

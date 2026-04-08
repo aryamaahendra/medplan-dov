@@ -95,6 +95,7 @@ export default function NeedShow({
               </TabsContent>
               <TabsContent value="checklist" className="mt-0">
                 <ChecklistForm
+                  key={need.id}
                   needId={need.id}
                   questions={checklistQuestions.data}
                   existingAnswers={existingAnswers.data}

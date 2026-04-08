@@ -1,32 +1,21 @@
 import type { DragEndEvent } from '@dnd-kit/core';
 import {
-  DndContext,
-  closestCenter,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
+import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { Head, useForm } from '@inertiajs/react';
-import { AlertCircle, Save } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 import needGroupChecklistActions from '@/actions/App/Http/Controllers/NeedGroupChecklistController';
 import needGroupActions from '@/actions/App/Http/Controllers/NeedGroupController';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 
-import { EmptyState } from './components/empty-state';
-import { QuestionBankDialog } from './components/question-bank-dialog';
-import { SortableItem } from './components/sortable-item';
+import { ChecklistHeader } from './components/checklist-header';
+import { QuestionList } from './components/question-list';
+import { QuestionToolbar } from './components/question-toolbar';
 import type { AssignedQuestion, ChecklistQuestion, NeedGroup } from './types';
 
 interface Props {
@@ -133,87 +122,36 @@ export default function ChecklistManagement({
     });
   };
 
+  const isDirty = questions !== assignedQuestions;
+
   return (
     <>
       <Head title={`Kelola Checklist - ${needGroup.name}`} />
 
       <div className="flex max-w-3xl flex-col gap-6 p-4">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Kelola Checklist: {needGroup.name}
-            </h1>
-            <Badge variant="outline">Tahun {needGroup.year}</Badge>
-          </div>
-          <p className="text-muted-foreground">
-            Tentukan pertanyaan mana yang harus dijawab saat menginput usulan di
-            kelompok ini.
-          </p>
-        </div>
+        <ChecklistHeader name={needGroup.name} year={needGroup.year} />
 
         <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-medium">
-              Daftar Pertanyaan ({questions.length})
-            </h2>
-            <div className="flex gap-2">
-              <QuestionBankDialog
-                availableQuestions={availableQuestions.data}
-                assignedQuestions={questions}
-                onAdd={addQuestion}
-                open={isSelectorOpen}
-                onOpenChange={setIsSelectorOpen}
-              />
+          <QuestionToolbar
+            questionsCount={questions.length}
+            availableQuestions={availableQuestions.data}
+            assignedQuestions={questions}
+            onAdd={addQuestion}
+            onSave={saveChanges}
+            processing={processing}
+            isDirty={isDirty}
+            isSelectorOpen={isSelectorOpen}
+            onSelectorOpenChange={setIsSelectorOpen}
+          />
 
-              <Button
-                onClick={saveChanges}
-                disabled={processing || questions === assignedQuestions}
-                size="sm"
-                className="gap-2"
-              >
-                <Save />
-                Simpan Perubahan
-              </Button>
-            </div>
-          </div>
-
-          <Card className="rounded-none py-0 ring-0">
-            <CardContent className="p-0">
-              {questions.length === 0 ? (
-                <EmptyState />
-              ) : (
-                <div className="flex flex-col gap-2">
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}
-                  >
-                    <SortableContext
-                      items={questions.map((q) => q.id)}
-                      strategy={verticalListSortingStrategy}
-                    >
-                      {questions.map((q) => (
-                        <SortableItem
-                          key={q.id}
-                          question={q}
-                          onRemove={removeQuestion}
-                          onToggleActive={toggleActive}
-                          onToggleRequired={toggleRequired}
-                        />
-                      ))}
-                    </SortableContext>
-                  </DndContext>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <div className="flex items-center justify-end gap-2 text-sm text-muted-foreground italic">
-            <AlertCircle className="size-4" />
-            <span>
-              Tarik dan lepas (drag & drop) untuk mengatur urutan pertanyaan.
-            </span>
-          </div>
+          <QuestionList
+            questions={questions}
+            sensors={sensors}
+            handleDragEnd={handleDragEnd}
+            removeQuestion={removeQuestion}
+            toggleActive={toggleActive}
+            toggleRequired={toggleRequired}
+          />
         </div>
       </div>
     </>

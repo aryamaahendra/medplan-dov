@@ -4,88 +4,74 @@ use App\Models\ChecklistQuestion;
 use App\Models\NeedGroup;
 use App\Models\User;
 
+use function Pest\Laravel\actingAs;
+
 beforeEach(function () {
     $this->user = User::factory()->create();
     $this->needGroup = NeedGroup::factory()->create();
+    $this->question = ChecklistQuestion::factory()->create();
 });
 
-it('can access the checklist management page', function () {
-    $response = $this->actingAs($this->user)
-        ->get(route('need-groups.checklists.index', $this->needGroup));
+test('can attach a checklist question to a need group', function () {
+    actingAs($this->user)
+        ->postJson(route('need-groups.checklists.store', $this->needGroup), [
+            'checklist_question_id' => $this->question->id,
+            'is_active' => true,
+            'is_required' => true,
+            'order_column' => 1,
+        ])
+        ->assertRedirect();
 
-    $response->assertStatus(200);
+    expect($this->needGroup->checklistQuestions()->find($this->question->id))
+        ->not->toBeNull()
+        ->pivot->is_active->toBeTrue()
+        ->pivot->is_required->toBeTrue()
+        ->pivot->order_column->toBe(1);
 });
 
-it('can sync checklist questions for a need group', function () {
-    $questions = ChecklistQuestion::factory()->count(3)->create();
-
-    $syncData = [
-        'questions' => [
-            [
-                'id' => $questions[0]->id,
-                'is_active' => true,
-                'is_required' => true,
-                'order_column' => 1,
-            ],
-            [
-                'id' => $questions[1]->id,
-                'is_active' => false,
-                'is_required' => false,
-                'order_column' => 2,
-            ],
-        ],
-    ];
-
-    $response = $this->actingAs($this->user)
-        ->put(route('need-groups.checklists.update', $this->needGroup), $syncData);
-
-    $response->assertRedirect();
-    $this->assertDatabaseCount('need_group_checklist_question', 2);
-
-    $this->assertDatabaseHas('need_group_checklist_question', [
-        'need_group_id' => $this->needGroup->id,
-        'checklist_question_id' => $questions[0]->id,
+test('can update a checklist question pivot data via patch', function () {
+    $this->needGroup->checklistQuestions()->attach($this->question->id, [
         'is_active' => true,
-        'is_required' => true,
+        'is_required' => false,
         'order_column' => 1,
     ]);
 
-    $this->assertDatabaseHas('need_group_checklist_question', [
-        'need_group_id' => $this->needGroup->id,
-        'checklist_question_id' => $questions[1]->id,
-        'is_active' => false,
-        'is_required' => false,
-        'order_column' => 2,
-    ]);
+    actingAs($this->user)
+        ->patchJson(route('need-groups.checklists.update', [$this->needGroup, $this->question]), [
+            'is_active' => false,
+            'is_required' => true,
+        ])
+        ->assertRedirect();
+
+    $pivot = $this->needGroup->checklistQuestions()->find($this->question->id)->pivot;
+    expect($pivot->is_active)->toBeFalse();
+    expect($pivot->is_required)->toBeTrue();
 });
 
-it('detaches questions not included in the sync data', function () {
-    $questions = ChecklistQuestion::factory()->count(2)->create();
-    $this->needGroup->checklistQuestions()->attach($questions->pluck('id')->toArray(), [
-        'order_column' => 1,
-        'is_active' => true,
-        'is_required' => false,
-    ]);
+test('can remove a checklist question from a need group', function () {
+    $this->needGroup->checklistQuestions()->attach($this->question->id);
 
-    $this->assertDatabaseCount('need_group_checklist_question', 2);
+    actingAs($this->user)
+        ->deleteJson(route('need-groups.checklists.destroy', [$this->needGroup, $this->question]))
+        ->assertRedirect();
 
-    $syncData = [
-        'questions' => [
-            [
-                'id' => $questions[0]->id,
-                'is_active' => true,
-                'is_required' => true,
-                'order_column' => 1,
+    expect($this->needGroup->checklistQuestions()->find($this->question->id))->toBeNull();
+});
+
+test('can reorder checklist questions', function () {
+    $question2 = ChecklistQuestion::factory()->create();
+    $this->needGroup->checklistQuestions()->attach($this->question->id, ['order_column' => 1]);
+    $this->needGroup->checklistQuestions()->attach($question2->id, ['order_column' => 2]);
+
+    actingAs($this->user)
+        ->postJson(route('need-groups.checklists.reorder', $this->needGroup), [
+            'questions' => [
+                ['id' => $this->question->id, 'order_column' => 2],
+                ['id' => $question2->id, 'order_column' => 1],
             ],
-        ],
-    ];
+        ])
+        ->assertRedirect();
 
-    $response = $this->actingAs($this->user)
-        ->put(route('need-groups.checklists.update', $this->needGroup), $syncData);
-
-    $response->assertRedirect();
-    $this->assertDatabaseCount('need_group_checklist_question', 1);
-    $this->assertDatabaseMissing('need_group_checklist_question', [
-        'checklist_question_id' => $questions[1]->id,
-    ]);
+    expect($this->needGroup->checklistQuestions()->find($this->question->id)->pivot->order_column)->toBe(2);
+    expect($this->needGroup->checklistQuestions()->find($question2->id)->pivot->order_column)->toBe(1);
 });

@@ -29,7 +29,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('need-types', NeedTypeController::class)->except(['create', 'edit', 'show']);
     Route::resource('need-groups', NeedGroupController::class)->except(['create', 'edit', 'show']);
     Route::get('need-groups/{need_group}/checklists', [NeedGroupChecklistController::class, 'index'])->name('need-groups.checklists.index');
-    Route::put('need-groups/{need_group}/checklists', [NeedGroupChecklistController::class, 'update'])->name('need-groups.checklists.update');
+    Route::post('need-groups/{need_group}/checklists', [NeedGroupChecklistController::class, 'store'])->name('need-groups.checklists.store');
+    Route::patch('need-groups/{need_group}/checklists/{checklist_question}', [NeedGroupChecklistController::class, 'update'])->name('need-groups.checklists.update');
+    Route::delete('need-groups/{need_group}/checklists/{checklist_question}', [NeedGroupChecklistController::class, 'destroy'])->name('need-groups.checklists.destroy');
+    Route::post('need-groups/{need_group}/checklists/reorder', [NeedGroupChecklistController::class, 'reorder'])->name('need-groups.checklists.reorder');
     Route::resource('needs', NeedController::class);
     Route::resource('renstras', RenstraController::class)->except(['create', 'edit']);
     Route::resource('tujuans', TujuanController::class)->except(['index', 'create', 'edit', 'show']);

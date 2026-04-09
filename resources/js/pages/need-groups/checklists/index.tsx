@@ -6,7 +6,7 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -29,13 +29,7 @@ export default function ChecklistManagement({
   assignedQuestions,
   availableQuestions,
 }: Props) {
-  const [questions, setQuestions] =
-    useState<AssignedQuestion[]>(assignedQuestions);
   const [isSelectorOpen, setIsSelectorOpen] = useState(false);
-
-  const { setData, put, processing } = useForm({
-    questions: assignedQuestions,
-  });
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -48,49 +42,127 @@ export default function ChecklistManagement({
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      setQuestions((items) => {
-        const oldIndex = items.findIndex((i) => i.id === active.id);
-        const newIndex = items.findIndex((i) => i.id === over.id);
+      const oldIndex = assignedQuestions.findIndex((i) => i.id === active.id);
+      const newIndex = assignedQuestions.findIndex((i) => i.id === over.id);
 
-        const newItems = arrayMove(items, oldIndex, newIndex).map(
-          (item, index) => ({
-            ...item,
-            order_column: index + 1,
-          }),
+      const newItems = arrayMove(assignedQuestions, oldIndex, newIndex).map(
+        (item, index) => ({
+          ...item,
+          order_column: index + 1,
+        }),
+      );
+
+      router
+        .optimistic(() => ({
+          assignedQuestions: newItems,
+        }))
+        .post(
+          needGroupChecklistActions.reorder.url({ need_group: needGroup.id }),
+          {
+            questions: newItems.map((item) => ({
+              id: item.id,
+              order_column: item.order_column,
+            })),
+          },
+          {
+            onSuccess: () => {
+              toast.success('Urutan checklist berhasil diperbarui.');
+            },
+            onError: () => {
+              toast.error('Gagal memperbarui urutan checklist.');
+            },
+          },
         );
-
-        setData('questions', newItems);
-
-        return newItems;
-      });
     }
   };
 
   const toggleActive = (id: number) => {
-    const newQuestions = questions.map((q) =>
-      q.id === id ? { ...q, is_active: !q.is_active } : q,
-    );
-    setQuestions(newQuestions);
-    setData('questions', newQuestions);
+    const question = assignedQuestions.find((q) => q.id === id);
+
+    if (!question) {
+return;
+}
+
+    const newActive = !question.is_active;
+
+    router
+      .optimistic(() => ({
+        assignedQuestions: assignedQuestions.map((q) =>
+          q.id === id ? { ...q, is_active: newActive } : q,
+        ),
+      }))
+      .patch(
+        needGroupChecklistActions.update.url({
+          need_group: needGroup.id,
+          checklist_question: id,
+        }),
+        { is_active: newActive },
+        {
+          onSuccess: () => {
+            toast.success('Checklist berhasil diperbarui.');
+          },
+          onError: () => {
+            toast.error('Gagal memperbarui checklist.');
+          },
+        },
+      );
   };
 
   const toggleRequired = (id: number) => {
-    const newQuestions = questions.map((q) =>
-      q.id === id ? { ...q, is_required: !q.is_required } : q,
-    );
-    setQuestions(newQuestions);
-    setData('questions', newQuestions);
+    const question = assignedQuestions.find((q) => q.id === id);
+
+    if (!question) {
+return;
+}
+
+    const newRequired = !question.is_required;
+
+    router
+      .optimistic(() => ({
+        assignedQuestions: assignedQuestions.map((q) =>
+          q.id === id ? { ...q, is_required: newRequired } : q,
+        ),
+      }))
+      .patch(
+        needGroupChecklistActions.update.url({
+          need_group: needGroup.id,
+          checklist_question: id,
+        }),
+        { is_required: newRequired },
+        {
+          onSuccess: () => {
+            toast.success('Checklist berhasil diperbarui.');
+          },
+          onError: () => {
+            toast.error('Gagal memperbarui checklist.');
+          },
+        },
+      );
   };
 
   const removeQuestion = (id: number) => {
-    const newQuestions = questions.filter((q) => q.id !== id);
-    setQuestions(newQuestions);
-    setData('questions', newQuestions);
-    toast.info('Pertanyaan dihapus dari daftar sementara.');
+    router
+      .optimistic(() => ({
+        assignedQuestions: assignedQuestions.filter((q) => q.id !== id),
+      }))
+      .delete(
+        needGroupChecklistActions.destroy.url({
+          need_group: needGroup.id,
+          checklist_question: id,
+        }),
+        {
+          onSuccess: () => {
+            toast.success('Pertanyaan berhasil dihapus.');
+          },
+          onError: () => {
+            toast.error('Gagal menghapus pertanyaan.');
+          },
+        },
+      );
   };
 
   const addQuestion = (q: ChecklistQuestion) => {
-    if (questions.some((item) => item.id === q.id)) {
+    if (assignedQuestions.some((item) => item.id === q.id)) {
       toast.error('Pertanyaan sudah ada di daftar.');
 
       return;
@@ -102,27 +174,31 @@ export default function ChecklistManagement({
       description: q.description,
       is_active: true,
       is_required: false,
-      order_column: questions.length + 1,
+      order_column: assignedQuestions.length + 1,
     };
 
-    const newQuestions = [...questions, newQuestion];
-    setQuestions(newQuestions);
-    setData('questions', newQuestions);
-    toast.success('Pertanyaan ditambahkan.');
+    router
+      .optimistic(() => ({
+        assignedQuestions: [...assignedQuestions, newQuestion],
+      }))
+      .post(
+        needGroupChecklistActions.store.url({ need_group: needGroup.id }),
+        {
+          checklist_question_id: q.id,
+          is_active: true,
+          is_required: false,
+          order_column: newQuestion.order_column,
+        },
+        {
+          onSuccess: () => {
+            toast.success('Pertanyaan berhasil ditambahkan.');
+          },
+          onError: () => {
+            toast.error('Gagal menambahkan pertanyaan.');
+          },
+        },
+      );
   };
-
-  const saveChanges = () => {
-    put(needGroupChecklistActions.update.url({ need_group: needGroup.id }), {
-      onSuccess: () => {
-        toast.success('Checklist berhasil diperbarui.');
-      },
-      onError: () => {
-        toast.error('Gagal memperbarui checklist.');
-      },
-    });
-  };
-
-  const isDirty = questions !== assignedQuestions;
 
   return (
     <>
@@ -133,19 +209,16 @@ export default function ChecklistManagement({
 
         <div className="flex flex-col gap-4">
           <QuestionToolbar
-            questionsCount={questions.length}
+            questionsCount={assignedQuestions.length}
             availableQuestions={availableQuestions.data}
-            assignedQuestions={questions}
+            assignedQuestions={assignedQuestions}
             onAdd={addQuestion}
-            onSave={saveChanges}
-            processing={processing}
-            isDirty={isDirty}
             isSelectorOpen={isSelectorOpen}
             onSelectorOpenChange={setIsSelectorOpen}
           />
 
           <QuestionList
-            questions={questions}
+            questions={assignedQuestions}
             sensors={sensors}
             handleDragEnd={handleDragEnd}
             removeQuestion={removeQuestion}

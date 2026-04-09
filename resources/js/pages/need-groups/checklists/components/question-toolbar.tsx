@@ -1,7 +1,3 @@
-import { Save } from 'lucide-react';
-
-import { Button } from '@/components/ui/button';
-
 import type { AssignedQuestion, ChecklistQuestion } from '../types';
 import { QuestionBankDialog } from './question-bank-dialog';
 
@@ -10,9 +6,6 @@ interface Props {
   availableQuestions: ChecklistQuestion[];
   assignedQuestions: AssignedQuestion[];
   onAdd: (q: ChecklistQuestion) => void;
-  onSave: () => void;
-  processing: boolean;
-  isDirty: boolean;
   isSelectorOpen: boolean;
   onSelectorOpenChange: (open: boolean) => void;
 }
@@ -22,9 +15,6 @@ export function QuestionToolbar({
   availableQuestions,
   assignedQuestions,
   onAdd,
-  onSave,
-  processing,
-  isDirty,
   isSelectorOpen,
   onSelectorOpenChange,
 }: Props) {
@@ -41,16 +31,6 @@ export function QuestionToolbar({
           open={isSelectorOpen}
           onOpenChange={onSelectorOpenChange}
         />
-
-        <Button
-          onClick={onSave}
-          disabled={processing || !isDirty}
-          size="sm"
-          className="gap-2"
-        >
-          <Save className="size-4" />
-          Simpan Perubahan
-        </Button>
       </div>
     </div>
   );

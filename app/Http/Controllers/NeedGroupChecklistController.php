@@ -36,29 +36,73 @@ class NeedGroupChecklistController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Store a newly created resource in storage.
      */
-    public function update(Request $request, NeedGroup $needGroup)
+    public function store(Request $request, NeedGroup $needGroup)
     {
         $validated = $request->validate([
-            'questions' => 'present|array',
-            'questions.*.id' => 'required|exists:checklist_questions,id',
-            'questions.*.is_active' => 'required|boolean',
-            'questions.*.is_required' => 'required|boolean',
-            'questions.*.order_column' => 'required|integer',
+            'checklist_question_id' => 'required|exists:checklist_questions,id',
+            'is_active' => 'sometimes|boolean',
+            'is_required' => 'sometimes|boolean',
+            'order_column' => 'sometimes|integer',
         ]);
 
-        $syncData = collect($validated['questions'])->mapWithKeys(fn ($item) => [
-            $item['id'] => [
-                'is_active' => $item['is_active'],
-                'is_required' => $item['is_required'],
-                'order_column' => $item['order_column'],
-            ],
-        ])->toArray();
+        $needGroup->checklistQuestions()->attach($validated['checklist_question_id'], [
+            'is_active' => $validated['is_active'] ?? true,
+            'is_required' => $validated['is_required'] ?? false,
+            'order_column' => $validated['order_column'] ?? ($needGroup->checklistQuestions()->count() + 1),
+        ]);
 
-        $needGroup->checklistQuestions()->sync($syncData);
+        return redirect()->back()
+            ->with('success', 'Pertanyaan berhasil ditambahkan.');
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, NeedGroup $needGroup, ChecklistQuestion $checklistQuestion)
+    {
+        $validated = $request->validate([
+            'is_active' => 'sometimes|boolean',
+            'is_required' => 'sometimes|boolean',
+            'order_column' => 'sometimes|integer',
+        ]);
+
+        $needGroup->checklistQuestions()->updateExistingPivot($checklistQuestion->id, $validated);
 
         return redirect()->back()
             ->with('success', 'Checklist berhasil diperbarui.');
+    }
+
+    /**
+     * Reorder the resources in storage.
+     */
+    public function reorder(Request $request, NeedGroup $needGroup)
+    {
+        $validated = $request->validate([
+            'questions' => 'required|array',
+            'questions.*.id' => 'required|exists:checklist_questions,id',
+            'questions.*.order_column' => 'required|integer',
+        ]);
+
+        foreach ($validated['questions'] as $item) {
+            $needGroup->checklistQuestions()->updateExistingPivot($item['id'], [
+                'order_column' => $item['order_column'],
+            ]);
+        }
+
+        return redirect()->back()
+            ->with('success', 'Urutan checklist berhasil diperbarui.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(NeedGroup $needGroup, ChecklistQuestion $checklistQuestion)
+    {
+        $needGroup->checklistQuestions()->detach($checklistQuestion->id);
+
+        return redirect()->back()
+            ->with('success', 'Pertanyaan berhasil dihapus.');
     }
 }

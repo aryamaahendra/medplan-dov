@@ -81,8 +81,6 @@ export function NeedDetailSection({
     };
   };
 
-  console.log('need-detail-section rendred!');
-
   return (
     <div className="space-y-5 py-6">
       <div className="mb-4 space-y-1">

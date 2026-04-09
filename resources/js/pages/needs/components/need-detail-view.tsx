@@ -1,3 +1,6 @@
+import { Card, CardContent } from '@/components/ui/card';
+import { EditorRenderer } from '@/components/ui/editor-renderer';
+import { Label } from '@/components/ui/label';
 import type { NeedDetail } from '../columns';
 
 interface NeedDetailViewProps {
@@ -31,25 +34,29 @@ export function NeedDetailView({ detail }: NeedDetailViewProps) {
   }
 
   return (
-    <div className="mt-6 space-y-6">
-      {DETAIL_FIELDS.map(({ key, label }) => {
-        const value = detail?.[key];
+    <Card className="mt-8 py-6">
+      <CardContent className="p-0">
+        <div className="space-y-6">
+          {DETAIL_FIELDS.map(({ key, label }) => {
+            const value = detail?.[key];
 
-        if (!value) {
-          return null;
-        }
+            if (!value) {
+              return null;
+            }
 
-        return (
-          <div key={key} className="space-y-1.5">
-            <p className="text-xs font-semibold tracking-tight text-muted-foreground uppercase">
-              {label}
-            </p>
-            <p className="rounded-md bg-muted/30 p-3 text-sm leading-relaxed whitespace-pre-wrap">
-              {value}
-            </p>
-          </div>
-        );
-      })}
-    </div>
+            return (
+              <div key={key} className="space-y-1.5">
+                <Label className="mb-0 border-t bg-muted/40 px-4 py-3">
+                  {label}
+                </Label>
+                <div className="mb-0 min-h-[120px] w-full border-y border-input bg-background px-4 py-2 text-base md:text-sm">
+                  <EditorRenderer value={value?.toString()} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

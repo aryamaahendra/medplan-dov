@@ -135,8 +135,6 @@ export function NeedForm({
     }));
   };
 
-  console.log('need-form rendred!');
-
   return (
     <Card className={cn('w-full max-w-3xl overflow-hidden', className)}>
       <form onSubmit={handleSubmit}>

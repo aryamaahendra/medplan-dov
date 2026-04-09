@@ -123,7 +123,6 @@ export function Editor({ id, value, onChange, placeholder, className }: EditorPr
     prevValueRef.current = value;
   }, [value]);
 
-  console.log('editor rendred!');
 
   return (
     <div

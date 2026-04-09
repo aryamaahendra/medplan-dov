@@ -80,8 +80,8 @@ export default function ChecklistManagement({
     const question = assignedQuestions.find((q) => q.id === id);
 
     if (!question) {
-return;
-}
+      return;
+    }
 
     const newActive = !question.is_active;
 
@@ -112,8 +112,8 @@ return;
     const question = assignedQuestions.find((q) => q.id === id);
 
     if (!question) {
-return;
-}
+      return;
+    }
 
     const newRequired = !question.is_required;
 

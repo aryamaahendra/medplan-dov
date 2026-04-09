@@ -9,7 +9,7 @@ import {
   BookKey,
   Database,
   Pin,
-  ClipboardCheck,
+  ListChecks,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
@@ -72,12 +72,12 @@ const masterNavItems: NavItem[] = [
   {
     title: 'Rencana Layanan Strategis',
     href: strategicServicePlans.index.url(),
-    icon: ClipboardList,
+    icon: ListChecks,
   },
   {
     title: 'Bank Pertanyaan Checklist',
     href: checklistQuestions.index.url(),
-    icon: ClipboardCheck,
+    icon: ClipboardList,
   },
 ];
 

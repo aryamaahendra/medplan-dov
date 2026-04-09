@@ -93,11 +93,15 @@ class NeedController extends Controller
     public function store(StoreNeedRequest $request)
     {
         $need = DB::transaction(function () use ($request) {
-            $need = Need::create($request->validated());
+            $need = Need::create($request->safe()->except(['detail', 'sasaran_ids', 'indicator_ids', 'kpi_indicator_ids', 'strategic_service_plan_ids']));
             $need->sasarans()->sync($request->sasaran_ids);
             $need->indicators()->sync($request->indicator_ids ?? []);
             $need->kpiIndicators()->sync($request->kpi_indicator_ids ?? []);
             $need->strategicServicePlans()->sync($request->strategic_service_plan_ids ?? []);
+
+            if ($request->filled('detail')) {
+                $need->detail()->create($request->input('detail', []));
+            }
 
             return $need;
         });
@@ -136,7 +140,7 @@ class NeedController extends Controller
     public function edit(Need $need): Response
     {
         return Inertia::render('needs/edit', [
-            'need' => $need->load(['sasarans:id', 'indicators:id', 'kpiIndicators:id', 'strategicServicePlans:id']),
+            'need' => $need->load(['sasarans:id', 'indicators:id', 'kpiIndicators:id', 'strategicServicePlans:id', 'detail']),
             'currentGroup' => $need->needGroup,
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
@@ -161,11 +165,16 @@ class NeedController extends Controller
     public function update(UpdateNeedRequest $request, Need $need)
     {
         DB::transaction(function () use ($request, $need) {
-            $need->update($request->validated());
+            $need->update($request->safe()->except(['detail', 'sasaran_ids', 'indicator_ids', 'kpi_indicator_ids', 'strategic_service_plan_ids']));
             $need->sasarans()->sync($request->sasaran_ids);
             $need->indicators()->sync($request->indicator_ids ?? []);
             $need->kpiIndicators()->sync($request->kpi_indicator_ids ?? []);
             $need->strategicServicePlans()->sync($request->strategic_service_plan_ids ?? []);
+
+            $need->detail()->updateOrCreate(
+                ['need_id' => $need->id],
+                $request->input('detail', [])
+            );
         });
 
         return redirect()->route('needs.index', ['need_group_id' => $need->need_group_id])
@@ -188,6 +197,7 @@ class NeedController extends Controller
                 'kpiIndicators.parentIndicator:id,name,is_category',
                 'kpiIndicators.annualTargets:id,indicator_id,year,target_value',
                 'strategicServicePlans:id,strategic_program,service_plan,year,target,policy_direction',
+                'detail',
             ]),
             'checklistQuestions' => ChecklistQuestionResource::collection(
                 $need->needGroup->checklistQuestions()

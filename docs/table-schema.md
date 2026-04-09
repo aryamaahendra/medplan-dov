@@ -3,38 +3,45 @@
 This document provides a comprehensive overview of the database tables and their schemas in the application, extracted from the migration files.
 
 ## Table of Contents
+
 - [Core Application Tables](#core-application-tables)
-  - [organizational_units](#organizational_units)
-  - [need_types](#need_types)
-  - [need_groups](#need_groups)
-  - [needs](#needs)
-  - [need_sasaran](#need_sasaran)
-  - [need_indicator](#need_indicator)
+    - [organizational_units](#organizational_units)
+    - [need_types](#need_types)
+    - [need_groups](#need_groups)
+    - [needs](#needs)
+    - [need_details](#need_details)
+    - [need_sasaran](#need_sasaran)
+    - [need_indicator](#need_indicator)
 - [Strategic Planning Tables](#strategic-planning-tables)
-  - [renstras](#renstras)
-  - [tujuans](#tujuans)
-  - [sasarans](#sasarans)
-  - [indicators](#indicators)
-  - [indicator_targets](#indicator_targets)
-  - [strategic_service_plans](#strategic_service_plans)
-  - [need_strategic_service_plan](#need_strategic_service_plan)
+    - [renstras](#renstras)
+    - [tujuans](#tujuans)
+    - [sasarans](#sasarans)
+    - [indicators](#indicators)
+    - [indicator_targets](#indicator_targets)
+    - [strategic_service_plans](#strategic_service_plans)
+    - [need_strategic_service_plan](#need_strategic_service_plan)
 - [KPI Management Tables](#kpi-management-tables)
-  - [kpi_groups](#kpi_groups)
-  - [kpi_indicators](#kpi_indicators)
-  - [kpi_annual_targets](#kpi_annual_targets)
-  - [kpi_indicator_need](#kpi_indicator_need)
+    - [kpi_groups](#kpi_groups)
+    - [kpi_indicators](#kpi_indicators)
+    - [kpi_annual_targets](#kpi_annual_targets)
+    - [kpi_indicator_need](#kpi_indicator_need)
+- [Checklist Management Tables](#checklist-management-tables)
+    - [checklist_questions](#checklist_questions)
+    - [need_group_checklist_question](#need_group_checklist_question)
+    - [need_checklist_answers](#need_checklist_answers)
 - [System Tables](#system-tables)
-  - [users](#users)
-  - [password_reset_tokens](#password_reset_tokens)
-  - [sessions](#sessions)
-  - [cache](#cache)
-  - [jobs](#jobs)
+    - [users](#users)
+    - [password_reset_tokens](#password_reset_tokens)
+    - [sessions](#sessions)
+    - [cache](#cache)
+    - [jobs](#jobs)
 
 ---
 
 ## Core Application Tables
 
 ### `organizational_units`
+
 Stores the hierarchical structure of organizational units.
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
@@ -47,6 +54,7 @@ Stores the hierarchical structure of organizational units.
 | deleted_at | timestamp | Yes | Soft Deletes |
 
 ### `need_types`
+
 Stores categories or types of needs.
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
@@ -61,6 +69,7 @@ Stores categories or types of needs.
 | deleted_at | timestamp | Yes | Soft Deletes |
 
 ### `need_groups`
+
 Stores groups of needs for a specific year.
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
@@ -75,6 +84,7 @@ Stores groups of needs for a specific year.
 | deleted_at | timestamp | Yes | Soft Deletes |
 
 ### `needs`
+
 Stores the actual requests or needs from organizational units.
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
@@ -99,7 +109,27 @@ Stores the actual requests or needs from organizational units.
 | updated_at | timestamp | Yes | |
 | deleted_at | timestamp | Yes | Soft Deletes |
 
+### `need_details`
+
+Stores proposal/document-style fields for a need (1:1 relationship with needs).
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| need_id | bigint | No | Foreign Key (needs), cascadeOnDelete, Unique |
+| background | text | Yes | |
+| purpose_and_objectives | text | Yes | |
+| target_objective | text | Yes | |
+| procurement_organization_name | text | Yes | |
+| funding_source_and_estimated_cost | text | Yes | |
+| implementation_period | text | Yes | |
+| expert_or_skilled_personnel | text | Yes | |
+| technical_specifications | text | Yes | |
+| training | text | Yes | |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+
 ### `need_sasaran`
+
 Pivot table connecting needs and strategic targets.
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
@@ -110,6 +140,7 @@ Pivot table connecting needs and strategic targets.
 | updated_at | timestamp | Yes | |
 
 ### `need_indicator`
+
 Pivot table connecting needs and performance indicators.
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
@@ -124,6 +155,7 @@ Pivot table connecting needs and performance indicators.
 ## Strategic Planning Tables
 
 ### `renstras`
+
 Stores strategic planning periods.
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
@@ -137,6 +169,7 @@ Stores strategic planning periods.
 | updated_at | timestamp | Yes | |
 
 ### `tujuans`
+
 Stores strategic objectives (Tujuan).
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
@@ -148,6 +181,7 @@ Stores strategic objectives (Tujuan).
 | updated_at | timestamp | Yes | |
 
 ### `sasarans`
+
 Stores strategic targets (Sasaran).
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
@@ -159,6 +193,7 @@ Stores strategic targets (Sasaran).
 | updated_at | timestamp | Yes | |
 
 ### `indicators`
+
 Stores performance indicators for objectives or targets.
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
@@ -172,6 +207,7 @@ Stores performance indicators for objectives or targets.
 | updated_at | timestamp | Yes | |
 
 ### `indicator_targets`
+
 Stores annual targets for performance indicators.
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
@@ -183,6 +219,7 @@ Stores annual targets for performance indicators.
 | updated_at | timestamp | Yes | |
 
 ### `strategic_service_plans`
+
 Stores strategic service plans including programs, targets, and policy directions.
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
@@ -197,6 +234,7 @@ Stores strategic service plans including programs, targets, and policy direction
 | deleted_at | timestamp | Yes | Soft Deletes |
 
 ### `need_strategic_service_plan`
+
 Pivot table connecting needs and strategic service plans.
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
@@ -211,6 +249,7 @@ Pivot table connecting needs and strategic service plans.
 ## KPI Management Tables
 
 ### `kpi_groups`
+
 Stores planning periods for KPIs.
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
@@ -224,6 +263,7 @@ Stores planning periods for KPIs.
 | updated_at | timestamp | Yes | |
 
 ### `kpi_indicators`
+
 Stores the hierarchical performance indicators.
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
@@ -238,6 +278,7 @@ Stores the hierarchical performance indicators.
 | updated_at | timestamp | Yes | |
 
 ### `kpi_annual_targets`
+
 Stores yearly target values for indicators.
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
@@ -249,6 +290,7 @@ Stores yearly target values for indicators.
 | updated_at | timestamp | Yes | |
 
 ### `kpi_indicator_need`
+
 Pivot table connecting KPI indicators and needs.
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
@@ -260,45 +302,95 @@ Pivot table connecting KPI indicators and needs.
 
 ---
 
-## System Tables
+## Checklist Management Tables
 
-### `users`
+### `checklist_questions`
+
+Stores general checklist questions that can be assigned to need groups.
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
 | id | bigint | No | Primary Key |
-| name | string | No | |
-| email | string | No | Unique |
-| email_verified_at | timestamp | Yes | |
-| password | string | No | |
-| two_factor_secret | text | Yes | |
-| two_factor_recovery_codes | text | Yes | |
-| two_factor_confirmed_at | timestamp | Yes | |
-| remember_token | string(100) | Yes | |
+| question | text | No | |
+| description | text | Yes | |
+| is_active | boolean | No | Default: true |
+| order_column | integer | No | Default: 0 |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+| deleted_at | timestamp | Yes | Soft Deletes |
+
+### `need_group_checklist_question`
+
+Pivot table connecting need groups and checklist questions, allowing group-specific configuration.
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| need_group_id | bigint | No | Foreign Key (need_groups), cascadeOnDelete |
+| checklist_question_id | bigint | No | Foreign Key (checklist_questions), cascadeOnDelete |
+| order_column | integer | No | Default: 0 |
+| is_required | boolean | No | Default: false |
+| is_active | boolean | No | Default: true |
 | created_at | timestamp | Yes | |
 | updated_at | timestamp | Yes | |
 
-### `password_reset_tokens`
+### `need_checklist_answers`
+
+Stores the answers to checklist questions for each individual need.
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
-| email | string | No | Primary Key |
-| token | string | No | |
+| id | bigint | No | Primary Key |
+| need_id | bigint | No | Foreign Key (needs), cascadeOnDelete |
+| checklist_question_id | bigint | No | Foreign Key (checklist_questions), cascadeOnDelete |
+| answer | string | Yes | Usually 'yes', 'no', or 'n/a' |
+| notes | text | Yes | |
 | created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+
+---
+
+## System Tables
+
+### `users`
+
+| Column                    | Type        | Nullable | Extra       |
+| :------------------------ | :---------- | :------: | :---------- |
+| id                        | bigint      |    No    | Primary Key |
+| name                      | string      |    No    |             |
+| email                     | string      |    No    | Unique      |
+| email_verified_at         | timestamp   |   Yes    |             |
+| password                  | string      |    No    |             |
+| two_factor_secret         | text        |   Yes    |             |
+| two_factor_recovery_codes | text        |   Yes    |             |
+| two_factor_confirmed_at   | timestamp   |   Yes    |             |
+| remember_token            | string(100) |   Yes    |             |
+| created_at                | timestamp   |   Yes    |             |
+| updated_at                | timestamp   |   Yes    |             |
+
+### `password_reset_tokens`
+
+| Column     | Type      | Nullable | Extra       |
+| :--------- | :-------- | :------: | :---------- |
+| email      | string    |    No    | Primary Key |
+| token      | string    |    No    |             |
+| created_at | timestamp |   Yes    |             |
 
 ### `sessions`
-| Column | Type | Nullable | Extra |
-| :--- | :--- | :---: | :--- |
-| id | string | No | Primary Key |
-| user_id | bigint | Yes | Foreign Key (users), index |
-| ip_address | string(45) | Yes | |
-| user_agent | text | Yes | |
-| payload | longText | No | |
-| last_activity | integer | No | Index |
+
+| Column        | Type       | Nullable | Extra                      |
+| :------------ | :--------- | :------: | :------------------------- |
+| id            | string     |    No    | Primary Key                |
+| user_id       | bigint     |   Yes    | Foreign Key (users), index |
+| ip_address    | string(45) |   Yes    |                            |
+| user_agent    | text       |   Yes    |                            |
+| payload       | longText   |    No    |                            |
+| last_activity | integer    |    No    | Index                      |
 
 ### `cache`
+
 - **cache**: `key` (PK), `value`, `expiration`
 - **cache_locks**: `key` (PK), `owner`, `expiration`
 
 ### `jobs`
+
 - **jobs**: `id`, `queue` (index), `payload`, `attempts`, `reserved_at`, `available_at`, `created_at`
 - **job_batches**: `id`, `name`, `total_jobs`, `pending_jobs`, `failed_jobs`, `failed_job_ids`, `options`, `cancelled_at`, `created_at`, `finished_at`
 - **failed_jobs**: `id`, `uuid` (unique), `connection`, `queue`, `payload`, `exception`, `failed_at`

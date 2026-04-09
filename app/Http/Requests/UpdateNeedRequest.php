@@ -59,6 +59,15 @@ class UpdateNeedRequest extends FormRequest
             'kpi_indicator_ids.*' => ['exists:kpi_indicators,id'],
             'strategic_service_plan_ids' => ['nullable', 'array'],
             'strategic_service_plan_ids.*' => ['exists:strategic_service_plans,id'],
+            'detail.background' => ['nullable', 'string'],
+            'detail.purpose_and_objectives' => ['nullable', 'string'],
+            'detail.target_objective' => ['nullable', 'string'],
+            'detail.procurement_organization_name' => ['nullable', 'string'],
+            'detail.funding_source_and_estimated_cost' => ['nullable', 'string'],
+            'detail.implementation_period' => ['nullable', 'string'],
+            'detail.expert_or_skilled_personnel' => ['nullable', 'string'],
+            'detail.technical_specifications' => ['nullable', 'string'],
+            'detail.training' => ['nullable', 'string'],
         ];
     }
 }

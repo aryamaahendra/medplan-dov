@@ -11,6 +11,7 @@ import needRoutes from '@/routes/needs';
 import type { Need, StrategicServicePlan, Tujuan } from '../columns';
 import { GeneralInfoSection } from './general-info-section';
 import { IkkAlignmentSection } from './ikk-alignment-section';
+import { NeedDetailSection } from './need-detail-section';
 import { PriorityStatusSection } from './priority-status-section';
 import { RenstraAlignmentSection } from './renstra-alignment-section';
 import { RlsAlignmentSection } from './rls-alignment-section';
@@ -68,6 +69,20 @@ export function NeedForm({
     strategic_service_plan_ids:
       need?.strategic_service_plans?.map((i) => i.id.toString()) ??
       ([] as string[]),
+    detail: {
+      background: need?.detail?.background ?? '',
+      purpose_and_objectives: need?.detail?.purpose_and_objectives ?? '',
+      target_objective: need?.detail?.target_objective ?? '',
+      procurement_organization_name:
+        need?.detail?.procurement_organization_name ?? '',
+      funding_source_and_estimated_cost:
+        need?.detail?.funding_source_and_estimated_cost ?? '',
+      implementation_period: need?.detail?.implementation_period ?? '',
+      expert_or_skilled_personnel:
+        need?.detail?.expert_or_skilled_personnel ?? '',
+      technical_specifications: need?.detail?.technical_specifications ?? '',
+      training: need?.detail?.training ?? '',
+    },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -131,6 +146,9 @@ export function NeedForm({
               <TabsTrigger value="rls" className="">
                 RLS
               </TabsTrigger>
+              <TabsTrigger value="detail" className="">
+                Detail Proposal
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent
@@ -192,6 +210,17 @@ export function NeedForm({
                 setData={setData}
                 errors={errors}
                 strategicServicePlans={strategicServicePlans}
+              />
+            </TabsContent>
+
+            <TabsContent
+              value="detail"
+              className="mt-0 focus-visible:outline-none"
+            >
+              <NeedDetailSection
+                data={data}
+                setData={setData}
+                errors={errors}
               />
             </TabsContent>
           </Tabs>

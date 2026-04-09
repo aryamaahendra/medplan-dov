@@ -7,6 +7,7 @@ import type { ChecklistQuestion, ChecklistAnswer } from '@/types';
 
 import type { Need, Sasaran, Tujuan } from './columns';
 import { IkkAlignmentShow } from './components/ikk-alignment-show';
+import { NeedDetailView } from './components/need-detail-view';
 import { NeedGeneralInfo } from './components/need-general-info';
 import { NeedHeader } from './components/need-header';
 import { NeedSidebar } from './components/need-sidebar';
@@ -71,6 +72,7 @@ export default function NeedShow({
                 <TabsTrigger value="ikk">IKK</TabsTrigger>
                 <TabsTrigger value="rls">RLS</TabsTrigger>
                 <TabsTrigger value="checklist">Checklist</TabsTrigger>
+                <TabsTrigger value="detail">Detail Proposal</TabsTrigger>
               </TabsList>
               <TabsContent value="general" className="mt-0">
                 <div className="mt-4">
@@ -100,6 +102,15 @@ export default function NeedShow({
                   questions={checklistQuestions.data}
                   existingAnswers={existingAnswers.data}
                 />
+              </TabsContent>
+              <TabsContent value="detail" className="mt-0">
+                <div className="mt-4 space-y-1">
+                  <h2 className="text-xl font-semibold">Detail Proposal</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Informasi dokumen proposal usulan kebutuhan.
+                  </p>
+                </div>
+                <NeedDetailView detail={need.detail} />
               </TabsContent>
             </Tabs>
           </div>

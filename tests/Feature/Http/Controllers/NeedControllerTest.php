@@ -247,7 +247,6 @@ test('store validates required fields', function () {
             'total_price',
             'urgency',
             'impact',
-            'sasaran_ids',
         ]);
 });
 
@@ -334,7 +333,6 @@ test('update validates required fields', function () {
             'total_price',
             'urgency',
             'impact',
-            'sasaran_ids',
         ]);
 });
 

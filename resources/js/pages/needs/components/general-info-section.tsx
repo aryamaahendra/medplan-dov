@@ -13,8 +13,8 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 const formatIDR = (value: string | number) => {
   if (value === undefined || value === null || value === '') {
-return '';
-}
+    return '';
+  }
 
   const strValue = value.toString().replace(',', '.');
   const [intPart, decPart] = strValue.split('.');

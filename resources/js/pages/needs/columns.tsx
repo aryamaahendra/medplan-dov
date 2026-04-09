@@ -43,6 +43,20 @@ export interface Tujuan {
 
 export type StrategicServicePlan = BaseStrategicServicePlan;
 
+export interface NeedDetail {
+  id?: number;
+  need_id?: number;
+  background: string | null;
+  purpose_and_objectives: string | null;
+  target_objective: string | null;
+  procurement_organization_name: string | null;
+  funding_source_and_estimated_cost: string | null;
+  implementation_period: string | null;
+  expert_or_skilled_personnel: string | null;
+  technical_specifications: string | null;
+  training: string | null;
+}
+
 export interface Need {
   id: number;
   need_group_id: number;
@@ -76,6 +90,7 @@ export interface Need {
   indicators_count?: number;
   kpi_indicators_count?: number;
   strategic_service_plans_count?: number;
+  detail?: NeedDetail | null;
 }
 
 export const STATUS_LABELS: Record<Need['status'], string> = {

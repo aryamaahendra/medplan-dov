@@ -1,10 +1,12 @@
+import { useState } from 'react';
+import type { MutableRefObject } from 'react';
 import InputError from '@/components/input-error';
+import { Editor } from '@/components/ui/editor';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 
 interface NeedDetailSectionProps {
-  data: any;
-  setData: (key: any, value: any) => void;
+  initialValues: any;
+  detailValuesRef: MutableRefObject<any>;
   errors: any;
 }
 
@@ -63,15 +65,23 @@ const DETAIL_FIELDS: DetailField[] = [
 ];
 
 export function NeedDetailSection({
-  data,
-  setData,
+  initialValues: providedInitialValues,
+  detailValuesRef,
   errors,
 }: NeedDetailSectionProps) {
-  const detail = data.detail ?? {};
+  // Capture the initial values on mount to avoid reading ref during render.
+  // This is safe because Editor is an uncontrolled component and uses this value
+  // primarily for initialization.
+  const [initialValues] = useState(providedInitialValues);
 
   const handleChange = (key: string, value: string) => {
-    setData('detail', { ...detail, [key]: value });
+    detailValuesRef.current = {
+      ...detailValuesRef.current,
+      [key]: value,
+    };
   };
+
+  console.log('need-detail-section rendred!');
 
   return (
     <div className="space-y-5 py-6">
@@ -82,20 +92,23 @@ export function NeedDetailSection({
         </p>
       </div>
 
-      <div className="space-y-5">
+      <div className="-mx-4 space-y-6">
         {DETAIL_FIELDS.map(({ key, label, placeholder }) => (
           <div key={key} className="space-y-1.5">
-            <Label htmlFor={`detail_${key}`}>{label}</Label>
-            <Textarea
+            <Label className="mb-0 border-t bg-muted/40 px-4 py-3">
+              {label}
+            </Label>
+            <Editor
               id={`detail_${key}`}
-              name={`detail[${key}]`}
-              placeholder={placeholder}
-              value={detail[key] ?? ''}
-              onChange={(e) => handleChange(key, e.target.value)}
-              rows={3}
-              className="resize-none bg-muted/10"
+              placeholder={'Type here ...'}
+              value={initialValues?.[key] ?? ''}
+              onChange={(value) => handleChange(key, value)}
+              className="mb-0 bg-muted/10"
             />
             <InputError message={errors[`detail.${key}`]} />
+            <Label className="mb-0 border-b bg-muted/40 px-4 py-3 text-xs text-muted-foreground italic">
+              *{placeholder}
+            </Label>
           </div>
         ))}
       </div>

@@ -1,4 +1,5 @@
 import { router, useForm } from '@inertiajs/react';
+import { useRef } from 'react';
 import { toast } from 'sonner';
 
 import NeedController from '@/actions/App/Http/Controllers/NeedController';
@@ -39,51 +40,55 @@ export function NeedForm({
 }: NeedFormProps) {
   const isEditing = !!need;
 
-  const { data, setData, post, patch, processing, errors } = useForm({
-    need_group_id:
-      need?.need_group_id?.toString() ?? currentGroup?.id?.toString() ?? '',
-    organizational_unit_id: need?.organizational_unit_id?.toString() ?? '',
-    need_type_id: need?.need_type_id?.toString() ?? '',
-    year:
-      need?.year?.toString() ??
-      currentGroup?.year?.toString() ??
-      new Date().getFullYear().toString(),
-    title: need?.title ?? '',
-    description: need?.description ?? '',
-    current_condition: need?.current_condition ?? '',
-    required_condition: need?.required_condition ?? '',
-    unit: need?.unit ?? '',
-    volume: need?.volume ?? '',
-    unit_price: need?.unit_price ?? '',
-    total_price: need?.total_price ?? '',
-    urgency: need?.urgency ?? 'medium',
-    impact: need?.impact ?? 'medium',
-    is_priority: need?.is_priority ?? false,
-    status: need?.status ?? 'draft',
-    sasaran_ids:
-      need?.sasarans?.map((s) => s.id.toString()) ?? ([] as string[]),
-    indicator_ids:
-      need?.indicators?.map((i) => i.id.toString()) ?? ([] as string[]),
-    kpi_indicator_ids:
-      need?.kpi_indicators?.map((i) => i.id.toString()) ?? ([] as string[]),
-    strategic_service_plan_ids:
-      need?.strategic_service_plans?.map((i) => i.id.toString()) ??
-      ([] as string[]),
-    detail: {
-      background: need?.detail?.background ?? '',
-      purpose_and_objectives: need?.detail?.purpose_and_objectives ?? '',
-      target_objective: need?.detail?.target_objective ?? '',
-      procurement_organization_name:
-        need?.detail?.procurement_organization_name ?? '',
-      funding_source_and_estimated_cost:
-        need?.detail?.funding_source_and_estimated_cost ?? '',
-      implementation_period: need?.detail?.implementation_period ?? '',
-      expert_or_skilled_personnel:
-        need?.detail?.expert_or_skilled_personnel ?? '',
-      technical_specifications: need?.detail?.technical_specifications ?? '',
-      training: need?.detail?.training ?? '',
+  const { data, setData, post, patch, processing, errors, transform } = useForm(
+    {
+      need_group_id:
+        need?.need_group_id?.toString() ?? currentGroup?.id?.toString() ?? '',
+      organizational_unit_id: need?.organizational_unit_id?.toString() ?? '',
+      need_type_id: need?.need_type_id?.toString() ?? '',
+      year:
+        need?.year?.toString() ??
+        currentGroup?.year?.toString() ??
+        new Date().getFullYear().toString(),
+      title: need?.title ?? '',
+      description: need?.description ?? '',
+      current_condition: need?.current_condition ?? '',
+      required_condition: need?.required_condition ?? '',
+      unit: need?.unit ?? '',
+      volume: need?.volume ?? '',
+      unit_price: need?.unit_price ?? '',
+      total_price: need?.total_price ?? '',
+      urgency: need?.urgency ?? 'medium',
+      impact: need?.impact ?? 'medium',
+      is_priority: need?.is_priority ?? false,
+      status: need?.status ?? 'draft',
+      sasaran_ids:
+        need?.sasarans?.map((s) => s.id.toString()) ?? ([] as string[]),
+      indicator_ids:
+        need?.indicators?.map((i) => i.id.toString()) ?? ([] as string[]),
+      kpi_indicator_ids:
+        need?.kpi_indicators?.map((i) => i.id.toString()) ?? ([] as string[]),
+      strategic_service_plan_ids:
+        need?.strategic_service_plans?.map((i) => i.id.toString()) ??
+        ([] as string[]),
+      detail: {
+        background: need?.detail?.background ?? '',
+        purpose_and_objectives: need?.detail?.purpose_and_objectives ?? '',
+        target_objective: need?.detail?.target_objective ?? '',
+        procurement_organization_name:
+          need?.detail?.procurement_organization_name ?? '',
+        funding_source_and_estimated_cost:
+          need?.detail?.funding_source_and_estimated_cost ?? '',
+        implementation_period: need?.detail?.implementation_period ?? '',
+        expert_or_skilled_personnel:
+          need?.detail?.expert_or_skilled_personnel ?? '',
+        technical_specifications: need?.detail?.technical_specifications ?? '',
+        training: need?.detail?.training ?? '',
+      },
     },
-  });
+  );
+
+  const detailValuesRef = useRef(data.detail);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,6 +102,11 @@ export function NeedForm({
         );
       },
     };
+
+    transform((data) => ({
+      ...data,
+      detail: detailValuesRef.current,
+    }));
 
     if (isEditing) {
       patch(NeedController.update.url({ need: need.id }), options);
@@ -124,6 +134,8 @@ export function NeedForm({
       total_price: (vol * price).toFixed(2),
     }));
   };
+
+  console.log('need-form rendred!');
 
   return (
     <Card className={cn('w-full max-w-3xl overflow-hidden', className)}>
@@ -215,11 +227,12 @@ export function NeedForm({
 
             <TabsContent
               value="detail"
-              className="mt-0 focus-visible:outline-none"
+              className="mt-0 focus-visible:outline-none data-[state=inactive]:hidden"
+              forceMount
             >
               <NeedDetailSection
-                data={data}
-                setData={setData}
+                initialValues={data.detail}
+                detailValuesRef={detailValuesRef}
                 errors={errors}
               />
             </TabsContent>

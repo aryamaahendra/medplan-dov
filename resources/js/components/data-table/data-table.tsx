@@ -36,6 +36,7 @@ interface DataTableProps<TData, TValue> {
   onReset: () => void;
   searchPlaceholder?: string;
   toolbarChildren?: React.ReactNode;
+  toolbarPosition?: 'beside-search' | 'between-search-and-table';
   view?: 'table' | 'grid';
   renderGrid?: (rows: TData[]) => React.ReactNode;
 }
@@ -52,6 +53,7 @@ export function DataTable<TData, TValue>({
   onReset,
   searchPlaceholder,
   toolbarChildren,
+  toolbarPosition = 'beside-search',
   view = 'table',
   renderGrid,
 }: DataTableProps<TData, TValue>) {
@@ -86,9 +88,16 @@ export function DataTable<TData, TValue>({
         onSearch={onSearch}
         onReset={onReset}
         searchPlaceholder={searchPlaceholder}
+        toolbarPosition={toolbarPosition}
       >
-        {toolbarChildren}
+        {toolbarPosition === 'beside-search' && toolbarChildren}
       </DataTableToolbar>
+
+      {toolbarPosition === 'between-search-and-table' && toolbarChildren && (
+        <div className="flex flex-wrap items-center gap-2">
+          {toolbarChildren}
+        </div>
+      )}
 
       {view === 'table' ? (
         <div className="rounded-md border">

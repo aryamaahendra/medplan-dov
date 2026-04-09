@@ -15,7 +15,9 @@ interface DataTableToolbarProps {
   onReset: () => void;
   /** Placeholder text for the search input */
   searchPlaceholder?: string;
-  /** Optional extra filter controls to render on the right */
+  /** Position of the toolbar children */
+  toolbarPosition?: 'beside-search' | 'between-search-and-table';
+  /** Optional extra filter controls */
   children?: ReactNode;
 }
 
@@ -24,6 +26,7 @@ export function DataTableToolbar({
   onSearch,
   onReset,
   searchPlaceholder = 'Search...',
+  toolbarPosition = 'beside-search',
   children,
 }: DataTableToolbarProps) {
   const isFiltered =
@@ -43,7 +46,7 @@ export function DataTableToolbar({
 
   return (
     <div className="flex items-center justify-between gap-4">
-      <div className="flex flex-1 items-center gap-2">
+      <div className="flex flex-1 flex-wrap items-center gap-2">
         <InputGroup className="max-w-xs">
           <InputGroupInput
             id="data-table-search"
@@ -67,9 +70,13 @@ export function DataTableToolbar({
             <XIcon className="ml-1 size-4" />
           </Button>
         )}
+
+        {toolbarPosition === 'beside-search' && children}
       </div>
 
-      {children && <div className="flex items-center gap-2">{children}</div>}
+      {toolbarPosition !== 'beside-search' && children && (
+        <div className="flex items-center gap-2">{children}</div>
+      )}
     </div>
   );
 }

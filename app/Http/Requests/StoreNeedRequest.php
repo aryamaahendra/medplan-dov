@@ -43,7 +43,7 @@ class StoreNeedRequest extends FormRequest
             'impact' => ['required', Rule::enum(Impact::class)],
             'is_priority' => ['boolean'],
             'status' => ['sometimes', 'string', Rule::in(['draft', 'submitted', 'approved', 'rejected'])],
-            'sasaran_ids' => ['required', 'array', 'min:1'],
+            'sasaran_ids' => ['nullable', 'array'],
             'sasaran_ids.*' => ['exists:sasarans,id'],
             'indicator_ids' => ['nullable', 'array'],
             'indicator_ids.*' => [

@@ -11,6 +11,22 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
+const formatIDR = (value: string | number) => {
+  if (value === undefined || value === null || value === '') {
+return '';
+}
+
+  const strValue = value.toString().replace(',', '.');
+  const [intPart, decPart] = strValue.split('.');
+  const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+  return decPart !== undefined ? `${formattedInt},${decPart}` : formattedInt;
+};
+
+const parseIDR = (value: string) => {
+  return value.replace(/\./g, '').replace(',', '.');
+};
+
 const UNIT_OPTIONS = [
   'pcs',
   'unit',
@@ -226,12 +242,12 @@ export function GeneralInfoSection({
               <Input
                 id="unit_price"
                 name="unit_price"
-                type="number"
-                min="0"
-                step="0.01"
+                type="text"
                 placeholder="0"
-                value={data.unit_price}
-                onChange={(e) => handleUnitPriceChange(e.target.value)}
+                value={formatIDR(data.unit_price)}
+                onChange={(e) =>
+                  handleUnitPriceChange(parseIDR(e.target.value))
+                }
                 required
                 className="bg-background pl-9 font-mono"
               />
@@ -253,8 +269,8 @@ export function GeneralInfoSection({
               <Input
                 id="total_price"
                 name="total_price"
-                type="number"
-                value={data.total_price}
+                type="text"
+                value={formatIDR(data.total_price)}
                 readOnly
                 className="border-primary/20 bg-primary/5 pl-9 font-mono font-bold text-primary"
                 tabIndex={-1}

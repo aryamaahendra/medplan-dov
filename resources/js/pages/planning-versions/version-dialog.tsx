@@ -32,7 +32,7 @@ export function VersionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="pb-0">
         <DialogHeader>
           <DialogTitle>
             {isEditing
@@ -49,7 +49,9 @@ export function VersionDialog({
         <Form
           key={version?.id ?? 'new-version'}
           {...(isEditing
-            ? PlanningVersionController.store.form() // Replace with update if exists, but controller only has store for now
+            ? PlanningVersionController.update.form({
+                planning_version: version.id,
+              })
             : PlanningVersionController.store.form())}
           onSuccess={() => {
             onOpenChange(false);
@@ -57,7 +59,7 @@ export function VersionDialog({
               isEditing ? 'Versi diperbarui!' : 'Versi baru berhasil dibuat!',
             );
           }}
-          className="space-y-4 py-4"
+          className="space-y-4"
         >
           {({ processing, errors }) => (
             <>
@@ -100,7 +102,7 @@ export function VersionDialog({
                 <InputError message={errors.notes} />
               </div>
 
-              <DialogFooter>
+              <DialogFooter className="mb-0">
                 <Button
                   type="button"
                   variant="outline"

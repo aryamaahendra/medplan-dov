@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 
 import { DataTable } from '@/components/data-table/data-table';
 import { Badge } from '@/components/ui/badge';
-import type { DataTableFilters} from '@/hooks/use-data-table';
+import type { DataTableFilters } from '@/hooks/use-data-table';
 import { useDataTable } from '@/hooks/use-data-table';
 import planningVersions from '@/routes/planning-versions';
 import type {

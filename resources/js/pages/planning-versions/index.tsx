@@ -42,6 +42,11 @@ export default function PlanningVersionsIndex({
       only: ['versions', 'filters'],
     });
 
+  const onEdit = (version: PlanningVersion) => {
+    setSelectedVersion(version);
+    setDialogOpen(true);
+  };
+
   const handleCreateRevision = (version: PlanningVersion) => {
     if (
       confirm(`Apakah Anda yakin ingin membuat revisi dari "${version.name}"?`)
@@ -94,7 +99,8 @@ export default function PlanningVersionsIndex({
   };
 
   const columns = useMemo(
-    () => getColumns(handleCreateRevision, handleSetCurrent, handleDelete),
+    () =>
+      getColumns(onEdit, handleCreateRevision, handleSetCurrent, handleDelete),
     [],
   );
 

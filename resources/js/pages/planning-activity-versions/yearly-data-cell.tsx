@@ -60,8 +60,8 @@ export function YearlyDataCell({
       .optimistic(() => ({
         activities: activities.map((a) => {
           if (a.id !== activity.id) {
-return a;
-}
+            return a;
+          }
 
           const existingYears = a.activity_years ?? [];
           const yearExists = existingYears.some((y) => y.year === year);

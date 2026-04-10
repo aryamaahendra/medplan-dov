@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePlanningVersionRequest;
+use App\Http\Requests\UpdatePlanningVersionRequest;
 use App\Models\PlanningActivity;
 use App\Models\PlanningActivityVersion;
 use App\Models\PlanningVersion;
@@ -75,6 +76,16 @@ class PlanningVersionController extends Controller
         });
 
         return redirect()->back()->with('success', 'Planning version created from source activities.');
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdatePlanningVersionRequest $request, PlanningVersion $planningVersion)
+    {
+        $planningVersion->update($request->validated());
+
+        return redirect()->back()->with('success', 'Planning version updated.');
     }
 
     /**

@@ -51,7 +51,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('indicators', KpiIndicatorController::class)->except(['index', 'show', 'create', 'edit']);
     });
 
-    Route::resource('planning-versions', PlanningVersionController::class)->only(['index', 'store', 'destroy']);
+    Route::resource('planning-versions', PlanningVersionController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::post('planning-versions/{planning_version}/create-revision', [PlanningVersionController::class, 'createRevision'])->name('planning-versions.create-revision');
     Route::post('planning-versions/{planning_version}/set-current', [PlanningVersionController::class, 'setCurrent'])->name('planning-versions.set-current');
 

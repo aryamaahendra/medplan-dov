@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { Copy, Trash2, CheckCircle2, List } from 'lucide-react';
+import { Copy, Trash2, CheckCircle2, List, Edit } from 'lucide-react';
 
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
@@ -26,6 +26,7 @@ const statusVariants: Record<
 };
 
 export const getColumns = (
+  onEdit: (version: PlanningVersion) => void,
   onCreateRevision: (version: PlanningVersion) => void,
   onSetCurrent: (version: PlanningVersion) => void,
   onDelete: (version: PlanningVersion) => void,
@@ -130,6 +131,11 @@ export const getColumns = (
                   planning_version: version.id,
                 });
               },
+            },
+            {
+              label: 'Edit',
+              icon: Edit,
+              onClick: () => onEdit(version),
             },
             {
               label: 'Buat Revisi',

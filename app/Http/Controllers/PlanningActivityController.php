@@ -26,7 +26,8 @@ class PlanningActivityController extends Controller
     public function index(Request $request): Response
     {
         $activities = $this->applyDataTable(
-            PlanningActivity::query(),
+            PlanningActivity::query()
+                ->when(! $request->filled('sort'), fn ($q) => $q->orderBy('code')),
             $request,
             self::SEARCH_COLUMNS,
             self::SORTABLE_COLUMNS,
@@ -37,6 +38,7 @@ class PlanningActivityController extends Controller
             'filters' => $this->dataTableFilters($request),
             'parents' => PlanningActivity::query()
                 ->whereIn('type', ['program', 'activity', 'sub_activity'])
+                ->orderBy('code')
                 ->get(['id', 'name', 'type']),
         ]);
     }

@@ -27,6 +27,10 @@ This document provides a comprehensive overview of the database tables and their
     - [kpi_indicator_need](#kpi_indicator_need)
 - [Planning Hierarchy Tables](#planning-hierarchy-tables)
     - [planning_activities](#planning_activities)
+    - [planning_versions](#planning_versions)
+    - [planning_revision_groups](#planning_revision_groups)
+    - [planning_activity_versions](#planning_activity_versions)
+    - [planning_activity_years](#planning_activity_years)
 - [Checklist Management Tables](#checklist-management-tables)
     - [checklist_questions](#checklist_questions)
     - [need_group_checklist_question](#need_group_checklist_question)
@@ -319,6 +323,64 @@ Stores the hierarchical structure of programs, activities, sub-activities, and o
 | parent_id | bigint | Yes | Foreign Key (planning_activities), cascadeOnDelete |
 | type | enum | No | 'program', 'activity', 'sub_activity', 'output' |
 | full_code | string | Yes | |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+
+### `planning_versions`
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| name | string | No | |
+| fiscal_year | integer | No | |
+| revision_no | integer | No | |
+| status | enum | No | 'draft', 'submitted', 'approved', 'archived' |
+| is_current | boolean | No | Default: false |
+| notes | text | Yes | |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+
+### `planning_revision_groups`
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| planning_version_id | bigint | No | Foreign Key (planning_versions), cascadeOnDelete |
+| code | string | No | Index |
+| name | string | No | |
+| description | text | Yes | |
+| parent_group_id | bigint | Yes | Foreign Key (self), nullOnDelete |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+
+### `planning_activity_versions`
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| planning_version_id | bigint | No | Foreign Key (planning_versions), cascadeOnDelete |
+| revision_group_id | bigint | Yes | Foreign Key (planning_revision_groups), nullOnDelete |
+| source_activity_id | bigint | Yes | Foreign Key (planning_activities), nullOnDelete |
+| parent_id | bigint | Yes | Foreign Key (self), nullOnDelete |
+| code | string | Yes | Index |
+| name | text | No | |
+| type | enum | No | 'program', 'activity', 'sub_activity', 'output' |
+| full_code | string | Yes | |
+| indicator_name | string | Yes | |
+| indicator_baseline_2024 | string | Yes | |
+| perangkat_daerah | string | Yes | |
+| keterangan | text | Yes | |
+| sort_order | integer | Yes | |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+
+### `planning_activity_years`
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| planning_activity_version_id | bigint | No | Foreign Key (planning_activity_versions), cascadeOnDelete |
+| year | integer | No | |
+| target | string | No | |
+| budget | decimal(20,2) | No | |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
 | created_at | timestamp | Yes | |
 | updated_at | timestamp | Yes | |
 

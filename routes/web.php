@@ -11,6 +11,8 @@ use App\Http\Controllers\NeedGroupController;
 use App\Http\Controllers\NeedTypeController;
 use App\Http\Controllers\OrganizationalUnitController;
 use App\Http\Controllers\PlanningActivityController;
+use App\Http\Controllers\PlanningActivityVersionController;
+use App\Http\Controllers\PlanningVersionController;
 use App\Http\Controllers\RenstraController;
 use App\Http\Controllers\SasaranController;
 use App\Http\Controllers\StrategicServicePlanController;
@@ -48,6 +50,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('groups/{group}/activate', [KpiGroupController::class, 'activate'])->name('groups.activate');
         Route::resource('indicators', KpiIndicatorController::class)->except(['index', 'show', 'create', 'edit']);
     });
+
+    Route::resource('planning-versions', PlanningVersionController::class)->only(['index', 'store', 'destroy']);
+    Route::post('planning-versions/{planning_version}/create-revision', [PlanningVersionController::class, 'createRevision'])->name('planning-versions.create-revision');
+    Route::post('planning-versions/{planning_version}/set-current', [PlanningVersionController::class, 'setCurrent'])->name('planning-versions.set-current');
+
+    Route::get('planning-versions/{planning_version}/activities', [PlanningActivityVersionController::class, 'index'])->name('planning-versions.activities.index');
+    Route::post('planning-versions/activities/{planning_activity_version}/year', [PlanningActivityVersionController::class, 'updateYearlyData'])->name('planning-versions.activities.update-yearly-data');
 });
 
 require __DIR__.'/settings.php';

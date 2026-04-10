@@ -18,7 +18,10 @@ class PlanningActivityFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'code' => fake()->unique()->numerify('1.##.##.##.####'),
+            'name' => fake()->sentence(),
+            'type' => fake()->randomElement(['program', 'activity', 'sub_activity', 'output']),
+            'full_code' => fake()->unique()->numerify('1.##.##.##.####'),
         ];
     }
 }

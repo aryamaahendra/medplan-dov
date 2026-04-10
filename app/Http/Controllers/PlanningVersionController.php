@@ -6,21 +6,37 @@ use App\Http\Requests\StorePlanningVersionRequest;
 use App\Models\PlanningActivity;
 use App\Models\PlanningActivityVersion;
 use App\Models\PlanningVersion;
+use App\Traits\HasDataTable;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class PlanningVersionController extends Controller
 {
+    use HasDataTable;
+
+    /** Columns searchable across */
+    private const array SEARCH_COLUMNS = ['name', 'fiscal_year', 'notes'];
+
+    /** Columns sortable by */
+    private const array SORTABLE_COLUMNS = ['name', 'fiscal_year', 'revision_no', 'status', 'is_current'];
+
     /**
      * Display a listing of the resource.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $versions = $this->applyDataTable(
+            PlanningVersion::query(),
+            $request,
+            self::SEARCH_COLUMNS,
+            self::SORTABLE_COLUMNS,
+        );
+
         return Inertia::render('planning-versions/index', [
-            'versions' => PlanningVersion::orderByDesc('fiscal_year')
-                ->orderByDesc('revision_no')
-                ->get(),
+            'versions' => $versions,
+            'filters' => $this->dataTableFilters($request),
         ]);
     }
 

@@ -5,24 +5,40 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UpdatePlanningActivityYearRequest;
 use App\Models\PlanningActivityVersion;
 use App\Models\PlanningVersion;
+use App\Traits\HasDataTable;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class PlanningActivityVersionController extends Controller
 {
+    use HasDataTable;
+
+    /** Columns searchable across */
+    private const array SEARCH_COLUMNS = ['code', 'name', 'full_code'];
+
+    /** Columns sortable by */
+    private const array SORTABLE_COLUMNS = ['code', 'name', 'type', 'sort_order'];
+
     /**
      * Display a listing of activities for the given version.
      */
-    public function index(PlanningVersion $planningVersion): Response
+    public function index(PlanningVersion $planningVersion, Request $request): Response
     {
-        $activities = $planningVersion->activityVersions()
-            ->with(['activityYears', 'parent'])
-            ->orderBy('sort_order')
-            ->get();
+        $activities = $this->applyDataTable(
+            PlanningActivityVersion::query()
+                ->where('planning_version_id', $planningVersion->id)
+                ->with(['activityYears', 'parent']),
+            $request,
+            self::SEARCH_COLUMNS,
+            self::SORTABLE_COLUMNS,
+            50 // Higher default for snapshots
+        );
 
         return Inertia::render('planning-activity-versions/index', [
             'version' => $planningVersion,
             'activities' => $activities,
+            'filters' => $this->dataTableFilters($request, 50),
         ]);
     }
 

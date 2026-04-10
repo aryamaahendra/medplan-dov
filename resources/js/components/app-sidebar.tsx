@@ -32,6 +32,7 @@ import needTypes from '@/routes/need-types';
 import needs from '@/routes/needs';
 import organizationalUnits from '@/routes/organizational-units';
 import planningActivities from '@/routes/planning-activities';
+import planningVersions from '@/routes/planning-versions';
 import renstras from '@/routes/renstras';
 import strategicServicePlans from '@/routes/strategic-service-plans';
 import users from '@/routes/users';
@@ -85,6 +86,11 @@ const masterNavItems: NavItem[] = [
     title: 'Nomenklatur Perencanaan',
     href: planningActivities.index.url(),
     icon: Network,
+  },
+  {
+    title: 'Versi Perencanaan',
+    href: planningVersions.index.url(),
+    icon: ClipboardList,
   },
 ];
 

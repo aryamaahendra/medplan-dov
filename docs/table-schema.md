@@ -25,6 +25,8 @@ This document provides a comprehensive overview of the database tables and their
     - [kpi_indicators](#kpi_indicators)
     - [kpi_annual_targets](#kpi_annual_targets)
     - [kpi_indicator_need](#kpi_indicator_need)
+- [Planning Hierarchy Tables](#planning-hierarchy-tables)
+    - [planning_activities](#planning_activities)
 - [Checklist Management Tables](#checklist-management-tables)
     - [checklist_questions](#checklist_questions)
     - [need_group_checklist_question](#need_group_checklist_question)
@@ -292,11 +294,31 @@ Stores yearly target values for indicators.
 ### `kpi_indicator_need`
 
 Pivot table connecting KPI indicators and needs.
+
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
 | id | bigint | No | Primary Key |
 | kpi_indicator_id | bigint | No | Foreign Key (kpi_indicators), cascadeOnDelete |
 | need_id | bigint | No | Foreign Key (needs), cascadeOnDelete |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+
+---
+
+## Planning Hierarchy Tables
+
+### `planning_activities`
+
+Stores the hierarchical structure of programs, activities, sub-activities, and outputs.
+
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| code | string | Yes | Index |
+| name | text | No | |
+| parent_id | bigint | Yes | Foreign Key (planning_activities), cascadeOnDelete |
+| type | enum | No | 'program', 'activity', 'sub_activity', 'output' |
+| full_code | string | Yes | |
 | created_at | timestamp | Yes | |
 | updated_at | timestamp | Yes | |
 

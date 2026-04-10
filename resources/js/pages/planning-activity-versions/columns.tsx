@@ -1,10 +1,22 @@
 import type { ColumnDef } from '@tanstack/react-table';
+import { MoreHorizontal, Pencil, Trash } from 'lucide-react';
+
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import type {
   PlanningActivityVersion,
   PlanningVersion,
 } from '@/types/planning-version';
+
 import { YearlyDataCell } from './yearly-data-cell';
 
 const typeIndentation: Record<PlanningActivityVersion['type'], string> = {
@@ -24,11 +36,48 @@ const typeLabels: Record<PlanningActivityVersion['type'], string> = {
 export const getColumns = (
   version: PlanningVersion,
   activities: PlanningActivityVersion[],
+  onEdit: (activity: PlanningActivityVersion) => void,
+  onDelete: (activity: PlanningActivityVersion) => void,
 ): ColumnDef<PlanningActivityVersion>[] => {
   const startYear = version.fiscal_year;
   const years = Array.from({ length: 5 }, (_, i) => startYear + i);
 
   const baseColumns: ColumnDef<PlanningActivityVersion>[] = [
+    {
+      id: 'actions',
+      cell: ({ row }) => {
+        const activity = row.original;
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Buka menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => onEdit(activity)}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => onDelete(activity)}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash className="mr-2 h-4 w-4" />
+                Hapus
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+      meta: {
+        cellClassName: 'w-[50px] p-0',
+      },
+    },
     {
       accessorKey: 'code',
       header: (props) => <DataTableColumnHeader {...props} title="Kode" />,

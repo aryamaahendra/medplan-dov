@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePlanningActivityVersionRequest;
+use App\Http\Requests\UpdatePlanningActivityVersionRequest;
 use App\Http\Requests\UpdatePlanningActivityYearRequest;
 use App\Models\PlanningActivityVersion;
 use App\Models\PlanningVersion;
@@ -39,7 +41,45 @@ class PlanningActivityVersionController extends Controller
             'version' => $planningVersion,
             'activities' => $activities,
             'filters' => $this->dataTableFilters($request, 50),
+            'parents' => PlanningActivityVersion::query()
+                ->where('planning_version_id', $planningVersion->id)
+                ->whereIn('type', ['program', 'activity', 'sub_activity'])
+                ->orderBy('code')
+                ->get(['id', 'name', 'type']),
         ]);
+    }
+
+    /**
+     * Store a newly created snapshot activity.
+     */
+    public function store(PlanningVersion $planningVersion, StorePlanningActivityVersionRequest $request)
+    {
+        $planningVersion->activityVersions()->create($request->validated());
+
+        return redirect()->back()
+            ->with('success', 'Aktivitas Snapshot berhasil ditambahkan.');
+    }
+
+    /**
+     * Update the snapshot activity.
+     */
+    public function update(PlanningActivityVersion $planningActivityVersion, UpdatePlanningActivityVersionRequest $request)
+    {
+        $planningActivityVersion->update($request->validated());
+
+        return redirect()->back()
+            ->with('success', 'Aktivitas Snapshot berhasil diperbarui.');
+    }
+
+    /**
+     * Remove the snapshot activity.
+     */
+    public function destroy(PlanningActivityVersion $planningActivityVersion)
+    {
+        $planningActivityVersion->delete();
+
+        return redirect()->back()
+            ->with('success', 'Aktivitas Snapshot berhasil dihapus.');
     }
 
     /**

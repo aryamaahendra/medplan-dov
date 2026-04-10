@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\PlanningActivity;
 use App\Models\PlanningActivityVersion;
 use App\Models\PlanningRevisionGroup;
 use App\Models\PlanningVersion;
@@ -23,7 +22,6 @@ class PlanningActivityVersionFactory extends Factory
         return [
             'planning_version_id' => PlanningVersion::factory(),
             'revision_group_id' => PlanningRevisionGroup::factory(),
-            'source_activity_id' => PlanningActivity::factory(),
             'parent_id' => null,
             'code' => fake()->unique()->numerify('1.##.##.##.####'),
             'name' => fake()->sentence(),

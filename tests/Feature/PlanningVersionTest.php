@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\PlanningActivity;
 use App\Models\PlanningActivityVersion;
 use App\Models\PlanningActivityYear;
 use App\Models\PlanningVersion;
@@ -22,13 +21,8 @@ test('can list planning versions', function () {
     $response->assertStatus(200);
 });
 
-test('can create planning version from source activities', function () {
-    // 1. Setup source activities (hierarchy)
-    $program = PlanningActivity::factory()->create(['type' => 'program', 'code' => 'P1']);
-    $activity = PlanningActivity::factory()->create(['type' => 'activity', 'code' => 'A1', 'parent_id' => $program->id]);
-    $subActivity = PlanningActivity::factory()->create(['type' => 'sub_activity', 'code' => 'S1', 'parent_id' => $activity->id]);
-
-    // 2. Perform store
+test('can create planning version empty', function () {
+    // 1. Perform store
     $response = $this->actingAs($this->user)
         ->post(route('planning-versions.store'), [
             'name' => 'Original 2026',
@@ -38,19 +32,13 @@ test('can create planning version from source activities', function () {
 
     $response->assertRedirect();
 
-    // 3. Verify version created
+    // 2. Verify version created
     $version = PlanningVersion::where('fiscal_year', 2026)->first();
     expect($version)->not->toBeNull()
         ->and($version->name)->toBe('Original 2026');
 
-    // 4. Verify activities cloned with hierarchy
-    $clonedProgram = PlanningActivityVersion::where('planning_version_id', $version->id)->where('code', 'P1')->first();
-    $clonedActivity = PlanningActivityVersion::where('planning_version_id', $version->id)->where('code', 'A1')->first();
-    $clonedSubActivity = PlanningActivityVersion::where('planning_version_id', $version->id)->where('code', 'S1')->first();
-
-    expect($clonedProgram)->not->toBeNull()
-        ->and($clonedActivity->parent_id)->toBe($clonedProgram->id)
-        ->and($clonedSubActivity->parent_id)->toBe($clonedActivity->id);
+    // 3. Verify no activities created automatically
+    expect(PlanningActivityVersion::where('planning_version_id', $version->id)->count())->toBe(0);
 });
 
 test('can create revision from existing version', function () {

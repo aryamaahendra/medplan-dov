@@ -16,7 +16,6 @@ class PlanningActivityVersion extends Model
     protected $fillable = [
         'planning_version_id',
         'revision_group_id',
-        'source_activity_id',
         'parent_id',
         'code',
         'name',
@@ -37,11 +36,6 @@ class PlanningActivityVersion extends Model
     public function revisionGroup(): BelongsTo
     {
         return $this->belongsTo(PlanningRevisionGroup::class);
-    }
-
-    public function sourceActivity(): BelongsTo
-    {
-        return $this->belongsTo(PlanningActivity::class, 'source_activity_id');
     }
 
     public function parent(): BelongsTo

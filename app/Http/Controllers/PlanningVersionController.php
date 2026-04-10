@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePlanningVersionRequest;
 use App\Http\Requests\UpdatePlanningVersionRequest;
-use App\Models\PlanningActivity;
-use App\Models\PlanningActivityVersion;
 use App\Models\PlanningVersion;
 use App\Traits\HasDataTable;
 use Illuminate\Http\Request;
@@ -46,36 +44,16 @@ class PlanningVersionController extends Controller
      */
     public function store(StorePlanningVersionRequest $request)
     {
-        DB::transaction(function () use ($request) {
-            $version = PlanningVersion::create([
-                'name' => $request->name,
-                'fiscal_year' => $request->fiscal_year,
-                'revision_no' => 0,
-                'status' => 'draft',
-                'is_current' => false,
-                'notes' => $request->notes,
-            ]);
+        PlanningVersion::create([
+            'name' => $request->name,
+            'fiscal_year' => $request->fiscal_year,
+            'revision_no' => 0,
+            'status' => 'draft',
+            'is_current' => false,
+            'notes' => $request->notes,
+        ]);
 
-            // Initial population from source activities
-            $sourceActivities = PlanningActivity::orderBy('id')->get();
-            $idMapping = [];
-
-            foreach ($sourceActivities as $source) {
-                $newActivity = PlanningActivityVersion::create([
-                    'planning_version_id' => $version->id,
-                    'source_activity_id' => $source->id,
-                    'parent_id' => $source->parent_id ? ($idMapping[$source->parent_id] ?? null) : null,
-                    'code' => $source->code,
-                    'name' => $source->name,
-                    'type' => $source->type,
-                    'full_code' => $source->full_code,
-                    'sort_order' => $source->id,
-                ]);
-                $idMapping[$source->id] = $newActivity->id;
-            }
-        });
-
-        return redirect()->back()->with('success', 'Planning version created from source activities.');
+        return redirect()->back()->with('success', 'Planning version created.');
     }
 
     /**

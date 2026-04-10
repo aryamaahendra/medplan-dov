@@ -10,7 +10,6 @@ use App\Http\Controllers\NeedGroupChecklistController;
 use App\Http\Controllers\NeedGroupController;
 use App\Http\Controllers\NeedTypeController;
 use App\Http\Controllers\OrganizationalUnitController;
-use App\Http\Controllers\PlanningActivityController;
 use App\Http\Controllers\PlanningActivityVersionController;
 use App\Http\Controllers\PlanningVersionController;
 use App\Http\Controllers\RenstraController;
@@ -42,7 +41,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('sasarans', SasaranController::class)->except(['index', 'create', 'edit', 'show']);
     Route::resource('indicators', IndicatorController::class)->except(['index', 'create', 'edit', 'show']);
     Route::resource('strategic-service-plans', StrategicServicePlanController::class)->except(['create', 'edit', 'show']);
-    Route::resource('planning-activities', PlanningActivityController::class)->except(['create', 'edit', 'show']);
     Route::resource('checklist-questions', ChecklistQuestionController::class)->except(['show']);
     Route::post('needs/{need}/checklist-answers', [NeedChecklistAnswerController::class, 'store'])->name('needs.checklist-answers.store');
     Route::prefix('kpis')->name('kpis.')->group(function () {

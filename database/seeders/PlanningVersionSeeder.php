@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\PlanningActivity;
 use App\Models\PlanningActivityVersion;
 use App\Models\PlanningActivityYear;
 use App\Models\PlanningRevisionGroup;
@@ -16,12 +15,7 @@ class PlanningVersionSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Ensure we have some master activities
-        if (PlanningActivity::count() === 0) {
-            PlanningActivity::factory()->count(5)->create();
-        }
-
-        // 2. Create a Version
+        // 1. Create a Version
         $version = PlanningVersion::create([
             'name' => 'RKPD 2026 Murni',
             'fiscal_year' => 2026,
@@ -31,38 +25,57 @@ class PlanningVersionSeeder extends Seeder
             'notes' => 'Original planning version',
         ]);
 
-        // 3. Create a Revision Group
+        // 2. Create a Revision Group
         $group = PlanningRevisionGroup::create([
             'planning_version_id' => $version->id,
             'code' => 'ORG-2026',
             'name' => 'Original Setting',
         ]);
 
-        // 4. Snapshot Master Activities into this Version
-        $masterActivities = PlanningActivity::all();
+        // 3. Create initial activities directly in this Version
+        $activities = [
+            ['code' => '1', 'name' => 'Peningkatan Pelayanan Kesehatan', 'type' => 'program'],
+            ['code' => '1.01', 'name' => 'Pengadaan Alat Kesehatan', 'type' => 'activity'],
+            ['code' => '1.01.01', 'name' => 'Stetoskop Digital', 'type' => 'sub_activity'],
+            ['code' => '1.01.01.01', 'name' => 'Output Stetoskop', 'type' => 'output'],
+        ];
 
-        foreach ($masterActivities as $master) {
+        $parentId = null;
+        $idMapping = [];
+
+        foreach ($activities as $data) {
+            $parentCode = null;
+            if ($data['type'] === 'activity') {
+                $parentCode = '1';
+            } elseif ($data['type'] === 'sub_activity') {
+                $parentCode = '1.01';
+            } elseif ($data['type'] === 'output') {
+                $parentCode = '1.01.01';
+            }
+
             $versionedActivity = PlanningActivityVersion::create([
                 'planning_version_id' => $version->id,
                 'revision_group_id' => $group->id,
-                'source_activity_id' => $master->id,
-                'code' => $master->code,
-                'name' => $master->name,
-                'type' => $master->type,
-                'full_code' => $master->full_code,
-                'indicator_name' => 'Indicator for '.$master->name,
+                'parent_id' => $parentCode ? ($idMapping[$parentCode] ?? null) : null,
+                'code' => $data['code'],
+                'name' => $data['name'],
+                'type' => $data['type'],
+                'full_code' => $data['code'],
+                'indicator_name' => 'Indicator for '.$data['name'],
                 'indicator_baseline_2024' => rand(50, 100),
                 'perangkat_daerah' => 'Dinas Kesehatan',
-                'sort_order' => $master->id,
+                'sort_order' => count($idMapping) + 1,
             ]);
 
-            // 5. Create Dynamic Year Rows (2026-2030)
+            $idMapping[$data['code']] = $versionedActivity->id;
+
+            // 4. Create Dynamic Year Rows (2026-2030)
             for ($year = 2026; $year <= 2030; $year++) {
                 PlanningActivityYear::create([
                     'planning_activity_version_id' => $versionedActivity->id,
                     'year' => $year,
                     'target' => rand(80, 100).' %',
-                    'budget' => rand(500000000, 5000000000),
+                    'budget' => rand(100000000, 1000000000),
                 ]);
             }
         }

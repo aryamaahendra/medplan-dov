@@ -381,8 +381,6 @@ Stores the hierarchical structure of programs, activities, sub-activities, and o
 | budget | decimal(20,2) | No | |
 | created_at | timestamp | Yes | |
 | updated_at | timestamp | Yes | |
-| created_at | timestamp | Yes | |
-| updated_at | timestamp | Yes | |
 
 ---
 

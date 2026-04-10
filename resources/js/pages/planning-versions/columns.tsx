@@ -98,14 +98,9 @@ export const getColumns = (
       const isCurrent = row.getValue('is_current') as boolean;
 
       return isCurrent ? (
-        <Badge
-          variant="default"
-          className="bg-emerald-500 hover:bg-emerald-600"
-        >
-          Ya
-        </Badge>
+        <Badge variant="default">Ya</Badge>
       ) : (
-        <span className="text-xs text-muted-foreground">Tidak</span>
+        <Badge variant="outline">Tidak</Badge>
       );
     },
     meta: {

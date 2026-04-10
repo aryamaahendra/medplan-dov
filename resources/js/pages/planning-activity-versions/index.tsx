@@ -1,8 +1,9 @@
 import { Head, router } from '@inertiajs/react';
-import { List, Plus } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { Plus } from 'lucide-react';
+import { Fragment, useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
+import PlanningActivityVersionController from '@/actions/App/Http/Controllers/PlanningActivityVersionController';
 import { DataTable } from '@/components/data-table/data-table';
 import {
   AlertDialog,
@@ -16,6 +17,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import { useDataTable } from '@/hooks/use-data-table';
 import planningVersions from '@/routes/planning-versions';
@@ -60,15 +62,15 @@ export default function PlanningActivityVersionsIndex({
   const [selectedActivity, setSelectedActivity] =
     useState<PlanningActivityVersion | null>(null);
 
-  const handleEdit = (activity: PlanningActivityVersion) => {
+  const handleEdit = useCallback((activity: PlanningActivityVersion) => {
     setSelectedActivity(activity);
     setIsDialogOpen(true);
-  };
+  }, []);
 
-  const handleDelete = (activity: PlanningActivityVersion) => {
+  const handleDelete = useCallback((activity: PlanningActivityVersion) => {
     setSelectedActivity(activity);
     setIsDeleteDialogOpen(true);
-  };
+  }, []);
 
   const confirmDelete = () => {
     if (!selectedActivity) {
@@ -76,7 +78,7 @@ export default function PlanningActivityVersionsIndex({
     }
 
     router.delete(
-      route('planning-versions.activities.destroy', selectedActivity.id),
+      PlanningActivityVersionController.destroy.url(selectedActivity.id),
       {
         onSuccess: () => {
           setIsDeleteDialogOpen(false);
@@ -87,36 +89,28 @@ export default function PlanningActivityVersionsIndex({
   };
 
   const columns = useMemo(
-    () => getColumns(version, activities.data, handleEdit, handleDelete),
-    [version, activities.data],
+    () => getColumns(version, handleEdit, handleDelete),
+    [version, handleEdit, handleDelete],
   );
+
+  const years = Array.from({ length: 5 }, (_, i) => version.fiscal_year + i);
 
   return (
     <>
       <Head title={`Snapshot: ${version.name}`} />
 
       <div className="flex flex-col gap-4 p-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-primary/10 p-2">
-              <List className="h-6 w-6 text-primary" />
-            </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight">
                 {version.name}
               </h1>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
                 <span>Tahun Anggaran {version.fiscal_year}</span>
                 <span>•</span>
-                <Badge variant="outline" className="h-5 text-[10px]">
-                  Revisi {version.revision_no}
-                </Badge>
-                {version.is_current && (
-                  <Badge className="h-5 bg-emerald-500 text-[10px]">
-                    {' '}
-                    Utama{' '}
-                  </Badge>
-                )}
+                <Badge variant="outline">Revisi {version.revision_no}</Badge>
+                {version.is_current && <Badge> Utama </Badge>}
               </div>
             </div>
           </div>
@@ -132,7 +126,7 @@ export default function PlanningActivityVersionsIndex({
           </Button>
         </div>
 
-        <div className="rounded-md border bg-card">
+        <div className="mt-6">
           <DataTable
             columns={columns}
             data={activities.data}
@@ -144,6 +138,48 @@ export default function PlanningActivityVersionsIndex({
             onPerPageChange={onPerPageChange}
             onReset={onReset}
             searchPlaceholder="Cari nomenklatur..."
+            customThead={
+              <TableHeader>
+                <TableRow className="bg-muted/50 hover:bg-muted/50">
+                  <TableHead rowSpan={2} className="w-[50px] border-r">
+                    Aksi
+                  </TableHead>
+                  <TableHead rowSpan={2} className="w-px border-r">
+                    Kode
+                  </TableHead>
+                  <TableHead
+                    rowSpan={2}
+                    className="min-w-[300px] border-r text-foreground"
+                  >
+                    Nomenklatur
+                  </TableHead>
+                  <TableHead rowSpan={2} className="w-[150px] border-r">
+                    Baseline
+                  </TableHead>
+                  {years.map((year) => (
+                    <TableHead
+                      key={year}
+                      colSpan={2}
+                      className="border-r text-center font-bold text-foreground"
+                    >
+                      {year}
+                    </TableHead>
+                  ))}
+                </TableRow>
+                <TableRow className="bg-muted/50 hover:bg-muted/50">
+                  {years.map((year) => (
+                    <Fragment key={year}>
+                      <TableHead className="w-[120px] border-r text-center text-[10px] font-bold">
+                        TARGET
+                      </TableHead>
+                      <TableHead className="w-[140px] border-r text-center text-[10px] font-bold">
+                        PAGU
+                      </TableHead>
+                    </Fragment>
+                  ))}
+                </TableRow>
+              </TableHeader>
+            }
           />
         </div>
       </div>

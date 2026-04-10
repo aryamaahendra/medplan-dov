@@ -1,29 +1,20 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal, Pencil, Trash } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 
+import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import type {
   PlanningActivityVersion,
   PlanningVersion,
 } from '@/types/planning-version';
-
 import { YearlyDataCell } from './yearly-data-cell';
 
 const typeIndentation: Record<PlanningActivityVersion['type'], string> = {
-  program: 'pl-0 font-bold bg-muted/30',
-  activity: 'pl-6 font-semibold',
-  sub_activity: 'pl-12 font-medium',
-  output: 'pl-16 text-muted-foreground',
+  program: '',
+  activity: '',
+  sub_activity: '',
+  output: '',
 };
 
 const typeLabels: Record<PlanningActivityVersion['type'], string> = {
@@ -35,7 +26,6 @@ const typeLabels: Record<PlanningActivityVersion['type'], string> = {
 
 export const getColumns = (
   version: PlanningVersion,
-  activities: PlanningActivityVersion[],
   onEdit: (activity: PlanningActivityVersion) => void,
   onDelete: (activity: PlanningActivityVersion) => void,
 ): ColumnDef<PlanningActivityVersion>[] => {
@@ -49,33 +39,26 @@ export const getColumns = (
         const activity = row.original;
 
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Buka menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => onEdit(activity)}>
-                <Pencil className="mr-2 h-4 w-4" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => onDelete(activity)}
-                className="text-destructive focus:text-destructive"
-              >
-                <Trash className="mr-2 h-4 w-4" />
-                Hapus
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <ActionDropdown
+            actions={[
+              {
+                label: 'Edit',
+                icon: Pencil,
+                onClick: () => onEdit(activity),
+              },
+              'separator',
+              {
+                label: 'Hapus',
+                icon: Trash2,
+                onClick: () => onDelete(activity),
+                variant: 'destructive',
+              },
+            ]}
+          />
         );
       },
       meta: {
-        cellClassName: 'w-[50px] p-0',
+        cellClassName: 'w-[50px] border-r',
       },
     },
     {
@@ -87,7 +70,7 @@ export const getColumns = (
         return (
           <div
             className={cn(
-              'font-mono text-xs whitespace-nowrap',
+              'font-mono whitespace-nowrap',
               typeIndentation[activity.type],
             )}
           >
@@ -99,7 +82,7 @@ export const getColumns = (
         );
       },
       meta: {
-        cellClassName: 'w-[180px] p-0',
+        cellClassName: 'w-px border-r',
       },
     },
     {
@@ -123,54 +106,49 @@ export const getColumns = (
         );
       },
       meta: {
-        cellClassName: 'min-w-[300px] p-0',
+        cellClassName: 'min-w-[300px] border-r',
+      },
+    },
+    {
+      accessorKey: 'indicator_baseline_2024',
+      header: (props) => <DataTableColumnHeader {...props} title="Baseline" />,
+      cell: ({ row }) => {
+        return (
+          <div className="text-sm">
+            {row.original.indicator_baseline_2024 || '-'}
+          </div>
+        );
+      },
+      meta: {
+        cellClassName: 'w-[250px] border-r',
       },
     },
   ];
 
-  const targetColumns: ColumnDef<PlanningActivityVersion>[] = years.map(
-    (year) => ({
-      id: `target-${year}`,
-      header: () => (
-        <div className="text-center text-[10px] font-bold uppercase">
-          {year} Target
-        </div>
-      ),
-      cell: ({ row }) => (
-        <YearlyDataCell
-          activity={row.original}
-          year={year}
-          field="target"
-          activities={activities}
-        />
-      ),
-      meta: {
-        cellClassName: 'w-[120px] px-1',
+  const yearlyColumns: ColumnDef<PlanningActivityVersion>[] = years.flatMap(
+    (year) => [
+      {
+        id: `target-${year}`,
+        header: () => <div className="text-xs uppercase">{year} Target</div>,
+        cell: ({ row }) => (
+          <YearlyDataCell activity={row.original} year={year} field="target" />
+        ),
+        meta: {
+          cellClassName: 'w-[120px] border-r',
+        },
       },
-    }),
+      {
+        id: `budget-${year}`,
+        header: () => <div className="text-xs uppercase">{year} Pagu</div>,
+        cell: ({ row }) => (
+          <YearlyDataCell activity={row.original} year={year} field="budget" />
+        ),
+        meta: {
+          cellClassName: 'w-[140px] border-r',
+        },
+      },
+    ],
   );
 
-  const budgetColumns: ColumnDef<PlanningActivityVersion>[] = years.map(
-    (year) => ({
-      id: `budget-${year}`,
-      header: () => (
-        <div className="text-center text-[10px] font-bold uppercase">
-          {year} Anggaran
-        </div>
-      ),
-      cell: ({ row }) => (
-        <YearlyDataCell
-          activity={row.original}
-          year={year}
-          field="budget"
-          activities={activities}
-        />
-      ),
-      meta: {
-        cellClassName: 'w-[140px] px-1',
-      },
-    }),
-  );
-
-  return [...baseColumns, ...targetColumns, ...budgetColumns];
+  return [...baseColumns, ...yearlyColumns];
 };

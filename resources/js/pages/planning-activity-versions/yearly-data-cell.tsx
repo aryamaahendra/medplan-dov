@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 import PlanningActivityVersionController from '@/actions/App/Http/Controllers/PlanningActivityVersionController';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 import type {
   PlanningActivityVersion,
   PlanningActivityYear,
@@ -13,15 +14,9 @@ interface YearlyDataCellProps {
   activity: PlanningActivityVersion;
   year: number;
   field: 'target' | 'budget';
-  activities: PlanningActivityVersion[];
 }
 
-export function YearlyDataCell({
-  activity,
-  year,
-  field,
-  activities,
-}: YearlyDataCellProps) {
+export function YearlyDataCell({ activity, year, field }: YearlyDataCellProps) {
   const yearlyData = activity.activity_years?.find((y) => y.year === year);
   const initialValue = yearlyData
     ? yearlyData[field]
@@ -30,12 +25,52 @@ export function YearlyDataCell({
       : '';
 
   const [isEditing, setIsEditing] = useState(false);
-  const [value, setValue] = useState(initialValue.toString());
+  const formatBudget = (val: string | number) => {
+    if (!val || val === '0' || val === 0) {
+      return 'Rp 0';
+    }
+
+    let numeric: number;
+
+    if (typeof val === 'number') {
+      numeric = Math.round(val);
+    } else {
+      const cleanValue = val.toString().trim();
+
+      // HEURISTIC: Check if this string looks like it has a decimal part at the end
+      // e.g. "123.00", "1.234,00", "Rp 1.234,00"
+      if (/[.,]\d{2}$/.test(cleanValue)) {
+        // Remove the decimal part (.00 or ,00) before stripping non-digits
+        // to avoid "100.00" becoming "10000"
+        const withoutDecimal = cleanValue.slice(0, -3);
+        numeric = parseInt(withoutDecimal.replace(/[^0-9]/g, '')) || 0;
+      } else {
+        // Standard strip everything except digits
+        numeric = parseInt(cleanValue.replace(/[^0-9]/g, '')) || 0;
+      }
+    }
+
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      maximumFractionDigits: 0,
+    }).format(numeric);
+  };
+
+  const [value, setValue] = useState(
+    field === 'budget' ? formatBudget(initialValue) : initialValue.toString(),
+  );
+  const [prevInitialValue, setPrevInitialValue] = useState(initialValue);
+  const [prevField, setPrevField] = useState(field);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    setValue(initialValue.toString());
-  }, [initialValue]);
+  if (initialValue !== prevInitialValue || field !== prevField) {
+    setPrevInitialValue(initialValue);
+    setPrevField(field);
+    setValue(
+      field === 'budget' ? formatBudget(initialValue) : initialValue.toString(),
+    );
+  }
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -52,37 +87,38 @@ export function YearlyDataCell({
     }
 
     const numericValue =
-      field === 'budget'
-        ? parseFloat(value.replace(/[^0-9.]/g, '')) || 0
-        : value;
+      field === 'budget' ? parseInt(value.replace(/[^0-9]/g, '')) || 0 : value;
 
     router
-      .optimistic(() => ({
-        activities: activities.map((a) => {
-          if (a.id !== activity.id) {
-            return a;
-          }
+      .optimistic((props: any) => ({
+        activities: {
+          ...props.activities,
+          data: props.activities.data.map((a: PlanningActivityVersion) => {
+            if (a.id !== activity.id) {
+              return a;
+            }
 
-          const existingYears = a.activity_years ?? [];
-          const yearExists = existingYears.some((y) => y.year === year);
+            const existingYears = a.activity_years ?? [];
+            const yearExists = existingYears.some((y) => y.year === year);
 
-          const newYears = yearExists
-            ? existingYears.map((y) =>
-                y.year === year ? { ...y, [field]: numericValue } : y,
-              )
-            : [
-                ...existingYears,
-                {
-                  id: 0,
-                  planning_activity_version_id: activity.id,
-                  year,
-                  target: field === 'target' ? value : '',
-                  budget: field === 'budget' ? numericValue : 0,
-                } as PlanningActivityYear,
-              ];
+            const newYears = yearExists
+              ? existingYears.map((y) =>
+                  y.year === year ? { ...y, [field]: numericValue } : y,
+                )
+              : [
+                  ...existingYears,
+                  {
+                    id: 0,
+                    planning_activity_version_id: activity.id,
+                    year,
+                    target: field === 'target' ? value : '',
+                    budget: field === 'budget' ? numericValue : 0,
+                  } as PlanningActivityYear,
+                ];
 
-          return { ...a, activity_years: newYears };
-        }),
+            return { ...a, activity_years: newYears };
+          }),
+        },
       }))
       .post(
         PlanningActivityVersionController.updateYearlyData.url({
@@ -96,13 +132,20 @@ export function YearlyDataCell({
         {
           onSuccess: () => {
             setIsEditing(false);
+            toast.success('Data berhasil diperbarui');
           },
           onError: (errors) => {
             setIsEditing(false);
-            setValue(initialValue.toString());
+            setValue(
+              field === 'budget'
+                ? formatBudget(initialValue)
+                : initialValue.toString(),
+            );
             const firstError = Object.values(errors)[0];
             toast.error(firstError || 'Gagal memperbarui data');
           },
+          preserveScroll: true,
+          showProgress: false,
         },
       );
   };
@@ -112,7 +155,11 @@ export function YearlyDataCell({
       handleUpdate();
     } else if (e.key === 'Escape') {
       setIsEditing(false);
-      setValue(initialValue.toString());
+      setValue(
+        field === 'budget'
+          ? formatBudget(initialValue)
+          : initialValue.toString(),
+      );
     }
   };
 
@@ -130,28 +177,32 @@ export function YearlyDataCell({
       <Input
         ref={inputRef}
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e) => {
+          if (field === 'budget') {
+            setValue(formatBudget(e.target.value));
+          } else {
+            setValue(e.target.value);
+          }
+        }}
         onBlur={handleUpdate}
         onKeyDown={handleKeyDown}
-        className="h-8 w-full text-xs"
-        type={field === 'budget' ? 'text' : 'text'}
+        className={cn('h-8 w-full', {
+          'min-w-20!': field !== 'budget',
+          'min-w-40!': field === 'budget',
+        })}
+        type="text"
       />
     );
   }
 
-  const displayValue =
-    field === 'budget'
-      ? new Intl.NumberFormat('id-ID', {
-          style: 'currency',
-          currency: 'IDR',
-          maximumFractionDigits: 0,
-        }).format(parseFloat(value) || 0)
-      : value || '-';
+  console.log(`${initialValue} ${value}`);
+
+  const displayValue = field === 'budget' ? value || 'Rp 0' : value || '-';
 
   return (
     <div
       onClick={() => setIsEditing(true)}
-      className="min-h-[24px] cursor-pointer rounded p-1 text-xs transition-colors hover:bg-muted/50"
+      className="min-h-[24px] cursor-pointer rounded font-mono transition-colors hover:bg-muted/50"
     >
       {displayValue}
     </div>

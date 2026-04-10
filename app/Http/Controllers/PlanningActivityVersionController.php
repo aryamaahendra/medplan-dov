@@ -27,10 +27,16 @@ class PlanningActivityVersionController extends Controller
      */
     public function index(PlanningVersion $planningVersion, Request $request): Response
     {
+        $query = PlanningActivityVersion::query()
+            ->where('planning_version_id', $planningVersion->id)
+            ->with(['activityYears', 'parent']);
+
+        if (! $request->has('sort')) {
+            $query->orderBy('code', 'asc');
+        }
+
         $activities = $this->applyDataTable(
-            PlanningActivityVersion::query()
-                ->where('planning_version_id', $planningVersion->id)
-                ->with(['activityYears', 'parent']),
+            $query,
             $request,
             self::SEARCH_COLUMNS,
             self::SORTABLE_COLUMNS,

@@ -39,6 +39,7 @@ interface DataTableProps<TData, TValue> {
   toolbarPosition?: 'beside-search' | 'between-search-and-table';
   view?: 'table' | 'grid';
   renderGrid?: (rows: TData[]) => React.ReactNode;
+  customThead?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
@@ -56,6 +57,7 @@ export function DataTable<TData, TValue>({
   toolbarPosition = 'beside-search',
   view = 'table',
   renderGrid,
+  customThead,
 }: DataTableProps<TData, TValue>) {
   // Local UI state
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
@@ -102,24 +104,28 @@ export function DataTable<TData, TValue>({
       {view === 'table' ? (
         <div className="rounded-md border">
           <Table className="text-sm">
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className="whitespace-nowrap">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, {
-                            ...header.getContext(),
-                            onSort,
-                            currentSort: filters.sort,
-                            currentDirection: filters.direction,
-                          })}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHeader>
+            {customThead ? (
+              customThead
+            ) : (
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id} className="whitespace-nowrap">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, {
+                              ...header.getContext(),
+                              onSort,
+                              currentSort: filters.sort,
+                              currentDirection: filters.direction,
+                            })}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+            )}
             <TableBody>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (

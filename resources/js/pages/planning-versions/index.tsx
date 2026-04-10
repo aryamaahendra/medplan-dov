@@ -1,9 +1,10 @@
 import { Head, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import PlanningVersionController from '@/actions/App/Http/Controllers/PlanningVersionController';
+import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
 import { useDataTable } from '@/hooks/use-data-table';
@@ -36,72 +37,106 @@ export default function PlanningVersionsIndex({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedVersion, setSelectedVersion] =
     useState<PlanningVersion | null>(null);
+  const [confirmConfig, setConfirmConfig] = useState<{
+    open: boolean;
+    title: string;
+    description: string;
+    onConfirm: () => void;
+    confirmText?: string;
+    variant?: 'default' | 'destructive';
+  }>({
+    open: false,
+    title: '',
+    description: '',
+    onConfirm: () => {},
+  });
 
   const { onSearch, onSort, onReset, onPageChange, onPerPageChange } =
     useDataTable({
       only: ['versions', 'filters'],
     });
 
-  const onEdit = (version: PlanningVersion) => {
+  const closeConfirm = () =>
+    setConfirmConfig((prev) => ({ ...prev, open: false }));
+
+  const onEdit = useCallback((version: PlanningVersion) => {
     setSelectedVersion(version);
     setDialogOpen(true);
-  };
+  }, []);
 
-  const handleCreateRevision = (version: PlanningVersion) => {
-    if (
-      confirm(`Apakah Anda yakin ingin membuat revisi dari "${version.name}"?`)
-    ) {
-      router.post(
-        PlanningVersionController.createRevision.url({
-          planning_version: version.id,
-        }),
-        {},
-        {
-          onSuccess: () => toast.success('Revisi berhasil dibuat'),
-        },
-      );
-    }
-  };
+  const handleCreateRevision = useCallback((version: PlanningVersion) => {
+    setConfirmConfig({
+      open: true,
+      title: 'Buat Revisi',
+      description: `Apakah Anda yakin ingin membuat revisi dari "${version.name}"?`,
+      confirmText: 'Buat Revisi',
+      onConfirm: () => {
+        router.post(
+          PlanningVersionController.createRevision.url({
+            planning_version: version.id,
+          }),
+          {},
+          {
+            onSuccess: () => {
+              toast.success('Revisi berhasil dibuat');
+              closeConfirm();
+            },
+          },
+        );
+      },
+    });
+  }, []);
 
-  const handleSetCurrent = (version: PlanningVersion) => {
-    if (
-      confirm(
-        `Jadikan "${version.name}" sebagai versi utama untuk tahun ${version.fiscal_year}?`,
-      )
-    ) {
-      router.post(
-        PlanningVersionController.setCurrent.url({
-          planning_version: version.id,
-        }),
-        {},
-        {
-          onSuccess: () => toast.success('Versi utama diperbarui'),
-        },
-      );
-    }
-  };
+  const handleSetCurrent = useCallback((version: PlanningVersion) => {
+    setConfirmConfig({
+      open: true,
+      title: 'Jadikan Versi Utama',
+      description: `Jadikan "${version.name}" sebagai versi utama untuk tahun ${version.fiscal_year}?`,
+      confirmText: 'Jadikan Utama',
+      onConfirm: () => {
+        router.post(
+          PlanningVersionController.setCurrent.url({
+            planning_version: version.id,
+          }),
+          {},
+          {
+            onSuccess: () => {
+              toast.success('Versi utama diperbarui');
+              closeConfirm();
+            },
+          },
+        );
+      },
+    });
+  }, []);
 
-  const handleDelete = (version: PlanningVersion) => {
-    if (
-      confirm(
-        `Apakah Anda yakin ingin menghapus versi "${version.name}"? Semua snapshot data dalam versi ini akan ikut terhapus.`,
-      )
-    ) {
-      router.delete(
-        PlanningVersionController.destroy.url({
-          planning_version: version.id,
-        }),
-        {
-          onSuccess: () => toast.success('Versi berhasil dihapus'),
-        },
-      );
-    }
-  };
+  const handleDelete = useCallback((version: PlanningVersion) => {
+    setConfirmConfig({
+      open: true,
+      title: 'Hapus Versi',
+      description: `Apakah Anda yakin ingin menghapus versi "${version.name}"? Semua snapshot data dalam versi ini akan ikut terhapus.`,
+      confirmText: 'Hapus Versi',
+      variant: 'destructive',
+      onConfirm: () => {
+        router.delete(
+          PlanningVersionController.destroy.url({
+            planning_version: version.id,
+          }),
+          {
+            onSuccess: () => {
+              toast.success('Versi berhasil dihapus');
+              closeConfirm();
+            },
+          },
+        );
+      },
+    });
+  }, []);
 
   const columns = useMemo(
     () =>
       getColumns(onEdit, handleCreateRevision, handleSetCurrent, handleDelete),
-    [],
+    [onEdit, handleCreateRevision, handleSetCurrent, handleDelete],
   );
 
   return (
@@ -146,6 +181,14 @@ export default function PlanningVersionsIndex({
           version={selectedVersion}
           open={dialogOpen}
           onOpenChange={setDialogOpen}
+        />
+
+        <ConfirmDialog
+          {...confirmConfig}
+          onOpenChange={(open) =>
+            setConfirmConfig((prev) => ({ ...prev, open }))
+          }
+          cancelText="Batal"
         />
       </div>
     </>

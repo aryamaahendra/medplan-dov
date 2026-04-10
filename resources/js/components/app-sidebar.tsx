@@ -10,6 +10,7 @@ import {
   Database,
   Pin,
   ListChecks,
+  Network,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
@@ -30,6 +31,7 @@ import needGroups from '@/routes/need-groups';
 import needTypes from '@/routes/need-types';
 import needs from '@/routes/needs';
 import organizationalUnits from '@/routes/organizational-units';
+import planningActivities from '@/routes/planning-activities';
 import renstras from '@/routes/renstras';
 import strategicServicePlans from '@/routes/strategic-service-plans';
 import users from '@/routes/users';
@@ -78,6 +80,11 @@ const masterNavItems: NavItem[] = [
     title: 'Bank Pertanyaan Checklist',
     href: checklistQuestions.index.url(),
     icon: ClipboardList,
+  },
+  {
+    title: 'Nomenklatur Perencanaan',
+    href: planningActivities.index.url(),
+    icon: Network,
   },
 ];
 

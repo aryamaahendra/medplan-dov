@@ -1,0 +1,18 @@
+export type PlanningActivityType =
+  | 'program'
+  | 'activity'
+  | 'sub_activity'
+  | 'output';
+
+export interface PlanningActivity {
+  id: number;
+  code: string | null;
+  name: string;
+  parent_id: number | null;
+  type: PlanningActivityType;
+  full_code: string | null;
+  parent?: PlanningActivity;
+  children?: PlanningActivity[];
+  created_at: string;
+  updated_at: string;
+}

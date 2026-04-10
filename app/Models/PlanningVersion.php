@@ -34,9 +34,4 @@ class PlanningVersion extends Model
     {
         return $this->hasMany(PlanningActivityVersion::class);
     }
-
-    public function revisionGroups(): HasMany
-    {
-        return $this->hasMany(PlanningRevisionGroup::class);
-    }
 }

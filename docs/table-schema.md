@@ -26,9 +26,7 @@ This document provides a comprehensive overview of the database tables and their
     - [kpi_annual_targets](#kpi_annual_targets)
     - [kpi_indicator_need](#kpi_indicator_need)
 - [Planning Hierarchy Tables](#planning-hierarchy-tables)
-    - [planning_activities](#planning_activities)
     - [planning_versions](#planning_versions)
-    - [planning_revision_groups](#planning_revision_groups)
     - [planning_activity_versions](#planning_activity_versions)
     - [planning_activity_years](#planning_activity_years)
 - [Checklist Management Tables](#checklist-management-tables)
@@ -96,8 +94,8 @@ Stores the actual requests or needs from organizational units.
 | :--- | :--- | :---: | :--- |
 | id | bigint | No | Primary Key |
 | need_group_id | bigint | No | Foreign Key (need_groups), cascadeOnDelete |
-| organizational_unit_id | bigint | No | Foreign Key (organizational_units) |
-| need_type_id | bigint | No | Foreign Key (need_types) |
+| organizational_unit_id | bigint | No | Foreign Key (organizational_units), cascadeOnDelete |
+| need_type_id | bigint | No | Foreign Key (need_types), cascadeOnDelete |
 | year | unsignedSmallInteger | No | |
 | title | string | No | |
 | description | text | Yes | |
@@ -311,21 +309,6 @@ Pivot table connecting KPI indicators and needs.
 
 ## Planning Hierarchy Tables
 
-### `planning_activities`
-
-Stores the hierarchical structure of programs, activities, sub-activities, and outputs.
-
-| Column | Type | Nullable | Extra |
-| :--- | :--- | :---: | :--- |
-| id | bigint | No | Primary Key |
-| code | string | Yes | Index |
-| name | text | No | |
-| parent_id | bigint | Yes | Foreign Key (planning_activities), cascadeOnDelete |
-| type | enum | No | 'program', 'activity', 'sub_activity', 'output' |
-| full_code | string | Yes | |
-| created_at | timestamp | Yes | |
-| updated_at | timestamp | Yes | |
-
 ### `planning_versions`
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
@@ -333,21 +316,9 @@ Stores the hierarchical structure of programs, activities, sub-activities, and o
 | name | string | No | |
 | fiscal_year | integer | No | |
 | revision_no | integer | No | |
-| status | enum | No | 'draft', 'submitted', 'approved', 'archived' |
+| status | enum | No | 'draft', 'submitted', 'approved', 'archived', Default: 'draft' |
 | is_current | boolean | No | Default: false |
 | notes | text | Yes | |
-| created_at | timestamp | Yes | |
-| updated_at | timestamp | Yes | |
-
-### `planning_revision_groups`
-| Column | Type | Nullable | Extra |
-| :--- | :--- | :---: | :--- |
-| id | bigint | No | Primary Key |
-| planning_version_id | bigint | No | Foreign Key (planning_versions), cascadeOnDelete |
-| code | string | No | Index |
-| name | string | No | |
-| description | text | Yes | |
-| parent_group_id | bigint | Yes | Foreign Key (self), nullOnDelete |
 | created_at | timestamp | Yes | |
 | updated_at | timestamp | Yes | |
 
@@ -356,8 +327,6 @@ Stores the hierarchical structure of programs, activities, sub-activities, and o
 | :--- | :--- | :---: | :--- |
 | id | bigint | No | Primary Key |
 | planning_version_id | bigint | No | Foreign Key (planning_versions), cascadeOnDelete |
-| revision_group_id | bigint | Yes | Foreign Key (planning_revision_groups), nullOnDelete |
-| source_activity_id | bigint | Yes | Foreign Key (planning_activities), nullOnDelete |
 | parent_id | bigint | Yes | Foreign Key (self), nullOnDelete |
 | code | string | Yes | Index |
 | name | text | No | |
@@ -376,7 +345,7 @@ Stores the hierarchical structure of programs, activities, sub-activities, and o
 | :--- | :--- | :---: | :--- |
 | id | bigint | No | Primary Key |
 | planning_activity_version_id | bigint | No | Foreign Key (planning_activity_versions), cascadeOnDelete |
-| year | integer | No | |
+| year | integer | No | Unique per activity |
 | target | string | No | |
 | budget | decimal(20,2) | No | |
 | created_at | timestamp | Yes | |

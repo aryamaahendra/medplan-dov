@@ -61,8 +61,8 @@ export function ActivityVersionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto pb-0 sm:max-w-[525px]">
-        <DialogHeader>
+      <DialogContent className="px-0 pb-0 sm:max-w-[525px]">
+        <DialogHeader className="px-4">
           <DialogTitle>
             {isEditing
               ? 'Edit Aktivitas Snapshot'
@@ -90,7 +90,7 @@ export function ActivityVersionDialog({
               isEditing ? 'Aktivitas diperbarui!' : 'Aktivitas dibuat!',
             );
           }}
-          className="space-y-4"
+          className="no-scrollbar max-h-[calc(100vh-12rem)] space-y-4 overflow-y-auto px-4"
         >
           {({ processing, errors }) => (
             <>
@@ -215,7 +215,7 @@ export function ActivityVersionDialog({
                 </div>
               </div>
 
-              <DialogFooter className="sticky bottom-0 bg-background pt-2 pb-4">
+              <DialogFooter>
                 <Button
                   type="button"
                   variant="outline"

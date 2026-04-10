@@ -11,7 +11,6 @@ When a user wants to create a new revision (e.g., shifting from "Original" to "R
 2. Fetch all `PlanningActivityVersion` records from the previous version.
 3. For each record:
     - Create a new `PlanningActivityVersion` linked to the new `PlanningVersion`.
-    - Link it to the same `source_activity_id`.
     - Copy all metadata fields (`code`, `name`, `indicator_name`, etc.).
     - Fetch all `PlanningActivityYear` records for that item and create copies linked to the new versioned activity.
 
@@ -95,5 +94,4 @@ $activities = PlanningActivityVersion::where('planning_version_id', $version->id
 
 ## 4. Best Practices
 - **Immutability**: Once a version is 'approved', it should ideally be locked (read-only).
-- **Revision Groups**: Use `PlanningRevisionGroup` to track *why* a set of changes happened (e.g., "Adjusted for Inflation April 2026").
 - **Cascading**: Always use transactions when creating revisions to prevent partial snapshots.

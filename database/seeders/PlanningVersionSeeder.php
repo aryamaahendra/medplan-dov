@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\PlanningActivityVersion;
 use App\Models\PlanningActivityYear;
-use App\Models\PlanningRevisionGroup;
 use App\Models\PlanningVersion;
 use Illuminate\Database\Seeder;
 
@@ -25,14 +24,7 @@ class PlanningVersionSeeder extends Seeder
             'notes' => 'Original planning version',
         ]);
 
-        // 2. Create a Revision Group
-        $group = PlanningRevisionGroup::create([
-            'planning_version_id' => $version->id,
-            'code' => 'ORG-2026',
-            'name' => 'Original Setting',
-        ]);
-
-        // 3. Create initial activities directly in this Version
+        // 2. Create initial activities directly in this Version
         $activities = [
             ['code' => '1', 'name' => 'Peningkatan Pelayanan Kesehatan', 'type' => 'program'],
             ['code' => '1.01', 'name' => 'Pengadaan Alat Kesehatan', 'type' => 'activity'],
@@ -55,7 +47,6 @@ class PlanningVersionSeeder extends Seeder
 
             $versionedActivity = PlanningActivityVersion::create([
                 'planning_version_id' => $version->id,
-                'revision_group_id' => $group->id,
                 'parent_id' => $parentCode ? ($idMapping[$parentCode] ?? null) : null,
                 'code' => $data['code'],
                 'name' => $data['name'],
@@ -69,7 +60,7 @@ class PlanningVersionSeeder extends Seeder
 
             $idMapping[$data['code']] = $versionedActivity->id;
 
-            // 4. Create Dynamic Year Rows (2026-2030)
+            // 3. Create Dynamic Year Rows (2026-2030)
             for ($year = 2026; $year <= 2030; $year++) {
                 PlanningActivityYear::create([
                     'planning_activity_version_id' => $versionedActivity->id,

@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers\Planning;
 
+use App\Exports\PlanningHierarchyExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Planning\StorePlanningActivityVersionRequest;
 use App\Http\Requests\Planning\UpdatePlanningActivityVersionRequest;
+use App\Imports\PlanningImport;
 use App\Models\PlanningActivityIndicator;
 use App\Models\PlanningActivityVersion;
 use App\Models\PlanningVersion;
 use App\Traits\HasDataTable;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PlanningActivityVersionController extends Controller
 {
@@ -33,7 +37,7 @@ class PlanningActivityVersionController extends Controller
             ->with(['activityYears', 'indicators.activityYears', 'parent']);
 
         if (! $request->has('sort')) {
-            $query->orderBy('code', 'asc');
+            $query->orderBy('sort_order', 'asc')->orderBy('code', 'asc');
         }
 
         $activities = $this->applyDataTable(
@@ -224,5 +228,47 @@ class PlanningActivityVersionController extends Controller
 
         return redirect()->back()
             ->with('success', "Data tahun {$request->year} berhasil diperbarui.");
+    }
+
+    /**
+     * Export planning activities to Excel.
+     */
+    public function export(PlanningVersion $planningVersion)
+    {
+        $fileName = 'Perencanaan_'.str_replace(' ', '_', $planningVersion->name).'_'.date('Ymd_His').'.xlsx';
+
+        return Excel::download(
+            new PlanningHierarchyExport($planningVersion->id),
+            $fileName
+        );
+    }
+
+    /**
+     * Import planning activities from Excel.
+     */
+    public function import(Request $request, PlanningVersion $planningVersion)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls,ods'],
+            'start_cell' => ['required', 'string'],
+            'end_cell' => ['required', 'string'],
+        ]);
+
+        try {
+            Excel::import(
+                new PlanningImport(
+                    $planningVersion->id,
+                    $request->start_cell,
+                    $request->end_cell
+                ),
+                $request->file('file')
+            );
+        } catch (ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors());
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['file' => 'Gagal mengimpor file: '.$e->getMessage()]);
+        }
+
+        return redirect()->back()->with('success', 'Data aktivitas perencanaan berhasil diimpor.');
     }
 }

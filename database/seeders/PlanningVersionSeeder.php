@@ -36,7 +36,7 @@ class PlanningVersionSeeder extends Seeder
 
         $idMapping = [];
 
-        foreach ($activities as $data) {
+        foreach ($activities as $index => $data) {
             $parentCode = null;
             if ($data['type'] === 'activity') {
                 $parentCode = '1';
@@ -54,7 +54,7 @@ class PlanningVersionSeeder extends Seeder
                 'type' => $data['type'],
                 'full_code' => $data['code'],
                 'perangkat_daerah' => 'Dinas Kesehatan',
-                'sort_order' => count($idMapping) + 1,
+                'sort_order' => $index,
             ]);
 
             $idMapping[$data['code']] = $versionedActivity->id;

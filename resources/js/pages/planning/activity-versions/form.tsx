@@ -203,6 +203,18 @@ export function ActivityVersionForm({
                   )}
                   <InputError message={errors.code} />
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="sort_order">Urutan (Sort Order)</Label>
+                  <Input
+                    id="sort_order"
+                    name="sort_order"
+                    type="number"
+                    defaultValue={activity?.sort_order ?? 0}
+                    placeholder="0"
+                  />
+                  <InputError message={errors.sort_order} />
+                </div>
               </div>
 
               <div className="grid gap-2">

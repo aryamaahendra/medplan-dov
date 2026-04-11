@@ -54,6 +54,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('planning-versions/{planning_version}/set-current', [PlanningVersionController::class, 'setCurrent'])->name('planning-versions.set-current');
 
     Route::get('planning-versions/{planning_version}/activities', [PlanningActivityVersionController::class, 'index'])->name('planning-versions.activities.index');
+    Route::post('planning-versions/{planning_version}/activities/import', [PlanningActivityVersionController::class, 'import'])->name('planning-versions.activities.import');
+    Route::get('planning-versions/{planning_version}/activities/export', [PlanningActivityVersionController::class, 'export'])->name('planning-versions.activities.export');
     Route::get('planning-versions/{planning_version}/activities/create', [PlanningActivityVersionController::class, 'create'])->name('planning-versions.activities.create');
     Route::post('planning-versions/{planning_version}/activities', [PlanningActivityVersionController::class, 'store'])->name('planning-versions.activities.store');
     Route::get('planning-versions/activities/{planning_activity_version}/edit', [PlanningActivityVersionController::class, 'edit'])->name('planning-versions.activities.edit');

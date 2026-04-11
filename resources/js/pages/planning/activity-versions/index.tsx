@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { Download, Plus } from 'lucide-react';
 import { Fragment, useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -27,6 +27,7 @@ import type {
 } from '@/types/planning-version';
 
 import { getColumns } from './columns';
+import { ActivityImportDialog } from './import-dialog';
 
 interface PaginatedActivities {
   data: PlanningActivityVersion[];
@@ -112,14 +113,25 @@ export default function PlanningActivityVersionsIndex({
             </div>
           </div>
 
-          <Button asChild>
-            <Link
-              href={PlanningActivityVersionController.create.url(version.id)}
-            >
-              <Plus className="mr-2" />
-              Tambah Aktivitas
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" asChild>
+              <a
+                href={PlanningActivityVersionController.export.url(version.id)}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Export
+              </a>
+            </Button>
+            <ActivityImportDialog version={version} />
+            <Button asChild>
+              <Link
+                href={PlanningActivityVersionController.create.url(version.id)}
+              >
+                <Plus className="mr-2" />
+                Tambah Aktivitas
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <div className="mt-6">

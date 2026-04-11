@@ -246,7 +246,7 @@ export function YearlyDataCell({
   return (
     <div
       onClick={() => setIsEditing(true)}
-      className="min-h-[24px] cursor-pointer rounded font-mono transition-colors hover:bg-muted/50"
+      className="cursor-pointer rounded font-mono transition-colors hover:bg-muted/50"
     >
       {displayValue}
     </div>

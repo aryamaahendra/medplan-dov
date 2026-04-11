@@ -135,13 +135,24 @@ export function DataTable<TData, TValue>({
                   >
                     {row.getVisibleCells().map((cell) => {
                       const cellMeta = cell.column.columnDef.meta;
+                      // @ts-expect-error - colSpan is a custom meta property
+                      const colSpan = cellMeta?.colSpan?.(row, table);
+
+                      if (colSpan === 0) {
+                        return null;
+                      }
+
                       const cellClassName =
                         typeof cellMeta?.cellClassName === 'function'
                           ? cellMeta.cellClassName(row)
                           : cellMeta?.cellClassName;
 
                       return (
-                        <TableCell key={cell.id} className={cn(cellClassName)}>
+                        <TableCell
+                          key={cell.id}
+                          className={cn(cellClassName)}
+                          colSpan={colSpan}
+                        >
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext(),

@@ -43,6 +43,24 @@ class PlanningActivityVersionController extends Controller
             50 // Higher default for snapshots
         );
 
+        $flattened = $activities->getCollection()->flatMap(function ($activity) {
+            if ($activity->indicators->isEmpty()) {
+                $activity->specific_indicator = null;
+
+                return [$activity];
+            }
+
+            return $activity->indicators->map(function ($indicator) use ($activity) {
+                $row = clone $activity;
+                $row->setRelation('indicators', $activity->indicators); // Keep relation if needed
+                $row->specific_indicator = $indicator;
+
+                return $row;
+            });
+        });
+
+        $activities->setCollection($flattened);
+
         return Inertia::render('planning-activity-versions/index', [
             'version' => $planningVersion,
             'activities' => $activities,

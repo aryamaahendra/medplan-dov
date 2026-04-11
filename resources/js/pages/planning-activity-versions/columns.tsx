@@ -3,19 +3,11 @@ import { Pencil, Trash2 } from 'lucide-react';
 
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
-import { cn } from '@/lib/utils';
 import type {
   PlanningActivityVersion,
   PlanningVersion,
 } from '@/types/planning-version';
 import { YearlyDataCell } from './yearly-data-cell';
-
-const typeIndentation: Record<PlanningActivityVersion['type'], string> = {
-  program: '',
-  activity: '',
-  sub_activity: '',
-  output: '',
-};
 
 const typeLabels: Record<PlanningActivityVersion['type'], string> = {
   program: 'P',
@@ -58,31 +50,43 @@ export const getColumns = (
         );
       },
       meta: {
-        cellClassName: 'w-[50px] border-r',
+        cellClassName: 'w-px border-r',
       },
     },
     {
       accessorKey: 'code',
       header: (props) => <DataTableColumnHeader {...props} title="Kode" />,
-      cell: ({ row }) => {
+      cell: ({ row, table }) => {
         const activity = row.original;
+        const index = row.index;
+        const rows = table.getRowModel().rows;
+        const isDuplicate =
+          index > 0 && rows[index - 1].original.id === activity.id;
+
+        if (isDuplicate) {
+          return null;
+        }
 
         return (
-          <div
-            className={cn(
-              'font-mono whitespace-nowrap',
-              typeIndentation[activity.type],
-            )}
-          >
-            <span className="mr-2 opacity-50">
+          <p className="font-mono whitespace-nowrap">
+            <span className="text-muted-foreground">
               [{typeLabels[activity.type]}]
-            </span>
+            </span>{' '}
             {activity.code}
-          </div>
+          </p>
         );
       },
       meta: {
         cellClassName: 'w-px border-r',
+        colSpan: (row, table) => {
+          const index = row.index;
+          // @ts-expect-error - getRowModel is available on table
+          const rows = table.getRowModel().rows;
+          const isDuplicate =
+            index > 0 && rows[index - 1].original.id === row.original.id;
+
+          return isDuplicate ? 2 : 1;
+        },
       },
     },
     {
@@ -90,23 +94,30 @@ export const getColumns = (
       header: (props) => (
         <DataTableColumnHeader {...props} title="Nomenklatur" />
       ),
-      cell: ({ row }) => {
+      cell: ({ row, table }) => {
         const activity = row.original;
+        const index = row.index;
+        const rows = table.getRowModel().rows;
+        const isDuplicate =
+          index > 0 && rows[index - 1].original.id === activity.id;
 
-        return (
-          <div
-            className={cn(
-              'py-1 text-sm',
-              typeIndentation[activity.type],
-              'pl-2',
-            )}
-          >
-            {activity.name}
-          </div>
-        );
+        if (isDuplicate) {
+          return null;
+        }
+
+        return <p className="whitespace-normal">{activity.name}</p>;
       },
       meta: {
-        cellClassName: 'min-w-[300px] border-r align-top',
+        cellClassName: 'min-w-[300px] border-r',
+        colSpan: (row, table) => {
+          const index = row.index;
+          // @ts-expect-error - getRowModel is available on table
+          const rows = table.getRowModel().rows;
+          const isDuplicate =
+            index > 0 && rows[index - 1].original.id === row.original.id;
+
+          return isDuplicate ? 0 : 1;
+        },
       },
     },
     {
@@ -114,22 +125,16 @@ export const getColumns = (
       header: (props) => <DataTableColumnHeader {...props} title="Indikator" />,
       cell: ({ row }) => {
         const activity = row.original;
+        const ind = activity.specific_indicator;
 
-        return (
-          <div className="flex flex-col gap-2 py-1 text-sm">
-            {activity.indicators?.map((ind) => (
-              <div key={ind.id} className="flex min-h-10 items-center">
-                {ind.name}
-              </div>
-            ))}
-            {(!activity.indicators || activity.indicators.length === 0) && (
-              <div className="text-muted-foreground italic">-</div>
-            )}
-          </div>
-        );
+        if (!ind) {
+          return <p className="text-muted-foreground italic">-</p>;
+        }
+
+        return <p className="w-xs whitespace-normal">{ind.name}</p>;
       },
       meta: {
-        cellClassName: 'w-[200px] border-r align-top',
+        cellClassName: 'border-r',
       },
     },
     {
@@ -142,24 +147,21 @@ export const getColumns = (
       ),
       cell: ({ row }) => {
         const activity = row.original;
+        const ind = activity.specific_indicator;
+
+        if (!ind) {
+          return null;
+        }
 
         return (
-          <div className="flex flex-col gap-2 py-1 text-sm">
-            {activity.indicators?.map((ind) => (
-              <div key={ind.id} className="flex min-h-10 items-center">
-                {ind.baseline || '-'}
-                {ind.unit && (
-                  <span className="ml-1 text-xs text-muted-foreground">
-                    {ind.unit}
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
+          <p className="">
+            {ind.baseline || '-'}
+            {ind.unit && <span>{ind.unit}</span>}
+          </p>
         );
       },
       meta: {
-        cellClassName: 'w-[150px] border-r align-top',
+        cellClassName: 'w-[150px] border-r',
       },
     },
   ];
@@ -171,39 +173,39 @@ export const getColumns = (
         header: () => <div className="text-xs uppercase">{year} Target</div>,
         cell: ({ row }) => {
           const activity = row.original;
+          const ind = activity.specific_indicator;
+
+          if (!ind) {
+            return (
+              <div>
+                <YearlyDataCell
+                  activityId={activity.id}
+                  yearableId={0}
+                  yearableType="indicator"
+                  items={[]}
+                  year={year}
+                  field="target"
+                  disabled={true}
+                />
+              </div>
+            );
+          }
 
           return (
-            <div className="flex flex-col gap-2 py-1">
-              {activity.indicators?.map((ind) => (
-                <div key={ind.id} className="min-h-10">
-                  <YearlyDataCell
-                    activityId={activity.id}
-                    yearableId={ind.id}
-                    yearableType="indicator"
-                    items={ind.activity_years ?? []}
-                    year={year}
-                    field="target"
-                  />
-                </div>
-              ))}
-              {(!activity.indicators || activity.indicators.length === 0) && (
-                <div className="min-h-10">
-                  <YearlyDataCell
-                    activityId={activity.id}
-                    yearableId={0}
-                    yearableType="indicator"
-                    items={[]}
-                    year={year}
-                    field="target"
-                    disabled={true}
-                  />
-                </div>
-              )}
+            <div>
+              <YearlyDataCell
+                activityId={activity.id}
+                yearableId={ind.id}
+                yearableType="indicator"
+                items={ind.activity_years ?? []}
+                year={year}
+                field="target"
+              />
             </div>
           );
         },
         meta: {
-          cellClassName: 'w-[120px] border-r align-top',
+          cellClassName: 'w-[120px] border-r',
         },
       },
       {
@@ -213,7 +215,7 @@ export const getColumns = (
           const activity = row.original;
 
           return (
-            <div className="py-1">
+            <div className="">
               <YearlyDataCell
                 activityId={activity.id}
                 yearableId={activity.id}
@@ -226,7 +228,7 @@ export const getColumns = (
           );
         },
         meta: {
-          cellClassName: 'w-[140px] border-r align-top',
+          cellClassName: 'w-[140px] border-r',
         },
       },
     ],

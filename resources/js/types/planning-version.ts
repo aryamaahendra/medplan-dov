@@ -48,6 +48,7 @@ export interface PlanningActivityVersion {
   sort_order: number;
   activity_years?: PlanningActivityYear[];
   indicators?: PlanningActivityIndicator[];
+  specific_indicator?: PlanningActivityIndicator | null;
   parent?: PlanningActivityVersion;
   created_at: string;
   updated_at: string;

@@ -51,11 +51,12 @@ export function ActionDropdown({
       <DropdownMenuTrigger asChild>
         {trigger || (
           <Button
+            size={'icon-sm'}
             variant={triggerVariant}
-            className={cn('h-8 w-8 p-0', className)}
+            className={cn('', className)}
           >
             <span className="sr-only">Open menu</span>
-            <MoreHorizontal className="h-4 w-4" />
+            <MoreHorizontal />
           </Button>
         )}
       </DropdownMenuTrigger>

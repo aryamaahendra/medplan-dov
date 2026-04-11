@@ -21,7 +21,7 @@ describe('KpiGroupController', function () {
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
-            ->component('kpis/groups/index', false)
+            ->component('kpi/groups/index', false)
             ->has('groups.data', 3)
         );
     });

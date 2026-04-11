@@ -28,7 +28,7 @@ class NeedGroupController extends Controller
             self::SORTABLE_COLUMNS,
         );
 
-        return Inertia::render('need-groups/index', [
+        return Inertia::render('need/groups/index', [
             'needGroups' => $needGroups,
             'filters' => $this->dataTableFilters($request),
         ]);

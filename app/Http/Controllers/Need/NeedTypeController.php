@@ -32,7 +32,7 @@ class NeedTypeController extends Controller
             self::SORTABLE_COLUMNS,
         );
 
-        return Inertia::render('need-types/index', [
+        return Inertia::render('need/types/index', [
             'needTypes' => $needTypes,
             'filters' => $this->dataTableFilters($request),
         ]);

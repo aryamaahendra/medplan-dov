@@ -62,7 +62,7 @@ class PlanningActivityVersionController extends Controller
 
         $activities->setCollection($flattened);
 
-        return Inertia::render('planning-activity-versions/index', [
+        return Inertia::render('planning/activity-versions/index', [
             'version' => $planningVersion,
             'activities' => $activities,
             'filters' => $this->dataTableFilters($request, 50),
@@ -74,7 +74,7 @@ class PlanningActivityVersionController extends Controller
      */
     public function create(PlanningVersion $planningVersion)
     {
-        return Inertia::render('planning-activity-versions/create', [
+        return Inertia::render('planning/activity-versions/create', [
             'version' => $planningVersion,
             'parents' => PlanningActivityVersion::query()
                 ->where('planning_version_id', $planningVersion->id)
@@ -116,7 +116,7 @@ class PlanningActivityVersionController extends Controller
         $planningActivityVersion->load('indicators');
         $version = PlanningVersion::findOrFail($planningActivityVersion->planning_version_id);
 
-        return Inertia::render('planning-activity-versions/edit', [
+        return Inertia::render('planning/activity-versions/edit', [
             'version' => $version,
             'activity' => $planningActivityVersion,
             'parents' => PlanningActivityVersion::query()

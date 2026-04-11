@@ -20,7 +20,7 @@ test('index renders the correct component and props', function () {
         ->get(route('organizational-units.index'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('organizational-units/index')
+            ->component('management/organizational-units/index')
             ->has('units.data', 3)
             ->has('allUnits', 3)
             ->has('filters')

@@ -33,7 +33,7 @@ class RenstraController extends Controller
             self::SORTABLE_COLUMNS,
         );
 
-        return Inertia::render('renstras/index', [
+        return Inertia::render('renstra/renstras/index', [
             'renstras' => $renstras,
             'filters' => $this->dataTableFilters($request),
         ]);
@@ -77,7 +77,7 @@ class RenstraController extends Controller
      */
     public function show(Renstra $renstra): Response
     {
-        return Inertia::render('renstras/show', [
+        return Inertia::render('renstra/renstras/show', [
             'renstra' => $renstra->load('tujuans.indicators.targets', 'tujuans.sasarans.indicators.targets'),
         ]);
     }

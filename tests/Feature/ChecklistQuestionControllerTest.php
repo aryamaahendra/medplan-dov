@@ -18,7 +18,7 @@ it('can list all checklist questions', function () {
     actingAs($this->user)
         ->get(route('checklist-questions.index'))
         ->assertInertia(fn ($page) => $page
-            ->component('checklist-questions/index')
+            ->component('need/checklist-questions/index')
             ->has('questions.data', 2)
             ->where('questions.data.0.order_column', 1)
             ->where('questions.data.1.order_column', 2)

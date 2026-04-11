@@ -56,7 +56,7 @@ test('index renders the correct component and props', function () {
         ->get(route('renstras.index'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('renstras/index')
+            ->component('renstra/renstras/index')
             ->has('renstras.data', 3)
             ->has('filters')
         );
@@ -239,7 +239,7 @@ test('show renders the correct component and props', function () {
         ->get(route('renstras.show', $renstra))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('renstras/show')
+            ->component('renstra/renstras/show')
             ->has('renstra')
             ->where('renstra.id', $renstra->id)
         );

@@ -30,7 +30,7 @@ class UserController extends Controller
             self::SORTABLE_COLUMNS,
         );
 
-        return Inertia::render('users/index', [
+        return Inertia::render('management/users/index', [
             'users' => $users,
             'filters' => $this->dataTableFilters($request),
         ]);

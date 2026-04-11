@@ -33,7 +33,7 @@ class StrategicServicePlanController extends Controller
             self::SORTABLE_COLUMNS,
         );
 
-        return Inertia::render('strategic-service-plans/index', [
+        return Inertia::render('strategic-plan/service-plans/index', [
             'plans' => $plans,
             'filters' => $this->dataTableFilters($request),
         ]);

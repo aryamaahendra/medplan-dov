@@ -17,7 +17,7 @@ test('it can display activities for a version', function () {
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
-        ->component('planning-activity-versions/index')
+        ->component('planning/activity-versions/index')
         ->has('activities.data', 3)
     );
 });

@@ -17,7 +17,7 @@ class NeedGroupChecklistController extends Controller
      */
     public function index(NeedGroup $needGroup): Response
     {
-        return Inertia::render('need-groups/checklists/index', [
+        return Inertia::render('need/groups/checklists/index', [
             'needGroup' => $needGroup,
             'assignedQuestions' => $needGroup->checklistQuestions()
                 ->orderBy('need_group_checklist_question.order_column')

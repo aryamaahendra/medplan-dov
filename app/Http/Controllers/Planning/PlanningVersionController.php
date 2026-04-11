@@ -34,7 +34,7 @@ class PlanningVersionController extends Controller
             self::SORTABLE_COLUMNS,
         );
 
-        return Inertia::render('planning-versions/index', [
+        return Inertia::render('planning/versions/index', [
             'versions' => $versions,
             'filters' => $this->dataTableFilters($request),
         ]);

@@ -13,7 +13,7 @@ describe('GET /users', function () {
         $this->get('/users')
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
-                ->component('users/index')
+                ->component('management/users/index')
                 ->has('users')
                 ->has('filters')
             );

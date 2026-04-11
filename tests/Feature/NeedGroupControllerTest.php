@@ -19,7 +19,7 @@ it('can view need groups index', function () {
 
     $response->assertStatus(200)
         ->assertInertia(fn (Assert $page) => $page
-            ->component('need-groups/index')
+            ->component('need/groups/index')
             ->has('needGroups.data', 3)
         );
 });

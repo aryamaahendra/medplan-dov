@@ -20,7 +20,7 @@ test('index renders the correct component and props', function () {
         ->get(route('need-types.index'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('need-types/index')
+            ->component('need/types/index')
             ->has('needTypes.data', 3)
             ->has('filters')
         );

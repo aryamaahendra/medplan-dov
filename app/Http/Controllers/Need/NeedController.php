@@ -73,7 +73,7 @@ class NeedController extends Controller
             self::SORTABLE_COLUMNS,
         );
 
-        return Inertia::render('needs/index', [
+        return Inertia::render('need/needs/index', [
             'needs' => $needs,
             'currentGroup' => $currentGroup,
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name'])->get(),
@@ -116,7 +116,7 @@ class NeedController extends Controller
         $groupId = $request->input('need_group_id');
         $currentGroup = $groupId ? NeedGroup::findOrFail($groupId) : null;
 
-        return Inertia::render('needs/create', [
+        return Inertia::render('need/needs/create', [
             'currentGroup' => $currentGroup,
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
@@ -140,7 +140,7 @@ class NeedController extends Controller
 
     public function edit(Need $need): Response
     {
-        return Inertia::render('needs/edit', [
+        return Inertia::render('need/needs/edit', [
             'need' => $need->load(['sasarans:id', 'indicators:id', 'kpiIndicators:id', 'strategicServicePlans:id', 'detail']),
             'currentGroup' => $need->needGroup,
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name'])->get(),
@@ -184,7 +184,7 @@ class NeedController extends Controller
 
     public function show(Need $need): Response
     {
-        return Inertia::render('needs/show', [
+        return Inertia::render('need/needs/show', [
             'need' => $need->load([
                 'organizationalUnit:id,name',
                 'needType:id,name',

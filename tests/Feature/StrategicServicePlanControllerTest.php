@@ -21,7 +21,7 @@ describe('StrategicServicePlanController', function () {
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
-            ->component('strategic-service-plans/index')
+            ->component('strategic-plan/service-plans/index')
             ->has('plans.data', 3)
         );
     });

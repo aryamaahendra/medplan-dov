@@ -3,6 +3,7 @@ import { Edit, Plus, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
+import KpiIndicatorController from '@/actions/App/Http/Controllers/Kpi/KpiIndicatorController';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,7 +17,6 @@ import {
 import { cn } from '@/lib/utils';
 import type { KpiIndicator } from '@/types';
 import { IndicatorTable } from './indicator-table';
-import KpiIndicatorController from '@/actions/App/Http/Controllers/KpiIndicatorController';
 
 interface IndicatorCardProps {
   indicator: KpiIndicator;

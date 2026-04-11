@@ -34,7 +34,7 @@ class KpiGroupController extends Controller
             self::SORTABLE_COLUMNS,
         );
 
-        return Inertia::render('kpis/groups/index', [
+        return Inertia::render('kpi/groups/index', [
             'groups' => $groups,
             'filters' => $this->dataTableFilters($request),
         ]);
@@ -58,7 +58,7 @@ class KpiGroupController extends Controller
 
     public function show(KpiGroup $group): Response
     {
-        return Inertia::render('kpis/groups/show', [
+        return Inertia::render('kpi/groups/show', [
             'group' => $group->load('indicators.annualTargets'),
         ]);
     }

@@ -30,7 +30,7 @@ class OrganizationalUnitController extends Controller
             self::SORTABLE_COLUMNS,
         );
 
-        return Inertia::render('organizational-units/index', [
+        return Inertia::render('management/organizational-units/index', [
             'units' => $units,
             'allUnits' => OrganizationalUnit::query()->select(['id', 'name'])->get(),
             'filters' => $this->dataTableFilters($request),

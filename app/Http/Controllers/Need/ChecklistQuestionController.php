@@ -31,7 +31,7 @@ class ChecklistQuestionController extends Controller
             self::SORTABLE_COLUMNS,
         );
 
-        return Inertia::render('checklist-questions/index', [
+        return Inertia::render('need/checklist-questions/index', [
             'questions' => $questions,
             'filters' => $this->dataTableFilters($request),
         ]);

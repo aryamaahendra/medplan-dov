@@ -1,0 +1,203 @@
+import { Head, router } from '@inertiajs/react';
+import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
+
+import { ConfirmDialog } from '@/components/confirm-dialog';
+import { DataTable } from '@/components/data-table/data-table';
+import { useDataTable } from '@/hooks/use-data-table';
+import type { DataTableFilters } from '@/hooks/use-data-table';
+import needGroupRoutes from '@/routes/need-groups';
+import needRoutes from '@/routes/needs';
+
+import { NeedGroupDialog } from '../groups/need-group-dialog';
+import { getColumns } from './columns';
+import type { Need } from './columns';
+import { NeedGridView } from './components/need-grid-view';
+import { NeedsHeader } from './components/needs-header';
+import { NeedsTableToolbar } from './components/needs-table-toolbar';
+
+interface PaginatedNeeds {
+  data: Need[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+  from: number | null;
+  to: number | null;
+}
+
+interface NeedsIndexProps {
+  needs: PaginatedNeeds;
+  currentGroup: { id: number; name: string; year: number };
+  organizationalUnits: { id: number; name: string }[];
+  needTypes: { id: number; name: string }[];
+  filters: DataTableFilters & {
+    year?: string | string[];
+    status?: string | string[];
+    need_type_id?: string | string[];
+    organizational_unit_id?: string | string[];
+    urgency?: string | string[];
+    impact?: string | string[];
+    is_priority?: string | string[];
+    need_group_id?: string | string[];
+  };
+}
+
+export default function NeedsIndex({
+  needs,
+  currentGroup,
+  organizationalUnits,
+  needTypes,
+  filters,
+}: NeedsIndexProps) {
+  const [deletingNeed, setDeletingNeed] = useState<Need | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('grid');
+  const [isGroupDialogOpen, setIsGroupDialogOpen] = useState(false);
+  const [isDeletingGroup, setIsDeletingGroup] = useState(false);
+  const [isDeletingGroupLoading, setIsDeletingGroupLoading] = useState(false);
+
+  const {
+    onSearch,
+    onSort,
+    onPageChange,
+    onPerPageChange,
+    onReset,
+    mergeParams,
+  } = useDataTable({ only: ['needs', 'filters'] });
+
+  const onEdit = (need: Need) => {
+    router.visit(needRoutes.edit.url({ need: need.id }));
+  };
+
+  const onCreate = () => {
+    router.visit(
+      needRoutes.create.url({ query: { need_group_id: currentGroup.id } }),
+    );
+  };
+
+  const onDelete = (need: Need) => {
+    setDeletingNeed(need);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!deletingNeed) {
+      return;
+    }
+
+    setIsDeleting(true);
+
+    router.delete(needRoutes.destroy.url({ need: deletingNeed.id }), {
+      onSuccess: () => {
+        toast.success('Usulan kebutuhan berhasil dihapus.');
+        setDeletingNeed(null);
+      },
+      onFinish: () => setIsDeleting(false),
+    });
+  };
+
+  const handleConfirmDeleteGroup = () => {
+    setIsDeletingGroupLoading(true);
+
+    router.delete(
+      needGroupRoutes.destroy.url({ need_group: currentGroup.id }),
+      {
+        onSuccess: () => {
+          toast.success('Kelompok usulan berhasil dihapus.');
+          router.visit(needGroupRoutes.index.url());
+        },
+        onFinish: () => setIsDeletingGroupLoading(false),
+      },
+    );
+  };
+
+  const stableColumns = useMemo(() => getColumns(onEdit, onDelete), []);
+
+  return (
+    <>
+      <Head title={`Usulan: ${currentGroup.name}`} />
+
+      <div className="flex flex-col gap-6 p-4">
+        <NeedsHeader
+          currentGroup={currentGroup}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          onCreate={onCreate}
+          onEditGroup={() => setIsGroupDialogOpen(true)}
+          onDeleteGroup={() => setIsDeletingGroup(true)}
+        />
+
+        <NeedGroupDialog
+          open={isGroupDialogOpen}
+          onOpenChange={setIsGroupDialogOpen}
+          needGroup={currentGroup as any}
+        />
+
+        <ConfirmDialog
+          open={isDeletingGroup}
+          onOpenChange={setIsDeletingGroup}
+          onConfirm={handleConfirmDeleteGroup}
+          title="Hapus Kelompok Usulan"
+          description={`Apakah Anda yakin ingin menghapus "${currentGroup.name}"? Data usulan di dalam kelompok ini juga akan terdampak.`}
+          confirmText="Hapus"
+          variant="destructive"
+          loading={isDeletingGroupLoading}
+        />
+
+        <DataTable
+          columns={stableColumns}
+          data={needs.data}
+          meta={needs}
+          filters={filters}
+          onSearch={onSearch}
+          onSort={onSort}
+          onPageChange={onPageChange}
+          onPerPageChange={onPerPageChange}
+          onReset={onReset}
+          searchPlaceholder="Cari berdasarkan judul atau deskripsi..."
+          view={viewMode}
+          renderGrid={(data) => (
+            <NeedGridView data={data} onEdit={onEdit} onDelete={onDelete} />
+          )}
+          toolbarChildren={
+            <NeedsTableToolbar
+              filters={filters}
+              organizationalUnits={organizationalUnits}
+              needTypes={needTypes}
+              mergeParams={mergeParams}
+            />
+          }
+          toolbarPosition="between-search-and-table"
+        />
+      </div>
+
+      <ConfirmDialog
+        open={!!deletingNeed}
+        onOpenChange={(open) => !open && setDeletingNeed(null)}
+        onConfirm={handleConfirmDelete}
+        title="Hapus Usulan Kebutuhan"
+        description={`Apakah Anda yakin ingin menghapus "${deletingNeed?.title}"? Data yang dihapus akan dipindahkan ke tempat sampah (Soft Delete).`}
+        confirmText="Hapus"
+        variant="destructive"
+        loading={isDeleting}
+      />
+    </>
+  );
+}
+
+NeedsIndex.layout = (props: NeedsIndexProps) => ({
+  breadcrumbs: [
+    {
+      title: 'Usulan Kebutuhan',
+      href: '#',
+    },
+    {
+      title: props.currentGroup?.name || 'Loading...',
+      href: props.currentGroup
+        ? needRoutes.index.url({
+            query: { need_group_id: props.currentGroup.id },
+          })
+        : '#',
+    },
+  ],
+});

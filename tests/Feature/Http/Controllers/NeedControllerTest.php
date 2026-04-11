@@ -64,7 +64,7 @@ test('index renders the correct component and props', function () {
         ->get(route('needs.index', ['need_group_id' => $group->id]))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('needs/index')
+            ->component('need/needs/index')
             ->has('needs.data', 3)
             ->has('organizationalUnits')
             ->has('needTypes')

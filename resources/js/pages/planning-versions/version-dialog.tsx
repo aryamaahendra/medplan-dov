@@ -53,6 +53,10 @@ export function VersionDialog({
                 planning_version: version.id,
               })
             : PlanningVersionController.store.form())}
+          transform={(data) => ({
+            ...data,
+            year_end: parseInt(data.year_start as string) + 4,
+          })}
           onSuccess={() => {
             onOpenChange(false);
             toast.success(
@@ -75,20 +79,36 @@ export function VersionDialog({
                 <InputError message={errors.name} />
               </div>
 
-              <div className="grid gap-2">
-                <Label htmlFor="fiscal_year">Tahun Anggaran</Label>
-                <Input
-                  id="fiscal_year"
-                  name="fiscal_year"
-                  type="number"
-                  min={2020}
-                  max={2100}
-                  defaultValue={
-                    version?.fiscal_year ?? new Date().getFullYear() + 1
-                  }
-                  required
-                />
-                <InputError message={errors.fiscal_year} />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="year_start">Tahun Mulai</Label>
+                  <Input
+                    id="year_start"
+                    name="year_start"
+                    type="number"
+                    min={2020}
+                    max={2100}
+                    defaultValue={
+                      version?.year_start ?? new Date().getFullYear() + 1
+                    }
+                    required
+                  />
+                  <InputError message={errors.year_start} />
+                </div>
+                <div className="grid gap-2 opacity-70">
+                  <Label htmlFor="year_end">Tahun Selesai (Auto)</Label>
+                  <Input
+                    id="year_end"
+                    name="year_end"
+                    type="number"
+                    value={
+                      (version?.year_start ?? new Date().getFullYear() + 1) + 4
+                    }
+                    readOnly
+                    className="bg-muted"
+                  />
+                  <InputError message={errors.year_end} />
+                </div>
               </div>
 
               <div className="grid gap-2">

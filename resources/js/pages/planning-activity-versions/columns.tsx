@@ -29,7 +29,7 @@ export const getColumns = (
   onEdit: (activity: PlanningActivityVersion) => void,
   onDelete: (activity: PlanningActivityVersion) => void,
 ): ColumnDef<PlanningActivityVersion>[] => {
-  const startYear = version.fiscal_year;
+  const startYear = version.year_start;
   const years = Array.from({ length: 5 }, (_, i) => startYear + i);
 
   const baseColumns: ColumnDef<PlanningActivityVersion>[] = [
@@ -110,12 +110,25 @@ export const getColumns = (
       },
     },
     {
-      accessorKey: 'indicator_baseline_2024',
-      header: (props) => <DataTableColumnHeader {...props} title="Baseline" />,
+      id: 'baseline',
+      header: (props) => (
+        <DataTableColumnHeader
+          {...props}
+          title={`Baseline ${version.year_start - 1}`}
+        />
+      ),
       cell: ({ row }) => {
+        const activity = row.original;
+        const mainIndicator = activity.indicators?.[0];
+
         return (
           <div className="text-sm">
-            {row.original.indicator_baseline_2024 || '-'}
+            {mainIndicator?.baseline || '-'}
+            {mainIndicator?.unit && (
+              <span className="ml-1 text-xs text-muted-foreground">
+                {mainIndicator.unit}
+              </span>
+            )}
           </div>
         );
       },
@@ -130,9 +143,22 @@ export const getColumns = (
       {
         id: `target-${year}`,
         header: () => <div className="text-xs uppercase">{year} Target</div>,
-        cell: ({ row }) => (
-          <YearlyDataCell activity={row.original} year={year} field="target" />
-        ),
+        cell: ({ row }) => {
+          const activity = row.original;
+          const mainIndicator = activity.indicators?.[0];
+
+          return (
+            <YearlyDataCell
+              activityId={activity.id}
+              yearableId={mainIndicator?.id ?? 0}
+              yearableType="indicator"
+              items={mainIndicator?.activity_years ?? []}
+              year={year}
+              field="target"
+              disabled={!mainIndicator}
+            />
+          );
+        },
         meta: {
           cellClassName: 'w-[120px] border-r',
         },
@@ -140,9 +166,20 @@ export const getColumns = (
       {
         id: `budget-${year}`,
         header: () => <div className="text-xs uppercase">{year} Pagu</div>,
-        cell: ({ row }) => (
-          <YearlyDataCell activity={row.original} year={year} field="budget" />
-        ),
+        cell: ({ row }) => {
+          const activity = row.original;
+
+          return (
+            <YearlyDataCell
+              activityId={activity.id}
+              yearableId={activity.id}
+              yearableType="activity"
+              items={activity.activity_years ?? []}
+              year={year}
+              field="budget"
+            />
+          );
+        },
         meta: {
           cellClassName: 'w-[140px] border-r',
         },

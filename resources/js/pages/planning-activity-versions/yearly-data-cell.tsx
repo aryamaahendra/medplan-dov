@@ -11,13 +11,25 @@ import type {
 } from '@/types/planning-version';
 
 interface YearlyDataCellProps {
-  activity: PlanningActivityVersion;
+  activityId: number;
+  yearableId: number;
+  yearableType: 'activity' | 'indicator';
+  items: PlanningActivityYear[];
   year: number;
   field: 'target' | 'budget';
+  disabled?: boolean;
 }
 
-export function YearlyDataCell({ activity, year, field }: YearlyDataCellProps) {
-  const yearlyData = activity.activity_years?.find((y) => y.year === year);
+export function YearlyDataCell({
+  activityId,
+  yearableId,
+  yearableType,
+  items,
+  year,
+  field,
+  disabled,
+}: YearlyDataCellProps) {
+  const yearlyData = items.find((y) => y.year === year);
   const initialValue = yearlyData
     ? yearlyData[field]
     : field === 'budget'
@@ -25,7 +37,7 @@ export function YearlyDataCell({ activity, year, field }: YearlyDataCellProps) {
       : '';
 
   const [isEditing, setIsEditing] = useState(false);
-  const formatBudget = (val: string | number) => {
+  const formatBudget = (val: string | number | null) => {
     if (!val || val === '0' || val === 0) {
       return 'Rp 0';
     }
@@ -37,15 +49,10 @@ export function YearlyDataCell({ activity, year, field }: YearlyDataCellProps) {
     } else {
       const cleanValue = val.toString().trim();
 
-      // HEURISTIC: Check if this string looks like it has a decimal part at the end
-      // e.g. "123.00", "1.234,00", "Rp 1.234,00"
       if (/[.,]\d{2}$/.test(cleanValue)) {
-        // Remove the decimal part (.00 or ,00) before stripping non-digits
-        // to avoid "100.00" becoming "10000"
         const withoutDecimal = cleanValue.slice(0, -3);
         numeric = parseInt(withoutDecimal.replace(/[^0-9]/g, '')) || 0;
       } else {
-        // Standard strip everything except digits
         numeric = parseInt(cleanValue.replace(/[^0-9]/g, '')) || 0;
       }
     }
@@ -58,7 +65,9 @@ export function YearlyDataCell({ activity, year, field }: YearlyDataCellProps) {
   };
 
   const [value, setValue] = useState(
-    field === 'budget' ? formatBudget(initialValue) : initialValue.toString(),
+    field === 'budget'
+      ? formatBudget(initialValue)
+      : (initialValue ?? '').toString(),
   );
   const [prevInitialValue, setPrevInitialValue] = useState(initialValue);
   const [prevField, setPrevField] = useState(field);
@@ -68,7 +77,9 @@ export function YearlyDataCell({ activity, year, field }: YearlyDataCellProps) {
     setPrevInitialValue(initialValue);
     setPrevField(field);
     setValue(
-      field === 'budget' ? formatBudget(initialValue) : initialValue.toString(),
+      field === 'budget'
+        ? formatBudget(initialValue)
+        : (initialValue ?? '').toString(),
     );
   }
 
@@ -80,7 +91,13 @@ export function YearlyDataCell({ activity, year, field }: YearlyDataCellProps) {
   }, [isEditing]);
 
   const handleUpdate = () => {
-    if (value === initialValue.toString()) {
+    if (value === (initialValue ?? '').toString()) {
+      setIsEditing(false);
+
+      return;
+    }
+
+    if (disabled || !yearableId) {
       setIsEditing(false);
 
       return;
@@ -94,39 +111,73 @@ export function YearlyDataCell({ activity, year, field }: YearlyDataCellProps) {
         activities: {
           ...props.activities,
           data: props.activities.data.map((a: PlanningActivityVersion) => {
-            if (a.id !== activity.id) {
+            if (a.id !== activityId) {
               return a;
             }
 
-            const existingYears = a.activity_years ?? [];
-            const yearExists = existingYears.some((y) => y.year === year);
+            if (yearableType === 'activity') {
+              const existingYears = a.activity_years ?? [];
+              const yearExists = existingYears.some((y) => y.year === year);
+              const newYears = yearExists
+                ? existingYears.map((y) =>
+                    y.year === year ? { ...y, [field]: numericValue } : y,
+                  )
+                : [
+                    ...existingYears,
+                    {
+                      id: 0,
+                      yearable_id: yearableId,
+                      yearable_type: 'App\\Models\\PlanningActivityVersion',
+                      year,
+                      target: null,
+                      budget: numericValue,
+                    } as PlanningActivityYear,
+                  ];
 
-            const newYears = yearExists
-              ? existingYears.map((y) =>
-                  y.year === year ? { ...y, [field]: numericValue } : y,
-                )
-              : [
-                  ...existingYears,
-                  {
-                    id: 0,
-                    planning_activity_version_id: activity.id,
-                    year,
-                    target: field === 'target' ? value : '',
-                    budget: field === 'budget' ? numericValue : 0,
-                  } as PlanningActivityYear,
-                ];
+              return { ...a, activity_years: newYears };
+            } else {
+              // Update target in indicators
+              const newIndicators = (a.indicators ?? []).map((ind) => {
+                if (ind.id !== yearableId) {
+                  return ind;
+                }
 
-            return { ...a, activity_years: newYears };
+                const existingYears = ind.activity_years ?? [];
+                const yearExists = existingYears.some((y) => y.year === year);
+                const newYears = yearExists
+                  ? existingYears.map((y) =>
+                      y.year === year ? { ...y, [field]: numericValue } : y,
+                    )
+                  : [
+                      ...existingYears,
+                      {
+                        id: 0,
+                        yearable_id: yearableId,
+                        yearable_type: 'App\\Models\\PlanningActivityIndicator',
+                        year,
+                        target: numericValue as string,
+                        budget: null,
+                      } as PlanningActivityYear,
+                    ];
+
+                return { ...ind, activity_years: newYears };
+              });
+
+              return { ...a, indicators: newIndicators };
+            }
           }),
         },
       }))
       .post(
         PlanningActivityVersionController.updateYearlyData.url({
-          planning_activity_version: activity.id,
+          planning_activity_version: activityId,
         }),
         {
+          yearable_id: yearableId,
+          yearable_type: yearableType,
           year,
-          target: field === 'target' ? value : (yearlyData?.target ?? ''),
+          target:
+            field === 'target' ? numericValue : (yearlyData?.target ?? ''),
           budget: field === 'budget' ? numericValue : (yearlyData?.budget ?? 0),
         },
         {
@@ -139,7 +190,7 @@ export function YearlyDataCell({ activity, year, field }: YearlyDataCellProps) {
             setValue(
               field === 'budget'
                 ? formatBudget(initialValue)
-                : initialValue.toString(),
+                : (initialValue ?? '').toString(),
             );
             const firstError = Object.values(errors)[0];
             toast.error(firstError || 'Gagal memperbarui data');
@@ -158,18 +209,13 @@ export function YearlyDataCell({ activity, year, field }: YearlyDataCellProps) {
       setValue(
         field === 'budget'
           ? formatBudget(initialValue)
-          : initialValue.toString(),
+          : (initialValue ?? '').toString(),
       );
     }
   };
 
-  if (activity.type === 'program' || activity.type === 'activity') {
-    // Programs and Activities usually don't have targets/budgets in SIPD snapshots,
-    // but let's allow it if the data exists, otherwise show empty or total
-    // For now, we only allow editing for sub_activity and output as per common practice
-    if (activity.type === 'program' || activity.type === 'activity') {
-      return null;
-    }
+  if (disabled) {
+    return <div className="text-center text-muted-foreground">-</div>;
   }
 
   if (isEditing) {
@@ -194,8 +240,6 @@ export function YearlyDataCell({ activity, year, field }: YearlyDataCellProps) {
       />
     );
   }
-
-  console.log(`${initialValue} ${value}`);
 
   const displayValue = field === 'budget' ? value || 'Rp 0' : value || '-';
 

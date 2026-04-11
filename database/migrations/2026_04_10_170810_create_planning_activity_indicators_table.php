@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('planning_activity_years', function (Blueprint $table) {
+        Schema::create('planning_activity_indicators', function (Blueprint $table) {
             $table->id();
-            $table->morphs('yearable');
-            $table->integer('year');
-            $table->string('target')->nullable();
-            $table->decimal('budget', 20, 2)->nullable();
+            $table->foreignId('planning_activity_version_id')->constrained('planning_activity_versions')->cascadeOnDelete();
+            $table->text('name');
+            $table->string('baseline')->nullable();
+            $table->string('unit')->nullable();
             $table->timestamps();
-
-            $table->unique(['yearable_id', 'yearable_type', 'year'], 'planning_activity_year_unique');
         });
     }
 
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('planning_activity_years');
+        Schema::dropIfExists('planning_activity_indicators');
     }
 };

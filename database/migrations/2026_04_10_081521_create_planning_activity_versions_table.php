@@ -19,8 +19,6 @@ return new class extends Migration
             $table->text('name');
             $table->enum('type', ['program', 'activity', 'sub_activity', 'output']);
             $table->string('full_code')->nullable();
-            $table->string('indicator_name')->nullable();
-            $table->string('indicator_baseline_2024')->nullable();
             $table->string('perangkat_daerah')->nullable();
             $table->text('keterangan')->nullable();
             $table->integer('sort_order')->nullable();

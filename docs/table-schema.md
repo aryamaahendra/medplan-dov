@@ -314,7 +314,8 @@ Pivot table connecting KPI indicators and needs.
 | :--- | :--- | :---: | :--- |
 | id | bigint | No | Primary Key |
 | name | string | No | |
-| fiscal_year | integer | No | |
+| year_start | integer | No | |
+| year_end | integer | No | |
 | revision_no | integer | No | |
 | status | enum | No | 'draft', 'submitted', 'approved', 'archived', Default: 'draft' |
 | is_current | boolean | No | Default: false |
@@ -332,11 +333,20 @@ Pivot table connecting KPI indicators and needs.
 | name | text | No | |
 | type | enum | No | 'program', 'activity', 'sub_activity', 'output' |
 | full_code | string | Yes | |
-| indicator_name | string | Yes | |
-| indicator_baseline_2024 | string | Yes | |
 | perangkat_daerah | string | Yes | |
 | keterangan | text | Yes | |
 | sort_order | integer | Yes | |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+
+### `planning_activity_indicators`
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| planning_activity_version_id | bigint | No | Foreign Key (planning_activity_versions), cascadeOnDelete |
+| name | text | No | |
+| baseline | string | Yes | |
+| unit | string | Yes | |
 | created_at | timestamp | Yes | |
 | updated_at | timestamp | Yes | |
 
@@ -344,10 +354,11 @@ Pivot table connecting KPI indicators and needs.
 | Column | Type | Nullable | Extra |
 | :--- | :--- | :---: | :--- |
 | id | bigint | No | Primary Key |
-| planning_activity_version_id | bigint | No | Foreign Key (planning_activity_versions), cascadeOnDelete |
-| year | integer | No | Unique per activity |
-| target | string | No | |
-| budget | decimal(20,2) | No | |
+| yearable_id | bigint | No | Polymorphic ID |
+| yearable_type | string | No | Polymorphic Type |
+| year | integer | No | Unique per yearable |
+| target | string | Yes | Nullable (used for indicators) |
+| budget | decimal(20,2) | Yes | Nullable (used for activities) |
 | created_at | timestamp | Yes | |
 | updated_at | timestamp | Yes | |
 

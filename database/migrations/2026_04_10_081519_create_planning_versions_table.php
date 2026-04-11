@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('planning_versions', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->integer('fiscal_year');
+            $table->integer('year_start');
+            $table->integer('year_end');
             $table->integer('revision_no');
             $table->enum('status', ['draft', 'submitted', 'approved', 'archived'])->default('draft');
             $table->boolean('is_current')->default(false);

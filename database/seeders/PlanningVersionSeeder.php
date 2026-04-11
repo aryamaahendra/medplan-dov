@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\PlanningActivityIndicator;
 use App\Models\PlanningActivityVersion;
 use App\Models\PlanningActivityYear;
 use App\Models\PlanningVersion;
@@ -16,12 +17,13 @@ class PlanningVersionSeeder extends Seeder
     {
         // 1. Create a Version
         $version = PlanningVersion::create([
-            'name' => 'RKPD 2026 Murni',
-            'fiscal_year' => 2026,
+            'name' => 'Renstra 2025-2029 Murni',
+            'year_start' => 2025,
+            'year_end' => 2029,
             'revision_no' => 0,
             'status' => 'approved',
             'is_current' => true,
-            'notes' => 'Original planning version',
+            'notes' => 'Five year strategic plan version',
         ]);
 
         // 2. Create initial activities directly in this Version
@@ -32,7 +34,6 @@ class PlanningVersionSeeder extends Seeder
             ['code' => '1.01.01.01', 'name' => 'Output Stetoskop', 'type' => 'output'],
         ];
 
-        $parentId = null;
         $idMapping = [];
 
         foreach ($activities as $data) {
@@ -52,22 +53,45 @@ class PlanningVersionSeeder extends Seeder
                 'name' => $data['name'],
                 'type' => $data['type'],
                 'full_code' => $data['code'],
-                'indicator_name' => 'Indicator for '.$data['name'],
-                'indicator_baseline_2024' => rand(50, 100),
                 'perangkat_daerah' => 'Dinas Kesehatan',
                 'sort_order' => count($idMapping) + 1,
             ]);
 
             $idMapping[$data['code']] = $versionedActivity->id;
 
-            // 3. Create Dynamic Year Rows (2026-2030)
-            for ($year = 2026; $year <= 2030; $year++) {
+            // 3. Create Budget Data (Activity Level)
+            for ($year = $version->year_start; $year <= $version->year_end; $year++) {
                 PlanningActivityYear::create([
-                    'planning_activity_version_id' => $versionedActivity->id,
+                    'yearable_id' => $versionedActivity->id,
+                    'yearable_type' => PlanningActivityVersion::class,
                     'year' => $year,
-                    'target' => rand(80, 100).' %',
                     'budget' => rand(100000000, 1000000000),
                 ]);
+            }
+
+            // 4. Create Indicators
+            $indicatorSpecs = [
+                ['name' => 'Persentase '.$data['name'], 'unit' => '%'],
+                ['name' => 'Jumlah output '.$data['name'], 'unit' => 'Unit'],
+            ];
+
+            foreach ($indicatorSpecs as $spec) {
+                $indicator = PlanningActivityIndicator::create([
+                    'planning_activity_version_id' => $versionedActivity->id,
+                    'name' => $spec['name'],
+                    'baseline' => (string) rand(50, 100),
+                    'unit' => $spec['unit'],
+                ]);
+
+                // 5. Create Target Data (Indicator Level)
+                for ($year = $version->year_start; $year <= $version->year_end; $year++) {
+                    PlanningActivityYear::create([
+                        'yearable_id' => $indicator->id,
+                        'yearable_type' => PlanningActivityIndicator::class,
+                        'year' => $year,
+                        'target' => (string) rand(80, 100),
+                    ]);
+                }
             }
         }
     }

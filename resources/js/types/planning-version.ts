@@ -3,7 +3,8 @@ import type { PlanningActivityType } from './planning-activity';
 export interface PlanningVersion {
   id: number;
   name: string;
-  fiscal_year: number;
+  year_start: number;
+  year_end: number;
   revision_no: number;
   status: 'draft' | 'submitted' | 'approved' | 'archived';
   is_current: boolean;
@@ -14,10 +15,22 @@ export interface PlanningVersion {
 
 export interface PlanningActivityYear {
   id: number;
-  planning_activity_version_id: number;
+  yearable_id: number;
+  yearable_type: string;
   year: number;
-  target: string;
-  budget: string | number;
+  target: string | null;
+  budget: string | number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PlanningActivityIndicator {
+  id: number;
+  planning_activity_version_id: number;
+  name: string;
+  baseline: string | null;
+  unit: string | null;
+  activity_years?: PlanningActivityYear[];
   created_at: string;
   updated_at: string;
 }
@@ -25,19 +38,16 @@ export interface PlanningActivityYear {
 export interface PlanningActivityVersion {
   id: number;
   planning_version_id: number;
-  revision_group_id: number | null;
-  source_activity_id: number | null;
   parent_id: number | null;
   code: string | null;
   name: string;
   type: PlanningActivityType;
   full_code: string | null;
-  indicator_name: string | null;
-  indicator_baseline_2024: string | null;
   perangkat_daerah: string | null;
   keterangan: string | null;
   sort_order: number;
   activity_years?: PlanningActivityYear[];
+  indicators?: PlanningActivityIndicator[];
   parent?: PlanningActivityVersion;
   created_at: string;
   updated_at: string;

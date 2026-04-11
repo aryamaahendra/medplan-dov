@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class PlanningActivityVersion extends Model
 {
@@ -20,8 +21,6 @@ class PlanningActivityVersion extends Model
         'name',
         'type',
         'full_code',
-        'indicator_name',
-        'indicator_baseline_2024',
         'perangkat_daerah',
         'keterangan',
         'sort_order',
@@ -42,8 +41,13 @@ class PlanningActivityVersion extends Model
         return $this->hasMany(PlanningActivityVersion::class, 'parent_id');
     }
 
-    public function activityYears(): HasMany
+    public function indicators(): HasMany
     {
-        return $this->hasMany(PlanningActivityYear::class);
+        return $this->hasMany(PlanningActivityIndicator::class);
+    }
+
+    public function activityYears(): MorphMany
+    {
+        return $this->morphMany(PlanningActivityYear::class, 'yearable');
     }
 }

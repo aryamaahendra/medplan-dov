@@ -14,7 +14,8 @@ class PlanningVersion extends Model
 
     protected $fillable = [
         'name',
-        'fiscal_year',
+        'year_start',
+        'year_end',
         'revision_no',
         'status',
         'is_current',
@@ -25,7 +26,8 @@ class PlanningVersion extends Model
     {
         return [
             'is_current' => 'boolean',
-            'fiscal_year' => 'integer',
+            'year_start' => 'integer',
+            'year_end' => 'integer',
             'revision_no' => 'integer',
         ];
     }

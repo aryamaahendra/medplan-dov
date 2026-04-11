@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             StrategicServicePlanSeeder::class,
             ChecklistQuestionSeeder::class,
             NeedChecklistAnswerSeeder::class,
+            PlanningVersionSeeder::class,
         ]);
     }
 }

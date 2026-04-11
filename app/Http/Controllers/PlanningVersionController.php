@@ -16,10 +16,10 @@ class PlanningVersionController extends Controller
     use HasDataTable;
 
     /** Columns searchable across */
-    private const array SEARCH_COLUMNS = ['name', 'fiscal_year', 'notes'];
+    private const array SEARCH_COLUMNS = ['name', 'year_start', 'year_end', 'notes'];
 
     /** Columns sortable by */
-    private const array SORTABLE_COLUMNS = ['name', 'fiscal_year', 'revision_no', 'status', 'is_current'];
+    private const array SORTABLE_COLUMNS = ['name', 'year_start', 'year_end', 'revision_no', 'status', 'is_current'];
 
     /**
      * Display a listing of the resource.
@@ -46,7 +46,8 @@ class PlanningVersionController extends Controller
     {
         PlanningVersion::create([
             'name' => $request->name,
-            'fiscal_year' => $request->fiscal_year,
+            'year_start' => $request->year_start,
+            'year_end' => $request->year_end,
             'revision_no' => 0,
             'status' => 'draft',
             'is_current' => false,
@@ -74,7 +75,8 @@ class PlanningVersionController extends Controller
         DB::transaction(function () use ($planningVersion) {
             $newVersion = PlanningVersion::create([
                 'name' => $planningVersion->name.' Revision '.($planningVersion->revision_no + 1),
-                'fiscal_year' => $planningVersion->fiscal_year,
+                'year_start' => $planningVersion->year_start,
+                'year_end' => $planningVersion->year_end,
                 'revision_no' => $planningVersion->revision_no + 1,
                 'status' => 'draft',
                 'is_current' => false,
@@ -92,11 +94,27 @@ class PlanningVersionController extends Controller
 
                 $idMapping[$oldActivity->id] = $newActivity->id;
 
-                // Clone yearly data
+                // Clone activity yearly data (budget)
                 foreach ($oldActivity->activityYears as $oldYear) {
                     $newYear = $oldYear->replicate();
-                    $newYear->planning_activity_version_id = $newActivity->id;
+                    $newYear->yearable_id = $newActivity->id;
+                    $newYear->yearable_type = PlanningActivityVersion::class;
                     $newYear->save();
+                }
+
+                // Clone indicators
+                foreach ($oldActivity->indicators as $oldIndicator) {
+                    $newIndicator = $oldIndicator->replicate();
+                    $newIndicator->planning_activity_version_id = $newActivity->id;
+                    $newIndicator->save();
+
+                    // Clone indicator yearly data (target)
+                    foreach ($oldIndicator->activityYears as $oldIndicatorYear) {
+                        $newIndicatorYear = $oldIndicatorYear->replicate();
+                        $newIndicatorYear->yearable_id = $newIndicator->id;
+                        $newIndicatorYear->yearable_type = PlanningActivityIndicator::class;
+                        $newIndicatorYear->save();
+                    }
                 }
             }
         });
@@ -110,7 +128,8 @@ class PlanningVersionController extends Controller
     public function setCurrent(PlanningVersion $planningVersion)
     {
         DB::transaction(function () use ($planningVersion) {
-            PlanningVersion::where('fiscal_year', $planningVersion->fiscal_year)
+            PlanningVersion::where('year_start', $planningVersion->year_start)
+                ->where('year_end', $planningVersion->year_end)
                 ->where('is_current', true)
                 ->update(['is_current' => false]);
 

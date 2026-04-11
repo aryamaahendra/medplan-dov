@@ -91,7 +91,7 @@ export default function PlanningVersionsIndex({
     setConfirmConfig({
       open: true,
       title: 'Jadikan Versi Utama',
-      description: `Jadikan "${version.name}" sebagai versi utama untuk tahun ${version.fiscal_year}?`,
+      description: `Jadikan "${version.name}" sebagai versi utama untuk periode ${version.year_start} - ${version.year_end}?`,
       confirmText: 'Jadikan Utama',
       onConfirm: () => {
         router.post(

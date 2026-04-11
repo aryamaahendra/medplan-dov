@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePlanningActivityVersionRequest;
 use App\Http\Requests\UpdatePlanningActivityVersionRequest;
-use App\Http\Requests\UpdatePlanningActivityYearRequest;
 use App\Models\PlanningActivityVersion;
 use App\Models\PlanningVersion;
 use App\Traits\HasDataTable;
@@ -29,7 +28,7 @@ class PlanningActivityVersionController extends Controller
     {
         $query = PlanningActivityVersion::query()
             ->where('planning_version_id', $planningVersion->id)
-            ->with(['activityYears', 'parent']);
+            ->with(['activityYears', 'indicators.activityYears', 'parent']);
 
         if (! $request->has('sort')) {
             $query->orderBy('code', 'asc');
@@ -89,13 +88,25 @@ class PlanningActivityVersionController extends Controller
     }
 
     /**
-     * Update or create yearly target/budget for an activity version.
+     * Update or create yearly target/budget for an activity or indicator.
      */
-    public function updateYearlyData(
-        PlanningActivityVersion $planningActivityVersion,
-        UpdatePlanningActivityYearRequest $request
-    ) {
-        $planningActivityVersion->activityYears()->updateOrCreate(
+    public function updateYearlyData(Request $request)
+    {
+        $request->validate([
+            'yearable_id' => 'required|integer',
+            'yearable_type' => 'required|string|in:activity,indicator',
+            'year' => 'required|integer',
+            'target' => 'nullable|string',
+            'budget' => 'nullable|numeric',
+        ]);
+
+        $modelClass = $request->yearable_type === 'activity'
+            ? PlanningActivityVersion::class
+            : PlanningActivityIndicator::class;
+
+        $model = $modelClass::findOrFail($request->yearable_id);
+
+        $model->activityYears()->updateOrCreate(
             ['year' => $request->year],
             [
                 'target' => $request->target,
@@ -104,6 +115,6 @@ class PlanningActivityVersionController extends Controller
         );
 
         return redirect()->back()
-            ->with('success', "Target/Anggaran tahun {$request->year} berhasil diperbarui.");
+            ->with('success', "Data tahun {$request->year} berhasil diperbarui.");
     }
 }

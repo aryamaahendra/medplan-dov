@@ -57,10 +57,19 @@ export const getColumns = (
     },
   },
   {
-    accessorKey: 'fiscal_year',
-    header: (props) => <DataTableColumnHeader {...props} title="Tahun" />,
+    id: 'period',
+    header: (props) => <DataTableColumnHeader {...props} title="Periode" />,
+    cell: ({ row }) => {
+      const { year_start, year_end } = row.original;
+
+      return (
+        <span className="font-medium">
+          {year_start} - {year_end}
+        </span>
+      );
+    },
     meta: {
-      cellClassName: 'w-[100px]',
+      cellClassName: 'w-[140px]',
     },
   },
   {

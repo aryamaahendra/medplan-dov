@@ -3,7 +3,6 @@ import { Plus } from 'lucide-react';
 import { Fragment, useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-import PlanningActivityVersionController from '@/actions/App/Http/Controllers/PlanningActivityVersionController';
 import { DataTable } from '@/components/data-table/data-table';
 import {
   AlertDialog,
@@ -27,6 +26,7 @@ import type {
 } from '@/types/planning-version';
 
 import { getColumns } from './columns';
+import PlanningActivityVersionController from '@/actions/App/Http/Controllers/PlanningActivityVersionController';
 
 interface PaginatedActivities {
   data: PlanningActivityVersion[];

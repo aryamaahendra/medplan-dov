@@ -1,7 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import { toast } from 'sonner';
 
-import OrganizationalUnitController from '@/actions/App/Http/Controllers/OrganizationalUnitController';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,6 +22,7 @@ import {
 } from '@/components/ui/select';
 
 import type { OrganizationalUnit } from './columns';
+import OrganizationalUnitController from '@/actions/App/Http/Controllers/OrganizationalUnitController';
 
 interface OrganizationalUnitDialogProps {
   unit?: OrganizationalUnit | null;

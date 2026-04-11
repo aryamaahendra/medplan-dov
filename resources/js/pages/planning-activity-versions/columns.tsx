@@ -80,7 +80,6 @@ export const getColumns = (
         cellClassName: 'w-px border-r',
         colSpan: (row, table) => {
           const index = row.index;
-          // @ts-expect-error - getRowModel is available on table
           const rows = table.getRowModel().rows;
           const isDuplicate =
             index > 0 && rows[index - 1].original.id === row.original.id;
@@ -111,7 +110,6 @@ export const getColumns = (
         cellClassName: 'min-w-[300px] border-r',
         colSpan: (row, table) => {
           const index = row.index;
-          // @ts-expect-error - getRowModel is available on table
           const rows = table.getRowModel().rows;
           const isDuplicate =
             index > 0 && rows[index - 1].original.id === row.original.id;

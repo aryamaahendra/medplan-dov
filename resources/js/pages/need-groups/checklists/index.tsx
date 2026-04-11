@@ -10,13 +10,13 @@ import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-import needGroupChecklistActions from '@/actions/App/Http/Controllers/NeedGroupChecklistController';
-import needGroupActions from '@/actions/App/Http/Controllers/NeedGroupController';
 
 import { ChecklistHeader } from './components/checklist-header';
 import { QuestionList } from './components/question-list';
 import { QuestionToolbar } from './components/question-toolbar';
 import type { AssignedQuestion, ChecklistQuestion, NeedGroup } from './types';
+import needGroupChecklistActions from '@/actions/App/Http/Controllers/NeedGroupChecklistController';
+import needGroupActions from '@/actions/App/Http/Controllers/NeedGroupController';
 
 interface Props {
   needGroup: NeedGroup;

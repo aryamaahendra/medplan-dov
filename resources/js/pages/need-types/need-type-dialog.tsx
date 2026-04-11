@@ -1,7 +1,6 @@
 import { Form } from '@inertiajs/react';
 import { toast } from 'sonner';
 
-import NeedTypeController from '@/actions/App/Http/Controllers/NeedTypeController';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,6 +17,7 @@ import { Switch } from '@/components/ui/switch';
 
 import { Textarea } from '@/components/ui/textarea';
 import type { NeedType } from './columns';
+import NeedTypeController from '@/actions/App/Http/Controllers/NeedTypeController';
 
 interface NeedTypeDialogProps {
   needType?: NeedType | null;

@@ -1,7 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import { toast } from 'sonner';
 
-import KpiIndicatorController from '@/actions/App/Http/Controllers/KpiIndicatorController';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import type { KpiGroup, KpiIndicator } from '@/types';
+import KpiIndicatorController from '@/actions/App/Http/Controllers/KpiIndicatorController';
 
 interface KpiIndicatorDialogProps {
   group: KpiGroup;

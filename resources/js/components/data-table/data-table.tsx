@@ -135,7 +135,6 @@ export function DataTable<TData, TValue>({
                   >
                     {row.getVisibleCells().map((cell) => {
                       const cellMeta = cell.column.columnDef.meta;
-                      // @ts-expect-error - colSpan is a custom meta property
                       const colSpan = cellMeta?.colSpan?.(row, table);
 
                       if (colSpan === 0) {

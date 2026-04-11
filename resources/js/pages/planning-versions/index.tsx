@@ -3,7 +3,6 @@ import { Plus } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-import PlanningVersionController from '@/actions/App/Http/Controllers/PlanningVersionController';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
@@ -14,6 +13,7 @@ import type { PlanningVersion } from '@/types/planning-version';
 
 import { getColumns } from './columns';
 import { VersionDialog } from './version-dialog';
+import PlanningVersionController from '@/actions/App/Http/Controllers/PlanningVersionController';
 
 interface PaginatedVersions {
   data: PlanningVersion[];

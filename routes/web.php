@@ -1,22 +1,22 @@
 <?php
 
-use App\Http\Controllers\ChecklistQuestionController;
-use App\Http\Controllers\IndicatorController;
-use App\Http\Controllers\KpiGroupController;
-use App\Http\Controllers\KpiIndicatorController;
-use App\Http\Controllers\NeedChecklistAnswerController;
-use App\Http\Controllers\NeedController;
-use App\Http\Controllers\NeedGroupChecklistController;
-use App\Http\Controllers\NeedGroupController;
-use App\Http\Controllers\NeedTypeController;
-use App\Http\Controllers\OrganizationalUnitController;
-use App\Http\Controllers\PlanningActivityVersionController;
-use App\Http\Controllers\PlanningVersionController;
-use App\Http\Controllers\RenstraController;
-use App\Http\Controllers\SasaranController;
-use App\Http\Controllers\StrategicServicePlanController;
-use App\Http\Controllers\TujuanController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\Kpi\KpiGroupController;
+use App\Http\Controllers\Kpi\KpiIndicatorController;
+use App\Http\Controllers\Management\OrganizationalUnitController;
+use App\Http\Controllers\Management\UserController;
+use App\Http\Controllers\Need\ChecklistQuestionController;
+use App\Http\Controllers\Need\NeedChecklistAnswerController;
+use App\Http\Controllers\Need\NeedController;
+use App\Http\Controllers\Need\NeedGroupChecklistController;
+use App\Http\Controllers\Need\NeedGroupController;
+use App\Http\Controllers\Need\NeedTypeController;
+use App\Http\Controllers\Planning\PlanningActivityVersionController;
+use App\Http\Controllers\Planning\PlanningVersionController;
+use App\Http\Controllers\Renstra\IndicatorController;
+use App\Http\Controllers\Renstra\RenstraController;
+use App\Http\Controllers\Renstra\SasaranController;
+use App\Http\Controllers\Renstra\TujuanController;
+use App\Http\Controllers\StrategicPlan\StrategicServicePlanController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 

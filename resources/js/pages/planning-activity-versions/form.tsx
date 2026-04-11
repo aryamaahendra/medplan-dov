@@ -3,7 +3,6 @@ import { Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-import PlanningActivityVersionController from '@/actions/App/Http/Controllers/PlanningActivityVersionController';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,6 +19,7 @@ import type {
   PlanningActivityVersion,
   PlanningVersion,
 } from '@/types/planning-version';
+import PlanningActivityVersionController from '@/actions/App/Http/Controllers/PlanningActivityVersionController';
 
 interface ActivityVersionFormProps {
   version: PlanningVersion;

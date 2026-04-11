@@ -29,16 +29,6 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - eslint (ESLINT) - v9
 - prettier (PRETTIER) - v3
 
-## Skills Activation
-
-This project has domain-specific skills available. You MUST activate the relevant skill whenever you work in that domain—don't wait until you're stuck.
-
-- `laravel-best-practices` — Apply this skill whenever writing, reviewing, or refactoring Laravel PHP code. This includes creating or modifying controllers, models, migrations, form requests, policies, jobs, scheduled commands, service classes, and Eloquent queries. Triggers for N+1 and query performance issues, caching strategies, authorization and security patterns, validation, error handling, queue and job configuration, route definitions, and architectural decisions. Also use for Laravel code reviews and refactoring existing Laravel code to follow best practices. Covers any task involving Laravel backend PHP code patterns.
-- `wayfinder-development` — Use this skill for Laravel Wayfinder which auto-generates typed functions for Laravel controllers and routes. ALWAYS use this skill when frontend code needs to call backend routes or controller actions. Trigger when: connecting any React/Vue/Svelte/Inertia frontend to Laravel controllers, routes, building end-to-end features with both frontend and backend, wiring up forms or links to backend endpoints, fixing route-related TypeScript errors, importing from @/actions or @/routes, or running wayfinder:generate. Use Wayfinder route functions instead of hardcoded URLs. Covers: wayfinder() vite plugin, .url()/.get()/.post()/.form(), query params, route model binding, tree-shaking. Do not use for backend-only task
-- `pest-testing` — Use this skill for Pest PHP testing in Laravel projects only. Trigger whenever any test is being written, edited, fixed, or refactored — including fixing tests that broke after a code change, adding assertions, converting PHPUnit to Pest, adding datasets, and TDD workflows. Always activate when the user asks how to write something in Pest, mentions test files or directories (tests/Feature, tests/Unit, tests/Browser), or needs browser testing, smoke testing multiple pages for JS errors, or architecture tests. Covers: it()/expect() syntax, datasets, mocking, browser testing (visit/click/fill), smoke testing, arch(), Livewire component tests, RefreshDatabase, and all Pest 4 features. Do not use for factories, seeders, migrations, controllers, models, or non-test PHP code.
-- `inertia-react-development` — Develops Inertia.js v3 React client-side applications. Activates when creating React pages, forms, or navigation; using <Link>, <Form>, useForm, useHttp, setLayoutProps, or router; working with deferred props, prefetching, optimistic updates, instant visits, or polling; or when user mentions React with Inertia, React pages, React forms, or React navigation.
-- `tailwindcss-development` — Always invoke when the user's message includes 'tailwind' in any form. Also invoke for: building responsive grid layouts (multi-column card grids, product grids), flex/grid page structures (dashboards with sidebars, fixed topbars, mobile-toggle navs), styling UI components (cards, tables, navbars, pricing sections, forms, inputs, badges), adding dark mode variants, fixing spacing or typography, and Tailwind v3/v4 work. The core use case: writing or fixing Tailwind utility classes in HTML templates (Blade, JSX, Vue). Skip for backend PHP logic, database queries, API routes, JavaScript with no HTML/CSS component, CSS file audits, build tool configuration, and vanilla CSS.
-
 ## Conventions
 
 - You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach, and naming.
@@ -62,11 +52,44 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 - You must only create documentation files if explicitly requested by the user.
 
-## Replies
+## Replies - Caveman Mode
 
-- Be concise in your explanations - focus on what's important rather than explaining obvious details.
-- Fix errors silently without explaining. Only describe what went wrong if the user explicitly asks.
-- Keep all explanations short and blunt — simple words, direct sentences, no filler. Still be accurate. Example: "Missing file caused crash. Added it. Fixed."
+Terse. Direct. No filler. Proper grammar when it aids clarity, fragments when it doesn't.
+
+- **No filler phrases.** Never start with "I'd be happy to", "Let me", "Sure!", "Great question", "Of course", or any greeting/acknowledgment.
+- **Execute first, talk second.** Do the task. Report the result. Stop.
+- **Be direct.** Short sentences or fragments. Cut articles and pronouns when meaning is clear without them. Keep grammar when dropping it would confuse.
+- **No meta-commentary.** Don't narrate what you're about to do or what you just did. Don't say "I'll search for..." — just search.
+- **No preamble.** Don't restate the question. Don't explain your approach before doing it.
+- **No postamble.** Don't summarize what you did. Don't ask "Is there anything else?" Don't offer next steps unless asked.
+- **No tool announcements.** When using tools, just use them. Don't say "Let me read that file" — read it silently.
+- **Explain only when needed.** Explain if the result is surprising or explicitly asked for. Otherwise, skip it.
+- **Code speaks.** When the answer is code, show code. Skip the English wrapper around it.
+- **Error = fix.** If something fails, fix it and report. Don't apologize or narrate the error.
+
+## Examples
+
+### Bad (normal mode)
+
+```
+I'd be happy to help you with that! Let me search for the TypeScript test files in your project.
+
+I found the following TypeScript test files in your project:
+- src/__tests__/auth.test.ts
+- src/__tests__/api.test.ts
+- src/__tests__/utils.test.ts
+
+These are located in the __tests__ directory. Would you like me to look at any of these files in more detail?
+```
+
+### Good (caveman mode)
+
+```
+Found 3 test files:
+- src/__tests__/auth.test.ts
+- src/__tests__/api.test.ts
+- src/__tests__/utils.test.ts
+```
 
 === boost rules ===
 
@@ -96,16 +119,16 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 ## Artisan
 
-- Run Artisan commands directly via the command line (e.g., `php artisan route:list`). Use `php artisan list` to discover available commands and `php artisan [command] --help` to check parameters.
-- Inspect routes with `php artisan route:list`. Filter with: `--method=GET`, `--name=users`, `--path=api`, `--except-vendor`, `--only-vendor`.
-- Read configuration values using dot notation: `php artisan config:show app.name`, `php artisan config:show database.default`. Or read config files directly from the `config/` directory.
+- Run Artisan commands directly via the command line (e.g., `./vendor/bin/sail artisan route:list`). Use `./vendor/bin/sail artisan list` to discover available commands and `./vendor/bin/sail artisan [command] --help` to check parameters.
+- Inspect routes with `./vendor/bin/sail artisan route:list`. Filter with: `--method=GET`, `--name=users`, `--path=api`, `--except-vendor`, `--only-vendor`.
+- Read configuration values using dot notation: `./vendor/bin/sail artisan config:show app.name`, `./vendor/bin/sail artisan config:show database.default`. Or read config files directly from the `config/` directory.
 - To check environment variables, read the `.env` file directly.
 
 ## Tinker
 
 - Execute PHP in app context for debugging and testing code. Do not create models without user approval, prefer tests with factories instead. Prefer existing Artisan commands over custom tinker code.
-- Always use single quotes to prevent shell expansion: `php artisan tinker --execute 'Your::code();'`
-    - Double quotes for PHP strings inside: `php artisan tinker --execute 'User::where("active", true)->count();'`
+- Always use single quotes to prevent shell expansion: `./vendor/bin/sail artisan tinker --execute 'Your::code();'`
+    - Double quotes for PHP strings inside: `./vendor/bin/sail artisan tinker --execute 'User::where("active", true)->count();'`
 
 === php rules ===
 
@@ -182,7 +205,7 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 # Laravel Wayfinder
 
-Use Wayfinder to generate TypeScript functions for Laravel routes. Import from `@/actions/` (controllers) or `@/routes/` (named routes).
+Use Wayfinder to generate TypeScript functions for Laravel routes. Import from `@/actions/` (controllers) or `@/routes/` (named routes). use sail with --with-form
 
 === pest/core rules ===
 

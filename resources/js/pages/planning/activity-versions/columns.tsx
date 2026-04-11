@@ -1,4 +1,4 @@
-import type { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, Row, Table } from '@tanstack/react-table';
 import { Pencil, Trash2 } from 'lucide-react';
 
 import { ActionDropdown } from '@/components/action-dropdown';
@@ -16,6 +16,32 @@ const typeLabels: Record<PlanningActivityVersion['type'], string> = {
   output: 'O',
 };
 
+const calculateRowSpan = <TData,>(
+  row: Row<TData>,
+  table: Table<TData>,
+  idSelector: (item: TData) => any,
+) => {
+  const index = row.index;
+  const rows = table.getRowModel().rows;
+  const currentId = idSelector(row.original);
+
+  if (index > 0 && idSelector(rows[index - 1].original) === currentId) {
+    return 0;
+  }
+
+  let span = 1;
+
+  for (let i = index + 1; i < rows.length; i++) {
+    if (idSelector(rows[i].original) === currentId) {
+      span++;
+    } else {
+      break;
+    }
+  }
+
+  return span;
+};
+
 export const getColumns = (
   version: PlanningVersion,
   onEdit: (activity: PlanningActivityVersion) => void,
@@ -27,8 +53,14 @@ export const getColumns = (
   const baseColumns: ColumnDef<PlanningActivityVersion>[] = [
     {
       id: 'actions',
-      cell: ({ row }) => {
+      cell: ({ row, table }) => {
         const activity = row.original;
+        const isDuplicate =
+          calculateRowSpan(row, table, (item) => item.id) === 0;
+
+        if (isDuplicate) {
+          return null;
+        }
 
         return (
           <ActionDropdown
@@ -51,6 +83,10 @@ export const getColumns = (
       },
       meta: {
         cellClassName: 'w-px border-r',
+        rowSpan: (
+          row: Row<PlanningActivityVersion>,
+          table: Table<PlanningActivityVersion>,
+        ) => calculateRowSpan(row, table, (item) => item.id),
       },
     },
     {
@@ -58,10 +94,8 @@ export const getColumns = (
       header: (props) => <DataTableColumnHeader {...props} title="Kode" />,
       cell: ({ row, table }) => {
         const activity = row.original;
-        const index = row.index;
-        const rows = table.getRowModel().rows;
         const isDuplicate =
-          index > 0 && rows[index - 1].original.id === activity.id;
+          calculateRowSpan(row, table, (item) => item.id) === 0;
 
         if (isDuplicate) {
           return null;
@@ -78,14 +112,10 @@ export const getColumns = (
       },
       meta: {
         cellClassName: 'w-px border-r',
-        colSpan: (row, table) => {
-          const index = row.index;
-          const rows = table.getRowModel().rows;
-          const isDuplicate =
-            index > 0 && rows[index - 1].original.id === row.original.id;
-
-          return isDuplicate ? 2 : 1;
-        },
+        rowSpan: (
+          row: Row<PlanningActivityVersion>,
+          table: Table<PlanningActivityVersion>,
+        ) => calculateRowSpan(row, table, (item) => item.id),
       },
     },
     {
@@ -95,10 +125,8 @@ export const getColumns = (
       ),
       cell: ({ row, table }) => {
         const activity = row.original;
-        const index = row.index;
-        const rows = table.getRowModel().rows;
         const isDuplicate =
-          index > 0 && rows[index - 1].original.id === activity.id;
+          calculateRowSpan(row, table, (item) => item.id) === 0;
 
         if (isDuplicate) {
           return null;
@@ -108,22 +136,29 @@ export const getColumns = (
       },
       meta: {
         cellClassName: 'min-w-[300px] border-r',
-        colSpan: (row, table) => {
-          const index = row.index;
-          const rows = table.getRowModel().rows;
-          const isDuplicate =
-            index > 0 && rows[index - 1].original.id === row.original.id;
-
-          return isDuplicate ? 0 : 1;
-        },
+        rowSpan: (
+          row: Row<PlanningActivityVersion>,
+          table: Table<PlanningActivityVersion>,
+        ) => calculateRowSpan(row, table, (item) => item.id),
       },
     },
     {
       id: 'indicator',
       header: (props) => <DataTableColumnHeader {...props} title="Indikator" />,
-      cell: ({ row }) => {
+      cell: ({ row, table }) => {
         const activity = row.original;
         const ind = activity.specific_indicator;
+
+        const isDuplicate =
+          calculateRowSpan(
+            row,
+            table,
+            (item) => `${item.id}-${item.specific_indicator?.name}`,
+          ) === 0;
+
+        if (isDuplicate) {
+          return null;
+        }
 
         if (!ind) {
           return <p className="text-muted-foreground italic">-</p>;
@@ -133,6 +168,16 @@ export const getColumns = (
       },
       meta: {
         cellClassName: 'border-r',
+        rowSpan: (
+          row: Row<PlanningActivityVersion>,
+          table: Table<PlanningActivityVersion>,
+        ) =>
+          calculateRowSpan(
+            row,
+            table,
+            (item: PlanningActivityVersion) =>
+              `${item.id}-${item.specific_indicator?.name}`,
+          ),
       },
     },
     {
@@ -143,9 +188,20 @@ export const getColumns = (
           title={`Baseline ${version.year_start - 1}`}
         />
       ),
-      cell: ({ row }) => {
+      cell: ({ row, table }) => {
         const activity = row.original;
         const ind = activity.specific_indicator;
+
+        const isDuplicate =
+          calculateRowSpan(
+            row,
+            table,
+            (item) => `${item.id}-${item.specific_indicator?.name}`,
+          ) === 0;
+
+        if (isDuplicate) {
+          return null;
+        }
 
         if (!ind) {
           return null;
@@ -160,6 +216,16 @@ export const getColumns = (
       },
       meta: {
         cellClassName: 'w-[150px] border-r',
+        rowSpan: (
+          row: Row<PlanningActivityVersion>,
+          table: Table<PlanningActivityVersion>,
+        ) =>
+          calculateRowSpan(
+            row,
+            table,
+            (item: PlanningActivityVersion) =>
+              `${item.id}-${item.specific_indicator?.name}`,
+          ),
       },
     },
   ];
@@ -209,8 +275,14 @@ export const getColumns = (
       {
         id: `budget-${year}`,
         header: () => <div className="text-xs uppercase">{year} Pagu</div>,
-        cell: ({ row }) => {
+        cell: ({ row, table }) => {
           const activity = row.original;
+          const isDuplicate =
+            calculateRowSpan(row, table, (item) => item.id) === 0;
+
+          if (isDuplicate) {
+            return null;
+          }
 
           return (
             <div className="">
@@ -227,6 +299,10 @@ export const getColumns = (
         },
         meta: {
           cellClassName: 'w-[140px] border-r',
+          rowSpan: (
+            row: Row<PlanningActivityVersion>,
+            table: Table<PlanningActivityVersion>,
+          ) => calculateRowSpan(row, table, (item) => item.id),
         },
       },
     ],

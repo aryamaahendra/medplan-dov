@@ -5,6 +5,7 @@ import {
 } from '@tanstack/react-table';
 import type {
   ColumnDef,
+  RowData,
   RowSelectionState,
   VisibilityState,
 } from '@tanstack/react-table';
@@ -24,7 +25,7 @@ import { DataTablePagination } from './data-table-pagination';
 import type { PaginationMeta } from './data-table-pagination';
 import { DataTableToolbar } from './data-table-toolbar';
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData extends RowData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   meta: PaginationMeta;
@@ -42,7 +43,7 @@ interface DataTableProps<TData, TValue> {
   customThead?: React.ReactNode;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends RowData, TValue>({
   columns,
   data,
   meta,
@@ -136,8 +137,9 @@ export function DataTable<TData, TValue>({
                     {row.getVisibleCells().map((cell) => {
                       const cellMeta = cell.column.columnDef.meta;
                       const colSpan = cellMeta?.colSpan?.(row, table);
+                      const rowSpan = cellMeta?.rowSpan?.(row, table);
 
-                      if (colSpan === 0) {
+                      if (colSpan === 0 || rowSpan === 0) {
                         return null;
                       }
 
@@ -151,6 +153,7 @@ export function DataTable<TData, TValue>({
                           key={cell.id}
                           className={cn(cellClassName)}
                           colSpan={colSpan}
+                          rowSpan={rowSpan}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,

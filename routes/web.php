@@ -54,9 +54,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('planning-versions/{planning_version}/set-current', [PlanningVersionController::class, 'setCurrent'])->name('planning-versions.set-current');
 
     Route::get('planning-versions/{planning_version}/activities', [PlanningActivityVersionController::class, 'index'])->name('planning-versions.activities.index');
+    Route::get('planning-versions/{planning_version}/activities/create', [PlanningActivityVersionController::class, 'create'])->name('planning-versions.activities.create');
     Route::post('planning-versions/{planning_version}/activities', [PlanningActivityVersionController::class, 'store'])->name('planning-versions.activities.store');
+    Route::get('planning-versions/activities/{planning_activity_version}/edit', [PlanningActivityVersionController::class, 'edit'])->name('planning-versions.activities.edit');
     Route::patch('planning-versions/activities/{planning_activity_version}', [PlanningActivityVersionController::class, 'update'])->name('planning-versions.activities.update');
     Route::delete('planning-versions/activities/{planning_activity_version}', [PlanningActivityVersionController::class, 'destroy'])->name('planning-versions.activities.destroy');
+    Route::get('planning-versions/{planning_version}/activities/check-code', [PlanningActivityVersionController::class, 'checkCode'])->name('planning-versions.activities.check-code');
     Route::post('planning-versions/activities/{planning_activity_version}/year', [PlanningActivityVersionController::class, 'updateYearlyData'])->name('planning-versions.activities.update-yearly-data');
 });
 

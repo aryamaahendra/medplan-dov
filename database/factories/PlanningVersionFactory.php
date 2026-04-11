@@ -18,8 +18,9 @@ class PlanningVersionFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => 'RKPD '.$fiscalYear = fake()->year(),
-            'fiscal_year' => $fiscalYear,
+            'name' => 'RKPD '.$yearStart = fake()->year(),
+            'year_start' => $yearStart,
+            'year_end' => $yearStart + 4,
             'revision_no' => fake()->numberBetween(1, 10),
             'status' => fake()->randomElement(['draft', 'submitted', 'approved', 'archived']),
             'is_current' => false,

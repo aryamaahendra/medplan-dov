@@ -19,16 +19,27 @@ test('it can display activities for a version', function () {
     $response->assertInertia(fn ($page) => $page
         ->component('planning-activity-versions/index')
         ->has('activities.data', 3)
-        ->has('parents')
     );
 });
 
-test('it can store a new activity version', function () {
+test('it can store a new activity version with indicators', function () {
     $version = PlanningVersion::factory()->create();
     $data = [
         'name' => 'New Program Snapshot',
         'type' => 'program',
         'code' => '1.01',
+        'indicators' => [
+            [
+                'name' => 'Indicator 1',
+                'baseline' => '100',
+                'unit' => '%',
+            ],
+            [
+                'name' => 'Indicator 2',
+                'baseline' => '200',
+                'unit' => 'kg',
+            ],
+        ],
     ];
 
     $response = $this->post(route('planning-versions.activities.store', $version), $data);
@@ -39,13 +50,41 @@ test('it can store a new activity version', function () {
         'name' => 'New Program Snapshot',
         'type' => 'program',
     ]);
+
+    $this->assertDatabaseHas('planning_activity_indicators', [
+        'name' => 'Indicator 1',
+        'baseline' => '100',
+        'unit' => '%',
+    ]);
+
+    $this->assertDatabaseHas('planning_activity_indicators', [
+        'name' => 'Indicator 2',
+        'baseline' => '200',
+        'unit' => 'kg',
+    ]);
 });
 
-test('it can update an activity version', function () {
+test('it can update an activity version and sync indicators', function () {
     $activity = PlanningActivityVersion::factory()->create();
+    $indicatorToKeep = $activity->indicators()->create(['name' => 'Keep Me', 'baseline' => '1', 'unit' => 'pt']);
+    $indicatorToDrop = $activity->indicators()->create(['name' => 'Drop Me', 'baseline' => '2', 'unit' => 'pt']);
+
     $data = [
         'name' => 'Updated Activity Name',
         'type' => $activity->type,
+        'indicators' => [
+            [
+                'id' => $indicatorToKeep->id,
+                'name' => 'Kept & Renamed',
+                'baseline' => '1',
+                'unit' => 'pt',
+            ],
+            [
+                'name' => 'New Included',
+                'baseline' => '3',
+                'unit' => 'pt',
+            ],
+        ],
     ];
 
     $response = $this->patch(route('planning-versions.activities.update', $activity), $data);
@@ -54,6 +93,19 @@ test('it can update an activity version', function () {
     $this->assertDatabaseHas('planning_activity_versions', [
         'id' => $activity->id,
         'name' => 'Updated Activity Name',
+    ]);
+
+    $this->assertDatabaseHas('planning_activity_indicators', [
+        'id' => $indicatorToKeep->id,
+        'name' => 'Kept & Renamed',
+    ]);
+
+    $this->assertDatabaseHas('planning_activity_indicators', [
+        'name' => 'New Included',
+    ]);
+
+    $this->assertDatabaseMissing('planning_activity_indicators', [
+        'id' => $indicatorToDrop->id,
     ]);
 });
 
@@ -69,6 +121,8 @@ test('it can delete an activity version', function () {
 test('it can update yearly data for an activity version', function () {
     $activity = PlanningActivityVersion::factory()->create();
     $data = [
+        'yearable_id' => $activity->id,
+        'yearable_type' => 'activity',
         'year' => 2025,
         'target' => '100%',
         'budget' => 150000000.00,
@@ -78,7 +132,8 @@ test('it can update yearly data for an activity version', function () {
 
     $response->assertRedirect();
     $this->assertDatabaseHas('planning_activity_years', [
-        'planning_activity_version_id' => $activity->id,
+        'yearable_id' => $activity->id,
+        'yearable_type' => PlanningActivityVersion::class,
         'year' => 2025,
         'target' => '100%',
         'budget' => 150000000.00,

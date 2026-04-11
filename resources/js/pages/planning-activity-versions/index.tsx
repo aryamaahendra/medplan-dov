@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { Fragment, useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -26,7 +26,6 @@ import type {
   PlanningVersion,
 } from '@/types/planning-version';
 
-import { ActivityVersionDialog } from './activity-version-dialog';
 import { getColumns } from './columns';
 
 interface PaginatedActivities {
@@ -43,28 +42,24 @@ interface PlanningActivityVersionsIndexProps {
   version: PlanningVersion;
   activities: PaginatedActivities;
   filters: DataTableFilters;
-  parents: Pick<PlanningActivityVersion, 'id' | 'name' | 'type'>[];
 }
 
 export default function PlanningActivityVersionsIndex({
   version,
   activities,
   filters,
-  parents,
 }: PlanningActivityVersionsIndexProps) {
   const { onSearch, onSort, onReset, onPageChange, onPerPageChange } =
     useDataTable({
       only: ['activities', 'filters'],
     });
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] =
     useState<PlanningActivityVersion | null>(null);
 
   const handleEdit = useCallback((activity: PlanningActivityVersion) => {
-    setSelectedActivity(activity);
-    setIsDialogOpen(true);
+    router.visit(PlanningActivityVersionController.edit.url(activity.id));
   }, []);
 
   const handleDelete = useCallback((activity: PlanningActivityVersion) => {
@@ -93,7 +88,7 @@ export default function PlanningActivityVersionsIndex({
     [version, handleEdit, handleDelete],
   );
 
-  const years = Array.from({ length: 5 }, (_, i) => version.fiscal_year + i);
+  const years = Array.from({ length: 5 }, (_, i) => version.year_start + i);
 
   return (
     <>
@@ -107,7 +102,9 @@ export default function PlanningActivityVersionsIndex({
                 {version.name}
               </h1>
               <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Tahun Anggaran {version.fiscal_year}</span>
+                <span>
+                  Periode {version.year_start} - {version.year_end}
+                </span>
                 <span>•</span>
                 <Badge variant="outline">Revisi {version.revision_no}</Badge>
                 {version.is_current && <Badge> Utama </Badge>}
@@ -115,14 +112,13 @@ export default function PlanningActivityVersionsIndex({
             </div>
           </div>
 
-          <Button
-            onClick={() => {
-              setSelectedActivity(null);
-              setIsDialogOpen(true);
-            }}
-          >
-            <Plus />
-            Tambah Aktivitas
+          <Button asChild>
+            <Link
+              href={PlanningActivityVersionController.create.url(version.id)}
+            >
+              <Plus className="mr-2" />
+              Tambah Aktivitas
+            </Link>
           </Button>
         </div>
 
@@ -153,8 +149,14 @@ export default function PlanningActivityVersionsIndex({
                   >
                     Nomenklatur
                   </TableHead>
+                  <TableHead
+                    rowSpan={2}
+                    className="w-[200px] border-r text-foreground"
+                  >
+                    Indikator
+                  </TableHead>
                   <TableHead rowSpan={2} className="w-[150px] border-r">
-                    Baseline
+                    Baseline {version.year_start - 1}
                   </TableHead>
                   {years.map((year) => (
                     <TableHead
@@ -183,14 +185,6 @@ export default function PlanningActivityVersionsIndex({
           />
         </div>
       </div>
-
-      <ActivityVersionDialog
-        version={version}
-        activity={selectedActivity}
-        parents={parents}
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-      />
 
       <AlertDialog
         open={isDeleteDialogOpen}

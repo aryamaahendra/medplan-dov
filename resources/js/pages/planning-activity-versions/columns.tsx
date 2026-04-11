@@ -106,7 +106,30 @@ export const getColumns = (
         );
       },
       meta: {
-        cellClassName: 'min-w-[300px] border-r',
+        cellClassName: 'min-w-[300px] border-r align-top',
+      },
+    },
+    {
+      id: 'indicator',
+      header: (props) => <DataTableColumnHeader {...props} title="Indikator" />,
+      cell: ({ row }) => {
+        const activity = row.original;
+
+        return (
+          <div className="flex flex-col gap-2 py-1 text-sm">
+            {activity.indicators?.map((ind) => (
+              <div key={ind.id} className="flex min-h-10 items-center">
+                {ind.name}
+              </div>
+            ))}
+            {(!activity.indicators || activity.indicators.length === 0) && (
+              <div className="text-muted-foreground italic">-</div>
+            )}
+          </div>
+        );
+      },
+      meta: {
+        cellClassName: 'w-[200px] border-r align-top',
       },
     },
     {
@@ -119,21 +142,24 @@ export const getColumns = (
       ),
       cell: ({ row }) => {
         const activity = row.original;
-        const mainIndicator = activity.indicators?.[0];
 
         return (
-          <div className="text-sm">
-            {mainIndicator?.baseline || '-'}
-            {mainIndicator?.unit && (
-              <span className="ml-1 text-xs text-muted-foreground">
-                {mainIndicator.unit}
-              </span>
-            )}
+          <div className="flex flex-col gap-2 py-1 text-sm">
+            {activity.indicators?.map((ind) => (
+              <div key={ind.id} className="flex min-h-10 items-center">
+                {ind.baseline || '-'}
+                {ind.unit && (
+                  <span className="ml-1 text-xs text-muted-foreground">
+                    {ind.unit}
+                  </span>
+                )}
+              </div>
+            ))}
           </div>
         );
       },
       meta: {
-        cellClassName: 'w-[250px] border-r',
+        cellClassName: 'w-[150px] border-r align-top',
       },
     },
   ];
@@ -145,22 +171,39 @@ export const getColumns = (
         header: () => <div className="text-xs uppercase">{year} Target</div>,
         cell: ({ row }) => {
           const activity = row.original;
-          const mainIndicator = activity.indicators?.[0];
 
           return (
-            <YearlyDataCell
-              activityId={activity.id}
-              yearableId={mainIndicator?.id ?? 0}
-              yearableType="indicator"
-              items={mainIndicator?.activity_years ?? []}
-              year={year}
-              field="target"
-              disabled={!mainIndicator}
-            />
+            <div className="flex flex-col gap-2 py-1">
+              {activity.indicators?.map((ind) => (
+                <div key={ind.id} className="min-h-10">
+                  <YearlyDataCell
+                    activityId={activity.id}
+                    yearableId={ind.id}
+                    yearableType="indicator"
+                    items={ind.activity_years ?? []}
+                    year={year}
+                    field="target"
+                  />
+                </div>
+              ))}
+              {(!activity.indicators || activity.indicators.length === 0) && (
+                <div className="min-h-10">
+                  <YearlyDataCell
+                    activityId={activity.id}
+                    yearableId={0}
+                    yearableType="indicator"
+                    items={[]}
+                    year={year}
+                    field="target"
+                    disabled={true}
+                  />
+                </div>
+              )}
+            </div>
           );
         },
         meta: {
-          cellClassName: 'w-[120px] border-r',
+          cellClassName: 'w-[120px] border-r align-top',
         },
       },
       {
@@ -170,18 +213,20 @@ export const getColumns = (
           const activity = row.original;
 
           return (
-            <YearlyDataCell
-              activityId={activity.id}
-              yearableId={activity.id}
-              yearableType="activity"
-              items={activity.activity_years ?? []}
-              year={year}
-              field="budget"
-            />
+            <div className="py-1">
+              <YearlyDataCell
+                activityId={activity.id}
+                yearableId={activity.id}
+                yearableType="activity"
+                items={activity.activity_years ?? []}
+                year={year}
+                field="budget"
+              />
+            </div>
           );
         },
         meta: {
-          cellClassName: 'w-[140px] border-r',
+          cellClassName: 'w-[140px] border-r align-top',
         },
       },
     ],

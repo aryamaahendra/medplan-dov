@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePlanningActivityVersionRequest;
 use App\Http\Requests\UpdatePlanningActivityVersionRequest;
+use App\Models\PlanningActivityIndicator;
 use App\Models\PlanningActivityVersion;
 use App\Models\PlanningVersion;
 use App\Traits\HasDataTable;
@@ -46,11 +47,21 @@ class PlanningActivityVersionController extends Controller
             'version' => $planningVersion,
             'activities' => $activities,
             'filters' => $this->dataTableFilters($request, 50),
+        ]);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create(PlanningVersion $planningVersion)
+    {
+        return Inertia::render('planning-activity-versions/create', [
+            'version' => $planningVersion,
             'parents' => PlanningActivityVersion::query()
                 ->where('planning_version_id', $planningVersion->id)
                 ->whereIn('type', ['program', 'activity', 'sub_activity'])
                 ->orderBy('code')
-                ->get(['id', 'name', 'type']),
+                ->get(['id', 'name', 'type', 'code']),
         ]);
     }
 
@@ -59,10 +70,43 @@ class PlanningActivityVersionController extends Controller
      */
     public function store(PlanningVersion $planningVersion, StorePlanningActivityVersionRequest $request)
     {
-        $planningVersion->activityVersions()->create($request->validated());
+        $validated = $request->validated();
+        $activity = $planningVersion->activityVersions()->create($validated);
 
-        return redirect()->back()
+        if ($request->has('indicators')) {
+            foreach ($request->indicators as $indicatorData) {
+                if (! empty($indicatorData['name'])) {
+                    $activity->indicators()->create([
+                        'name' => $indicatorData['name'],
+                        'baseline' => $indicatorData['baseline'] ?? null,
+                        'unit' => $indicatorData['unit'] ?? null,
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->route('planning-versions.activities.index', $planningVersion)
             ->with('success', 'Aktivitas Snapshot berhasil ditambahkan.');
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(PlanningActivityVersion $planningActivityVersion)
+    {
+        $planningActivityVersion->load('indicators');
+        $version = PlanningVersion::findOrFail($planningActivityVersion->planning_version_id);
+
+        return Inertia::render('planning-activity-versions/edit', [
+            'version' => $version,
+            'activity' => $planningActivityVersion,
+            'parents' => PlanningActivityVersion::query()
+                ->where('planning_version_id', $version->id)
+                ->where('id', '!=', $planningActivityVersion->id)
+                ->whereIn('type', ['program', 'activity', 'sub_activity'])
+                ->orderBy('code')
+                ->get(['id', 'name', 'type', 'code']),
+        ]);
     }
 
     /**
@@ -70,10 +114,55 @@ class PlanningActivityVersionController extends Controller
      */
     public function update(PlanningActivityVersion $planningActivityVersion, UpdatePlanningActivityVersionRequest $request)
     {
-        $planningActivityVersion->update($request->validated());
+        $validated = $request->validated();
+        $planningActivityVersion->update($validated);
 
-        return redirect()->back()
+        if ($request->has('indicators')) {
+            $existingIndicatorIds = [];
+            foreach ($request->indicators as $indicatorData) {
+                if (empty($indicatorData['name'])) {
+                    continue;
+                }
+
+                if (! empty($indicatorData['id'])) {
+                    $indicator = $planningActivityVersion->indicators()->find($indicatorData['id']);
+                    if ($indicator) {
+                        $indicator->update([
+                            'name' => $indicatorData['name'],
+                            'baseline' => $indicatorData['baseline'] ?? null,
+                            'unit' => $indicatorData['unit'] ?? null,
+                        ]);
+                        $existingIndicatorIds[] = $indicator->id;
+                    }
+                } else {
+                    $newIndicator = $planningActivityVersion->indicators()->create([
+                        'name' => $indicatorData['name'],
+                        'baseline' => $indicatorData['baseline'] ?? null,
+                        'unit' => $indicatorData['unit'] ?? null,
+                    ]);
+                    $existingIndicatorIds[] = $newIndicator->id;
+                }
+            }
+            $planningActivityVersion->indicators()->whereNotIn('id', $existingIndicatorIds)->delete();
+        } else {
+            $planningActivityVersion->indicators()->delete();
+        }
+
+        return redirect()->route('planning-versions.activities.index', $planningActivityVersion->planning_version_id)
             ->with('success', 'Aktivitas Snapshot berhasil diperbarui.');
+    }
+
+    /**
+     * Check if code already exists in the version.
+     */
+    public function checkCode(PlanningVersion $planningVersion, Request $request)
+    {
+        $exists = PlanningActivityVersion::where('planning_version_id', $planningVersion->id)
+            ->where('code', $request->code)
+            ->when($request->ignore_id, fn ($q) => $q->where('id', '!=', $request->ignore_id))
+            ->exists();
+
+        return response()->json(['exists' => $exists]);
     }
 
     /**

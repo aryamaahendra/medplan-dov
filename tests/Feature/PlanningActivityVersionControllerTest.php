@@ -26,7 +26,6 @@ test('it can store a new activity version with indicators', function () {
     $version = PlanningVersion::factory()->create();
     $data = [
         'name' => 'New Program Snapshot',
-        'type' => 'program',
         'code' => '1.01',
         'indicators' => [
             [
@@ -48,7 +47,6 @@ test('it can store a new activity version with indicators', function () {
     $this->assertDatabaseHas('planning_activity_versions', [
         'planning_version_id' => $version->id,
         'name' => 'New Program Snapshot',
-        'type' => 'program',
     ]);
 
     $this->assertDatabaseHas('planning_activity_indicators', [
@@ -71,7 +69,6 @@ test('it can update an activity version and sync indicators', function () {
 
     $data = [
         'name' => 'Updated Activity Name',
-        'type' => $activity->type,
         'indicators' => [
             [
                 'id' => $indicatorToKeep->id,

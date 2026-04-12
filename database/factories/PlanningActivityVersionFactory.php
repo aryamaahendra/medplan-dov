@@ -23,7 +23,6 @@ class PlanningActivityVersionFactory extends Factory
             'parent_id' => null,
             'code' => fake()->unique()->numerify('1.##.##.##.####'),
             'name' => fake()->sentence(),
-            'type' => fake()->randomElement(['program', 'activity', 'sub_activity', 'output']),
             'full_code' => fake()->unique()->numerify('1.##.##.##.####'),
             'perangkat_daerah' => fake()->company(),
             'keterangan' => fake()->paragraph(),

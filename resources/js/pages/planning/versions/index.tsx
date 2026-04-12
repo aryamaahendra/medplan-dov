@@ -159,7 +159,7 @@ export default function PlanningVersionsIndex({
               setDialogOpen(true);
             }}
           >
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus />
             Buat Versi Baru
           </Button>
         </div>

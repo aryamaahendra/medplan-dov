@@ -25,7 +25,7 @@ class PlanningActivityVersionController extends Controller
     private const array SEARCH_COLUMNS = ['code', 'name', 'full_code'];
 
     /** Columns sortable by */
-    private const array SORTABLE_COLUMNS = ['code', 'name', 'type', 'sort_order'];
+    private const array SORTABLE_COLUMNS = ['code', 'name', 'sort_order'];
 
     /**
      * Display a listing of activities for the given version.
@@ -82,9 +82,9 @@ class PlanningActivityVersionController extends Controller
             'version' => $planningVersion,
             'parents' => PlanningActivityVersion::query()
                 ->where('planning_version_id', $planningVersion->id)
-                ->whereIn('type', ['program', 'activity', 'sub_activity'])
+                ->where('code', 'NOT LIKE', '%.%.%.%')
                 ->orderBy('code')
-                ->get(['id', 'name', 'type', 'code']),
+                ->get(['id', 'name', 'code']),
         ]);
     }
 
@@ -126,9 +126,9 @@ class PlanningActivityVersionController extends Controller
             'parents' => PlanningActivityVersion::query()
                 ->where('planning_version_id', $version->id)
                 ->where('id', '!=', $planningActivityVersion->id)
-                ->whereIn('type', ['program', 'activity', 'sub_activity'])
+                ->where('code', 'NOT LIKE', '%.%.%.%')
                 ->orderBy('code')
-                ->get(['id', 'name', 'type', 'code']),
+                ->get(['id', 'name', 'code']),
         ]);
     }
 

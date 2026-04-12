@@ -28,22 +28,22 @@ class PlanningVersionSeeder extends Seeder
 
         // 2. Create initial activities directly in this Version
         $activities = [
-            ['code' => '1', 'name' => 'Peningkatan Pelayanan Kesehatan', 'type' => 'program'],
-            ['code' => '1.01', 'name' => 'Pengadaan Alat Kesehatan', 'type' => 'activity'],
-            ['code' => '1.01.01', 'name' => 'Stetoskop Digital', 'type' => 'sub_activity'],
-            ['code' => '1.01.01.01', 'name' => 'Output Stetoskop', 'type' => 'output'],
+            ['code' => '1', 'name' => 'Peningkatan Pelayanan Kesehatan'],
+            ['code' => '1.01', 'name' => 'Pengadaan Alat Kesehatan'],
+            ['code' => '1.01.01', 'name' => 'Stetoskop Digital'],
+            ['code' => '1.01.01.02', 'name' => 'Output Stetoskop'],
         ];
 
         $idMapping = [];
 
         foreach ($activities as $index => $data) {
+            $code = $data['code'];
             $parentCode = null;
-            if ($data['type'] === 'activity') {
-                $parentCode = '1';
-            } elseif ($data['type'] === 'sub_activity') {
-                $parentCode = '1.01';
-            } elseif ($data['type'] === 'output') {
-                $parentCode = '1.01.01';
+
+            if (str_contains($code, '.')) {
+                $parts = explode('.', $code);
+                array_pop($parts);
+                $parentCode = implode('.', $parts);
             }
 
             $versionedActivity = PlanningActivityVersion::create([
@@ -51,7 +51,6 @@ class PlanningVersionSeeder extends Seeder
                 'parent_id' => $parentCode ? ($idMapping[$parentCode] ?? null) : null,
                 'code' => $data['code'],
                 'name' => $data['name'],
-                'type' => $data['type'],
                 'full_code' => $data['code'],
                 'perangkat_daerah' => 'Dinas Kesehatan',
                 'sort_order' => $index,

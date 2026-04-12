@@ -119,9 +119,6 @@ class PlanningImport implements ToCollection, WithLimit, WithStartRow
 
                     $currentLevel = $level;
 
-                    $typeMap = [0 => 'program', 1 => 'activity', 2 => 'sub_activity', 3 => 'output'];
-                    $type = $typeMap[$level] ?? 'output';
-
                     $activity = PlanningActivityVersion::updateOrCreate(
                         [
                             'planning_version_id' => $this->versionId,
@@ -130,7 +127,6 @@ class PlanningImport implements ToCollection, WithLimit, WithStartRow
                         [
                             'parent_id' => $parent->id ?? null,
                             'name' => $name,
-                            'type' => $type,
                             'full_code' => $code,
                             'perangkat_daerah' => $row[13] ?? null,
                             'keterangan' => $row[14] ?? null,

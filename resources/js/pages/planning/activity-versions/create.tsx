@@ -10,7 +10,7 @@ import { ActivityVersionForm } from './form';
 
 interface CreateProps {
   version: PlanningVersion;
-  parents: Pick<PlanningActivityVersion, 'id' | 'name' | 'type' | 'code'>[];
+  parents: Pick<PlanningActivityVersion, 'id' | 'name' | 'code'>[];
 }
 
 export default function Create({ version, parents }: CreateProps) {
@@ -18,7 +18,7 @@ export default function Create({ version, parents }: CreateProps) {
     <>
       <Head title="Tambah Aktivitas Snapshot" />
 
-      <div className="mx-auto max-w-4xl p-4 md:p-8">
+      <div className="max-w-4xl p-4 md:p-8">
         <div className="mb-8">
           <h1 className="text-2xl font-bold tracking-tight">
             Tambah Aktivitas Snapshot

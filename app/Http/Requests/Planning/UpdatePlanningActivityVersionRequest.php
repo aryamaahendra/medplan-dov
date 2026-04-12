@@ -25,7 +25,6 @@ class UpdatePlanningActivityVersionRequest extends FormRequest
         return [
             'code' => ['nullable', 'string', 'max:255'],
             'name' => ['required', 'string'],
-            'type' => ['required', 'in:program,activity,sub_activity,output'],
             'parent_id' => ['nullable', 'exists:planning_activity_versions,id'],
             'indicators' => ['nullable', 'array'],
             'indicators.*.id' => ['nullable', 'integer'],

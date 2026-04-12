@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('parent_id')->nullable()->constrained('planning_activity_versions')->nullOnDelete();
             $table->string('code')->nullable()->index();
             $table->text('name');
-            $table->enum('type', ['program', 'activity', 'sub_activity', 'output']);
             $table->string('full_code')->nullable();
             $table->string('perangkat_daerah')->nullable();
             $table->text('keterangan')->nullable();

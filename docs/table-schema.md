@@ -331,7 +331,6 @@ Pivot table connecting KPI indicators and needs.
 | parent_id | bigint | Yes | Foreign Key (self), nullOnDelete |
 | code | string | Yes | Index |
 | name | text | No | |
-| type | enum | No | 'program', 'activity', 'sub_activity', 'output' |
 | full_code | string | Yes | |
 | perangkat_daerah | string | Yes | |
 | keterangan | text | Yes | |

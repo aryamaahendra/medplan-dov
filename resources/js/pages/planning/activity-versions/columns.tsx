@@ -9,13 +9,6 @@ import type {
 } from '@/types/planning-version';
 import { YearlyDataCell } from './yearly-data-cell';
 
-const typeLabels: Record<PlanningActivityVersion['type'], string> = {
-  program: 'P',
-  activity: 'K',
-  sub_activity: 'S',
-  output: 'O',
-};
-
 const calculateRowSpan = <TData,>(
   row: Row<TData>,
   table: Table<TData>,
@@ -90,35 +83,6 @@ export const getColumns = (
       },
     },
     {
-      accessorKey: 'code',
-      header: (props) => <DataTableColumnHeader {...props} title="Kode" />,
-      cell: ({ row, table }) => {
-        const activity = row.original;
-        const isDuplicate =
-          calculateRowSpan(row, table, (item) => item.id) === 0;
-
-        if (isDuplicate) {
-          return null;
-        }
-
-        return (
-          <p className="font-mono whitespace-nowrap">
-            <span className="text-muted-foreground">
-              [{typeLabels[activity.type]}]
-            </span>{' '}
-            {activity.code}
-          </p>
-        );
-      },
-      meta: {
-        cellClassName: 'w-px border-r',
-        rowSpan: (
-          row: Row<PlanningActivityVersion>,
-          table: Table<PlanningActivityVersion>,
-        ) => calculateRowSpan(row, table, (item) => item.id),
-      },
-    },
-    {
       accessorKey: 'name',
       header: (props) => (
         <DataTableColumnHeader {...props} title="Nomenklatur" />
@@ -132,10 +96,19 @@ export const getColumns = (
           return null;
         }
 
-        return <p className="whitespace-normal">{activity.name}</p>;
+        return (
+          <div className="flex flex-col gap-1.5 py-1">
+            <p className="leading-snug font-medium whitespace-normal">
+              {activity.name}
+            </p>
+            <p className="font-mono text-xs leading-none text-muted-foreground">
+              {activity.code}
+            </p>
+          </div>
+        );
       },
       meta: {
-        cellClassName: 'min-w-[300px] border-r',
+        cellClassName: 'min-w-[350px] border-r align-top',
         rowSpan: (
           row: Row<PlanningActivityVersion>,
           table: Table<PlanningActivityVersion>,

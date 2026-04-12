@@ -6,6 +6,13 @@ import { toast } from 'sonner';
 import PlanningActivityVersionController from '@/actions/App/Http/Controllers/Planning/PlanningActivityVersionController';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -24,7 +31,7 @@ import type {
 interface ActivityVersionFormProps {
   version: PlanningVersion;
   activity?: PlanningActivityVersion;
-  parents: Pick<PlanningActivityVersion, 'id' | 'name' | 'type' | 'code'>[];
+  parents: Pick<PlanningActivityVersion, 'id' | 'name' | 'code'>[];
 }
 
 interface IndicatorFormState {
@@ -34,13 +41,6 @@ interface IndicatorFormState {
   unit: string;
 }
 
-const ACITIVITY_TYPES = [
-  { value: 'program', label: 'Program' },
-  { value: 'activity', label: 'Kegiatan' },
-  { value: 'sub_activity', label: 'Sub Kegiatan' },
-  { value: 'output', label: 'Output' },
-];
-
 export function ActivityVersionForm({
   version,
   activity,
@@ -48,9 +48,6 @@ export function ActivityVersionForm({
 }: ActivityVersionFormProps) {
   const isEditing = !!activity;
 
-  const [type, setType] = useState<PlanningActivityVersion['type'] | ''>(
-    activity?.type ?? '',
-  );
   const [parentId, setParentId] = useState<string>(
     activity?.parent_id?.toString() ?? 'none',
   );
@@ -131,201 +128,211 @@ export function ActivityVersionForm({
       className="space-y-8"
     >
       {({ processing, errors }) => (
-        <>
-          <div className="grid gap-6 rounded-lg border bg-card p-6 shadow-sm">
-            <h3 className="text-lg font-medium">Informasi Nomenklatur</h3>
-            <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="parent_id">Induk (Parent)</Label>
-                <Select value={parentId} onValueChange={handleParentChange}>
-                  <SelectTrigger id="parent_id" className="w-full">
-                    <SelectValue placeholder="Pilih induk (opsional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Tanpa Induk (Program)</SelectItem>
-                    {parents
-                      .filter((p) => p.id !== activity?.id)
-                      .map((parent) => (
-                        <SelectItem
-                          key={parent.id}
-                          value={parent.id.toString()}
-                        >
-                          [{parent.type.toUpperCase()}] {parent.code} -{' '}
-                          {parent.name}
+        <div className="space-y-8">
+          <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-2">
+            {/* Left Column: General Information */}
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Informasi Nomenklatur</CardTitle>
+                  <CardDescription>
+                    Pilih induk dan tentukan kode serta nama nomenklatur.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="parent_id">Induk (Parent)</Label>
+                    <Select value={parentId} onValueChange={handleParentChange}>
+                      <SelectTrigger id="parent_id" className="w-full">
+                        <SelectValue placeholder="Pilih induk (opsional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">
+                          Tanpa Induk (Program)
                         </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-                <input
-                  type="hidden"
-                  name="parent_id"
-                  value={parentId === 'none' ? '' : parentId}
-                />
-                <InputError message={errors.parent_id} />
-              </div>
+                        {parents
+                          .filter((p) => p.id !== activity?.id)
+                          .map((parent) => (
+                            <SelectItem
+                              key={parent.id}
+                              value={parent.id.toString()}
+                            >
+                              {parent.code} - {parent.name}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                    <input
+                      type="hidden"
+                      name="parent_id"
+                      value={parentId === 'none' ? '' : parentId}
+                    />
+                    <InputError message={errors.parent_id} />
+                  </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="type">Tipe</Label>
-                  <Select value={type} onValueChange={(v) => setType(v as any)}>
-                    <SelectTrigger id="type" className="w-full">
-                      <SelectValue placeholder="Pilih tipe" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ACITIVITY_TYPES.map((t) => (
-                        <SelectItem key={t.value} value={t.value}>
-                          {t.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <input type="hidden" name="type" value={type} />
-                  <InputError message={errors.type} />
-                </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="code">Kode</Label>
+                      <Input
+                        id="code"
+                        name="code"
+                        value={code}
+                        onChange={(e) => {
+                          setCode(e.target.value);
+                          setCodeExists(false);
+                        }}
+                        placeholder="Contoh: 1.02.01"
+                        className={codeExists ? 'border-destructive' : ''}
+                      />
+                      {codeExists && (
+                        <p className="text-xs text-destructive">
+                          Kode ini sudah digunakan dalam versi ini.
+                        </p>
+                      )}
+                      <InputError message={errors.code} />
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="code">Kode</Label>
-                  <Input
-                    id="code"
-                    name="code"
-                    value={code}
-                    onChange={(e) => {
-                      setCode(e.target.value);
-                      setCodeExists(false);
-                    }}
-                    placeholder="Contoh: 1.02.01"
-                    className={codeExists ? 'border-destructive' : ''}
-                  />
-                  {codeExists && (
-                    <p className="text-xs text-destructive">
-                      Kode ini sudah digunakan dalam versi ini.
-                    </p>
-                  )}
-                  <InputError message={errors.code} />
-                </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="sort_order">Urutan (Sort Order)</Label>
+                      <Input
+                        id="sort_order"
+                        name="sort_order"
+                        type="number"
+                        defaultValue={activity?.sort_order ?? 0}
+                        placeholder="0"
+                      />
+                      <InputError message={errors.sort_order} />
+                    </div>
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="sort_order">Urutan (Sort Order)</Label>
-                  <Input
-                    id="sort_order"
-                    name="sort_order"
-                    type="number"
-                    defaultValue={activity?.sort_order ?? 0}
-                    placeholder="0"
-                  />
-                  <InputError message={errors.sort_order} />
-                </div>
-              </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="name">Nama Nomenklatur</Label>
+                    <Textarea
+                      id="name"
+                      name="name"
+                      defaultValue={activity?.name ?? ''}
+                      className="min-h-[100px]"
+                      required
+                    />
+                    <InputError message={errors.name} />
+                  </div>
 
-              <div className="grid gap-2">
-                <Label htmlFor="name">Nama Nomenklatur</Label>
-                <Textarea
-                  id="name"
-                  name="name"
-                  defaultValue={activity?.name ?? ''}
-                  required
-                />
-                <InputError message={errors.name} />
-              </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="perangkat_daerah">Perangkat Daerah</Label>
+                    <Input
+                      id="perangkat_daerah"
+                      name="perangkat_daerah"
+                      defaultValue={activity?.perangkat_daerah ?? ''}
+                    />
+                    <InputError message={errors.perangkat_daerah} />
+                  </div>
 
-              <div className="grid gap-2">
-                <Label htmlFor="perangkat_daerah">Perangkat Daerah</Label>
-                <Input
-                  id="perangkat_daerah"
-                  name="perangkat_daerah"
-                  defaultValue={activity?.perangkat_daerah ?? ''}
-                />
-                <InputError message={errors.perangkat_daerah} />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="keterangan">Keterangan</Label>
-                <Textarea
-                  id="keterangan"
-                  name="keterangan"
-                  defaultValue={activity?.keterangan ?? ''}
-                />
-                <InputError message={errors.keterangan} />
-              </div>
-            </div>
-          </div>
-
-          <div className="grid gap-6 rounded-lg border bg-card p-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium">Indikator</h3>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addIndicator}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Tambahkan Indikator
-              </Button>
+                  <div className="grid gap-2">
+                    <Label htmlFor="keterangan">Keterangan</Label>
+                    <Textarea
+                      id="keterangan"
+                      name="keterangan"
+                      defaultValue={activity?.keterangan ?? ''}
+                    />
+                    <InputError message={errors.keterangan} />
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
-            <div className="space-y-4">
-              {indicators.map((indicator, index) => (
-                <div
-                  key={index}
-                  className="relative grid grid-cols-12 gap-4 rounded-md border p-4"
-                >
-                  <div className="col-span-12">
-                    <div className="flex items-center justify-between space-x-2">
-                      <Label>Nama Indikator {index + 1}</Label>
+            {/* Right Column: Indicators */}
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-medium">Indikator</h3>
+                <p className="text-sm text-muted-foreground">
+                  Target dan capaian untuk nomenklatur ini.
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                {indicators.map((indicator, index) => (
+                  <Card key={index}>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-semibold">
+                        Indikator {index + 1}
+                      </CardTitle>
                       {indicators.length > 1 && (
                         <Button
                           type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 px-2 text-destructive"
+                          variant="destructive"
+                          size="icon-sm"
                           onClick={() => removeIndicator(index)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       )}
-                    </div>
-                    <input
-                      type="hidden"
-                      name={`indicators[${index}][id]`}
-                      value={indicator.id ?? ''}
-                    />
-                    <Input
-                      name={`indicators[${index}][name]`}
-                      defaultValue={indicator.name}
-                      placeholder="Cth: Persentase Capaian"
-                      required
-                      className="mt-2"
-                    />
-                    <InputError message={errors[`indicators.${index}.name`]} />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid gap-4">
+                        <div className="grid gap-2">
+                          <Label>Nama Indikator</Label>
+                          <input
+                            type="hidden"
+                            name={`indicators[${index}][id]`}
+                            value={indicator.id ?? ''}
+                          />
+                          <Input
+                            name={`indicators[${index}][name]`}
+                            defaultValue={indicator.name}
+                            placeholder="Cth: Persentase Capaian"
+                            required
+                          />
+                          <InputError
+                            message={errors[`indicators.${index}.name`]}
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Baseline</Label>
+                            <Input
+                              name={`indicators[${index}][baseline]`}
+                              defaultValue={indicator.baseline}
+                              placeholder="Cth: 100"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Satuan</Label>
+                            <Input
+                              name={`indicators[${index}][unit]`}
+                              defaultValue={indicator.unit}
+                              placeholder="Cth: Persen (%)"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+                {indicators.length === 0 && (
+                  <div className="rounded-lg border border-dashed p-12 text-center">
+                    <p className="text-muted-foreground">
+                      Belum ada indikator yang ditambahkan.
+                    </p>
                   </div>
-                  <div className="col-span-6 space-y-2">
-                    <Label>Baseline</Label>
-                    <Input
-                      name={`indicators[${index}][baseline]`}
-                      defaultValue={indicator.baseline}
-                      placeholder="Cth: 100"
-                    />
-                  </div>
-                  <div className="col-span-6 space-y-2">
-                    <Label>Satuan</Label>
-                    <Input
-                      name={`indicators[${index}][unit]`}
-                      defaultValue={indicator.unit}
-                      placeholder="Cth: Persen (%)"
-                    />
-                  </div>
+                )}
+
+                <div className="">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addIndicator}
+                    className="w-full border-dashed"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Tambah Indikator
+                  </Button>
                 </div>
-              ))}
-              {indicators.length === 0 && (
-                <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
-                  Belum ada indikator. Silakan tambah indikator.
-                </div>
-              )}
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-4">
+          <div className="flex items-center justify-end gap-4 border-t pt-6">
             <Button
               type="button"
               variant="outline"
@@ -341,7 +348,7 @@ export function ActivityVersionForm({
               {isEditing ? 'Simpan Perubahan' : 'Buat Nomenklatur'}
             </Button>
           </div>
-        </>
+        </div>
       )}
     </Form>
   );

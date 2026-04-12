@@ -19,7 +19,6 @@ class PlanningActivityVersion extends Model
         'parent_id',
         'code',
         'name',
-        'type',
         'full_code',
         'perangkat_daerah',
         'keterangan',

@@ -1,5 +1,3 @@
-import type { PlanningActivityType } from './planning-activity';
-
 export interface PlanningVersion {
   id: number;
   name: string;
@@ -41,7 +39,6 @@ export interface PlanningActivityVersion {
   parent_id: number | null;
   code: string | null;
   name: string;
-  type: PlanningActivityType;
   full_code: string | null;
   perangkat_daerah: string | null;
   keterangan: string | null;

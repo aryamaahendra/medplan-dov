@@ -1,5 +1,5 @@
 import type { ColumnDef, Row, Table } from '@tanstack/react-table';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Dot, Pencil, Trash2 } from 'lucide-react';
 
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
@@ -7,6 +7,7 @@ import type {
   PlanningActivityVersion,
   PlanningVersion,
 } from '@/types/planning-version';
+import { TypeBadge } from './type-badge';
 import { YearlyDataCell } from './yearly-data-cell';
 
 const calculateRowSpan = <TData,>(
@@ -75,39 +76,7 @@ export const getColumns = (
         );
       },
       meta: {
-        cellClassName: 'w-px border-r',
-        rowSpan: (
-          row: Row<PlanningActivityVersion>,
-          table: Table<PlanningActivityVersion>,
-        ) => calculateRowSpan(row, table, (item) => item.id),
-      },
-    },
-    {
-      accessorKey: 'type',
-      header: (props) => <DataTableColumnHeader {...props} title="Tipe" />,
-      cell: ({ row, table }) => {
-        const activity = row.original;
-        const isDuplicate =
-          calculateRowSpan(row, table, (item) => item.id) === 0;
-
-        if (isDuplicate) {
-          return null;
-        }
-
-        if (!activity.type) {
-          return null;
-        }
-
-        return (
-          <div className="flex items-center">
-            <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold tracking-wider text-secondary-foreground uppercase shadow-sm">
-              {activity.type}
-            </span>
-          </div>
-        );
-      },
-      meta: {
-        cellClassName: 'w-[100px] border-r align-top py-4',
+        cellClassName: 'w-px border-r align-top py-4',
         rowSpan: (
           row: Row<PlanningActivityVersion>,
           table: Table<PlanningActivityVersion>,
@@ -129,18 +98,23 @@ export const getColumns = (
         }
 
         return (
-          <div className="flex flex-col gap-1.5 py-1">
+          <div className="flex flex-col gap-3 py-1">
             <p className="leading-snug font-medium whitespace-normal">
               {activity.name}
             </p>
-            <p className="font-mono text-xs leading-none text-muted-foreground">
-              {activity.code}
-            </p>
+
+            <div className="flex items-center gap-1.5">
+              <TypeBadge activity={activity} />
+
+              <Dot className="size-3" />
+
+              <p className="font-mono text-xs">{activity.code || '-'}</p>
+            </div>
           </div>
         );
       },
       meta: {
-        cellClassName: 'min-w-[350px] border-r align-top',
+        cellClassName: 'min-w-[350px] border-r align-top py-4',
         rowSpan: (
           row: Row<PlanningActivityVersion>,
           table: Table<PlanningActivityVersion>,
@@ -172,7 +146,7 @@ export const getColumns = (
         return <p className="w-xs whitespace-normal">{ind.name}</p>;
       },
       meta: {
-        cellClassName: 'border-r',
+        cellClassName: 'border-r align-top py-4',
         rowSpan: (
           row: Row<PlanningActivityVersion>,
           table: Table<PlanningActivityVersion>,
@@ -220,7 +194,7 @@ export const getColumns = (
         );
       },
       meta: {
-        cellClassName: 'w-[150px] border-r',
+        cellClassName: 'w-[150px] border-r align-top py-4',
         rowSpan: (
           row: Row<PlanningActivityVersion>,
           table: Table<PlanningActivityVersion>,
@@ -274,7 +248,7 @@ export const getColumns = (
           );
         },
         meta: {
-          cellClassName: 'w-[120px] border-r',
+          cellClassName: 'w-[120px] border-r align-top py-4',
         },
       },
       {
@@ -297,7 +271,7 @@ export const getColumns = (
           );
         },
         meta: {
-          cellClassName: 'w-[140px] border-r',
+          cellClassName: 'w-[140px] border-r align-top py-4',
         },
       },
     ],

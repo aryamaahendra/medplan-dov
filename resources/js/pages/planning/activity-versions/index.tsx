@@ -152,9 +152,9 @@ export default function PlanningActivityVersionsIndex({
                   <TableHead rowSpan={2} className="w-[50px] border-r">
                     Aksi
                   </TableHead>
-                  <TableHead rowSpan={2} className="w-px border-r">
-                    Kode
-                  </TableHead>
+                  {/* <TableHead rowSpan={2} className="w-[120px] border-r">
+                    Kode & Tipe
+                  </TableHead> */}
                   <TableHead
                     rowSpan={2}
                     className="min-w-[300px] border-r text-foreground"

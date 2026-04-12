@@ -82,9 +82,12 @@ class PlanningActivityVersionController extends Controller
             'version' => $planningVersion,
             'parents' => PlanningActivityVersion::query()
                 ->where('planning_version_id', $planningVersion->id)
-                ->where('code', 'NOT LIKE', '%.%.%.%')
+                ->whereNotNull('code')
+                ->where('code', '!=', '')
                 ->orderBy('code')
-                ->get(['id', 'name', 'code']),
+                ->get(['id', 'name', 'code'])
+                ->filter(fn ($p) => ! preg_match('/[a-zA-Z]$/', $p->code))
+                ->values(),
         ]);
     }
 
@@ -126,9 +129,12 @@ class PlanningActivityVersionController extends Controller
             'parents' => PlanningActivityVersion::query()
                 ->where('planning_version_id', $version->id)
                 ->where('id', '!=', $planningActivityVersion->id)
-                ->where('code', 'NOT LIKE', '%.%.%.%')
+                ->whereNotNull('code')
+                ->where('code', '!=', '')
                 ->orderBy('code')
-                ->get(['id', 'name', 'code']),
+                ->get(['id', 'name', 'code'])
+                ->filter(fn ($p) => ! preg_match('/[a-zA-Z]$/', $p->code))
+                ->values(),
         ]);
     }
 

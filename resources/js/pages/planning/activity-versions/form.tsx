@@ -129,6 +129,23 @@ export function ActivityVersionForm({
     >
       {({ processing, errors }) => (
         <div className="space-y-8">
+          <div className="flex items-center justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() =>
+                router.visit(
+                  PlanningActivityVersionController.index.url(version.id),
+                )
+              }
+            >
+              Batal
+            </Button>
+            <Button type="submit" disabled={processing || codeExists}>
+              {isEditing ? 'Simpan Perubahan' : 'Buat Nomenklatur'}
+            </Button>
+          </div>
+
           <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-2">
             {/* Left Column: General Information */}
             <div className="space-y-6">
@@ -143,15 +160,21 @@ export function ActivityVersionForm({
                   <div className="grid gap-2">
                     <Label htmlFor="parent_id">Induk (Parent)</Label>
                     <Select value={parentId} onValueChange={handleParentChange}>
-                      <SelectTrigger id="parent_id" className="w-full">
+                      <SelectTrigger
+                        id="parent_id"
+                        className="w-full max-w-full truncate"
+                      >
                         <SelectValue placeholder="Pilih induk (opsional)" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="none">
-                          Tanpa Induk (Program)
-                        </SelectItem>
+                        <SelectItem value="none">Tanpa Induk</SelectItem>
                         {parents
-                          .filter((p) => p.id !== activity?.id)
+                          .filter(
+                            (p) =>
+                              p.id !== activity?.id &&
+                              p.code &&
+                              !/[a-zA-Z]$/.test(p.code),
+                          )
                           .map((parent) => (
                             <SelectItem
                               key={parent.id}
@@ -330,23 +353,6 @@ export function ActivityVersionForm({
                 </div>
               </div>
             </div>
-          </div>
-
-          <div className="flex items-center justify-end gap-4 border-t pt-6">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() =>
-                router.visit(
-                  PlanningActivityVersionController.index.url(version.id),
-                )
-              }
-            >
-              Batal
-            </Button>
-            <Button type="submit" disabled={processing || codeExists}>
-              {isEditing ? 'Simpan Perubahan' : 'Buat Nomenklatur'}
-            </Button>
           </div>
         </div>
       )}

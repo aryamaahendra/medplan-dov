@@ -19,7 +19,7 @@ export default function Edit({ version, activity, parents }: EditProps) {
     <>
       <Head title={`Edit ${activity.name}`} />
 
-      <div className="p-4 md:p-8">
+      <div className="max-w-4xl p-4 md:p-8">
         <div className="mb-8">
           <h1 className="text-2xl font-bold tracking-tight">
             Edit Aktivitas Snapshot

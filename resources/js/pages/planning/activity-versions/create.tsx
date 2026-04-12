@@ -11,9 +11,14 @@ import { ActivityVersionForm } from './form';
 interface CreateProps {
   version: PlanningVersion;
   parents: Pick<PlanningActivityVersion, 'id' | 'name' | 'code'>[];
+  activityTypes: { value: string; label: string }[];
 }
 
-export default function Create({ version, parents }: CreateProps) {
+export default function Create({
+  version,
+  parents,
+  activityTypes,
+}: CreateProps) {
   return (
     <>
       <Head title="Tambah Aktivitas Snapshot" />
@@ -28,7 +33,11 @@ export default function Create({ version, parents }: CreateProps) {
           </p>
         </div>
 
-        <ActivityVersionForm version={version} parents={parents} />
+        <ActivityVersionForm
+          version={version}
+          parents={parents}
+          activityTypes={activityTypes}
+        />
       </div>
     </>
   );

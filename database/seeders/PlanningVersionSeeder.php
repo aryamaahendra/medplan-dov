@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\PlanningActivityType;
 use App\Models\PlanningActivityIndicator;
 use App\Models\PlanningActivityVersion;
 use App\Models\PlanningActivityYear;
@@ -46,10 +47,18 @@ class PlanningVersionSeeder extends Seeder
                 $parentCode = implode('.', $parts);
             }
 
+            $type = match (substr_count($code, '.')) {
+                0 => PlanningActivityType::Program,
+                1 => PlanningActivityType::Kegiatan,
+                2 => PlanningActivityType::Subkegiatan,
+                default => PlanningActivityType::Output,
+            };
+
             $versionedActivity = PlanningActivityVersion::create([
                 'planning_version_id' => $version->id,
                 'parent_id' => $parentCode ? ($idMapping[$parentCode] ?? null) : null,
                 'code' => $data['code'],
+                'type' => $type,
                 'name' => $data['name'],
                 'full_code' => $data['code'],
                 'perangkat_daerah' => 'Dinas Kesehatan',

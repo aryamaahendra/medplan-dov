@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Planning;
 
+use App\Enums\PlanningActivityType;
 use App\Exports\PlanningHierarchyExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Planning\StorePlanningActivityVersionRequest;
@@ -88,6 +89,7 @@ class PlanningActivityVersionController extends Controller
                 ->get(['id', 'name', 'code'])
                 ->filter(fn ($p) => ! preg_match('/[a-zA-Z]$/', $p->code))
                 ->values(),
+            'activityTypes' => PlanningActivityType::options(),
         ]);
     }
 
@@ -135,6 +137,7 @@ class PlanningActivityVersionController extends Controller
                 ->get(['id', 'name', 'code'])
                 ->filter(fn ($p) => ! preg_match('/[a-zA-Z]$/', $p->code))
                 ->values(),
+            'activityTypes' => PlanningActivityType::options(),
         ]);
     }
 

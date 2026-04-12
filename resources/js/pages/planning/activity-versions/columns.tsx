@@ -83,6 +83,38 @@ export const getColumns = (
       },
     },
     {
+      accessorKey: 'type',
+      header: (props) => <DataTableColumnHeader {...props} title="Tipe" />,
+      cell: ({ row, table }) => {
+        const activity = row.original;
+        const isDuplicate =
+          calculateRowSpan(row, table, (item) => item.id) === 0;
+
+        if (isDuplicate) {
+          return null;
+        }
+
+        if (!activity.type) {
+          return null;
+        }
+
+        return (
+          <div className="flex items-center">
+            <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold tracking-wider text-secondary-foreground uppercase shadow-sm">
+              {activity.type}
+            </span>
+          </div>
+        );
+      },
+      meta: {
+        cellClassName: 'w-[100px] border-r align-top py-4',
+        rowSpan: (
+          row: Row<PlanningActivityVersion>,
+          table: Table<PlanningActivityVersion>,
+        ) => calculateRowSpan(row, table, (item) => item.id),
+      },
+    },
+    {
       accessorKey: 'name',
       header: (props) => (
         <DataTableColumnHeader {...props} title="Nomenklatur" />

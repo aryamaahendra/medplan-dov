@@ -12,9 +12,15 @@ interface EditProps {
   version: PlanningVersion;
   activity: PlanningActivityVersion;
   parents: Pick<PlanningActivityVersion, 'id' | 'name' | 'code'>[];
+  activityTypes: { value: string; label: string }[];
 }
 
-export default function Edit({ version, activity, parents }: EditProps) {
+export default function Edit({
+  version,
+  activity,
+  parents,
+  activityTypes,
+}: EditProps) {
   return (
     <>
       <Head title={`Edit ${activity.name}`} />
@@ -33,6 +39,7 @@ export default function Edit({ version, activity, parents }: EditProps) {
           version={version}
           activity={activity}
           parents={parents}
+          activityTypes={activityTypes}
         />
       </div>
     </>

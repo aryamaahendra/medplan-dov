@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('planning_version_id')->constrained('planning_versions')->cascadeOnDelete();
             $table->foreignId('parent_id')->nullable()->constrained('planning_activity_versions')->nullOnDelete();
             $table->string('code')->nullable()->index();
+            $table->string('type')->nullable();
             $table->text('name');
             $table->string('full_code')->nullable();
             $table->string('perangkat_daerah')->nullable();

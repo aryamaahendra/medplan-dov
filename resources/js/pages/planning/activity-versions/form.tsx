@@ -32,6 +32,7 @@ interface ActivityVersionFormProps {
   version: PlanningVersion;
   activity?: PlanningActivityVersion;
   parents: Pick<PlanningActivityVersion, 'id' | 'name' | 'code'>[];
+  activityTypes: { value: string; label: string }[];
 }
 
 interface IndicatorFormState {
@@ -45,12 +46,14 @@ export function ActivityVersionForm({
   version,
   activity,
   parents,
+  activityTypes,
 }: ActivityVersionFormProps) {
   const isEditing = !!activity;
 
   const [parentId, setParentId] = useState<string>(
     activity?.parent_id?.toString() ?? 'none',
   );
+  const [type, setType] = useState<string>(activity?.type ?? '');
   const [code, setCode] = useState(activity?.code ?? '');
   const [codeExists, setCodeExists] = useState(false);
 
@@ -213,6 +216,28 @@ export function ActivityVersionForm({
                         </p>
                       )}
                       <InputError message={errors.code} />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="type">Tipe</Label>
+                      <Select
+                        value={type}
+                        onValueChange={(val) => setType(val)}
+                        name="type"
+                      >
+                        <SelectTrigger id="type">
+                          <SelectValue placeholder="Pilih Tipe" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {activityTypes.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <input type="hidden" name="type" value={type} />
+                      <InputError message={errors.type} />
                     </div>
 
                     <div className="space-y-2">

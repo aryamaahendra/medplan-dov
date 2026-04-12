@@ -38,6 +38,7 @@ export interface PlanningActivityVersion {
   planning_version_id: number;
   parent_id: number | null;
   code: string | null;
+  type: string | null;
   name: string;
   full_code: string | null;
   perangkat_daerah: string | null;

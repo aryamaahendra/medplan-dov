@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Planning;
 
+use App\Enums\PlanningActivityType;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
 class StorePlanningActivityVersionRequest extends FormRequest
 {
@@ -24,6 +26,7 @@ class StorePlanningActivityVersionRequest extends FormRequest
     {
         return [
             'code' => ['nullable', 'string', 'max:255'],
+            'type' => ['nullable', new Enum(PlanningActivityType::class)],
             'name' => ['required', 'string'],
             'parent_id' => ['nullable', 'exists:planning_activity_versions,id'],
             'indicators' => ['nullable', 'array'],

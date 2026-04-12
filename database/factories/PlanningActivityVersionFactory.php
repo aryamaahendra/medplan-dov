@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\PlanningActivityType;
 use App\Models\PlanningActivityVersion;
 use App\Models\PlanningVersion;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -21,9 +22,10 @@ class PlanningActivityVersionFactory extends Factory
         return [
             'planning_version_id' => PlanningVersion::factory(),
             'parent_id' => null,
-            'code' => fake()->unique()->numerify('1.##.##.##.####'),
+            'code' => $code = fake()->unique()->numerify('1.##.##.##.####'),
+            'type' => fake()->randomElement(PlanningActivityType::cases()),
             'name' => fake()->sentence(),
-            'full_code' => fake()->unique()->numerify('1.##.##.##.####'),
+            'full_code' => $code,
             'perangkat_daerah' => fake()->company(),
             'keterangan' => fake()->paragraph(),
             'sort_order' => fake()->numberBetween(1, 100),

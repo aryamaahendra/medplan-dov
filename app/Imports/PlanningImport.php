@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Enums\PlanningActivityType;
 use App\Models\PlanningActivityIndicator;
 use App\Models\PlanningActivityVersion;
 use App\Models\PlanningActivityYear;
@@ -93,6 +94,13 @@ class PlanningImport implements ToCollection, WithLimit, WithStartRow
                         // Coded row: level = number of dots (e.g. "1.02.01" → 2 dots → level 2)
                         $level = substr_count($code, '.');
 
+                        $type = match ($level) {
+                            2 => PlanningActivityType::Program,
+                            4 => PlanningActivityType::Kegiatan,
+                            5 => PlanningActivityType::Subkegiatan,
+                            default => throw ValidationException::withMessages(['file' => "Invalid code structure at row {$excelRow}: '{$code}'. Expected 2, 4, or 5 dots for coded items."]),
+                        };
+
                         // Find nearest parent in stack if hierarchy skips levels
                         $parent = null;
                         for ($l = $level - 1; $l >= 0; $l--) {
@@ -102,9 +110,18 @@ class PlanningImport implements ToCollection, WithLimit, WithStartRow
                             }
                         }
                     } else {
-                        // No-code row: nest under the last coded activity
                         $parent = $lastCodedActivity;
-                        $level = ($parent ? substr_count($parent->code, '.') : -1) + 1;
+                        if (! $parent) {
+                            throw ValidationException::withMessages(['file' => "No-code item at row {$excelRow} has no preceding coded activity."]);
+                        }
+
+                        $type = match ($parent->type) {
+                            PlanningActivityType::Program => PlanningActivityType::Outcome,
+                            PlanningActivityType::Kegiatan, PlanningActivityType::Subkegiatan => PlanningActivityType::Output,
+                            default => throw ValidationException::withMessages(['file' => "Invalid parent type for no-code item at row {$excelRow}."]),
+                        };
+
+                        $level = substr_count($parent->code, '.') + 1;
 
                         $parentCode = $parent->code ?? '';
                         $this->counters[$parentCode] = ($this->counters[$parentCode] ?? 0) + 1;
@@ -127,6 +144,7 @@ class PlanningImport implements ToCollection, WithLimit, WithStartRow
                         [
                             'parent_id' => $parent->id ?? null,
                             'name' => $name,
+                            'type' => $type,
                             'full_code' => $code,
                             'perangkat_daerah' => $row[13] ?? null,
                             'keterangan' => $row[14] ?? null,
@@ -167,8 +185,16 @@ class PlanningImport implements ToCollection, WithLimit, WithStartRow
                     $budgetStr = ($budgetRaw !== '' && $budgetRaw !== '-') ? $budgetRaw : null;
                     $budget = $budgetStr !== null ? floatval(str_replace(['.', ','], ['', '.'], (string) $budgetStr)) : null;
 
+                    // Force null budget for Outcome and Kegiatan Output
+                    if (
+                        $type === PlanningActivityType::Outcome ||
+                        ($type === PlanningActivityType::Output && ($parent->type ?? null) === PlanningActivityType::Kegiatan)
+                    ) {
+                        $budget = null;
+                    }
+
                     // Indicator target
-                    if ($indicator && $target !== null) {
+                    if ($indicator) {
                         PlanningActivityYear::updateOrCreate(
                             [
                                 'yearable_id' => $indicator->id,
@@ -180,7 +206,7 @@ class PlanningImport implements ToCollection, WithLimit, WithStartRow
                     }
 
                     // Activity budget (only update on the primary activity row)
-                    if ($label && $budget !== null) {
+                    if ($label) {
                         PlanningActivityYear::updateOrCreate(
                             [
                                 'yearable_id' => $activity->id,

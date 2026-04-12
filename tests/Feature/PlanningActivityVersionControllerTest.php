@@ -29,6 +29,7 @@ test('it can store a new activity version with indicators', function () {
     $data = [
         'name' => 'New Program Snapshot',
         'code' => '1.01',
+        'type' => 'PROGRAM',
         'indicators' => [
             [
                 'name' => 'Indicator 1',
@@ -49,6 +50,7 @@ test('it can store a new activity version with indicators', function () {
     $this->assertDatabaseHas('planning_activity_versions', [
         'planning_version_id' => $version->id,
         'name' => 'New Program Snapshot',
+        'type' => 'PROGRAM',
     ]);
 
     $this->assertDatabaseHas('planning_activity_indicators', [
@@ -71,6 +73,7 @@ test('it can update an activity version and sync indicators', function () {
 
     $data = [
         'name' => 'Updated Activity Name',
+        'type' => 'KEGIATAN',
         'indicators' => [
             [
                 'id' => $indicatorToKeep->id,
@@ -92,6 +95,7 @@ test('it can update an activity version and sync indicators', function () {
     $this->assertDatabaseHas('planning_activity_versions', [
         'id' => $activity->id,
         'name' => 'Updated Activity Name',
+        'type' => 'KEGIATAN',
     ]);
 
     $this->assertDatabaseHas('planning_activity_indicators', [

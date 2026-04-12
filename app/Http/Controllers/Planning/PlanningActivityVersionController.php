@@ -34,7 +34,7 @@ class PlanningActivityVersionController extends Controller
     {
         $query = PlanningActivityVersion::query()
             ->where('planning_version_id', $planningVersion->id)
-            ->with(['activityYears', 'indicators.activityYears', 'parent']);
+            ->with(['activityYears', 'indicators.activityYears', 'parent.activityYears']);
 
         if (! $request->has('sort')) {
             $query->orderBy('sort_order', 'asc')->orderBy('code', 'asc');

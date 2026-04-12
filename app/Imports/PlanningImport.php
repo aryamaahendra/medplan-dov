@@ -161,8 +161,10 @@ class PlanningImport implements ToCollection, WithLimit, WithStartRow
                 }
 
                 foreach ($years as $year => [$t, $b]) {
-                    $target = isset($row[$t]) && trim((string) $row[$t]) !== '' ? str_replace(',', '.', (string) $row[$t]) : null;
-                    $budgetStr = isset($row[$b]) && trim((string) $row[$b]) !== '' ? (string) $row[$b] : null;
+                    $targetStr = isset($row[$t]) ? trim((string) $row[$t]) : '';
+                    $target = ($targetStr !== '' && $targetStr !== '-') ? str_replace(',', '.', $targetStr) : null;
+                    $budgetRaw = isset($row[$b]) ? trim((string) $row[$b]) : '';
+                    $budgetStr = ($budgetRaw !== '' && $budgetRaw !== '-') ? $budgetRaw : null;
                     $budget = $budgetStr !== null ? floatval(str_replace(['.', ','], ['', '.'], (string) $budgetStr)) : null;
 
                     // Indicator target

@@ -18,6 +18,10 @@ interface YearlyDataCellProps {
   year: number;
   field: 'target' | 'budget';
   disabled?: boolean;
+  /** Year rows from the nearest parent activity — used as fallback when own value is null */
+  parentItems?: PlanningActivityYear[];
+  /** Code of the parent activity — shown as a reference in the inherited value display */
+  parentCode?: string;
 }
 
 export function YearlyDataCell({
@@ -28,8 +32,24 @@ export function YearlyDataCell({
   year,
   field,
   disabled,
+  parentItems,
+  parentCode,
 }: YearlyDataCellProps) {
   const yearlyData = items.find((y) => y.year === year);
+
+  /** True when this cell has no own value — will display inherited value */
+  const isInherited =
+    !disabled &&
+    (yearlyData == null ||
+      yearlyData[field] == null ||
+      yearlyData[field] === '' ||
+      yearlyData[field] === '0' ||
+      yearlyData[field] === 0);
+
+  const parentYearlyData = parentItems?.find((y) => y.year === year);
+  const inheritedValue =
+    isInherited && parentYearlyData ? parentYearlyData[field] : null;
+
   const initialValue = yearlyData
     ? yearlyData[field]
     : field === 'budget'
@@ -103,8 +123,14 @@ export function YearlyDataCell({
       return;
     }
 
-    const numericValue =
-      field === 'budget' ? parseInt(value.replace(/[^0-9]/g, '')) || 0 : value;
+    let saveValue: any = value;
+
+    if (field === 'budget') {
+      const numeric = parseInt(value.replace(/[^0-9]/g, '')) || 0;
+      saveValue = numeric === 0 ? null : numeric;
+    } else {
+      saveValue = value === '' || value === '-' ? null : value;
+    }
 
     router
       .optimistic((props: any) => ({
@@ -120,7 +146,7 @@ export function YearlyDataCell({
               const yearExists = existingYears.some((y) => y.year === year);
               const newYears = yearExists
                 ? existingYears.map((y) =>
-                    y.year === year ? { ...y, [field]: numericValue } : y,
+                    y.year === year ? { ...y, [field]: saveValue } : y,
                   )
                 : [
                     ...existingYears,
@@ -130,7 +156,7 @@ export function YearlyDataCell({
                       yearable_type: 'App\\Models\\PlanningActivityVersion',
                       year,
                       target: null,
-                      budget: numericValue,
+                      budget: saveValue,
                     } as PlanningActivityYear,
                   ];
 
@@ -146,7 +172,7 @@ export function YearlyDataCell({
                 const yearExists = existingYears.some((y) => y.year === year);
                 const newYears = yearExists
                   ? existingYears.map((y) =>
-                      y.year === year ? { ...y, [field]: numericValue } : y,
+                      y.year === year ? { ...y, [field]: saveValue } : y,
                     )
                   : [
                       ...existingYears,
@@ -155,7 +181,7 @@ export function YearlyDataCell({
                         yearable_id: yearableId,
                         yearable_type: 'App\\Models\\PlanningActivityIndicator',
                         year,
-                        target: numericValue as string,
+                        target: saveValue as string,
                         budget: null,
                       } as PlanningActivityYear,
                     ];
@@ -176,9 +202,8 @@ export function YearlyDataCell({
           yearable_id: yearableId,
           yearable_type: yearableType,
           year,
-          target:
-            field === 'target' ? numericValue : (yearlyData?.target ?? ''),
-          budget: field === 'budget' ? numericValue : (yearlyData?.budget ?? 0),
+          target: field === 'target' ? saveValue : (yearlyData?.target ?? ''),
+          budget: field === 'budget' ? saveValue : (yearlyData?.budget ?? 0),
         },
         {
           onSuccess: () => {
@@ -238,6 +263,27 @@ export function YearlyDataCell({
         })}
         type="text"
       />
+    );
+  }
+
+  // Inherited value display — shown when own value is null but parent has one
+  if (isInherited && inheritedValue != null) {
+    const inheritedDisplay =
+      field === 'budget'
+        ? formatBudget(inheritedValue)
+        : inheritedValue.toString();
+
+    return (
+      <div
+        onClick={() => setIsEditing(true)}
+        title={`Nilai diwarisi dari aktivitas induk${parentCode ? ` (${parentCode})` : ''}. Klik untuk mengatur nilai sendiri.`}
+        className="cursor-pointer items-center rounded font-mono text-muted-foreground italic transition-colors hover:bg-muted/50"
+      >
+        <div className="">{inheritedDisplay}</div>
+        <div className="-mt-1 inline-flex items-center gap-0.5 text-xs text-muted-foreground/60 not-italic">
+          ↑{parentCode && <p className="font-mono">{parentCode}</p>}
+        </div>
+      </div>
     );
   }
 

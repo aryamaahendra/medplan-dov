@@ -248,34 +248,24 @@ export const getColumns = (
       {
         id: `budget-${year}`,
         header: () => <div className="text-xs uppercase">{year} Pagu</div>,
-        cell: ({ row, table }) => {
+        cell: ({ row }) => {
           const activity = row.original;
-          const isDuplicate =
-            calculateRowSpan(row, table, (item) => item.id) === 0;
-
-          if (isDuplicate) {
-            return null;
-          }
 
           return (
-            <div className="">
-              <YearlyDataCell
-                activityId={activity.id}
-                yearableId={activity.id}
-                yearableType="activity"
-                items={activity.activity_years ?? []}
-                year={year}
-                field="budget"
-              />
-            </div>
+            <YearlyDataCell
+              activityId={activity.id}
+              yearableId={activity.id}
+              yearableType="activity"
+              items={activity.activity_years ?? []}
+              year={year}
+              field="budget"
+              parentItems={activity.parent?.activity_years ?? []}
+              parentCode={activity.parent?.code ?? undefined}
+            />
           );
         },
         meta: {
           cellClassName: 'w-[140px] border-r',
-          rowSpan: (
-            row: Row<PlanningActivityVersion>,
-            table: Table<PlanningActivityVersion>,
-          ) => calculateRowSpan(row, table, (item) => item.id),
         },
       },
     ],

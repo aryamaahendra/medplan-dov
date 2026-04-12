@@ -18,10 +18,13 @@ class PlanningActivityYearFactory extends Factory
      */
     public function definition(): array
     {
+        $activity = PlanningActivityVersion::factory()->create();
+
         return [
-            'planning_activity_version_id' => PlanningActivityVersion::factory(),
+            'yearable_id' => $activity->id,
+            'yearable_type' => PlanningActivityVersion::class,
             'year' => fake()->year(),
-            'target' => fake()->numberBetween(1, 100).' %',
+            'target' => null,
             'budget' => fake()->randomFloat(2, 1000000, 1000000000),
         ];
     }

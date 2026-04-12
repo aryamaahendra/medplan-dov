@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\PlanningActivityIndicator;
 use App\Models\PlanningActivityVersion;
+use App\Models\PlanningActivityYear;
 use App\Models\PlanningVersion;
 use App\Models\User;
 
@@ -134,5 +136,87 @@ test('it can update yearly data for an activity version', function () {
         'year' => 2025,
         'target' => '100%',
         'budget' => 150000000.00,
+    ]);
+});
+
+test('index response includes parent activity_years for child activities', function () {
+    $version = PlanningVersion::factory()->create();
+
+    $parent = PlanningActivityVersion::factory()->create([
+        'planning_version_id' => $version->id,
+        'code' => '1',
+        'sort_order' => 1,
+    ]);
+
+    PlanningActivityYear::create([
+        'yearable_id' => $parent->id,
+        'yearable_type' => PlanningActivityVersion::class,
+        'year' => 2025,
+        'budget' => 500000000,
+    ]);
+
+    PlanningActivityVersion::factory()->create([
+        'planning_version_id' => $version->id,
+        'parent_id' => $parent->id,
+        'code' => '1.01',
+        'sort_order' => 2,
+    ]);
+
+    $response = $this->get(route('planning-versions.activities.index', $version));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('planning/activity-versions/index')
+        ->has('activities.data', 2)
+        // child (index 1 after sort_order) should carry parent.activity_years
+        ->has('activities.data.1.parent.activity_years')
+        ->where('activities.data.1.parent.code', '1')
+    );
+});
+
+test('it can update yearly data to null when budget is 0 or target is -', function () {
+    $activity = PlanningActivityVersion::factory()->create();
+
+    // 1. Test budget 0 -> null
+    $data = [
+        'yearable_id' => $activity->id,
+        'yearable_type' => 'activity',
+        'year' => 2025,
+        'target' => '100%',
+        'budget' => 0,
+    ];
+
+    // The frontend handles the 0->null conversion before sending,
+    // but the controller itself just takes the nullable value.
+    // Let's simulate the frontend sending null for 0.
+    $response = $this->post(route('planning-versions.activities.update-yearly-data', $activity), [
+        ...$data,
+        'budget' => null,
+    ]);
+
+    $response->assertRedirect();
+    $this->assertDatabaseHas('planning_activity_years', [
+        'yearable_id' => $activity->id,
+        'yearable_type' => PlanningActivityVersion::class,
+        'year' => 2025,
+        'budget' => null,
+    ]);
+
+    // 2. Test target - -> null (simulated as frontend sending null)
+    $indicator = $activity->indicators()->create(['name' => 'Ind 1']);
+    $response = $this->post(route('planning-versions.activities.update-yearly-data', $activity), [
+        'yearable_id' => $indicator->id,
+        'yearable_type' => 'indicator',
+        'year' => 2025,
+        'target' => null,
+        'budget' => 0,
+    ]);
+
+    $response->assertRedirect();
+    $this->assertDatabaseHas('planning_activity_years', [
+        'yearable_id' => $indicator->id,
+        'yearable_type' => PlanningActivityIndicator::class,
+        'year' => 2025,
+        'target' => null,
     ]);
 });

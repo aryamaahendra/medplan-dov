@@ -4,6 +4,7 @@ import { Fragment, useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import PlanningActivityVersionController from '@/actions/App/Http/Controllers/Planning/PlanningActivityVersionController';
+import PlanningRecalculateController from '@/actions/App/Http/Controllers/Planning/PlanningRecalculateController';
 import { DataTable } from '@/components/data-table/data-table';
 import {
   AlertDialog,
@@ -20,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import { TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import { useDataTable } from '@/hooks/use-data-table';
+import { cn } from '@/lib/utils';
 import planningVersions from '@/routes/planning-versions';
 import type {
   PlanningActivityVersion,
@@ -56,6 +58,7 @@ export default function PlanningActivityVersionsIndex({
     });
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isRecalculating, setIsRecalculating] = useState(false);
   const [selectedActivity, setSelectedActivity] =
     useState<PlanningActivityVersion | null>(null);
 
@@ -116,20 +119,27 @@ export default function PlanningActivityVersionsIndex({
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
+              disabled={isRecalculating}
               onClick={() => {
+                setIsRecalculating(true);
                 router.post(
-                  PlanningActivityVersionController.recalculateAll.url(
-                    version.id,
-                  ),
+                  PlanningRecalculateController.url(version.id),
                   {},
                   {
-                    onSuccess: () => toast.success('Berhasil menghitung ulang.'),
+                    onSuccess: () =>
+                      toast.success('Berhasil menghitung ulang.'),
+                    onFinish: () => setIsRecalculating(false),
                   },
                 );
               }}
             >
-              <RefreshCcw className="mr-2 h-4 w-4" />
-              Recalculate
+              <RefreshCcw
+                className={cn(
+                  'mr-2 h-4 w-4',
+                  isRecalculating && 'animate-spin',
+                )}
+              />
+              {isRecalculating ? 'Recalculating...' : 'Recalculate'}
             </Button>
             <Button variant="outline" asChild>
               <a

@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Need;
+use App\Models\PlanningActivityVersion;
 use App\Observers\NeedObserver;
+use App\Observers\PlanningActivityVersionObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         Need::observe(NeedObserver::class);
+        PlanningActivityVersion::observe(PlanningActivityVersionObserver::class);
     }
 
     /**

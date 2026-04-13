@@ -2,6 +2,8 @@
 
 namespace App\Observers;
 
+use App\Jobs\CalculateActivityBudgetJob;
+use App\Models\PlanningActivityVersion;
 use App\Models\PlanningActivityYear;
 
 class PlanningActivityYearObserver
@@ -18,11 +20,11 @@ class PlanningActivityYearObserver
 
     private function updateParent(PlanningActivityYear $planningActivityYear): void
     {
-        if ($planningActivityYear->yearable_type === \App\Models\PlanningActivityVersion::class) {
+        if ($planningActivityYear->yearable_type === PlanningActivityVersion::class) {
             $activity = $planningActivityYear->yearable;
 
             if ($activity) {
-                app(\App\Actions\Planning\CalculateActivityBudgetAction::class)->execute($activity, $planningActivityYear->year);
+                CalculateActivityBudgetJob::dispatch($activity, $planningActivityYear->year);
             }
         }
     }

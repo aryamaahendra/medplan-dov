@@ -122,17 +122,22 @@ export function ActivityImportDialog({
               </div>
             </div>
           </div>
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-            >
-              Batal
-            </Button>
-            <Button type="submit" disabled={processing || !data.file}>
-              Import Data
-            </Button>
+          <DialogFooter className="flex items-center justify-between sm:justify-between">
+            <div className="text-[10px] text-muted-foreground italic">
+              * Anggaran akan dihitung ulang secara otomatis setelah impor
+            </div>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+              >
+                Batal
+              </Button>
+              <Button type="submit" disabled={processing || !data.file}>
+                {processing ? 'Mengimpor...' : 'Import Data'}
+              </Button>
+            </div>
           </DialogFooter>
         </form>
       </DialogContent>

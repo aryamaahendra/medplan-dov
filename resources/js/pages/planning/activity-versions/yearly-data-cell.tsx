@@ -299,23 +299,54 @@ export function YearlyDataCell({
   }
 
   const hasBudget = yearlyData?.budget != null && yearlyData.budget != 0;
-  const hasTotal = yearlyData?.total_budget != null && yearlyData.total_budget != 0;
+  const hasTotal =
+    yearlyData?.total_budget != null && yearlyData.total_budget != 0;
 
   return (
     <div
       onClick={() => setIsEditing(true)}
       className="group flex cursor-pointer flex-col items-center justify-center rounded p-1 transition-colors hover:bg-muted/50"
     >
-      <div className={cn('font-mono', { 'font-bold': hasBudget, 'text-muted-foreground/50': !hasBudget })}>
+      <div
+        className={cn('font-mono', {
+          'font-bold': hasBudget,
+          'text-muted-foreground/50': !hasBudget,
+        })}
+      >
         {formatBudget(yearlyData?.budget ?? 0)}
       </div>
       {hasTotal && (
-        <div 
-          title="Total terhitung dari sub-aktivitas"
-          className="mt-1 flex items-center gap-1 rounded-sm bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary"
+        <div
+          title={
+            hasBudget &&
+            Number(yearlyData.total_budget) > Number(yearlyData.budget)
+              ? 'Total terhitung (Rp ' +
+                formatBudget(yearlyData.total_budget ?? 0) +
+                ') lebih besar dari nilai yang diinputkan'
+              : hasBudget &&
+                  Number(yearlyData.total_budget) < Number(yearlyData.budget)
+                ? 'Total terhitung (Rp ' +
+                  formatBudget(yearlyData.total_budget ?? 0) +
+                  ') lebih kecil dari nilai yang diinputkan'
+                : 'Total terhitung dari sub-aktivitas'
+          }
+          className={cn(
+            'mt-1 flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-[10px] font-bold',
+            {
+              'bg-red-500/10 text-red-500':
+                hasBudget &&
+                Number(yearlyData.total_budget) > Number(yearlyData.budget),
+              'bg-emerald-500/10 text-emerald-500':
+                hasBudget &&
+                Number(yearlyData.total_budget) < Number(yearlyData.budget),
+              'bg-primary/10 text-primary':
+                !hasBudget ||
+                Number(yearlyData.total_budget) === Number(yearlyData.budget),
+            },
+          )}
         >
           <span className="opacity-70">Σ</span>
-          {formatBudget(yearlyData.total_budget)}
+          {formatBudget(yearlyData.total_budget ?? 0)}
         </div>
       )}
     </div>

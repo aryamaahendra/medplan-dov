@@ -22,15 +22,15 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             OrganizationalUnitSeeder::class,
-            NeedTypeSeeder::class,
+            // NeedTypeSeeder::class,
             // RenstraSeeder::class,
             // TujuanSeeder::class,
-            RenstraRSUDSeeder::class,
-            NeedGroupSeeder::class,
-            StrategicServicePlanSeeder::class,
-            ChecklistQuestionSeeder::class,
-            NeedChecklistAnswerSeeder::class,
-            PlanningVersionSeeder::class,
+            // RenstraRSUDSeeder::class,
+            // NeedGroupSeeder::class,
+            // StrategicServicePlanSeeder::class,
+            // ChecklistQuestionSeeder::class,
+            // NeedChecklistAnswerSeeder::class,
+            // PlanningVersionSeeder::class,
         ]);
     }
 }

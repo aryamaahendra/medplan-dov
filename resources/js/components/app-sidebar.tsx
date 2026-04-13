@@ -51,7 +51,7 @@ const masterNavItems: NavItem[] = [
     icon: Users,
   },
   {
-    title: 'Unit Organisasi',
+    title: 'Unit Kerja',
     href: organizationalUnits.index.url(),
     icon: Building2,
   },

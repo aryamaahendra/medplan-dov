@@ -63,6 +63,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('planning-versions/activities/{planning_activity_version}', [PlanningActivityVersionController::class, 'destroy'])->name('planning-versions.activities.destroy');
     Route::get('planning-versions/{planning_version}/activities/check-code', [PlanningActivityVersionController::class, 'checkCode'])->name('planning-versions.activities.check-code');
     Route::post('planning-versions/activities/{planning_activity_version}/year', [PlanningActivityVersionController::class, 'updateYearlyData'])->name('planning-versions.activities.update-yearly-data');
+    Route::post('planning-versions/{planning_version}/activities/recalculate', [PlanningActivityVersionController::class, 'recalculateAll'])->name('planning-versions.activities.recalculate');
 });
 
 require __DIR__.'/settings.php';

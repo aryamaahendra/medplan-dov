@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Download, Plus } from 'lucide-react';
+import { Download, Plus, RefreshCcw } from 'lucide-react';
 import { Fragment, useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -114,6 +114,23 @@ export default function PlanningActivityVersionsIndex({
           </div>
 
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                router.post(
+                  PlanningActivityVersionController.recalculateAll.url(
+                    version.id,
+                  ),
+                  {},
+                  {
+                    onSuccess: () => toast.success('Berhasil menghitung ulang.'),
+                  },
+                );
+              }}
+            >
+              <RefreshCcw className="mr-2 h-4 w-4" />
+              Recalculate
+            </Button>
             <Button variant="outline" asChild>
               <a
                 href={PlanningActivityVersionController.export.url(version.id)}

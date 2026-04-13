@@ -18,6 +18,7 @@ export interface PlanningActivityYear {
   year: number;
   target: string | null;
   budget: string | number | null;
+  total_budget?: string | number | null;
   created_at: string;
   updated_at: string;
 }

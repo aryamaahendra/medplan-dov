@@ -287,14 +287,37 @@ export function YearlyDataCell({
     );
   }
 
-  const displayValue = field === 'budget' ? value || 'Rp 0' : value || '-';
+  if (field === 'target') {
+    return (
+      <div
+        onClick={() => setIsEditing(true)}
+        className="cursor-pointer rounded font-mono transition-colors hover:bg-muted/50"
+      >
+        {value || '-'}
+      </div>
+    );
+  }
+
+  const hasBudget = yearlyData?.budget != null && yearlyData.budget != 0;
+  const hasTotal = yearlyData?.total_budget != null && yearlyData.total_budget != 0;
 
   return (
     <div
       onClick={() => setIsEditing(true)}
-      className="cursor-pointer rounded font-mono transition-colors hover:bg-muted/50"
+      className="group flex cursor-pointer flex-col items-center justify-center rounded p-1 transition-colors hover:bg-muted/50"
     >
-      {displayValue}
+      <div className={cn('font-mono', { 'font-bold': hasBudget, 'text-muted-foreground/50': !hasBudget })}>
+        {formatBudget(yearlyData?.budget ?? 0)}
+      </div>
+      {hasTotal && (
+        <div 
+          title="Total terhitung dari sub-aktivitas"
+          className="mt-1 flex items-center gap-1 rounded-sm bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary"
+        >
+          <span className="opacity-70">Σ</span>
+          {formatBudget(yearlyData.total_budget)}
+        </div>
+      )}
     </div>
   );
 }

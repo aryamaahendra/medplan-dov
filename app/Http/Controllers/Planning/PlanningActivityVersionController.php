@@ -280,4 +280,25 @@ class PlanningActivityVersionController extends Controller
 
         return redirect()->back()->with('success', 'Data aktivitas perencanaan berhasil diimpor.');
     }
+
+    /**
+     * Recalculate all budgets for the given version.
+     */
+    public function recalculateAll(PlanningVersion $planningVersion)
+    {
+        $years = \App\Models\PlanningActivityYear::where('yearable_type', PlanningActivityVersion::class)
+            ->whereHasMorph('yearable', [PlanningActivityVersion::class], function ($query) use ($planningVersion) {
+                $query->where('planning_version_id', $planningVersion->id);
+            })
+            ->get();
+
+        foreach ($years as $yearData) {
+            $activity = $yearData->yearable;
+            if ($activity) {
+                app(\App\Actions\Planning\CalculateActivityBudgetAction::class)->execute($activity, $yearData->year);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Semua anggaran berhasil dihitung ulang.');
+    }
 }

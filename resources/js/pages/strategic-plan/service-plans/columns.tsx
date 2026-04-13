@@ -3,12 +3,14 @@ import { PencilLine, Trash2 } from 'lucide-react';
 
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
+import { getIndexColumn } from '@/components/data-table/data-table-index-column';
 import type { StrategicServicePlan } from '@/types';
 
 export const getColumns = (
   onEdit: (plan: StrategicServicePlan) => void,
   onDelete: (plan: StrategicServicePlan) => void,
 ): ColumnDef<StrategicServicePlan>[] => [
+  getIndexColumn(),
   {
     accessorKey: 'year',
     header: (props) => <DataTableColumnHeader {...props} title="Tahun" />,

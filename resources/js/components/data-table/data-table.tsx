@@ -21,8 +21,8 @@ import {
 } from '@/components/ui/table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import { cn } from '@/lib/utils';
+import type { PaginationMeta } from '@/types/table';
 import { DataTablePagination } from './data-table-pagination';
-import type { PaginationMeta } from './data-table-pagination';
 import { DataTableToolbar } from './data-table-toolbar';
 
 interface DataTableProps<TData extends RowData, TValue> {
@@ -78,7 +78,9 @@ export function DataTable<TData extends RowData, TValue>({
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
-    // Handled on server
+    meta: {
+      pagination: meta,
+    },
     manualPagination: true,
     manualSorting: true,
     manualFiltering: true,

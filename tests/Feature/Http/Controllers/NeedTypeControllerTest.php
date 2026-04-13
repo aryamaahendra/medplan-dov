@@ -53,7 +53,7 @@ test('store creates a new need type', function () {
     $this->actingAs($user)
         ->post(route('need-types.store'), $data)
         ->assertRedirect(route('need-types.index'))
-        ->assertSessionHas('success', 'Jenis kebutuhan berhasil dibuat.');
+        ->assertSessionHas('success', 'Kategori kebutuhan berhasil dibuat.');
 
     $this->assertDatabaseHas('need_types', [
         'name' => 'New Need Type',
@@ -94,7 +94,7 @@ test('update modifies an existing need type', function () {
             'order_column' => 5,
         ])
         ->assertRedirect(route('need-types.index'))
-        ->assertSessionHas('success', 'Jenis kebutuhan berhasil diperbarui.');
+        ->assertSessionHas('success', 'Kategori kebutuhan berhasil diperbarui.');
 
     expect($needType->fresh()->name)->toBe('Updated Name');
     expect($needType->fresh()->order_column)->toBe(5);
@@ -121,7 +121,7 @@ test('destroy deletes a need type', function () {
     $this->actingAs($user)
         ->delete(route('need-types.destroy', $needType))
         ->assertRedirect(route('need-types.index'))
-        ->assertSessionHas('success', 'Jenis kebutuhan berhasil dihapus.');
+        ->assertSessionHas('success', 'Kategori kebutuhan berhasil dihapus.');
 
     $this->assertSoftDeleted($needType);
 });

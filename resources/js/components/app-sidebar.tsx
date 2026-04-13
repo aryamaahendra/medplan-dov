@@ -56,7 +56,7 @@ const masterNavItems: NavItem[] = [
     icon: Building2,
   },
   {
-    title: 'Jenis Kebutuhan',
+    title: 'Kategori Kebutuhan',
     href: needTypes.index.url(),
     icon: Layers,
   },

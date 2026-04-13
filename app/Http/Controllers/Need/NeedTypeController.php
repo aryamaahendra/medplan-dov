@@ -43,7 +43,7 @@ class NeedTypeController extends Controller
         NeedType::create($request->validated());
 
         return redirect()->route('need-types.index')
-            ->with('success', 'Jenis kebutuhan berhasil dibuat.');
+            ->with('success', 'Kategori kebutuhan berhasil dibuat.');
     }
 
     public function update(UpdateNeedTypeRequest $request, NeedType $needType)
@@ -51,7 +51,7 @@ class NeedTypeController extends Controller
         $needType->update($request->validated());
 
         return redirect()->route('need-types.index')
-            ->with('success', 'Jenis kebutuhan berhasil diperbarui.');
+            ->with('success', 'Kategori kebutuhan berhasil diperbarui.');
     }
 
     public function destroy(NeedType $needType)
@@ -59,6 +59,6 @@ class NeedTypeController extends Controller
         $needType->delete();
 
         return redirect()->route('need-types.index')
-            ->with('success', 'Jenis kebutuhan berhasil dihapus.');
+            ->with('success', 'Kategori kebutuhan berhasil dihapus.');
     }
 }

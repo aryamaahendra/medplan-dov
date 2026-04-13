@@ -10,6 +10,7 @@ import {
 
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
+import { getIndexColumn } from '@/components/data-table/data-table-index-column';
 import { PriorityBadge } from '@/components/priority-badge';
 import { Badge } from '@/components/ui/badge';
 import needRoutes from '@/routes/needs';
@@ -149,12 +150,7 @@ export const getColumns = (
   onEdit: (need: Need) => void,
   onDelete: (need: Need) => void,
 ): ColumnDef<Need>[] => [
-  {
-    accessorKey: 'id',
-    header: '#',
-    enableSorting: false,
-    meta: { cellClassName: 'font-mono text-muted-foreground w-[50px]' },
-  },
+  getIndexColumn(),
   {
     accessorKey: 'year',
     header: (props) => <DataTableColumnHeader {...props} title="Tahun" />,
@@ -178,7 +174,7 @@ export const getColumns = (
   },
   {
     id: 'need_type',
-    header: 'Jenis Kebutuhan',
+    header: 'Kategori Kebutuhan',
     cell: ({ row }) => row.original.need_type?.name ?? '-',
     enableSorting: false,
   },

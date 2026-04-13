@@ -26,7 +26,7 @@ class NeedTypeSeeder extends Seeder
                     'name' => $type['name'],
                     'order_column' => $type['order_column'],
                     'is_active' => true,
-                    'description' => 'Jenis kebutuhan '.$type['name'],
+                    'description' => 'Kategori kebutuhan '.$type['name'],
                 ]
             );
         }

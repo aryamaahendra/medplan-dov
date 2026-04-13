@@ -56,7 +56,7 @@ export function NeedGeneralInfo({ need }: NeedGeneralInfoProps) {
           <p className="text-sm font-medium">{need.year}</p>
         </InfoRow>
 
-        <InfoRow label="Jenis Kebutuhan">
+        <InfoRow label="Kategori Kebutuhan">
           <p className="text-sm font-medium">{need.need_type?.name}</p>
         </InfoRow>
 

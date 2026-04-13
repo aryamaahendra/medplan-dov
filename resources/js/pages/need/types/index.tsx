@@ -73,7 +73,7 @@ export default function NeedTypesIndex({
       }),
       {
         onSuccess: () => {
-          toast.success('Jenis kebutuhan berhasil dihapus.');
+          toast.success('Kategori kebutuhan berhasil dihapus.');
           setDeletingNeedType(null);
         },
         onFinish: () => setIsDeleting(false),
@@ -86,21 +86,21 @@ export default function NeedTypesIndex({
 
   return (
     <>
-      <Head title="Jenis Kebutuhan" />
+      <Head title="Kategori Kebutuhan" />
 
       <div className="flex flex-col gap-6 p-4">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-foreground">
-              Jenis Kebutuhan
+              Kategori Kebutuhan
             </h1>
             <p className="text-sm text-muted-foreground">
-              Kelola master data jenis kebutuhan.
+              Kelola master data kategori kebutuhan.
             </p>
           </div>
           <Button onClick={onCreate}>
             <Plus />
-            Tambah Jenis Kebutuhan
+            Tambah Kategori Kebutuhan
           </Button>
         </div>
 
@@ -129,7 +129,7 @@ export default function NeedTypesIndex({
         open={!!deletingNeedType}
         onOpenChange={(open) => !open && setDeletingNeedType(null)}
         onConfirm={handleConfirmDelete}
-        title="Hapus Jenis Kebutuhan"
+        title="Hapus Kategori Kebutuhan"
         description={`Apakah Anda yakin ingin menghapus "${deletingNeedType?.name}"? Data yang dihapus akan dipindahkan ke tempat sampah (Soft Delete).`}
         confirmText="Hapus"
         variant="destructive"
@@ -142,7 +142,7 @@ export default function NeedTypesIndex({
 NeedTypesIndex.layout = {
   breadcrumbs: [
     {
-      title: 'Jenis Kebutuhan',
+      title: 'Kategori Kebutuhan',
       href: needTypeRoutes.index.url(),
     },
   ],

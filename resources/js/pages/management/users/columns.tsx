@@ -3,6 +3,7 @@ import { PencilLine, Trash2 } from 'lucide-react';
 
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
+import { getIndexColumn } from '@/components/data-table/data-table-index-column';
 
 export interface User {
   id: number;
@@ -15,14 +16,7 @@ export const getColumns = (
   onEdit: (user: User) => void,
   onDelete: (user: User) => void,
 ): ColumnDef<User>[] => [
-  {
-    accessorKey: 'id',
-    header: '#',
-    enableSorting: false,
-    meta: {
-      cellClassName: 'font-mono text-muted-foreground w-[50px]',
-    },
-  },
+  getIndexColumn(),
   {
     accessorKey: 'name',
     header: (props) => <DataTableColumnHeader {...props} title="Name" />,

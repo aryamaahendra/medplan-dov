@@ -4,6 +4,7 @@ import { CheckCircle2, Eye, PencilLine, Trash2 } from 'lucide-react';
 import { ActionDropdown } from '@/components/action-dropdown';
 import type { ActionItem } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
+import { getIndexColumn } from '@/components/data-table/data-table-index-column';
 import { Badge } from '@/components/ui/badge';
 import groupRoutes from '@/routes/kpis/groups';
 import type { KpiGroup } from '@/types';
@@ -14,12 +15,7 @@ export const getColumns = (
   onActivate: (group: KpiGroup) => void,
   isActivating: boolean,
 ): ColumnDef<KpiGroup>[] => [
-  {
-    accessorKey: 'id',
-    header: '#',
-    enableSorting: false,
-    meta: { cellClassName: 'font-mono text-muted-foreground w-[50px]' },
-  },
+  getIndexColumn(),
   {
     accessorKey: 'name',
     header: (props) => (

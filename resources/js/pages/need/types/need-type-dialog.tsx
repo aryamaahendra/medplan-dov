@@ -37,12 +37,14 @@ export function NeedTypeDialog({
       <DialogContent className="pb-0 sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? 'Edit Jenis Kebutuhan' : 'Tambah Jenis Kebutuhan'}
+            {isEditing
+              ? 'Edit Kategori Kebutuhan'
+              : 'Tambah Kategori Kebutuhan'}
           </DialogTitle>
           <DialogDescription>
             {isEditing
-              ? `Perbarui detail untuk jenis kebutuhan ${needType.name}.`
-              : 'Tambahkan jenis kebutuhan baru ke dalam sistem.'}
+              ? `Perbarui detail untuk kategori kebutuhan ${needType.name}.`
+              : 'Tambahkan kategori kebutuhan baru ke dalam sistem.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -55,8 +57,8 @@ export function NeedTypeDialog({
             onOpenChange(false);
             toast.success(
               isEditing
-                ? 'Jenis kebutuhan berhasil diperbarui.'
-                : 'Jenis kebutuhan berhasil dibuat.',
+                ? 'Kategori kebutuhan berhasil diperbarui.'
+                : 'Kategori kebutuhan berhasil dibuat.',
             );
           }}
           className="space-y-4"
@@ -93,7 +95,7 @@ export function NeedTypeDialog({
                 <Textarea
                   id="description"
                   name="description"
-                  placeholder="Masukkan deskripsi opsional untuk jenis kebutuhan ini..."
+                  placeholder="Masukkan deskripsi opsional untuk kategori kebutuhan ini..."
                   defaultValue={needType?.description ?? ''}
                 />
                 <InputError message={errors.description} />

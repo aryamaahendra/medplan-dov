@@ -3,6 +3,7 @@ import { PencilLine, Trash2 } from 'lucide-react';
 
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
+import { getIndexColumn } from '@/components/data-table/data-table-index-column';
 import { Badge } from '@/components/ui/badge';
 
 export interface NeedType {
@@ -19,14 +20,7 @@ export const getColumns = (
   onEdit: (needType: NeedType) => void,
   onDelete: (needType: NeedType) => void,
 ): ColumnDef<NeedType>[] => [
-  {
-    accessorKey: 'id',
-    header: '#',
-    enableSorting: false,
-    meta: {
-      cellClassName: 'font-mono text-muted-foreground w-[50px]',
-    },
-  },
+  getIndexColumn(),
   {
     accessorKey: 'name',
     header: (props) => <DataTableColumnHeader {...props} title="Nama" />,

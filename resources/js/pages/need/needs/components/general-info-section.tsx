@@ -86,7 +86,7 @@ export function GeneralInfoSection({
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="need_type_id">Jenis Kebutuhan</Label>
+          <Label htmlFor="need_type_id">Kategori Kebutuhan</Label>
           <Select
             value={data.need_type_id}
             onValueChange={(v) => setData('need_type_id', v)}
@@ -95,7 +95,7 @@ export function GeneralInfoSection({
               id="need_type_id"
               className="w-full bg-muted/20 transition-colors hover:bg-muted/40"
             >
-              <SelectValue placeholder="Pilih jenis kebutuhan" />
+              <SelectValue placeholder="Pilih kategori kebutuhan" />
             </SelectTrigger>
             <SelectContent>
               {needTypes.map((t) => (

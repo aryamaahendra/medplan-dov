@@ -1,8 +1,7 @@
-import { CheckCircle2, ShieldCheck, XCircle } from 'lucide-react';
+import { CheckCircle2, XCircle } from 'lucide-react';
 import { PriorityBadge } from '@/components/priority-badge';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { EditorRenderer } from '@/components/ui/editor-renderer';
 
 import { STATUS_ICONS, STATUS_LABELS, STATUS_VARIANTS } from '../columns';
 import type { Need } from '../columns';
@@ -77,20 +76,6 @@ export function NeedStatusOverview({ need }: NeedStatusOverviewProps) {
           </div>
         </CardContent>
       </Card>
-
-      {need.notes && (
-        <Card className="mt-4 border-primary/20 bg-primary/5">
-          <CardContent className="space-y-2 p-4">
-            <div className="flex items-center gap-2 text-xs font-semibold tracking-wider text-primary uppercase">
-              <ShieldCheck className="h-4 w-4" />
-              Catatan Direktur
-            </div>
-            <div className="prose prose-sm dark:prose-invert max-w-none text-sm">
-              <EditorRenderer value={need.notes} />
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }

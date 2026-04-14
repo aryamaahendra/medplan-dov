@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { ArrowLeft, PencilLine, Signature } from 'lucide-react';
+import { ArrowLeft, PencilLine, Signature, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -32,9 +32,17 @@ export function NeedSidebar({ need }: NeedSidebarProps) {
         </Button>
       </div>
 
-      <Button className="w-full" onClick={() => setIsReviewDialogOpen(true)}>
+      <Button
+        className="relative w-full"
+        onClick={() => setIsReviewDialogOpen(true)}
+      >
         <Signature />
         Review Direktur
+        {need.notes && (
+          <span className="absolute -top-1.5 -left-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-background">
+            <AlertCircle />
+          </span>
+        )}
       </Button>
 
       <NeedStatusOverview need={need} />

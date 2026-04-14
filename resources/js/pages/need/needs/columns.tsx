@@ -5,7 +5,7 @@ import {
   Paperclip,
   PencilLine,
   Send,
-  ShieldCheck,
+  Signature,
   Trash2,
   XCircle,
 } from 'lucide-react';
@@ -340,8 +340,9 @@ export const getColumns = (
             'separator',
             {
               label: 'Review Direktur',
-              icon: ShieldCheck,
+              icon: Signature,
               onClick: () => onReview(need),
+              indicator: !!need.notes,
             },
           ]}
         />

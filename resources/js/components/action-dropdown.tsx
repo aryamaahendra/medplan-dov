@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
 import type { LucideIcon } from 'lucide-react';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, AlertCircle } from 'lucide-react';
 import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ export interface ActionItem {
   href?: string;
   variant?: 'default' | 'destructive';
   disabled?: boolean;
+  indicator?: boolean;
 }
 
 interface ActionDropdownProps {
@@ -74,6 +75,7 @@ export function ActionDropdown({
             href,
             variant,
             disabled,
+            indicator,
           } = action;
 
           return (
@@ -86,14 +88,24 @@ export function ActionDropdown({
               asChild={!!href}
             >
               {href ? (
-                <Link href={href}>
-                  {Icon && <Icon className="h-4 w-4" />}
+                <Link href={href} className="flex-1">
+                  {Icon && <Icon className="mr-2 h-4 w-4" />}
                   {label}
+                  {indicator && (
+                    <span className="ml-auto flex h-3.5 w-3.5 items-center justify-center rounded-full bg-foreground text-background ring-2 ring-foreground">
+                      <AlertCircle />
+                    </span>
+                  )}
                 </Link>
               ) : (
                 <>
-                  {Icon && <Icon className="h-4 w-4" />}
-                  {label}
+                  {Icon && <Icon className="mr-2 h-4 w-4" />}
+                  <span className="flex-1">{label}</span>
+                  {indicator && (
+                    <span className="ml-auto flex h-3.5 w-3.5 items-center justify-center rounded-full bg-foreground text-background ring-2 ring-foreground">
+                      <AlertCircle />
+                    </span>
+                  )}
                 </>
               )}
             </DropdownMenuItem>

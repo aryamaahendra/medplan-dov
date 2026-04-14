@@ -1,10 +1,11 @@
 import { Link } from '@inertiajs/react';
 import {
+  AlertCircle,
   CheckCircle2,
   FileText,
   Paperclip,
   PencilLine,
-  ShieldCheck,
+  Signature,
   Trash2,
   XCircle,
 } from 'lucide-react';
@@ -73,9 +74,19 @@ export function NeedCard({ need, onEdit, onDelete, onReview }: NeedCardProps) {
             Hapus
           </Button>
 
-          <Button variant="secondary" size="sm" onClick={() => onReview(need)}>
-            <ShieldCheck />
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => onReview(need)}
+            className="relative"
+          >
+            <Signature />
             Review Direktur
+            {need.notes && (
+              <span className="absolute -top-1.5 -left-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-background">
+                <AlertCircle />
+              </span>
+            )}
           </Button>
         </CardAction>
       </CardHeader>

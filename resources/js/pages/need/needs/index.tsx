@@ -79,7 +79,7 @@ export default function NeedsIndex({
 }: NeedsIndexProps) {
   const [deletingNeed, setDeletingNeed] = useState<Need | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [reviewingNeed, setReviewingNeed] = useState<Need | null>(null);
+  const [reviewingNeedId, setReviewingNeedId] = useState<number | null>(null);
 
   const viewMode = useSyncExternalStore(
     viewModeStore.subscribe,
@@ -119,7 +119,7 @@ export default function NeedsIndex({
   };
 
   const onReview = (need: Need) => {
-    setReviewingNeed(need);
+    setReviewingNeedId(need.id);
   };
 
   const handleConfirmDelete = () => {
@@ -254,13 +254,20 @@ export default function NeedsIndex({
         loading={isDeleting}
       />
 
-      {reviewingNeed && (
-        <NeedDirectorReviewDialog
-          need={reviewingNeed}
-          open={!!reviewingNeed}
-          onOpenChange={(open) => !open && setReviewingNeed(null)}
-        />
-      )}
+      {(() => {
+        const reviewingNeed = needs.data.find((n) => n.id === reviewingNeedId);
+
+        return (
+          reviewingNeed && (
+            <NeedDirectorReviewDialog
+              key={reviewingNeed.id}
+              need={reviewingNeed}
+              open={!!reviewingNeedId}
+              onOpenChange={(open) => !open && setReviewingNeedId(null)}
+            />
+          )
+        );
+      })()}
     </>
   );
 }

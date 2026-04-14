@@ -30,4 +30,17 @@ class StoreStrategicServicePlanRequest extends FormRequest
             'policy_direction' => ['required', 'string'],
         ];
     }
+
+    /**
+     * Get custom attributes for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'service_plan' => 'rencana pengembangan layanan',
+            'target' => 'sasaran',
+        ];
+    }
 }

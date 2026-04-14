@@ -35,12 +35,14 @@ export function StrategicServicePlanDialog({
       <DialogContent className="no-scrollbar max-h-[90vh] overflow-y-auto pb-0 sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? 'Edit Rencana Pelayanan' : 'Tambah Rencana Pelayanan'}
+            {isEditing
+              ? 'Edit Rencana Pengembangan Layanan'
+              : 'Tambah Rencana Pengembangan Layanan'}
           </DialogTitle>
           <DialogDescription>
             {isEditing
-              ? 'Perbarui detail rencana pelayanan strategis.'
-              : 'Tambah rencana pelayanan strategis baru ke dalam sistem.'}
+              ? 'Perbarui detail rencana pengembangan layanan strategis.'
+              : 'Tambah rencana pengembangan layanan strategis baru ke dalam sistem.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -54,7 +56,9 @@ export function StrategicServicePlanDialog({
           onSuccess={() => {
             onOpenChange(false);
             toast.success(
-              isEditing ? 'Rencana diperbarui.' : 'Rencana dibuat.',
+              isEditing
+                ? 'Rencana pengembangan layanan diperbarui.'
+                : 'Rencana pengembangan layanan dibuat.',
             );
           }}
           className="space-y-4"
@@ -87,26 +91,28 @@ export function StrategicServicePlanDialog({
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="service_plan">Rencana Pelayanan</Label>
+                <Label htmlFor="service_plan">
+                  Rencana Pengembangan Layanan
+                </Label>
                 <Textarea
                   id="service_plan"
                   name="service_plan"
                   defaultValue={plan?.service_plan ?? ''}
                   required
-                  placeholder="Detail rencana pelayanan"
+                  placeholder="Detail rencana pengembangan layanan"
                   rows={3}
                 />
                 <InputError message={errors.service_plan} />
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="target">Target</Label>
+                <Label htmlFor="target">Sasaran</Label>
                 <Textarea
                   id="target"
                   name="target"
                   defaultValue={plan?.target ?? ''}
                   required
-                  placeholder="Target yang ingin dicapai"
+                  placeholder="Sasaran yang ingin dicapai"
                   rows={3}
                 />
                 <InputError message={errors.target} />
@@ -134,7 +140,9 @@ export function StrategicServicePlanDialog({
                   Batal
                 </Button>
                 <Button type="submit" disabled={processing}>
-                  {isEditing ? 'Simpan Perubahan' : 'Tambah Rencana'}
+                  {isEditing
+                    ? 'Simpan Perubahan'
+                    : 'Tambah Rencana Pengembangan Layanan'}
                 </Button>
               </DialogFooter>
             </>

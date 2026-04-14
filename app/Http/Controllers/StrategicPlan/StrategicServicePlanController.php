@@ -47,7 +47,7 @@ class StrategicServicePlanController extends Controller
         StrategicServicePlan::create($request->validated());
 
         return redirect()->back()
-            ->with('success', 'Rencana Pelayanan Strategis berhasil dibuat.');
+            ->with('success', 'Rencana Pengembangan Layanan Strategis berhasil dibuat.');
     }
 
     /**
@@ -58,7 +58,7 @@ class StrategicServicePlanController extends Controller
         $strategicServicePlan->update($request->validated());
 
         return redirect()->back()
-            ->with('success', 'Rencana Pelayanan Strategis berhasil diperbarui.');
+            ->with('success', 'Rencana Pengembangan Layanan Strategis berhasil diperbarui.');
     }
 
     /**
@@ -69,6 +69,6 @@ class StrategicServicePlanController extends Controller
         $strategicServicePlan->delete();
 
         return redirect()->back()
-            ->with('success', 'Rencana Pelayanan Strategis berhasil dihapus.');
+            ->with('success', 'Rencana Pengembangan Layanan Strategis berhasil dihapus.');
     }
 }

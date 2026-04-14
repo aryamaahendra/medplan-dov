@@ -74,7 +74,7 @@ export default function StrategicServicePlansIndex({
       }),
       {
         onSuccess: () => {
-          toast.success('Rencana berhasil dihapus.');
+          toast.success('Rencana pengembangan layanan berhasil dihapus.');
           setDeletingPlan(null);
         },
         onFinish: () => setIsDeleting(false),
@@ -90,16 +90,16 @@ export default function StrategicServicePlansIndex({
 
   return (
     <>
-      <Head title="Rencana Pelayanan Strategis" />
+      <Head title="Rencana Pengembangan Layanan Strategis" />
 
       <div className="flex flex-col gap-6 p-4">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold">
-              Rencana Pelayanan Strategis
+              Rencana Pengembangan Layanan Strategis
             </h1>
             <p className="text-sm text-muted-foreground">
-              Kelola data rencana pelayanan strategis rumah sakit.
+              Kelola data rencana pengembangan layanan strategis rumah sakit.
             </p>
           </div>
           <Button onClick={onCreate}>
@@ -118,7 +118,7 @@ export default function StrategicServicePlansIndex({
           onPageChange={onPageChange}
           onPerPageChange={onPerPageChange}
           onReset={onReset}
-          searchPlaceholder="Cari program, rencana, target..."
+          searchPlaceholder="Cari program, rencana, sasaran..."
         />
       </div>
 
@@ -132,8 +132,8 @@ export default function StrategicServicePlansIndex({
         open={!!deletingPlan}
         onOpenChange={(open) => !open && setDeletingPlan(null)}
         onConfirm={handleConfirmDelete}
-        title="Hapus Rencana"
-        description="Apakah Anda yakin ingin menghapus rencana ini? Tindakan ini dapat dibatalkan melalui fitur restorasi jika diperlukan."
+        title="Hapus Rencana Pengembangan Layanan"
+        description="Apakah Anda yakin ingin menghapus rencana pengembangan layanan ini? Tindakan ini dapat dibatalkan melalui fitur restorasi jika diperlukan."
         confirmText="Hapus"
         variant="destructive"
         loading={isDeleting}
@@ -145,7 +145,7 @@ export default function StrategicServicePlansIndex({
 StrategicServicePlansIndex.layout = {
   breadcrumbs: [
     {
-      title: 'Rencana Pelayanan Strategis',
+      title: 'Rencana Pengembangan Layanan Strategis',
       href: strategicServicePlansRoutes.index.url(),
     },
   ],

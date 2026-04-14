@@ -53,7 +53,7 @@ export function RlsAlignmentSection({
           ))}
           {strategicServicePlans.length === 0 && (
             <p className="text-xs text-muted-foreground italic">
-              Tidak ada rencana pelayanan strategis.
+              Tidak ada rencana pengembangan layanan strategis.
             </p>
           )}
         </div>

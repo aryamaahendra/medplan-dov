@@ -71,7 +71,7 @@ const masterNavItems: NavItem[] = [
     icon: BookKey,
   },
   {
-    title: 'Rencana Layanan Strategis',
+    title: 'Rencana Pengembangan Layanan Strategis',
     href: strategicServicePlans.index.url(),
     icon: ListChecks,
   },

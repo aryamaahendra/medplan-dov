@@ -30,7 +30,7 @@ export const getColumns = (
   {
     accessorKey: 'service_plan',
     header: (props) => (
-      <DataTableColumnHeader {...props} title="Rencana Pelayanan" />
+      <DataTableColumnHeader {...props} title="Rencana Pengembangan Layanan" />
     ),
     cell: ({ row }) => {
       const value = row.getValue('service_plan') as string;
@@ -40,7 +40,7 @@ export const getColumns = (
   },
   {
     accessorKey: 'target',
-    header: (props) => <DataTableColumnHeader {...props} title="Target" />,
+    header: (props) => <DataTableColumnHeader {...props} title="Sasaran" />,
     cell: ({ row }) => {
       const value = row.getValue('target') as string;
 
@@ -59,13 +59,13 @@ export const getColumns = (
         <ActionDropdown
           actions={[
             {
-              label: 'Edit Rencana',
+              label: 'Edit Rencana Pengembangan Layanan',
               icon: PencilLine,
               onClick: () => onEdit(plan),
             },
             'separator',
             {
-              label: 'Hapus Rencana',
+              label: 'Hapus Rencana Pengembangan Layanan',
               icon: Trash2,
               onClick: () => onDelete(plan),
               variant: 'destructive',

@@ -157,7 +157,7 @@ export function NeedForm({
                 RLS
               </TabsTrigger>
               <TabsTrigger value="detail" className="">
-                Detail Proposal
+                Detail KAK
               </TabsTrigger>
             </TabsList>
 

@@ -31,7 +31,7 @@ const parseIDR = (value: string) => {
 const UNIT_OPTIONS = [
   'pcs',
   'unit',
-  'orang',
+  'orang/thn',
   'paket',
   'set',
   'buah',

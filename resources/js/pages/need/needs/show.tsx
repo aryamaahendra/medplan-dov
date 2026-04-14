@@ -71,8 +71,8 @@ export default function NeedShow({
                 <TabsTrigger value="strategic">Renstra</TabsTrigger>
                 <TabsTrigger value="ikk">IKK</TabsTrigger>
                 <TabsTrigger value="rls">RLS</TabsTrigger>
+                <TabsTrigger value="detail">Detail KAK</TabsTrigger>
                 <TabsTrigger value="checklist">Checklist</TabsTrigger>
-                <TabsTrigger value="detail">Detail Proposal</TabsTrigger>
               </TabsList>
               <TabsContent value="general" className="mt-0">
                 <div className="mt-4">

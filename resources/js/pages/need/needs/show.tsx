@@ -1,15 +1,23 @@
 import { Head, router } from '@inertiajs/react';
-import { DownloadIcon, FileIcon, PaperclipIcon } from 'lucide-react';
+import { PaperclipIcon } from 'lucide-react';
 import { useMemo } from 'react';
 import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 import { ChecklistForm } from '@/components/needs/checklist-form';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import needRoutes from '@/routes/needs';
 import type { ChecklistQuestion, ChecklistAnswer } from '@/types';
 
 import type { Need, Sasaran, Tujuan } from './columns';
+import { AttachmentList } from './components/attachment-list';
 import { IkkAlignmentShow } from './components/ikk-alignment-show';
 import { NeedDetailView } from './components/need-detail-view';
 import { NeedGeneralInfo } from './components/need-general-info';
@@ -118,91 +126,41 @@ export default function NeedShow({
                 <NeedDetailView detail={need.detail} />
               </TabsContent>
               <TabsContent value="lampiran" className="mt-0">
-                <div className="mt-4">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="space-y-1">
-                      <h2 className="text-xl font-semibold">
-                        Dokumen Lampiran
-                      </h2>
-                      <p className="text-sm text-muted-foreground">
-                        Dokumen bukti dukung usulan kebutuhan.
-                      </p>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        router.visit(
-                          NeedAttachmentController.index.url({ need: need.id }),
-                        )
-                      }
-                    >
-                      <PaperclipIcon className="mr-2 h-4 w-4" />
-                      Kelola Lampiran
-                    </Button>
-                  </div>
+                <Card className="mt-6">
+                  <CardHeader>
+                    <CardTitle>Dokumen Lampiran</CardTitle>
+                    <CardDescription>
+                      Dokumen bukti dukung usulan kebutuhan.
+                    </CardDescription>
 
-                  {need.attachments && need.attachments.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                      {need.attachments.map((attachment) => (
-                        <Card key={attachment.id} className="overflow-hidden">
-                          <CardContent className="flex items-center justify-between p-4">
-                            <div className="flex items-center gap-3 overflow-hidden">
-                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                                <FileIcon className="h-5 w-5" />
-                              </div>
-                              <div className="overflow-hidden">
-                                <p
-                                  className="truncate font-medium"
-                                  title={attachment.display_name}
-                                >
-                                  {attachment.display_name}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  {attachment.mime_type
-                                    .split('/')[1]
-                                    .toUpperCase()}{' '}
-                                  •{' '}
-                                  {(attachment.file_size / 1024 / 1024).toFixed(
-                                    2,
-                                  )}{' '}
-                                  MB
-                                </p>
-                              </div>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              asChild
-                              className="shrink-0"
-                            >
-                              <a
-                                href={NeedAttachmentController.download.url({
-                                  attachment: attachment.id,
-                                })}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                <DownloadIcon className="h-4 w-4" />
-                              </a>
-                            </Button>
-                          </CardContent>
-                        </Card>
-                      ))}
+                    <CardAction>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          router.visit(
+                            NeedAttachmentController.index.url({
+                              need: need.id,
+                            }),
+                          )
+                        }
+                      >
+                        <PaperclipIcon />
+                        Kelola Lampiran
+                      </Button>
+                    </CardAction>
+                  </CardHeader>
+                  <CardContent className="px-0">
+                    <div className="border-y">
+                      <AttachmentList
+                        attachments={need.attachments || []}
+                        showHeader={false}
+                        allowDelete={false}
+                        showCard={false}
+                      />
                     </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
-                      <PaperclipIcon className="mb-4 h-12 w-12 text-muted-foreground/20" />
-                      <h3 className="text-lg font-medium">
-                        Belum Ada Lampiran
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        Tidak ada dokumen bukti dukung yang dilampirkan untuk
-                        usulan ini.
-                      </p>
-                    </div>
-                  )}
-                </div>
+                  </CardContent>
+                </Card>
               </TabsContent>
             </Tabs>
           </div>

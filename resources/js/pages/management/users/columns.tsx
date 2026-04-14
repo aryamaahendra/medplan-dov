@@ -20,10 +20,6 @@ export const getColumns = (
   {
     accessorKey: 'name',
     header: (props) => <DataTableColumnHeader {...props} title="Name" />,
-    meta: {
-      cellClassName: (row) =>
-        row.original.id === 1 ? 'font-bold text-primary' : '',
-    },
   },
   {
     accessorKey: 'email',

@@ -14,7 +14,7 @@ interface NeedsTableToolbarProps {
     impact?: string | string[];
     is_priority?: string | string[];
   };
-  organizationalUnits: { id: number; name: string }[];
+  organizationalUnits: { id: number; name: string; parent_id: number | null }[];
   needTypes: { id: number; name: string }[];
   mergeParams: (params: Record<string, any>) => void;
 }

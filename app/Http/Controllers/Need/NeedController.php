@@ -76,7 +76,7 @@ class NeedController extends Controller
         return Inertia::render('need/needs/index', [
             'needs' => $needs,
             'currentGroup' => $currentGroup,
-            'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name'])->get(),
+            'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name', 'parent_id'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
             'filters' => array_merge($this->dataTableFilters($request), [
                 'year' => $request->input('year'),
@@ -118,7 +118,7 @@ class NeedController extends Controller
 
         return Inertia::render('need/needs/create', [
             'currentGroup' => $currentGroup,
-            'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name'])->get(),
+            'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name', 'parent_id'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
             'tujuans' => Tujuan::query()
                 ->whereHas('renstra', fn ($q) => $q->where('is_active', true))
@@ -143,7 +143,7 @@ class NeedController extends Controller
         return Inertia::render('need/needs/edit', [
             'need' => $need->load(['sasarans:id', 'indicators:id', 'kpiIndicators:id', 'strategicServicePlans:id', 'detail']),
             'currentGroup' => $need->needGroup,
-            'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name'])->get(),
+            'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name', 'parent_id'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
             'tujuans' => Tujuan::query()
                 ->whereHas('renstra', fn ($q) => $q->where('is_active', true))

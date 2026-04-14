@@ -4,7 +4,7 @@ import type { Tujuan } from './columns';
 import { NeedForm } from './components/need-form';
 
 interface CreateProps {
-  organizationalUnits: { id: number; name: string }[];
+  organizationalUnits: { id: number; name: string; parent_id: number | null }[];
   currentGroup: { id: number; name: string; year: number };
   needTypes: { id: number; name: string }[];
   tujuans: Tujuan[];

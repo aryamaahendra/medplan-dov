@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { TreeSelect } from '@/components/ui/tree-select';
 
 const formatIDR = (value: string | number) => {
   if (value === undefined || value === null || value === '') {
@@ -44,7 +45,7 @@ interface GeneralInfoSectionProps {
   data: any;
   setData: (key: any, value: any) => void;
   errors: any;
-  organizationalUnits: { id: number; name: string }[];
+  organizationalUnits: { id: number; name: string; parent_id: number | null }[];
   needTypes: { id: number; name: string }[];
   handleVolumeChange: (value: string) => void;
   handleUnitPriceChange: (value: string) => void;
@@ -64,24 +65,13 @@ export function GeneralInfoSection({
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="organizational_unit_id">Unit Kerja</Label>
-          <Select
+          <TreeSelect
+            items={organizationalUnits}
             value={data.organizational_unit_id}
             onValueChange={(v) => setData('organizational_unit_id', v)}
-          >
-            <SelectTrigger
-              id="organizational_unit_id"
-              className="w-full bg-muted/20 transition-colors hover:bg-muted/40"
-            >
-              <SelectValue placeholder="Pilih unit kerja" />
-            </SelectTrigger>
-            <SelectContent>
-              {organizationalUnits.map((u) => (
-                <SelectItem key={u.id} value={u.id.toString()}>
-                  {u.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            placeholder="Pilih unit kerja"
+            className="bg-muted/20 transition-colors hover:bg-muted/40"
+          />
           <InputError message={errors.organizational_unit_id} />
         </div>
 

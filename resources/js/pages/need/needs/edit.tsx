@@ -6,7 +6,7 @@ import { NeedForm } from './components/need-form';
 interface EditProps {
   need: Need;
   currentGroup: { id: number; name: string; year: number };
-  organizationalUnits: { id: number; name: string }[];
+  organizationalUnits: { id: number; name: string; parent_id: number | null }[];
   needTypes: { id: number; name: string }[];
   tujuans: Tujuan[];
   kpiGroups: any[];

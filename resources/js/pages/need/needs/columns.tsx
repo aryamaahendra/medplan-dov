@@ -19,6 +19,8 @@ import type {
   StrategicServicePlan as BaseStrategicServicePlan,
 } from '@/types';
 
+export type { KpiIndicator, BaseStrategicServicePlan };
+
 export interface Sasaran {
   id: number;
   name: string;

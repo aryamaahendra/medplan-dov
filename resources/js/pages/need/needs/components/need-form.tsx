@@ -20,7 +20,7 @@ import { RlsAlignmentSection } from './rls-alignment-section';
 interface NeedFormProps {
   need?: Need | null;
   currentGroup?: { id: number; name: string; year: number } | null;
-  organizationalUnits: { id: number; name: string }[];
+  organizationalUnits: { id: number; name: string; parent_id: number | null }[];
   needTypes: { id: number; name: string }[];
   tujuans: Tujuan[];
   kpiGroups: any[];

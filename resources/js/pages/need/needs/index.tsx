@@ -29,7 +29,7 @@ interface PaginatedNeeds {
 interface NeedsIndexProps {
   needs: PaginatedNeeds;
   currentGroup: { id: number; name: string; year: number };
-  organizationalUnits: { id: number; name: string }[];
+  organizationalUnits: { id: number; name: string; parent_id: number | null }[];
   needTypes: { id: number; name: string }[];
   filters: DataTableFilters & {
     year?: string | string[];

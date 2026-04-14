@@ -2,12 +2,14 @@ import type { ColumnDef } from '@tanstack/react-table';
 import {
   CheckCircle2,
   FileText,
+  Paperclip,
   PencilLine,
   Send,
   Trash2,
   XCircle,
 } from 'lucide-react';
 
+import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { getIndexColumn } from '@/components/data-table/data-table-index-column';
@@ -21,6 +23,17 @@ import type {
 } from '@/types';
 
 export type { KpiIndicator, BaseStrategicServicePlan };
+
+export interface Attachment {
+  id: number;
+  need_id: number;
+  display_name: string;
+  file_path: string;
+  file_size: number;
+  mime_type: string;
+  extension: string;
+  created_at: string;
+}
 
 export interface Sasaran {
   id: number;
@@ -96,6 +109,7 @@ export interface Need {
   strategic_service_plans_count?: number;
   detail?: NeedDetail | null;
   checklist_percentage?: number | string;
+  attachments?: Attachment[];
 }
 
 export const STATUS_LABELS: Record<Need['status'], string> = {
@@ -283,6 +297,11 @@ export const getColumns = (
               label: 'Edit',
               icon: PencilLine,
               onClick: () => onEdit(need),
+            },
+            {
+              label: 'Lampiran',
+              icon: Paperclip,
+              href: NeedAttachmentController.index.url({ need: need.id }),
             },
             'separator',
             {

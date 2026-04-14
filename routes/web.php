@@ -5,6 +5,7 @@ use App\Http\Controllers\Kpi\KpiIndicatorController;
 use App\Http\Controllers\Management\OrganizationalUnitController;
 use App\Http\Controllers\Management\UserController;
 use App\Http\Controllers\Need\ChecklistQuestionController;
+use App\Http\Controllers\Need\NeedAttachmentController;
 use App\Http\Controllers\Need\NeedChecklistAnswerController;
 use App\Http\Controllers\Need\NeedController;
 use App\Http\Controllers\Need\NeedGroupChecklistController;
@@ -37,6 +38,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('need-groups/{need_group}/checklists/{checklist_question}', [NeedGroupChecklistController::class, 'destroy'])->name('need-groups.checklists.destroy');
     Route::post('need-groups/{need_group}/checklists/reorder', [NeedGroupChecklistController::class, 'reorder'])->name('need-groups.checklists.reorder');
     Route::resource('needs', NeedController::class);
+    Route::get('needs/{need}/attachments', [NeedAttachmentController::class, 'index'])->name('needs.attachments.index');
+    Route::post('needs/{need}/attachments', [NeedAttachmentController::class, 'store'])->name('needs.attachments.store');
+    Route::get('needs/attachments/{attachment}', [NeedAttachmentController::class, 'download'])->name('needs.attachments.download');
+    Route::delete('needs/attachments/{attachment}', [NeedAttachmentController::class, 'destroy'])->name('needs.attachments.destroy');
     Route::resource('renstras', RenstraController::class)->except(['create', 'edit']);
     Route::resource('tujuans', TujuanController::class)->except(['index', 'create', 'edit', 'show']);
     Route::resource('sasarans', SasaranController::class)->except(['index', 'create', 'edit', 'show']);

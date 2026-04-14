@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
 
 import type { Need, StrategicServicePlan, Tujuan } from '../columns';
+import { FileSection } from './file-section';
 import { GeneralInfoSection } from './general-info-section';
 import { IkkAlignmentSection } from './ikk-alignment-section';
 import { NeedDetailSection } from './need-detail-section';
@@ -40,53 +41,54 @@ export function NeedForm({
 }: NeedFormProps) {
   const isEditing = !!need;
 
-  const { data, setData, post, patch, processing, errors, transform } = useForm(
-    {
-      need_group_id:
-        need?.need_group_id?.toString() ?? currentGroup?.id?.toString() ?? '',
-      organizational_unit_id: need?.organizational_unit_id?.toString() ?? '',
-      need_type_id: need?.need_type_id?.toString() ?? '',
-      year:
-        need?.year?.toString() ??
-        currentGroup?.year?.toString() ??
-        new Date().getFullYear().toString(),
-      title: need?.title ?? '',
-      description: need?.description ?? '',
-      current_condition: need?.current_condition ?? '',
-      required_condition: need?.required_condition ?? '',
-      unit: need?.unit ?? '',
-      volume: need?.volume ?? '',
-      unit_price: need?.unit_price ?? '',
-      total_price: need?.total_price ?? '',
-      urgency: need?.urgency ?? 'medium',
-      impact: need?.impact ?? 'medium',
-      is_priority: need?.is_priority ?? false,
-      status: need?.status ?? 'draft',
-      sasaran_ids:
-        need?.sasarans?.map((s) => s.id.toString()) ?? ([] as string[]),
-      indicator_ids:
-        need?.indicators?.map((i) => i.id.toString()) ?? ([] as string[]),
-      kpi_indicator_ids:
-        need?.kpi_indicators?.map((i) => i.id.toString()) ?? ([] as string[]),
-      strategic_service_plan_ids:
-        need?.strategic_service_plans?.map((i) => i.id.toString()) ??
-        ([] as string[]),
-      detail: {
-        background: need?.detail?.background ?? '',
-        purpose_and_objectives: need?.detail?.purpose_and_objectives ?? '',
-        target_objective: need?.detail?.target_objective ?? '',
-        procurement_organization_name:
-          need?.detail?.procurement_organization_name ?? '',
-        funding_source_and_estimated_cost:
-          need?.detail?.funding_source_and_estimated_cost ?? '',
-        implementation_period: need?.detail?.implementation_period ?? '',
-        expert_or_skilled_personnel:
-          need?.detail?.expert_or_skilled_personnel ?? '',
-        technical_specifications: need?.detail?.technical_specifications ?? '',
-        training: need?.detail?.training ?? '',
-      },
+  const { data, setData, post, processing, errors, transform } = useForm({
+    need_group_id:
+      need?.need_group_id?.toString() ?? currentGroup?.id?.toString() ?? '',
+    organizational_unit_id: need?.organizational_unit_id?.toString() ?? '',
+    need_type_id: need?.need_type_id?.toString() ?? '',
+    year:
+      need?.year?.toString() ??
+      currentGroup?.year?.toString() ??
+      new Date().getFullYear().toString(),
+    title: need?.title ?? '',
+    description: need?.description ?? '',
+    current_condition: need?.current_condition ?? '',
+    required_condition: need?.required_condition ?? '',
+    unit: need?.unit ?? '',
+    volume: need?.volume ?? '',
+    unit_price: need?.unit_price ?? '',
+    total_price: need?.total_price ?? '',
+    urgency: need?.urgency ?? 'medium',
+    impact: need?.impact ?? 'medium',
+    is_priority: need?.is_priority ?? false,
+    status: need?.status ?? 'draft',
+    sasaran_ids:
+      need?.sasarans?.map((s) => s.id.toString()) ?? ([] as string[]),
+    indicator_ids:
+      need?.indicators?.map((i) => i.id.toString()) ?? ([] as string[]),
+    kpi_indicator_ids:
+      need?.kpi_indicators?.map((i) => i.id.toString()) ?? ([] as string[]),
+    strategic_service_plan_ids:
+      need?.strategic_service_plans?.map((i) => i.id.toString()) ??
+      ([] as string[]),
+    detail: {
+      background: need?.detail?.background ?? '',
+      purpose_and_objectives: need?.detail?.purpose_and_objectives ?? '',
+      target_objective: need?.detail?.target_objective ?? '',
+      procurement_organization_name:
+        need?.detail?.procurement_organization_name ?? '',
+      funding_source_and_estimated_cost:
+        need?.detail?.funding_source_and_estimated_cost ?? '',
+      implementation_period: need?.detail?.implementation_period ?? '',
+      expert_or_skilled_personnel:
+        need?.detail?.expert_or_skilled_personnel ?? '',
+      technical_specifications: need?.detail?.technical_specifications ?? '',
+      training: need?.detail?.training ?? '',
     },
-  );
+    attachments: [] as File[],
+    attachment_names: [] as string[],
+    deleted_attachment_ids: [] as number[],
+  });
 
   const detailValuesRef = useRef(data.detail);
 
@@ -106,10 +108,11 @@ export function NeedForm({
     transform((data) => ({
       ...data,
       detail: detailValuesRef.current,
+      ...(isEditing ? { _method: 'PATCH' } : {}),
     }));
 
     if (isEditing) {
-      patch(NeedController.update.url({ need: need.id }), options);
+      post(NeedController.update.url({ need: need.id }), options);
     } else {
       post(NeedController.store.url(), options);
     }
@@ -159,6 +162,11 @@ export function NeedForm({
               <TabsTrigger value="detail" className="">
                 Detail KAK
               </TabsTrigger>
+              {!isEditing && (
+                <TabsTrigger value="lampiran" className="">
+                  Lampiran
+                </TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent
@@ -234,6 +242,26 @@ export function NeedForm({
                 errors={errors}
               />
             </TabsContent>
+
+            {!isEditing && (
+              <TabsContent
+                value="lampiran"
+                className="mt-0 focus-visible:outline-none"
+              >
+                <FileSection
+                  files={data.attachments}
+                  fileNames={data.attachment_names}
+                  setFiles={(files) => setData('attachments', files)}
+                  setFileNames={(names) => setData('attachment_names', names)}
+                  existingAttachments={[]}
+                  deletedAttachmentIds={data.deleted_attachment_ids}
+                  setDeletedAttachmentIds={(ids) =>
+                    setData('deleted_attachment_ids', ids)
+                  }
+                  errors={errors}
+                />
+              </TabsContent>
+            )}
           </Tabs>
         </CardContent>
         <CardFooter className="justify-end gap-2">

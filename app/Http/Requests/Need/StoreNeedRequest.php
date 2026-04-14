@@ -68,6 +68,10 @@ class StoreNeedRequest extends FormRequest
             'detail.expert_or_skilled_personnel' => ['nullable', 'string'],
             'detail.technical_specifications' => ['nullable', 'string'],
             'detail.training' => ['nullable', 'string'],
+            'attachments' => ['nullable', 'array'],
+            'attachments.*' => ['file', 'max:10240', 'mimes:jpg,jpeg,png,pdf,doc,docx,zip,rar'],
+            'attachment_names' => ['nullable', 'array'],
+            'attachment_names.*' => ['string', 'max:255'],
         ];
     }
 }

@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
-import { FileText, PencilLine, Trash2 } from 'lucide-react';
+import { FileText, Paperclip, PencilLine, Trash2 } from 'lucide-react';
 import * as React from 'react';
+import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 import { PriorityBadge } from '@/components/priority-badge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -47,6 +48,12 @@ export function NeedCard({ need, onEdit, onDelete }: NeedCardProps) {
           <Button variant="outline" size="sm" onClick={() => onEdit(need)}>
             <PencilLine />
             Edit
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <Link href={NeedAttachmentController.index.url({ need: need.id })}>
+              <Paperclip />
+              Lampiran
+            </Link>
           </Button>
           <Button
             variant="destructive"

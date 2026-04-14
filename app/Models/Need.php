@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 #[Fillable([
     'need_group_id',
@@ -122,5 +123,27 @@ class Need extends Model
     public function checklistAnswers(): HasMany
     {
         return $this->hasMany(NeedChecklistAnswer::class);
+    }
+
+    /**
+     * Get the attachments for this need.
+     */
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(NeedAttachment::class);
+    }
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        static::deleting(function (Need $need) {
+            if ($need->isForceDeleting()) {
+                foreach ($need->attachments as $attachment) {
+                    Storage::disk('local')->delete($attachment->file_path);
+                }
+            }
+        });
     }
 }

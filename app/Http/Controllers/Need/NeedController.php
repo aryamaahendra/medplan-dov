@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Need;
 
+use App\Actions\Need\StoreNeedAction;
+use App\Actions\Need\UpdateNeedAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Need\StoreNeedRequest;
 use App\Http\Requests\Need\UpdateNeedRequest;
@@ -17,7 +19,6 @@ use App\Models\Tujuan;
 use App\Traits\HasDataTable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -91,21 +92,13 @@ class NeedController extends Controller
         ]);
     }
 
-    public function store(StoreNeedRequest $request)
+    public function store(StoreNeedRequest $request, StoreNeedAction $action): RedirectResponse
     {
-        $need = DB::transaction(function () use ($request) {
-            $need = Need::create($request->safe()->except(['detail', 'sasaran_ids', 'indicator_ids', 'kpi_indicator_ids', 'strategic_service_plan_ids']));
-            $need->sasarans()->sync($request->sasaran_ids);
-            $need->indicators()->sync($request->indicator_ids ?? []);
-            $need->kpiIndicators()->sync($request->kpi_indicator_ids ?? []);
-            $need->strategicServicePlans()->sync($request->strategic_service_plan_ids ?? []);
-
-            if ($request->filled('detail')) {
-                $need->detail()->create($request->input('detail', []));
-            }
-
-            return $need;
-        });
+        $need = $action->execute(
+            $request->validated(),
+            $request->file('attachments'),
+            $request->input('attachment_names', [])
+        );
 
         return redirect()->route('needs.index', ['need_group_id' => $need->need_group_id])
             ->with('success', 'Usulan kebutuhan berhasil dibuat.');
@@ -163,20 +156,12 @@ class NeedController extends Controller
         ]);
     }
 
-    public function update(UpdateNeedRequest $request, Need $need)
+    public function update(UpdateNeedRequest $request, Need $need, UpdateNeedAction $action): RedirectResponse
     {
-        DB::transaction(function () use ($request, $need) {
-            $need->update($request->safe()->except(['detail', 'sasaran_ids', 'indicator_ids', 'kpi_indicator_ids', 'strategic_service_plan_ids']));
-            $need->sasarans()->sync($request->sasaran_ids);
-            $need->indicators()->sync($request->indicator_ids ?? []);
-            $need->kpiIndicators()->sync($request->kpi_indicator_ids ?? []);
-            $need->strategicServicePlans()->sync($request->strategic_service_plan_ids ?? []);
-
-            $need->detail()->updateOrCreate(
-                ['need_id' => $need->id],
-                $request->input('detail', [])
-            );
-        });
+        $action->execute(
+            $need,
+            $request->validated()
+        );
 
         return redirect()->route('needs.index', ['need_group_id' => $need->need_group_id])
             ->with('success', 'Usulan kebutuhan berhasil diperbarui.');
@@ -199,6 +184,7 @@ class NeedController extends Controller
                 'kpiIndicators.annualTargets:id,indicator_id,year,target_value',
                 'strategicServicePlans:id,strategic_program,service_plan,year,target,policy_direction',
                 'detail',
+                'attachments',
             ]),
             'checklistQuestions' => ChecklistQuestionResource::collection(
                 $need->needGroup->checklistQuestions()

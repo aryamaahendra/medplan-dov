@@ -33,6 +33,8 @@ use Illuminate\Support\Facades\Storage;
     'is_priority',
     'status',
     'checklist_percentage',
+    'notes',
+    'approved_by_director_at',
 ])]
 class Need extends Model
 {
@@ -50,6 +52,7 @@ class Need extends Model
             'urgency' => Urgency::class,
             'impact' => Impact::class,
             'checklist_percentage' => 'decimal:2',
+            'approved_by_director_at' => 'datetime',
         ];
     }
 

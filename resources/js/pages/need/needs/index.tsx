@@ -13,6 +13,7 @@ import needRoutes from '@/routes/needs';
 import { NeedGroupDialog } from '../groups/need-group-dialog';
 import { getColumns } from './columns';
 import type { Need } from './columns';
+import { NeedDirectorReviewDialog } from './components/need-director-review-dialog';
 import { NeedGridView } from './components/need-grid-view';
 import { NeedsHeader } from './components/needs-header';
 import { NeedsTableToolbar } from './components/needs-table-toolbar';
@@ -78,6 +79,7 @@ export default function NeedsIndex({
 }: NeedsIndexProps) {
   const [deletingNeed, setDeletingNeed] = useState<Need | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [reviewingNeed, setReviewingNeed] = useState<Need | null>(null);
 
   const viewMode = useSyncExternalStore(
     viewModeStore.subscribe,
@@ -116,6 +118,10 @@ export default function NeedsIndex({
     setDeletingNeed(need);
   };
 
+  const onReview = (need: Need) => {
+    setReviewingNeed(need);
+  };
+
   const handleConfirmDelete = () => {
     if (!deletingNeed) {
       return;
@@ -147,7 +153,10 @@ export default function NeedsIndex({
     );
   };
 
-  const stableColumns = useMemo(() => getColumns(onEdit, onDelete), []);
+  const stableColumns = useMemo(
+    () => getColumns(onEdit, onDelete, onReview),
+    [],
+  );
 
   return (
     <>
@@ -214,7 +223,12 @@ export default function NeedsIndex({
             searchPlaceholder="Cari berdasarkan judul atau deskripsi..."
             view={viewMode}
             renderGrid={(data) => (
-              <NeedGridView data={data} onEdit={onEdit} onDelete={onDelete} />
+              <NeedGridView
+                data={data}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onReview={onReview}
+              />
             )}
             toolbarChildren={
               <NeedsTableToolbar
@@ -239,6 +253,14 @@ export default function NeedsIndex({
         variant="destructive"
         loading={isDeleting}
       />
+
+      {reviewingNeed && (
+        <NeedDirectorReviewDialog
+          need={reviewingNeed}
+          open={!!reviewingNeed}
+          onOpenChange={(open) => !open && setReviewingNeed(null)}
+        />
+      )}
     </>
   );
 }

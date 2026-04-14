@@ -1,5 +1,13 @@
 import { Link } from '@inertiajs/react';
-import { FileText, Paperclip, PencilLine, Trash2 } from 'lucide-react';
+import {
+  CheckCircle2,
+  FileText,
+  Paperclip,
+  PencilLine,
+  ShieldCheck,
+  Trash2,
+  XCircle,
+} from 'lucide-react';
 import * as React from 'react';
 import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 import { PriorityBadge } from '@/components/priority-badge';
@@ -28,9 +36,10 @@ interface NeedCardProps {
   need: Need;
   onEdit: (need: Need) => void;
   onDelete: (need: Need) => void;
+  onReview: (need: Need) => void;
 }
 
-export function NeedCard({ need, onEdit, onDelete }: NeedCardProps) {
+export function NeedCard({ need, onEdit, onDelete, onReview }: NeedCardProps) {
   return (
     <Card className="w-full">
       <CardHeader>
@@ -62,6 +71,11 @@ export function NeedCard({ need, onEdit, onDelete }: NeedCardProps) {
           >
             <Trash2 />
             Hapus
+          </Button>
+
+          <Button variant="secondary" size="sm" onClick={() => onReview(need)}>
+            <ShieldCheck />
+            Review Direktur
           </Button>
         </CardAction>
       </CardHeader>
@@ -119,19 +133,37 @@ export function NeedCard({ need, onEdit, onDelete }: NeedCardProps) {
               <PriorityBadge level="Normal" fallback="Biasa" />
             )}
           </InfoItem>
-          {/* <InfoItem label="Skor Checklist" className="col-span-full border-t">
-            <div className="flex w-full items-center gap-3">
-              <div className="h-2 flex-1 overflow-hidden rounded-full bg-secondary">
-                <div
-                  className="h-full bg-primary transition-all duration-500"
-                  style={{ width: `${need.checklist_percentage || 0}%` }}
-                />
-              </div>
-              <span className="text-xs font-medium tabular-nums">
-                {Number(need.checklist_percentage || 0)}%
-              </span>
+
+          <InfoItem label="Review Direktur" className="col-span-full border-t">
+            <div className="flex items-center gap-2">
+              <Badge
+                variant={need.approved_by_director_at ? 'default' : 'secondary'}
+                className="flex items-center gap-1.5"
+              >
+                {need.approved_by_director_at ? (
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                ) : (
+                  <XCircle className="h-3.5 w-3.5" />
+                )}
+                {need.approved_by_director_at
+                  ? 'Disetujui Direktur'
+                  : 'Belum Review'}
+              </Badge>
+              {need.approved_by_director_at && (
+                <span className="text-xs text-muted-foreground">
+                  pada{' '}
+                  {new Date(need.approved_by_director_at).toLocaleDateString(
+                    'id-ID',
+                    {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    },
+                  )}
+                </span>
+              )}
             </div>
-          </InfoItem> */}
+          </InfoItem>
         </div>
       </CardContent>
     </Card>

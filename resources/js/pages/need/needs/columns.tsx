@@ -5,6 +5,7 @@ import {
   Paperclip,
   PencilLine,
   Send,
+  ShieldCheck,
   Trash2,
   XCircle,
 } from 'lucide-react';
@@ -110,6 +111,8 @@ export interface Need {
   detail?: NeedDetail | null;
   checklist_percentage?: number | string;
   attachments?: Attachment[];
+  notes?: string | null;
+  approved_by_director_at?: string | null;
 }
 
 export const STATUS_LABELS: Record<Need['status'], string> = {
@@ -167,6 +170,7 @@ export const formatCurrency = (value: string | number) =>
 export const getColumns = (
   onEdit: (need: Need) => void,
   onDelete: (need: Need) => void,
+  onReview: (need: Need) => void,
 ): ColumnDef<Need>[] => [
   getIndexColumn(),
   {
@@ -249,6 +253,29 @@ export const getColumns = (
     },
   },
   {
+    accessorKey: 'approved_by_director_at',
+    header: (props) => (
+      <DataTableColumnHeader {...props} title="Persetujuan Direktur" />
+    ),
+    cell: ({ row }) => {
+      const isApproved = !!row.original.approved_by_director_at;
+
+      return (
+        <Badge
+          variant={isApproved ? 'default' : 'secondary'}
+          className="flex w-fit items-center gap-1.5"
+        >
+          {isApproved ? (
+            <CheckCircle2 className="h-3.5 w-3.5" />
+          ) : (
+            <XCircle className="h-3.5 w-3.5" />
+          )}
+          {isApproved ? 'Disetujui' : 'Belum'}
+        </Badge>
+      );
+    },
+  },
+  {
     accessorKey: 'checklist_percentage',
     header: (props) => (
       <DataTableColumnHeader {...props} title="Skor Checklist" />
@@ -309,6 +336,12 @@ export const getColumns = (
               icon: Trash2,
               onClick: () => onDelete(need),
               variant: 'destructive',
+            },
+            'separator',
+            {
+              label: 'Review Direktur',
+              icon: ShieldCheck,
+              onClick: () => onReview(need),
             },
           ]}
         />

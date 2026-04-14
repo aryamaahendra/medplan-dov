@@ -37,6 +37,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('need-groups/{need_group}/checklists/{checklist_question}', [NeedGroupChecklistController::class, 'update'])->name('need-groups.checklists.update');
     Route::delete('need-groups/{need_group}/checklists/{checklist_question}', [NeedGroupChecklistController::class, 'destroy'])->name('need-groups.checklists.destroy');
     Route::post('need-groups/{need_group}/checklists/reorder', [NeedGroupChecklistController::class, 'reorder'])->name('need-groups.checklists.reorder');
+    Route::patch('needs/{need}/director-review', [NeedController::class, 'updateDirectorReview'])->name('needs.director-review');
     Route::resource('needs', NeedController::class);
     Route::get('needs/{need}/attachments', [NeedAttachmentController::class, 'index'])->name('needs.attachments.index');
     Route::post('needs/{need}/attachments', [NeedAttachmentController::class, 'store'])->name('needs.attachments.store');

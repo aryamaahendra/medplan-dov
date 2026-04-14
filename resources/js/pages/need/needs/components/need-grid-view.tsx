@@ -5,9 +5,15 @@ interface NeedGridViewProps {
   data: Need[];
   onEdit: (need: Need) => void;
   onDelete: (need: Need) => void;
+  onReview: (need: Need) => void;
 }
 
-export function NeedGridView({ data, onEdit, onDelete }: NeedGridViewProps) {
+export function NeedGridView({
+  data,
+  onEdit,
+  onDelete,
+  onReview,
+}: NeedGridViewProps) {
   return (
     <div className="grid grid-cols-1 gap-4">
       {data.map((need) => (
@@ -16,6 +22,7 @@ export function NeedGridView({ data, onEdit, onDelete }: NeedGridViewProps) {
           need={need}
           onEdit={onEdit}
           onDelete={onDelete}
+          onReview={onReview}
         />
       ))}
       {data.length === 0 && (

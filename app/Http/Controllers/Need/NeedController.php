@@ -206,4 +206,19 @@ class NeedController extends Controller
         return redirect()->route('needs.index', ['need_group_id' => $groupId])
             ->with('success', 'Usulan kebutuhan berhasil dihapus.');
     }
+
+    public function updateDirectorReview(Request $request, Need $need): RedirectResponse
+    {
+        $validated = $request->validate([
+            'notes' => 'nullable|string',
+            'is_approved' => 'required|boolean',
+        ]);
+
+        $need->update([
+            'notes' => $validated['notes'],
+            'approved_by_director_at' => $validated['is_approved'] ? now() : null,
+        ]);
+
+        return back()->with('success', 'Review direktur berhasil diperbarui.');
+    }
 }

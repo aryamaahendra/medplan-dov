@@ -41,6 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('needs/{need}/attachments', [NeedAttachmentController::class, 'index'])->name('needs.attachments.index');
     Route::post('needs/{need}/attachments', [NeedAttachmentController::class, 'store'])->name('needs.attachments.store');
     Route::get('needs/attachments/{attachment}', [NeedAttachmentController::class, 'download'])->name('needs.attachments.download');
+    Route::get('needs/attachments/{attachment}/view', [NeedAttachmentController::class, 'view'])->name('needs.attachments.view');
     Route::delete('needs/attachments/{attachment}', [NeedAttachmentController::class, 'destroy'])->name('needs.attachments.destroy');
     Route::resource('renstras', RenstraController::class)->except(['create', 'edit']);
     Route::resource('tujuans', TujuanController::class)->except(['index', 'create', 'edit', 'show']);

@@ -32,7 +32,7 @@ class NeedAttachmentController extends Controller
     public function store(Request $request, Need $need, AddNeedAttachmentAction $action): RedirectResponse
     {
         $request->validate([
-            'file' => ['required', 'file', 'max:10240', 'mimes:jpg,jpeg,png,pdf,doc,docx,zip,rar'],
+            'file' => ['required', 'file', 'max:51200', 'mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,zip,rar,mp4,webm,ogg'],
             'display_name' => ['nullable', 'string', 'max:255'],
             'extension' => ['required', 'string'],
             'file_size' => ['required', 'integer'],
@@ -61,6 +61,18 @@ class NeedAttachmentController extends Controller
             $attachment->file_path,
             $attachment->display_name
         );
+    }
+
+    /**
+     * View the attachment inline.
+     */
+    public function view(NeedAttachment $attachment)
+    {
+        if (! Storage::disk('local')->exists($attachment->file_path)) {
+            abort(404);
+        }
+
+        return Storage::disk('local')->response($attachment->file_path);
     }
 
     /**

@@ -1,13 +1,17 @@
 import { router } from '@inertiajs/react';
 import {
   DownloadIcon,
+  EyeIcon,
   FileIcon,
   PaperclipIcon,
   Trash2Icon,
 } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
-
 import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
+import { ConfirmDialog } from '@/components/confirm-dialog';
+
+import { FilePreviewDialog } from '@/components/file-preview-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -46,17 +50,55 @@ export function AttachmentList({
   className,
   showCard = true,
 }: AttachmentListProps) {
-  const handleDelete = (attachmentId: number) => {
-    if (confirm('Apakah Anda yakin ingin menghapus lampiran ini?')) {
-      router.delete(
-        NeedAttachmentController.destroy.url({ attachment: attachmentId }),
-        {
-          onSuccess: () => {
-            toast.success('Lampiran berhasil dihapus.');
-          },
-        },
-      );
+  const [previewAttachment, setPreviewAttachment] = useState<Attachment | null>(
+    null,
+  );
+  const [deletingAttachment, setDeletingAttachment] =
+    useState<Attachment | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = (attachment: Attachment) => {
+    setDeletingAttachment(attachment);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!deletingAttachment) {
+      return;
     }
+
+    setIsDeleting(true);
+    router.delete(
+      NeedAttachmentController.destroy.url({
+        attachment: deletingAttachment.id,
+      }),
+      {
+        onSuccess: () => {
+          toast.success('Lampiran berhasil dihapus.');
+          setDeletingAttachment(null);
+        },
+        onFinish: () => {
+          setIsDeleting(false);
+        },
+      },
+    );
+  };
+
+  const previewableExtensions = [
+    'jpg',
+    'jpeg',
+    'png',
+    'gif',
+    'webp',
+    'bmp',
+    'svg',
+    'mp4',
+    'webm',
+    'ogg',
+    'pdf',
+  ];
+
+  const handlePreview = (attachment: Attachment) => {
+    setPreviewAttachment(attachment);
   };
 
   const formatFileSize = (bytes: number) => {
@@ -104,6 +146,17 @@ export function AttachmentList({
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
+                    {previewableExtensions.includes(
+                      attachment.extension?.toLowerCase() || '',
+                    ) && (
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => handlePreview(attachment)}
+                      >
+                        <EyeIcon />
+                      </Button>
+                    )}
                     <Button variant="ghost" size="icon-sm" asChild>
                       <a
                         href={NeedAttachmentController.download.url({
@@ -118,7 +171,7 @@ export function AttachmentList({
                       <Button
                         variant="destructive"
                         size="icon-sm"
-                        onClick={() => handleDelete(attachment.id)}
+                        onClick={() => handleDelete(attachment)}
                       >
                         <Trash2Icon />
                       </Button>
@@ -140,21 +193,51 @@ export function AttachmentList({
     </div>
   );
 
-  if (!showCard) {
-    return TableContent;
-  }
-
-  return (
-    <Card className="h-full">
-      {showHeader && (
-        <CardHeader>
-          <CardTitle>{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
-        </CardHeader>
+  const Content = (
+    <>
+      {showCard ? (
+        <Card className="h-full">
+          {showHeader && (
+            <CardHeader>
+              <CardTitle>{title}</CardTitle>
+              <CardDescription>{description}</CardDescription>
+            </CardHeader>
+          )}
+          <CardContent className="px-0">
+            <div className="border-y">{TableContent}</div>
+          </CardContent>
+        </Card>
+      ) : (
+        TableContent
       )}
-      <CardContent className="px-0">
-        <div className="border-y">{TableContent}</div>
-      </CardContent>
-    </Card>
+
+      {previewAttachment && (
+        <FilePreviewDialog
+          isOpen={!!previewAttachment}
+          onOpenChange={(open) => !open && setPreviewAttachment(null)}
+          fileName={previewAttachment.display_name}
+          extension={previewAttachment.extension || ''}
+          fileUrl={NeedAttachmentController.view.url({
+            attachment: previewAttachment.id,
+          })}
+          downloadUrl={NeedAttachmentController.download.url({
+            attachment: previewAttachment.id,
+          })}
+        />
+      )}
+
+      <ConfirmDialog
+        open={!!deletingAttachment}
+        onOpenChange={(open) => !open && setDeletingAttachment(null)}
+        onConfirm={handleConfirmDelete}
+        title="Hapus Lampiran"
+        description={`Apakah Anda yakin ingin menghapus lampiran "${deletingAttachment?.display_name}"? Tindakan ini tidak dapat dibatalkan.`}
+        confirmText="Hapus Lampiran"
+        variant="destructive"
+        loading={isDeleting}
+      />
+    </>
   );
+
+  return Content;
 }

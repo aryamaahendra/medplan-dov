@@ -1,9 +1,10 @@
 import { Head, router } from '@inertiajs/react';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useSyncExternalStore } from 'react';
 import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import needGroupRoutes from '@/routes/need-groups';
@@ -15,6 +16,31 @@ import type { Need } from './columns';
 import { NeedGridView } from './components/need-grid-view';
 import { NeedsHeader } from './components/needs-header';
 import { NeedsTableToolbar } from './components/needs-table-toolbar';
+
+// External store for viewMode to avoid hydration mismatch without useEffect
+const viewModeStore = {
+  subscribe(callback: () => void) {
+    window.addEventListener('storage', callback);
+    window.addEventListener('view-mode-change', callback);
+
+    return () => {
+      window.removeEventListener('storage', callback);
+      window.removeEventListener('view-mode-change', callback);
+    };
+  },
+  getSnapshot() {
+    return (
+      (localStorage.getItem('needs-view-mode') as 'table' | 'grid') || 'table'
+    );
+  },
+  getServerSnapshot() {
+    return 'loading' as const;
+  },
+  set(mode: 'table' | 'grid') {
+    localStorage.setItem('needs-view-mode', mode);
+    window.dispatchEvent(new Event('view-mode-change'));
+  },
+};
 
 interface PaginatedNeeds {
   data: Need[];
@@ -52,7 +78,17 @@ export default function NeedsIndex({
 }: NeedsIndexProps) {
   const [deletingNeed, setDeletingNeed] = useState<Need | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [viewMode, setViewMode] = useState<'table' | 'grid'>('grid');
+
+  const viewMode = useSyncExternalStore(
+    viewModeStore.subscribe,
+    viewModeStore.getSnapshot,
+    viewModeStore.getServerSnapshot,
+  );
+
+  const handleViewModeChange = (mode: 'table' | 'grid') => {
+    viewModeStore.set(mode);
+  };
+
   const [isGroupDialogOpen, setIsGroupDialogOpen] = useState(false);
   const [isDeletingGroup, setIsDeletingGroup] = useState(false);
   const [isDeletingGroupLoading, setIsDeletingGroupLoading] = useState(false);
@@ -121,7 +157,7 @@ export default function NeedsIndex({
         <NeedsHeader
           currentGroup={currentGroup}
           viewMode={viewMode}
-          setViewMode={setViewMode}
+          setViewMode={handleViewModeChange}
           onCreate={onCreate}
           onEditGroup={() => setIsGroupDialogOpen(true)}
           onDeleteGroup={() => setIsDeletingGroup(true)}
@@ -144,31 +180,53 @@ export default function NeedsIndex({
           loading={isDeletingGroupLoading}
         />
 
-        <DataTable
-          columns={stableColumns}
-          data={needs.data}
-          meta={needs}
-          filters={filters}
-          onSearch={onSearch}
-          onSort={onSort}
-          onPageChange={onPageChange}
-          onPerPageChange={onPerPageChange}
-          onReset={onReset}
-          searchPlaceholder="Cari berdasarkan judul atau deskripsi..."
-          view={viewMode}
-          renderGrid={(data) => (
-            <NeedGridView data={data} onEdit={onEdit} onDelete={onDelete} />
-          )}
-          toolbarChildren={
-            <NeedsTableToolbar
-              filters={filters}
-              organizationalUnits={organizationalUnits}
-              needTypes={needTypes}
-              mergeParams={mergeParams}
-            />
-          }
-          toolbarPosition="between-search-and-table"
-        />
+        {viewMode === 'loading' ? (
+          <div className="overflow-hidden rounded-md border">
+            <div className="h-10 border-b bg-muted/20" />
+            <div className="divide-y">
+              {[...Array(10)].map((_, i) => (
+                <div
+                  key={i}
+                  className="flex h-12 items-center gap-4 bg-card/50 px-4"
+                >
+                  <Skeleton className="h-4 w-8" />
+                  <Skeleton className="h-4 w-[20ch]" />
+                  <Skeleton className="h-4 flex-1" />
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-4 w-8" />
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <DataTable
+            columns={stableColumns}
+            data={needs.data}
+            meta={needs}
+            filters={filters}
+            onSearch={onSearch}
+            onSort={onSort}
+            onPageChange={onPageChange}
+            onPerPageChange={onPerPageChange}
+            onReset={onReset}
+            searchPlaceholder="Cari berdasarkan judul atau deskripsi..."
+            view={viewMode}
+            renderGrid={(data) => (
+              <NeedGridView data={data} onEdit={onEdit} onDelete={onDelete} />
+            )}
+            toolbarChildren={
+              <NeedsTableToolbar
+                filters={filters}
+                organizationalUnits={organizationalUnits}
+                needTypes={needTypes}
+                mergeParams={mergeParams}
+              />
+            }
+            toolbarPosition="between-search-and-table"
+          />
+        )}
       </div>
 
       <ConfirmDialog

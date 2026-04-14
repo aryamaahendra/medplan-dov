@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'impact',
     'is_priority',
     'status',
+    'checklist_percentage',
 ])]
 class Need extends Model
 {
@@ -47,6 +48,7 @@ class Need extends Model
             'is_priority' => 'boolean',
             'urgency' => Urgency::class,
             'impact' => Impact::class,
+            'checklist_percentage' => 'decimal:2',
         ];
     }
 

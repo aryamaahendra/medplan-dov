@@ -42,6 +42,20 @@ export function NeedStatusOverview({ need }: NeedStatusOverviewProps) {
               {STATUS_LABELS[need.status]}
             </Badge>
           </div>
+          <div className="flex flex-col gap-2 px-4 py-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">Skor Checklist</span>
+              <span className="text-sm font-bold tabular-nums">
+                {Number(need.checklist_percentage || 0)}%
+              </span>
+            </div>
+            <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+              <div
+                className="h-full bg-primary transition-all duration-500"
+                style={{ width: `${need.checklist_percentage || 0}%` }}
+              />
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -62,7 +62,9 @@ export function NeedCard({ need, onEdit, onDelete }: NeedCardProps) {
       <CardContent className="">
         <div className="-mx-4 grid grid-cols-3 gap-px overflow-hidden border-y bg-border">
           <InfoItem label="Unit Kerja">
-            {need.organizational_unit?.name}
+            <span className="text-right!">
+              {need.organizational_unit?.name}
+            </span>
           </InfoItem>
 
           <InfoItem label="Jenis">{need.need_type?.name}</InfoItem>
@@ -110,6 +112,19 @@ export function NeedCard({ need, onEdit, onDelete }: NeedCardProps) {
               <PriorityBadge level="Normal" fallback="Biasa" />
             )}
           </InfoItem>
+          {/* <InfoItem label="Skor Checklist" className="col-span-full border-t">
+            <div className="flex w-full items-center gap-3">
+              <div className="h-2 flex-1 overflow-hidden rounded-full bg-secondary">
+                <div
+                  className="h-full bg-primary transition-all duration-500"
+                  style={{ width: `${need.checklist_percentage || 0}%` }}
+                />
+              </div>
+              <span className="text-xs font-medium tabular-nums">
+                {Number(need.checklist_percentage || 0)}%
+              </span>
+            </div>
+          </InfoItem> */}
         </div>
       </CardContent>
     </Card>
@@ -124,10 +139,15 @@ interface InfoItemProps {
 function InfoItem({ label, children, className }: InfoItemProps) {
   return (
     <div
-      className={cn('flex items-center justify-between bg-card p-4', className)}
+      className={cn(
+        'flex items-center justify-between gap-6 bg-card p-4',
+        className,
+      )}
     >
-      <div className="text-sm text-muted-foreground">{label}</div>
-      <div className="text-sm">{children}</div>
+      <div className="text-sm whitespace-nowrap text-muted-foreground">
+        {label}
+      </div>
+      <div className="text-right text-sm">{children}</div>
     </div>
   );
 }

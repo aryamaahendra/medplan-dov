@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 
 interface NeedsHeaderProps {
   currentGroup: { id: number; name: string; year: number };
-  viewMode: 'table' | 'grid';
+  viewMode: 'table' | 'grid' | 'loading';
   setViewMode: (mode: 'table' | 'grid') => void;
   onCreate: () => void;
   onEditGroup: () => void;

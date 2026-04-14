@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Need;
 
+use App\Actions\Need\RecalculateNeedChecklistScore;
 use App\Enums\ChecklistAnswer;
 use App\Http\Controllers\Controller;
 use App\Models\Need;
@@ -14,7 +15,7 @@ class NeedChecklistAnswerController extends Controller
     /**
      * Store multiple answers for a need.
      */
-    public function store(Request $request, Need $need): RedirectResponse
+    public function store(Request $request, Need $need, RecalculateNeedChecklistScore $recalculateScore): RedirectResponse
     {
         $validated = $request->validate([
             'answers' => ['required', 'array'],
@@ -32,6 +33,8 @@ class NeedChecklistAnswerController extends Controller
                 ]
             );
         }
+
+        $recalculateScore->execute($need);
 
         return back()->with('success', 'Checklist berhasil disimpan.');
     }

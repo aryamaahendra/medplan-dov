@@ -13,6 +13,7 @@ import { DataTableColumnHeader } from '@/components/data-table/data-table-column
 import { getIndexColumn } from '@/components/data-table/data-table-index-column';
 import { PriorityBadge } from '@/components/priority-badge';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
 import type {
   KpiIndicator,
@@ -94,6 +95,7 @@ export interface Need {
   kpi_indicators_count?: number;
   strategic_service_plans_count?: number;
   detail?: NeedDetail | null;
+  checklist_percentage?: number | string;
 }
 
 export const STATUS_LABELS: Record<Need['status'], string> = {
@@ -229,6 +231,37 @@ export const getColumns = (
           {Icon && <Icon className="h-3.5 w-3.5" />}
           {STATUS_LABELS[status]}
         </Badge>
+      );
+    },
+  },
+  {
+    accessorKey: 'checklist_percentage',
+    header: (props) => (
+      <DataTableColumnHeader {...props} title="Skor Checklist" />
+    ),
+    cell: ({ row }) => {
+      const percentage = Number(row.original.checklist_percentage || 0);
+
+      return (
+        <div className="flex w-[100px] flex-col gap-1">
+          <div className="flex justify-between text-[10px] text-muted-foreground tabular-nums">
+            <span>Progress</span>
+            <span>{percentage}%</span>
+          </div>
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+            <div
+              className={cn(
+                'h-full transition-all duration-500',
+                percentage >= 100
+                  ? 'bg-primary'
+                  : percentage > 50
+                    ? 'bg-primary/80'
+                    : 'bg-primary/40',
+              )}
+              style={{ width: `${percentage}%` }}
+            />
+          </div>
+        </div>
       );
     },
   },

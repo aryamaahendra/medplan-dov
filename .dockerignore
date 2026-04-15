@@ -1,0 +1,31 @@
+/node_modules
+/vendor
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+.env
+.env.*
+!.env.example
+.git
+.github
+.dockerignore
+/bootstrap/cache/*.php
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*.php
+/storage/logs/*.log
+/tests
+Dockerfile
+compose*.yaml
+Makefile
+phpunit.xml
+.agents
+AGENTS.md
+pint.json
+.editorconfig
+.prettierrc
+.prettierignore
+eslint.config.js
+# Keep package/composer files for building
+# Keep vite/tsconfig/tailwind for building

@@ -24,8 +24,8 @@ export function PlanningAlignmentShow({ need }: PlanningAlignmentShowProps) {
   const groupedVersions = selectedVersions.reduce(
     (acc, v) => {
       if (!acc[v.type]) {
-acc[v.type] = [];
-}
+        acc[v.type] = [];
+      }
 
       acc[v.type].push(v);
 

@@ -37,15 +37,15 @@ export function PlanningAlignmentSection({
         ): PlanningActivityVersion | undefined => {
           for (const a of activities) {
             if (a.id.toString() === activityId) {
-return a;
-}
+              return a;
+            }
 
             if (a.children) {
               const found = findActivity(a.children);
 
               if (found) {
-return found;
-}
+                return found;
+              }
             }
           }
 

@@ -4,8 +4,6 @@ import { LayoutGrid, Table as TableIcon } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-import SasaranController from '@/actions/App/Http/Controllers/Renstra/SasaranController';
-import TujuanController from '@/actions/App/Http/Controllers/Renstra/TujuanController';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -20,6 +18,8 @@ import { RenstraTable } from './components/renstra-table';
 import { SasaranDialog } from './components/sasaran-dialog';
 import { TujuanCard } from './components/tujuan-card';
 import { TujuanDialog } from './components/tujuan-dialog';
+import SasaranController from '@/actions/App/Http/Controllers/Renstra/SasaranController';
+import TujuanController from '@/actions/App/Http/Controllers/Renstra/TujuanController';
 
 interface RenstraShowProps {
   renstra: Renstra;

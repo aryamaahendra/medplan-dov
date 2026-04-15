@@ -1,10 +1,10 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { ClipboardList, PencilLine, Trash2 } from 'lucide-react';
-import needGroupChecklistActions from '@/actions/App/Http/Controllers/Need/NeedGroupChecklistController';
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { getIndexColumn } from '@/components/data-table/data-table-index-column';
 import { Badge } from '@/components/ui/badge';
+import needGroupChecklistActions from '@/actions/App/Http/Controllers/Need/NeedGroupChecklistController';
 
 export interface NeedGroup {
   id: number;

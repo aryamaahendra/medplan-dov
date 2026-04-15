@@ -1,7 +1,6 @@
 import { Head, router } from '@inertiajs/react';
 import { PaperclipIcon } from 'lucide-react';
 import { useMemo } from 'react';
-import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 import { ChecklistForm } from '@/components/needs/checklist-form';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,6 +25,7 @@ import { NeedSidebar } from './components/need-sidebar';
 import { PlanningAlignmentShow } from './components/planning-alignment-show';
 import { RlsAlignmentShow } from './components/rls-alignment-show';
 import { StrategicAlignmentSection } from './components/strategic-alignment-section';
+import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 
 interface NeedShowProps {
   need: Need;

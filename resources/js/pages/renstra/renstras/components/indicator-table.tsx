@@ -3,7 +3,6 @@ import { Edit, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-import IndicatorController from '@/actions/App/Http/Controllers/Renstra/IndicatorController';
 import { ActionDropdown } from '@/components/action-dropdown';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import {
@@ -15,6 +14,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import type { Indicator } from '@/types';
+import IndicatorController from '@/actions/App/Http/Controllers/Renstra/IndicatorController';
 
 interface IndicatorTableProps {
   indicators: Indicator[];

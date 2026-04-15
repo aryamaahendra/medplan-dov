@@ -1,7 +1,6 @@
 import { Form } from '@inertiajs/react';
 import { toast } from 'sonner';
 
-import StrategicServicePlanController from '@/actions/App/Http/Controllers/StrategicPlan/StrategicServicePlanController';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import type { StrategicServicePlan } from '@/types';
+import StrategicServicePlanController from '@/actions/App/Http/Controllers/StrategicPlan/StrategicServicePlanController';
 
 interface StrategicServicePlanDialogProps {
   plan?: StrategicServicePlan | null;

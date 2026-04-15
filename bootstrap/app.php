@@ -22,9 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
             AddLinkHeadersForPreloadedAssets::class,
         ]);
 
-        $middleware->trustProxies(at: config('app.trusted_proxies'));
+        $middleware->trustProxies(at: array_filter(explode(',', (string) (env('TRUSTED_PROXIES') ?: '*'))));
 
-        $middleware->trustHosts(at: config('app.trusted_hosts'));
+        $middleware->trustHosts(at: array_filter(explode(',', (string) env('TRUSTED_HOSTS', ''))));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -22,6 +22,8 @@ class StoreNeedAction
                 'indicator_ids',
                 'kpi_indicator_ids',
                 'strategic_service_plan_ids',
+                'planning_activity_version_ids',
+                'planning_activity_indicator_ids',
                 'attachments',
                 'attachment_names',
             ])->toArray());
@@ -30,6 +32,8 @@ class StoreNeedAction
             $need->indicators()->sync($data['indicator_ids'] ?? []);
             $need->kpiIndicators()->sync($data['kpi_indicator_ids'] ?? []);
             $need->strategicServicePlans()->sync($data['strategic_service_plan_ids'] ?? []);
+            $need->planningActivityVersions()->sync($data['planning_activity_version_ids'] ?? []);
+            $need->planningActivityIndicators()->sync($data['planning_activity_indicator_ids'] ?? []);
 
             if (! empty($data['detail'])) {
                 $need->detail()->create($data['detail']);

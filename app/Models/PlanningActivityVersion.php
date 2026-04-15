@@ -7,6 +7,7 @@ use Database\Factories\PlanningActivityVersionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
@@ -54,5 +55,10 @@ class PlanningActivityVersion extends Model
     public function activityYears(): MorphMany
     {
         return $this->morphMany(PlanningActivityYear::class, 'yearable');
+    }
+
+    public function needs(): BelongsToMany
+    {
+        return $this->belongsToMany(Need::class, 'need_planning_activity_version', 'planning_activity_version_id', 'need_id');
     }
 }

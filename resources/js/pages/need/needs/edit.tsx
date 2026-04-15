@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import needRoutes from '@/routes/needs';
-import type { Need, Tujuan } from './columns';
+import type { Need, PlanningActivityVersion, Tujuan } from './columns';
 import { NeedForm } from './components/need-form';
 
 interface EditProps {
@@ -11,6 +11,7 @@ interface EditProps {
   tujuans: Tujuan[];
   kpiGroups: any[];
   strategicServicePlans: any[];
+  planningActivities: PlanningActivityVersion[];
 }
 
 export default function Edit({
@@ -21,6 +22,7 @@ export default function Edit({
   tujuans,
   kpiGroups,
   strategicServicePlans,
+  planningActivities,
 }: EditProps) {
   return (
     <>
@@ -44,6 +46,7 @@ export default function Edit({
             tujuans={tujuans}
             kpiGroups={kpiGroups}
             strategicServicePlans={strategicServicePlans}
+            planningActivities={planningActivities}
           />
         </div>
       </div>

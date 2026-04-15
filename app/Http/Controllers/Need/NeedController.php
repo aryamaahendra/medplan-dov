@@ -14,6 +14,7 @@ use App\Models\Need;
 use App\Models\NeedGroup;
 use App\Models\NeedType;
 use App\Models\OrganizationalUnit;
+use App\Models\PlanningActivityVersion;
 use App\Models\StrategicServicePlan;
 use App\Models\Tujuan;
 use App\Traits\HasDataTable;
@@ -128,13 +129,30 @@ class NeedController extends Controller
             'strategicServicePlans' => StrategicServicePlan::query()
                 ->select(['id', 'strategic_program', 'service_plan', 'year'])
                 ->get(),
+            'planningActivities' => PlanningActivityVersion::query()
+                ->whereHas('planningVersion', fn ($q) => $q->where('is_current', true))
+                ->whereNull('parent_id')
+                ->with([
+                    'children.children.indicators',
+                    'children.indicators',
+                    'indicators',
+                ])
+                ->get(),
         ]);
     }
 
     public function edit(Need $need): Response
     {
         return Inertia::render('need/needs/edit', [
-            'need' => $need->load(['sasarans:id', 'indicators:id', 'kpiIndicators:id', 'strategicServicePlans:id', 'detail']),
+            'need' => $need->load([
+                'sasarans:id',
+                'indicators:id',
+                'kpiIndicators:id',
+                'strategicServicePlans:id',
+                'planningActivityVersions:id',
+                'planningActivityIndicators:id',
+                'detail',
+            ]),
             'currentGroup' => $need->needGroup,
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name', 'parent_id'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
@@ -152,6 +170,15 @@ class NeedController extends Controller
                 ->get(),
             'strategicServicePlans' => StrategicServicePlan::query()
                 ->select(['id', 'strategic_program', 'service_plan', 'year'])
+                ->get(),
+            'planningActivities' => PlanningActivityVersion::query()
+                ->whereHas('planningVersion', fn ($q) => $q->where('is_current', true))
+                ->whereNull('parent_id')
+                ->with([
+                    'children.children.indicators',
+                    'children.indicators',
+                    'indicators',
+                ])
                 ->get(),
         ]);
     }
@@ -183,6 +210,8 @@ class NeedController extends Controller
                 'kpiIndicators.parentIndicator:id,name,is_category',
                 'kpiIndicators.annualTargets:id,indicator_id,year,target_value',
                 'strategicServicePlans:id,strategic_program,service_plan,year,target,policy_direction',
+                'planningActivityVersions:id,name,type,code,full_code',
+                'planningActivityIndicators:id,name,baseline,unit',
                 'detail',
                 'attachments',
             ]),

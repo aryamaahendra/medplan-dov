@@ -23,6 +23,7 @@ import { NeedDetailView } from './components/need-detail-view';
 import { NeedGeneralInfo } from './components/need-general-info';
 import { NeedHeader } from './components/need-header';
 import { NeedSidebar } from './components/need-sidebar';
+import { PlanningAlignmentShow } from './components/planning-alignment-show';
 import { RlsAlignmentShow } from './components/rls-alignment-show';
 import { StrategicAlignmentSection } from './components/strategic-alignment-section';
 
@@ -83,6 +84,7 @@ export default function NeedShow({
                 <TabsTrigger value="strategic">Renstra</TabsTrigger>
                 <TabsTrigger value="ikk">IKK</TabsTrigger>
                 <TabsTrigger value="rls">RLS</TabsTrigger>
+                <TabsTrigger value="planning">Perencanaan</TabsTrigger>
                 <TabsTrigger value="detail">Detail KAK</TabsTrigger>
                 <TabsTrigger value="lampiran">Lampiran</TabsTrigger>
                 <TabsTrigger value="checklist">Checklist</TabsTrigger>
@@ -107,6 +109,9 @@ export default function NeedShow({
               </TabsContent>
               <TabsContent value="rls" className="mt-0">
                 <RlsAlignmentShow need={need} />
+              </TabsContent>
+              <TabsContent value="planning" className="mt-0">
+                <PlanningAlignmentShow need={need} />
               </TabsContent>
               <TabsContent value="checklist" className="mt-0">
                 <ChecklistForm

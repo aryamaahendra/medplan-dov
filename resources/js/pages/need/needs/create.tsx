@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import needRoutes from '@/routes/needs';
-import type { Tujuan } from './columns';
+import type { PlanningActivityVersion, Tujuan } from './columns';
 import { NeedForm } from './components/need-form';
 
 interface CreateProps {
@@ -10,6 +10,7 @@ interface CreateProps {
   tujuans: Tujuan[];
   kpiGroups: any[];
   strategicServicePlans: any[];
+  planningActivities: PlanningActivityVersion[];
 }
 
 export default function Create({
@@ -19,6 +20,7 @@ export default function Create({
   tujuans,
   kpiGroups,
   strategicServicePlans,
+  planningActivities,
 }: CreateProps) {
   return (
     <>
@@ -41,6 +43,7 @@ export default function Create({
             tujuans={tujuans}
             kpiGroups={kpiGroups}
             strategicServicePlans={strategicServicePlans}
+            planningActivities={planningActivities}
           />
         </div>
       </div>

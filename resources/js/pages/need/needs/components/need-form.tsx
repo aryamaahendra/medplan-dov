@@ -9,11 +9,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
 
-import type { Need, StrategicServicePlan, Tujuan } from '../columns';
+import type {
+  Need,
+  PlanningActivityVersion,
+  StrategicServicePlan,
+  Tujuan,
+} from '../columns';
 import { FileSection } from './file-section';
 import { GeneralInfoSection } from './general-info-section';
 import { IkkAlignmentSection } from './ikk-alignment-section';
 import { NeedDetailSection } from './need-detail-section';
+import { PlanningAlignmentSection } from './planning-alignment-section';
 import { PriorityStatusSection } from './priority-status-section';
 import { RenstraAlignmentSection } from './renstra-alignment-section';
 import { RlsAlignmentSection } from './rls-alignment-section';
@@ -26,6 +32,7 @@ interface NeedFormProps {
   tujuans: Tujuan[];
   kpiGroups: any[];
   strategicServicePlans: StrategicServicePlan[];
+  planningActivities: PlanningActivityVersion[];
   className?: string;
 }
 
@@ -37,6 +44,7 @@ export function NeedForm({
   tujuans,
   kpiGroups,
   strategicServicePlans,
+  planningActivities,
   className,
 }: NeedFormProps) {
   const isEditing = !!need;
@@ -70,6 +78,12 @@ export function NeedForm({
       need?.kpi_indicators?.map((i) => i.id.toString()) ?? ([] as string[]),
     strategic_service_plan_ids:
       need?.strategic_service_plans?.map((i) => i.id.toString()) ??
+      ([] as string[]),
+    planning_activity_version_ids:
+      need?.planning_activity_versions?.map((i) => i.id.toString()) ??
+      ([] as string[]),
+    planning_activity_indicator_ids:
+      need?.planning_activity_indicators?.map((i) => i.id.toString()) ??
       ([] as string[]),
     detail: {
       background: need?.detail?.background ?? '',
@@ -159,6 +173,9 @@ export function NeedForm({
               <TabsTrigger value="rls" className="">
                 RLS
               </TabsTrigger>
+              <TabsTrigger value="perencanaan" className="">
+                Perencanaan
+              </TabsTrigger>
               <TabsTrigger value="detail" className="">
                 Detail KAK
               </TabsTrigger>
@@ -228,6 +245,18 @@ export function NeedForm({
                 setData={setData}
                 errors={errors}
                 strategicServicePlans={strategicServicePlans}
+              />
+            </TabsContent>
+
+            <TabsContent
+              value="perencanaan"
+              className="mt-0 focus-visible:outline-none"
+            >
+              <PlanningAlignmentSection
+                data={data}
+                setData={setData}
+                errors={errors}
+                planningActivities={planningActivities}
               />
             </TabsContent>
 

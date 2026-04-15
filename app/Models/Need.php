@@ -113,6 +113,22 @@ class Need extends Model
     }
 
     /**
+     * Get the planning activity versions for this need.
+     */
+    public function planningActivityVersions(): BelongsToMany
+    {
+        return $this->belongsToMany(PlanningActivityVersion::class, 'need_planning_activity_version', 'need_id', 'planning_activity_version_id');
+    }
+
+    /**
+     * Get the planning activity indicators for this need.
+     */
+    public function planningActivityIndicators(): BelongsToMany
+    {
+        return $this->belongsToMany(PlanningActivityIndicator::class, 'need_planning_activity_indicator', 'need_id', 'planning_activity_indicator_id');
+    }
+
+    /**
      * Get the detail/proposal information for this need.
      */
     public function detail(): HasOne

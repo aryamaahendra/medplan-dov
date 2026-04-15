@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class PlanningActivityIndicator extends Model
@@ -26,5 +27,10 @@ class PlanningActivityIndicator extends Model
     public function activityYears(): MorphMany
     {
         return $this->morphMany(PlanningActivityYear::class, 'yearable');
+    }
+
+    public function needs(): BelongsToMany
+    {
+        return $this->belongsToMany(Need::class, 'need_planning_activity_indicator', 'planning_activity_indicator_id', 'need_id');
     }
 }

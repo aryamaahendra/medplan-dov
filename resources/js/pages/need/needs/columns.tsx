@@ -59,6 +59,26 @@ export interface Tujuan {
   sasarans: Sasaran[];
 }
 
+export interface PlanningActivityIndicator {
+  id: number;
+  planning_activity_version_id: number;
+  name: string;
+  baseline: string | null;
+  unit: string | null;
+}
+
+export interface PlanningActivityVersion {
+  id: number;
+  planning_version_id: number;
+  parent_id: number | null;
+  code: string | null;
+  type: string;
+  name: string;
+  full_code: string | null;
+  indicators?: PlanningActivityIndicator[];
+  children?: PlanningActivityVersion[];
+}
+
 export type StrategicServicePlan = BaseStrategicServicePlan;
 
 export interface NeedDetail {
@@ -113,6 +133,8 @@ export interface Need {
   attachments?: Attachment[];
   notes?: string | null;
   approved_by_director_at?: string | null;
+  planning_activity_versions?: PlanningActivityVersion[];
+  planning_activity_indicators?: PlanningActivityIndicator[];
 }
 
 export const STATUS_LABELS: Record<Need['status'], string> = {

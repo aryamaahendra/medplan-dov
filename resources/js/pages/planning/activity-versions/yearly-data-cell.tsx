@@ -2,13 +2,13 @@ import { router } from '@inertiajs/react';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
+import PlanningActivityVersionController from '@/actions/App/Http/Controllers/Planning/PlanningActivityVersionController';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import type {
   PlanningActivityVersion,
   PlanningActivityYear,
 } from '@/types/planning-version';
-import PlanningActivityVersionController from '@/actions/App/Http/Controllers/Planning/PlanningActivityVersionController';
 
 interface YearlyDataCellProps {
   activityId: number;

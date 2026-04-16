@@ -50,7 +50,8 @@ class NeedController extends Controller
             Need::query()
                 ->with([
                     'needGroup:id,name',
-                    'organizationalUnit:id,name',
+                    'organizationalUnit:id,name,parent_id',
+                    'organizationalUnit.parentsRecursive',
                     'needType:id,name',
                     'sasarans:id,tujuan_id,name',
                     'sasarans.tujuan:id,name',
@@ -198,7 +199,8 @@ class NeedController extends Controller
     {
         return Inertia::render('need/needs/show', [
             'need' => $need->load([
-                'organizationalUnit:id,name',
+                'organizationalUnit:id,name,parent_id',
+                'organizationalUnit.parentsRecursive',
                 'needType:id,name',
                 'sasarans:id,tujuan_id,name',
                 'sasarans.tujuan:id,name',

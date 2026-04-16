@@ -1,31 +1,20 @@
-import { Head, router } from '@inertiajs/react';
-import { PaperclipIcon } from 'lucide-react';
+import { Head } from '@inertiajs/react';
 import { useMemo } from 'react';
 import { ChecklistForm } from '@/components/needs/checklist-form';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import needRoutes from '@/routes/needs';
 import type { ChecklistQuestion, ChecklistAnswer } from '@/types';
 
 import type { Need, Sasaran, Tujuan } from './columns';
-import { AttachmentList } from './components/attachment-list';
 import { IkkAlignmentShow } from './components/ikk-alignment-show';
-import { NeedDetailView } from './components/need-detail-view';
-import { NeedGeneralInfo } from './components/need-general-info';
+import { NeedAttachmentsTab } from './components/need-attachments-tab';
+import { NeedDetailTab } from './components/need-detail-tab';
+import { NeedGeneralTab } from './components/need-general-tab';
 import { NeedHeader } from './components/need-header';
 import { NeedSidebar } from './components/need-sidebar';
 import { PlanningAlignmentShow } from './components/planning-alignment-show';
 import { RlsAlignmentShow } from './components/rls-alignment-show';
 import { StrategicAlignmentSection } from './components/strategic-alignment-section';
-import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 
 interface NeedShowProps {
   need: Need;
@@ -90,16 +79,7 @@ export default function NeedShow({
                 <TabsTrigger value="checklist">Checklist</TabsTrigger>
               </TabsList>
               <TabsContent value="general" className="mt-0">
-                <div className="mt-4">
-                  <div className="mb-6 space-y-1">
-                    <h2 className="text-xl font-semibold">Informasi Umum</h2>
-                    <p className="text-sm text-muted-foreground">
-                      Informasi umum mengenai usulan kebutuhan.
-                    </p>
-                  </div>
-
-                  <NeedGeneralInfo need={need} />
-                </div>
+                <NeedGeneralTab need={need} />
               </TabsContent>
               <TabsContent value="strategic" className="mt-0">
                 <StrategicAlignmentSection groupedRenstra={groupedRenstra} />
@@ -122,50 +102,10 @@ export default function NeedShow({
                 />
               </TabsContent>
               <TabsContent value="detail" className="mt-0">
-                <div className="mt-4 space-y-1">
-                  <h2 className="text-xl font-semibold">Detail Proposal</h2>
-                  <p className="text-sm text-muted-foreground">
-                    Informasi dokumen proposal usulan kebutuhan.
-                  </p>
-                </div>
-                <NeedDetailView detail={need.detail} />
+                <NeedDetailTab need={need} />
               </TabsContent>
               <TabsContent value="lampiran" className="mt-0">
-                <Card className="mt-6">
-                  <CardHeader>
-                    <CardTitle>Dokumen Lampiran</CardTitle>
-                    <CardDescription>
-                      Dokumen bukti dukung usulan kebutuhan.
-                    </CardDescription>
-
-                    <CardAction>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          router.visit(
-                            NeedAttachmentController.index.url({
-                              need: need.id,
-                            }),
-                          )
-                        }
-                      >
-                        <PaperclipIcon />
-                        Kelola Lampiran
-                      </Button>
-                    </CardAction>
-                  </CardHeader>
-                  <CardContent className="px-0">
-                    <div className="border-y">
-                      <AttachmentList
-                        attachments={need.attachments || []}
-                        showHeader={false}
-                        allowDelete={false}
-                        showCard={false}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
+                <NeedAttachmentsTab need={need} />
               </TabsContent>
             </Tabs>
           </div>

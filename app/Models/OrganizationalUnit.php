@@ -25,6 +25,14 @@ class OrganizationalUnit extends Model
     }
 
     /**
+     * Get all parent units recursively.
+     */
+    public function parentsRecursive(): BelongsTo
+    {
+        return $this->parent()->with('parentsRecursive');
+    }
+
+    /**
      * Get the sub-units.
      */
     public function children(): HasMany

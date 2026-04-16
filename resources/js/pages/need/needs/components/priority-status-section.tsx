@@ -1,15 +1,14 @@
+import { useEffect } from 'react';
 import InputError from '@/components/input-error';
 import {
   Field,
   FieldContent,
   FieldDescription,
-  FieldGroup,
   FieldLabel,
   FieldTitle,
 } from '@/components/ui/field';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 
 import type { Need } from '../columns';
@@ -75,6 +74,10 @@ export function PriorityStatusSection({
   setData,
   errors,
 }: PriorityStatusSectionProps) {
+  useEffect(() => {
+    setData('is_priority', data.urgency === 'high' && data.impact === 'high');
+  }, [data.urgency, data.impact, setData]);
+
   return (
     <div className="space-y-6 py-6">
       <div className="space-y-3">
@@ -170,54 +173,45 @@ export function PriorityStatusSection({
       </div>
 
       <div className="pt-2">
-        <FieldGroup className="w-full">
-          <FieldLabel
-            htmlFor="is_priority"
-            className={cn(
-              'cursor-pointer overflow-hidden border transition-all duration-200',
-              data.is_priority
-                ? 'border-green-500/30! bg-green-500/10! dark:border-green-500/20! dark:bg-green-500/5!'
-                : 'border-muted! bg-muted/30! dark:bg-muted/10!',
-            )}
-          >
-            <Field orientation="horizontal" className="p-4">
-              <FieldContent>
-                <div className="flex items-center gap-2">
-                  <div
-                    className={cn(
-                      'h-2 w-2 rounded-full',
-                      data.is_priority
-                        ? 'animate-pulse bg-green-500'
-                        : 'bg-muted-foreground/30',
-                    )}
-                  />
-                  <FieldTitle
-                    className={cn(
-                      'text-base',
-                      data.is_priority
-                        ? 'text-green-700 dark:text-green-400'
-                        : '',
-                    )}
-                  >
-                    {data.is_priority
-                      ? 'Prioritas Utama'
-                      : 'Bukan Prioritas Utama'}
-                  </FieldTitle>
-                </div>
-                <FieldDescription className="mt-1">
-                  Tandai jika usulan ini merupakan prioritas strategis yang
-                  harus segera dipenuhi.
-                </FieldDescription>
-              </FieldContent>
-              <Switch
-                id="is_priority"
-                checked={data.is_priority}
-                onCheckedChange={(checked) => setData('is_priority', checked)}
-              />
-            </Field>
-          </FieldLabel>
-          <InputError message={errors.is_priority} />
-        </FieldGroup>
+        <div
+          className={cn(
+            'overflow-hidden rounded-lg border transition-all duration-200',
+            data.is_priority
+              ? 'border-red-500/30! bg-red-500/10! dark:border-red-500/20! dark:bg-red-500/5!'
+              : 'border-muted! bg-muted/30! dark:bg-muted/10!',
+          )}
+        >
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <div
+                  className={cn(
+                    'h-2 w-2 rounded-full',
+                    data.is_priority
+                      ? 'animate-pulse bg-red-500'
+                      : 'bg-muted-foreground/30',
+                  )}
+                />
+                <span
+                  className={cn(
+                    'text-base font-semibold',
+                    data.is_priority ? 'text-red-700 dark:text-red-400' : '',
+                  )}
+                >
+                  {data.is_priority
+                    ? 'Prioritas Utama'
+                    : 'Bukan Prioritas Utama'}
+                </span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {data.is_priority
+                  ? 'Usulan ini otomatis ditandai sebagai prioritas strategis karena Urgensi & Dampak Tinggi.'
+                  : 'Tandai Urgensi & Dampak sebagai "Tinggi" untuk menjadikan usulan ini prioritas.'}
+              </p>
+            </div>
+          </div>
+        </div>
+        <InputError message={errors.is_priority} />
       </div>
     </div>
   );

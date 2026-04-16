@@ -1,3 +1,4 @@
+import React, { Fragment } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
@@ -47,9 +48,47 @@ export function NeedGeneralInfo({ need }: NeedGeneralInfoProps) {
         </InfoRow>
 
         <InfoRow label="Unit Kerja">
-          <p className="text-sm font-medium">
-            {need.organizational_unit?.name}
-          </p>
+          <div className="flex flex-col gap-0.5">
+            {(() => {
+              const getOrgUnitPath = (unit: any): string[] => {
+                const path: string[] = [unit.name];
+                let current = unit.parents_recursive;
+
+                while (current) {
+                  path.unshift(current.name);
+                  current = current.parents_recursive;
+                }
+
+                return path;
+              };
+
+              if (!need.organizational_unit) {
+                return <p className="text-sm">-</p>;
+              }
+
+              const paths = getOrgUnitPath(need.organizational_unit);
+
+              if (paths.length <= 1) {
+                return <p className="text-sm font-medium">{paths[0]}</p>;
+              }
+
+              return (
+                <>
+                  <div className="flex flex-wrap items-center gap-1 text-[10px] text-muted-foreground">
+                    {paths.slice(0, -1).map((name, i) => (
+                      <Fragment key={i}>
+                        <span>{name}</span>
+                        {i < paths.length - 2 && <span>/</span>}
+                      </Fragment>
+                    ))}
+                  </div>
+                  <p className="text-sm leading-tight font-medium">
+                    {paths[paths.length - 1]}
+                  </p>
+                </>
+              );
+            })()}
+          </div>
         </InfoRow>
 
         <InfoRow label="Tahun Anggaran">

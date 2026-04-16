@@ -1,6 +1,7 @@
 import { Form } from '@inertiajs/react';
 import { toast } from 'sonner';
 
+import IndicatorController from '@/actions/App/Http/Controllers/Renstra/IndicatorController';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,7 +16,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import type { Indicator, Sasaran, Tujuan } from '@/types';
-import IndicatorController from '@/actions/App/Http/Controllers/Renstra/IndicatorController';
 
 interface IndicatorDialogProps {
   tujuan?: Tujuan | null;

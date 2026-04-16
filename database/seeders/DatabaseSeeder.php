@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -14,7 +13,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(ISeedUsersTableSeeder::class);
-        
+
         \DB::table('users')->updateOrInsert(
             ['email' => 'admin@admin.com'],
             [
@@ -28,7 +27,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call(ISeedJobsTableSeeder::class);
         $this->call(ISeedJobBatchesTableSeeder::class);
-        
+
         // System / Independent
         $this->call(ISeedChecklistQuestionsTableSeeder::class);
         $this->call(ISeedOrganizationalUnitsTableSeeder::class);
@@ -48,7 +47,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ISeedSasaransTableSeeder::class);
         $this->call(ISeedIndicatorsTableSeeder::class);
         $this->call(ISeedIndicatorTargetsTableSeeder::class);
-        
+
         // KPI
         $this->call(ISeedKpiGroupsTableSeeder::class);
         $this->call(ISeedKpiIndicatorsTableSeeder::class);

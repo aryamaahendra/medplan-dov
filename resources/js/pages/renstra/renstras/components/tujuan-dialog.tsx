@@ -1,6 +1,7 @@
 import { Form } from '@inertiajs/react';
 import { toast } from 'sonner';
 
+import TujuanController from '@/actions/App/Http/Controllers/Renstra/TujuanController';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,7 +16,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import type { Renstra, Tujuan } from '@/types';
-import TujuanController from '@/actions/App/Http/Controllers/Renstra/TujuanController';
 
 interface TujuanDialogProps {
   renstra: Renstra;

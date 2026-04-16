@@ -3,6 +3,7 @@ import { Upload } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+import PlanningActivityVersionController from '@/actions/App/Http/Controllers/Planning/PlanningActivityVersionController';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -16,7 +17,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { PlanningVersion } from '@/types/planning-version';
-import PlanningActivityVersionController from '@/actions/App/Http/Controllers/Planning/PlanningActivityVersionController';
 
 export function ActivityImportDialog({
   version,

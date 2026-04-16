@@ -21,6 +21,9 @@ class UpdateNeedAction
                 'strategic_service_plan_ids',
                 'planning_activity_version_ids',
                 'planning_activity_indicator_ids',
+                'is_priority',
+            ])->merge([
+                'is_priority' => ($data['urgency'] ?? $need->urgency) === 'high' && ($data['impact'] ?? $need->impact) === 'high',
             ])->toArray());
 
             $need->sasarans()->sync($data['sasaran_ids'] ?? []);

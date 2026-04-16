@@ -3,6 +3,7 @@ import { Edit, MoreHorizontal, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+import KpiIndicatorController from '@/actions/App/Http/Controllers/Kpi/KpiIndicatorController';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,7 +23,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import type { KpiIndicator } from '@/types';
-import KpiIndicatorController from '@/actions/App/Http/Controllers/Kpi/KpiIndicatorController';
 
 interface IndicatorTableProps {
   indicators: KpiIndicator[];

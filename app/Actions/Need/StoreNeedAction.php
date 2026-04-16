@@ -26,6 +26,9 @@ class StoreNeedAction
                 'planning_activity_indicator_ids',
                 'attachments',
                 'attachment_names',
+                'is_priority',
+            ])->merge([
+                'is_priority' => ($data['urgency'] ?? '') === 'high' && ($data['impact'] ?? '') === 'high',
             ])->toArray());
 
             $need->sasarans()->sync($data['sasaran_ids'] ?? []);

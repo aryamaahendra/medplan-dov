@@ -1,6 +1,7 @@
 import { useForm } from '@inertiajs/react';
 import { toast } from 'sonner';
 
+import NeedGroupController from '@/actions/App/Http/Controllers/Need/NeedGroupController';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,7 +18,6 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 
 import type { NeedGroup } from './columns';
-import NeedGroupController from '@/actions/App/Http/Controllers/Need/NeedGroupController';
 
 interface NeedGroupDialogProps {
   open: boolean;

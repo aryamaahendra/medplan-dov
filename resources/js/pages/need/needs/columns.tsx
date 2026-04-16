@@ -10,6 +10,7 @@ import {
   XCircle,
 } from 'lucide-react';
 
+import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { getIndexColumn } from '@/components/data-table/data-table-index-column';
@@ -21,7 +22,6 @@ import type {
   KpiIndicator,
   StrategicServicePlan as BaseStrategicServicePlan,
 } from '@/types';
-import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 
 export type { KpiIndicator, BaseStrategicServicePlan };
 
@@ -79,6 +79,13 @@ export interface PlanningActivityVersion {
   children?: PlanningActivityVersion[];
 }
 
+export interface OrganizationalUnit {
+  id: number;
+  name: string;
+  parent_id: number | null;
+  parents_recursive?: OrganizationalUnit | null;
+}
+
 export type StrategicServicePlan = BaseStrategicServicePlan;
 
 export interface NeedDetail {
@@ -118,7 +125,12 @@ export interface Need {
   is_priority: boolean;
   status: 'draft' | 'submitted' | 'approved' | 'rejected';
   created_at: string;
-  organizational_unit?: { id: number; name: string };
+  organizational_unit?: {
+    id: number;
+    name: string;
+    parent_id: number | null;
+    parents_recursive?: OrganizationalUnit | null;
+  };
   need_type?: { id: number; name: string };
   sasarans?: Sasaran[];
   indicators?: Indicator[];
@@ -213,7 +225,34 @@ export const getColumns = (
   {
     id: 'organizational_unit',
     header: 'Unit Kerja',
-    cell: ({ row }) => row.original.organizational_unit?.name ?? '-',
+    cell: ({ row }) => {
+      const unit = row.original.organizational_unit;
+
+      if (!unit) {
+        return '-';
+      }
+
+      const path: string[] = [unit.name];
+      let current = unit.parents_recursive;
+
+      while (current) {
+        path.unshift(current.name);
+        current = current.parents_recursive;
+      }
+
+      if (path.length <= 1) {
+        return path[0];
+      }
+
+      return (
+        <div className="flex flex-col gap-0.5">
+          <span className="text-[10px] text-muted-foreground">
+            {path.slice(0, -1).join(' / ')}
+          </span>
+          <span className="font-medium">{path[path.length - 1]}</span>
+        </div>
+      );
+    },
     enableSorting: false,
   },
   {

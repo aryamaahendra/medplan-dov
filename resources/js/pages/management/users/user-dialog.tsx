@@ -1,6 +1,7 @@
 import { Form } from '@inertiajs/react';
 import { toast } from 'sonner';
 
+import UserController from '@/actions/App/Http/Controllers/Management/UserController';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,7 +16,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 import type { User } from './columns';
-import UserController from '@/actions/App/Http/Controllers/Management/UserController';
 
 interface UserDialogProps {
   user?: User | null;

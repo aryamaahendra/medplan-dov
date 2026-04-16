@@ -4,12 +4,14 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import type { PlanningActivityVersion } from '../columns';
+import { formatCurrency } from '../columns';
 
 interface PlanningAlignmentSectionProps {
   data: any;
   setData: (key: string | ((prev: any) => any), value?: any) => void;
   errors: any;
-  planningActivities: PlanningActivityVersion[];
+  planningActivities: any[];
+  year: number;
 }
 
 export function PlanningAlignmentSection({
@@ -17,6 +19,7 @@ export function PlanningAlignmentSection({
   setData,
   errors,
   planningActivities,
+  year,
 }: PlanningAlignmentSectionProps) {
   const handleActivityToggle = (activityId: string, checked: boolean) => {
     setData((prev: any) => {
@@ -108,6 +111,7 @@ export function PlanningAlignmentSection({
               onActivityToggle={handleActivityToggle}
               onIndicatorToggle={handleIndicatorToggle}
               level={0}
+              year={year}
             />
           ))}
         </div>
@@ -123,6 +127,7 @@ interface ActivityGroupProps {
   onActivityToggle: (id: string, checked: boolean) => void;
   onIndicatorToggle: (id: string, checked: boolean) => void;
   level: number;
+  year: number;
 }
 
 function ActivityGroup({
@@ -132,8 +137,17 @@ function ActivityGroup({
   onActivityToggle,
   onIndicatorToggle,
   level,
+  year,
 }: ActivityGroupProps) {
   const isChecked = activityIds.includes(activity.id.toString());
+  const planningVersion = (activity as any).planning_version;
+  const isOutOfRange =
+    level === 0 &&
+    planningVersion &&
+    (year < planningVersion.year_start || year > planningVersion.year_end);
+  const targetForYear = (activity as any).activity_years?.find(
+    (a: any) => a.year === year,
+  );
 
   return (
     <div className="space-y-4">
@@ -155,10 +169,40 @@ function ActivityGroup({
               level === 0 && 'text-xs font-semibold tracking-wider uppercase',
             )}
           >
-            {activity.type}:{' '}
-            {activity.full_code ? `${activity.full_code} ` : ''}
-            {activity.name}
+            <span className="font-semibold text-foreground">
+              {activity.type ? `${activity.type}: ` : ''}
+              {activity.full_code ? `${activity.full_code} ` : ''}
+              {activity.name}
+            </span>
           </Label>
+          {level === 0 && isOutOfRange && (
+            <span className="mt-0.5 block text-[10px] font-medium text-destructive">
+              (Renja di luar jangkauan tahun {planningVersion?.year_start} -{' '}
+              {planningVersion?.year_end})
+            </span>
+          )}
+          {targetForYear && (
+            <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <span className="text-[10px] font-medium text-muted-foreground/70 uppercase">
+                  Target {year}:
+                </span>
+                <span className="font-medium text-foreground">
+                  {targetForYear.target || '-'}
+                </span>
+              </span>
+              {targetForYear.budget && (
+                <span className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-medium text-muted-foreground/70 uppercase">
+                    Pagu:
+                  </span>
+                  <span className="font-medium text-foreground">
+                    {formatCurrency(targetForYear.budget)}
+                  </span>
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -171,29 +215,51 @@ function ActivityGroup({
         {/* Indicators at this level */}
         {activity.indicators && activity.indicators.length > 0 && (
           <div className="grid gap-3">
-            {activity.indicators.map((indicator) => (
-              <div
-                key={indicator.id}
-                className="group/indicator flex items-start space-x-3"
-              >
-                <Checkbox
-                  id={`activity-indicator-${indicator.id}`}
-                  checked={indicatorIds.includes(indicator.id.toString())}
-                  onCheckedChange={(checked) =>
-                    onIndicatorToggle(indicator.id.toString(), !!checked)
-                  }
-                  className="mt-1"
-                />
-                <div className="grid gap-1.5 leading-none">
-                  <Label
-                    htmlFor={`activity-indicator-${indicator.id}`}
-                    className="cursor-pointer text-sm leading-normal font-normal text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    Indikator: {indicator.name}
-                  </Label>
+            {activity.indicators.map((indicator: any) => {
+              const indicatorTarget = indicator.activity_years?.find(
+                (a: any) => a.year === year,
+              );
+
+              return (
+                <div
+                  key={indicator.id}
+                  className="group/indicator flex items-start space-x-3"
+                >
+                  <Checkbox
+                    id={`activity-indicator-${indicator.id}`}
+                    checked={indicatorIds.includes(indicator.id.toString())}
+                    onCheckedChange={(checked) =>
+                      onIndicatorToggle(indicator.id.toString(), !!checked)
+                    }
+                    className="mt-1"
+                  />
+                  <div className="mt-1 grid gap-1.5 leading-none">
+                    <Label
+                      htmlFor={`activity-indicator-${indicator.id}`}
+                      className="cursor-pointer text-sm leading-normal font-medium text-foreground transition-colors hover:text-primary"
+                    >
+                      {indicator.name}
+                    </Label>
+                    <div className="mt-0.5">
+                      {indicatorTarget ? (
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <span className="text-[10px] font-medium text-muted-foreground/70 uppercase">
+                            Target {year}:
+                          </span>
+                          <span className="font-medium text-foreground">
+                            {indicatorTarget.target || '-'}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-[10px] font-medium text-destructive italic">
+                          (Target tahun {year} tidak tersedia)
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
@@ -209,6 +275,7 @@ function ActivityGroup({
                 onActivityToggle={onActivityToggle}
                 onIndicatorToggle={onIndicatorToggle}
                 level={level + 1}
+                year={year}
               />
             ))}
           </div>

@@ -10,6 +10,7 @@ interface IkkAlignmentSectionProps {
   setData: (key: string | ((prev: any) => any), value?: any) => void;
   errors: any;
   kpiGroups: any[];
+  year: number;
 }
 
 export function IkkAlignmentSection({
@@ -17,6 +18,7 @@ export function IkkAlignmentSection({
   setData,
   errors,
   kpiGroups,
+  year,
 }: IkkAlignmentSectionProps) {
   const handleKpiIndicatorToggle = (indicatorId: string, checked: boolean) => {
     setData((prev: any) => ({
@@ -47,6 +49,7 @@ export function IkkAlignmentSection({
               group={group}
               selectedIds={data.kpi_indicator_ids}
               onToggle={handleKpiIndicatorToggle}
+              year={year}
             />
           ))}
           {kpiGroups.length === 0 && (
@@ -64,21 +67,29 @@ function KpiGroupSection({
   group,
   selectedIds,
   onToggle,
+  year,
 }: {
   group: any;
   selectedIds: string[];
   onToggle: (id: string, checked: boolean) => void;
+  year: number;
 }) {
   const rootIndicators = group.indicators.filter(
     (i: KpiIndicator) => !i.parent_indicator_id,
   );
+  const isOutOfRange = year < group.start_year || year > group.end_year;
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center gap-2">
         <h4 className="text-sm font-medium tracking-wider uppercase">
           Grup: {group.name} ({group.start_year} - {group.end_year})
         </h4>
+        {isOutOfRange && (
+          <span className="text-xs font-medium text-destructive">
+            (Siklus pengukuran di luar tahun {year})
+          </span>
+        )}
       </div>
       <div className="grid gap-4 border-l border-dashed pl-4">
         {rootIndicators.map((indicator: KpiIndicator) => (
@@ -88,6 +99,7 @@ function KpiGroupSection({
             allIndicators={group.indicators}
             selectedIds={selectedIds}
             onToggle={onToggle}
+            year={year}
           />
         ))}
       </div>
@@ -100,16 +112,21 @@ function KpiIndicatorItem({
   allIndicators,
   selectedIds,
   onToggle,
+  year,
 }: {
   indicator: KpiIndicator;
   allIndicators: KpiIndicator[];
   selectedIds: string[];
   onToggle: (id: string, checked: boolean) => void;
+  year: number;
 }) {
   const children = allIndicators.filter(
     (i) => i.parent_indicator_id === indicator.id,
   );
   const isSelected = selectedIds.includes(indicator.id.toString());
+  const targetForYear = indicator.annual_targets?.find(
+    (t: any) => t.year === year,
+  );
 
   return (
     <div className="space-y-3">
@@ -124,7 +141,7 @@ function KpiIndicatorItem({
             className="mt-1"
           />
         )}
-        <div className="grid gap-1.5 leading-none">
+        <div className="mt-1 grid gap-1.5 leading-none">
           <Label
             htmlFor={`kpi-${indicator.id}`}
             className={cn(
@@ -144,6 +161,24 @@ function KpiIndicatorItem({
               <span className="ml-1 font-normal">({indicator.unit})</span>
             )}
           </Label>
+          {!indicator.is_category && (
+            <div className="mt-0.5">
+              {targetForYear ? (
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <span className="text-[10px] font-medium text-muted-foreground/70 uppercase">
+                    Target {year}:
+                  </span>
+                  <span className="font-medium text-foreground">
+                    {targetForYear.target_value || '-'}
+                  </span>
+                </div>
+              ) : (
+                <span className="text-[10px] font-medium text-destructive italic">
+                  (Target tahun {year} tidak tersedia)
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -156,6 +191,7 @@ function KpiIndicatorItem({
               allIndicators={allIndicators}
               selectedIds={selectedIds}
               onToggle={onToggle}
+              year={year}
             />
           ))}
         </div>

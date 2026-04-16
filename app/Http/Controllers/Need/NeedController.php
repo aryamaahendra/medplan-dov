@@ -119,15 +119,20 @@ class NeedController extends Controller
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
             'tujuans' => Tujuan::query()
                 ->whereHas('renstra', fn ($q) => $q->where('is_active', true))
-                ->select(['id', 'name'])
+                ->select(['id', 'renstra_id', 'name'])
                 ->with([
+                    'renstra:id,year_start,year_end',
                     'sasarans' => fn ($q) => $q->select(['id', 'tujuan_id', 'name']),
                     'sasarans.indicators' => fn ($q) => $q->select(['id', 'sasaran_id', 'name']),
+                    'sasarans.indicators.targets' => fn ($q) => $q->select(['id', 'indicator_id', 'year', 'target']),
                 ])
                 ->get(),
             'kpiGroups' => KpiGroup::query()
                 ->where('is_active', true)
-                ->with(['indicators' => fn ($q) => $q->select(['id', 'group_id', 'parent_indicator_id', 'name', 'unit', 'is_category'])])
+                ->with([
+                    'indicators' => fn ($q) => $q->select(['id', 'group_id', 'parent_indicator_id', 'name', 'unit', 'is_category']),
+                    'indicators.annualTargets' => fn ($q) => $q->select(['id', 'indicator_id', 'year', 'target_value']),
+                ])
                 ->get(),
             'strategicServicePlans' => StrategicServicePlan::query()
                 ->select(['id', 'strategic_program', 'service_plan', 'year'])
@@ -136,9 +141,13 @@ class NeedController extends Controller
                 ->whereHas('planningVersion', fn ($q) => $q->where('is_current', true))
                 ->whereNull('parent_id')
                 ->with([
-                    'children.children.indicators',
-                    'children.indicators',
-                    'indicators',
+                    'planningVersion:id,year_start,year_end',
+                    'activityYears',
+                    'indicators.activityYears',
+                    'children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
+                    'children.children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
+                    'children.children.children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
+                    'children.children.children.children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
                 ])
                 ->get(),
         ]);
@@ -162,15 +171,20 @@ class NeedController extends Controller
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
             'tujuans' => Tujuan::query()
                 ->whereHas('renstra', fn ($q) => $q->where('is_active', true))
-                ->select(['id', 'name'])
+                ->select(['id', 'renstra_id', 'name'])
                 ->with([
+                    'renstra:id,year_start,year_end',
                     'sasarans' => fn ($q) => $q->select(['id', 'tujuan_id', 'name']),
                     'sasarans.indicators' => fn ($q) => $q->select(['id', 'sasaran_id', 'name']),
+                    'sasarans.indicators.targets' => fn ($q) => $q->select(['id', 'indicator_id', 'year', 'target']),
                 ])
                 ->get(),
             'kpiGroups' => KpiGroup::query()
                 ->where('is_active', true)
-                ->with(['indicators' => fn ($q) => $q->select(['id', 'group_id', 'parent_indicator_id', 'name', 'unit', 'is_category'])])
+                ->with([
+                    'indicators' => fn ($q) => $q->select(['id', 'group_id', 'parent_indicator_id', 'name', 'unit', 'is_category']),
+                    'indicators.annualTargets' => fn ($q) => $q->select(['id', 'indicator_id', 'year', 'target_value']),
+                ])
                 ->get(),
             'strategicServicePlans' => StrategicServicePlan::query()
                 ->select(['id', 'strategic_program', 'service_plan', 'year'])
@@ -179,9 +193,13 @@ class NeedController extends Controller
                 ->whereHas('planningVersion', fn ($q) => $q->where('is_current', true))
                 ->whereNull('parent_id')
                 ->with([
-                    'children.children.indicators',
-                    'children.indicators',
-                    'indicators',
+                    'planningVersion:id,year_start,year_end',
+                    'activityYears',
+                    'indicators.activityYears',
+                    'children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
+                    'children.children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
+                    'children.children.children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
+                    'children.children.children.children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
                 ])
                 ->get(),
         ]);

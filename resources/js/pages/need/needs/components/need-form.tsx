@@ -221,6 +221,7 @@ export function NeedForm({
                 setData={setData}
                 errors={errors}
                 tujuans={tujuans}
+                year={parseInt(data.year)}
               />
             </TabsContent>
 
@@ -233,6 +234,7 @@ export function NeedForm({
                 setData={setData}
                 errors={errors}
                 kpiGroups={kpiGroups}
+                year={parseInt(data.year)}
               />
             </TabsContent>
 
@@ -257,6 +259,7 @@ export function NeedForm({
                 setData={setData}
                 errors={errors}
                 planningActivities={planningActivities}
+                year={parseInt(data.year)}
               />
             </TabsContent>
 

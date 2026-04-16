@@ -57,6 +57,7 @@ export interface Indicator {
 export interface Tujuan {
   id: number;
   name: string;
+  renstra?: { id: number; year_start: number; year_end: number };
   sasarans: Sasaran[];
 }
 

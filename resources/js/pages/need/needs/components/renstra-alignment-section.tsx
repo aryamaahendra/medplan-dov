@@ -3,13 +3,14 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import type { Indicator, Sasaran, Tujuan } from '../columns';
+import type { Sasaran, Tujuan } from '../columns';
 
 interface RenstraAlignmentSectionProps {
   data: any;
   setData: (key: string | ((prev: any) => any), value?: any) => void;
   errors: any;
-  tujuans: Tujuan[];
+  tujuans: any[];
+  year: number;
 }
 
 export function RenstraAlignmentSection({
@@ -17,6 +18,7 @@ export function RenstraAlignmentSection({
   setData,
   errors,
   tujuans,
+  year,
 }: RenstraAlignmentSectionProps) {
   const handleSasaranToggle = (sasaranId: string, checked: boolean) => {
     setData((prev: any) => {
@@ -34,7 +36,7 @@ export function RenstraAlignmentSection({
           .find((s) => s.id.toString() === sasaranId);
 
         if (sasaran?.indicators) {
-          const indicatorIdsToRemove = sasaran.indicators.map((i) =>
+          const indicatorIdsToRemove = sasaran.indicators.map((i: any) =>
             i.id.toString(),
           );
           newIndicatorIds = newIndicatorIds.filter(
@@ -82,6 +84,7 @@ export function RenstraAlignmentSection({
               indicatorIds={data.indicator_ids}
               onSasaranToggle={handleSasaranToggle}
               onIndicatorToggle={handleIndicatorToggle}
+              year={year}
             />
           ))}
         </div>
@@ -96,6 +99,7 @@ interface TujuanGroupProps {
   indicatorIds: string[];
   onSasaranToggle: (id: string, checked: boolean) => void;
   onIndicatorToggle: (id: string, checked: boolean) => void;
+  year: number;
 }
 
 function TujuanGroup({
@@ -104,13 +108,24 @@ function TujuanGroup({
   indicatorIds,
   onSasaranToggle,
   onIndicatorToggle,
+  year,
 }: TujuanGroupProps) {
+  const renstra = tujuan.renstra;
+  const isOutOfRange =
+    renstra && (year < renstra.year_start || year > renstra.year_end);
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <h4 className="text-sm font-semibold tracking-wider uppercase">
           Tujuan: {tujuan.name}
         </h4>
+        {isOutOfRange && (
+          <span className="text-xs font-medium text-destructive">
+            (Di luar jangkauan tahun Renstra: {renstra?.year_start} -{' '}
+            {renstra?.year_end})
+          </span>
+        )}
       </div>
 
       <div className="grid gap-4 border-l border-dashed pl-4">
@@ -122,6 +137,7 @@ function TujuanGroup({
             indicatorIds={indicatorIds}
             onSasaranToggle={onSasaranToggle}
             onIndicatorToggle={onIndicatorToggle}
+            year={year}
           />
         ))}
       </div>
@@ -135,6 +151,7 @@ interface SasaranItemProps {
   indicatorIds: string[];
   onSasaranToggle: (id: string, checked: boolean) => void;
   onIndicatorToggle: (id: string, checked: boolean) => void;
+  year: number;
 }
 
 function SasaranItem({
@@ -143,6 +160,7 @@ function SasaranItem({
   indicatorIds,
   onSasaranToggle,
   onIndicatorToggle,
+  year,
 }: SasaranItemProps) {
   return (
     <div className="space-y-3">
@@ -176,11 +194,12 @@ function SasaranItem({
               {sasaran.indicators.map((indicator) => (
                 <IndicatorItem
                   key={indicator.id}
-                  indicator={indicator}
+                  indicator={indicator as any}
                   isIndicatorChecked={indicatorIds.includes(
                     indicator.id.toString(),
                   )}
                   onIndicatorToggle={onIndicatorToggle}
+                  year={year}
                 />
               ))}
             </div>
@@ -201,11 +220,15 @@ function IndicatorItem({
   indicator,
   isIndicatorChecked,
   onIndicatorToggle,
+  year,
 }: {
-  indicator: Indicator;
+  indicator: any;
   isIndicatorChecked: boolean;
   onIndicatorToggle: (id: string, checked: boolean) => void;
+  year: number;
 }) {
+  const targetForYear = indicator.targets?.find((t: any) => t.year === year);
+
   return (
     <div className="group/indicator flex items-start space-x-3">
       <Checkbox
@@ -216,18 +239,34 @@ function IndicatorItem({
         }
         className="mt-1"
       />
-      <div className="grid gap-1.5 leading-none">
+      <div className="mt-1 grid gap-1.5 leading-none">
         <Label
           htmlFor={`indicator-${indicator.id}`}
           className={cn(
-            'cursor-pointer text-sm leading-normal font-normal transition-colors',
+            'cursor-pointer text-sm leading-normal font-medium transition-colors',
             isIndicatorChecked
               ? 'text-foreground'
               : 'text-muted-foreground group-hover/indicator:text-foreground',
           )}
         >
-          Indikator: {indicator.name}
+          {indicator.name}
         </Label>
+        <div className="mt-0.5">
+          {targetForYear ? (
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <span className="text-[10px] font-medium text-muted-foreground/70 uppercase">
+                Target {year}:
+              </span>
+              <span className="font-medium text-foreground">
+                {targetForYear.target || '-'}
+              </span>
+            </div>
+          ) : (
+            <span className="text-[10px] font-medium text-destructive italic">
+              (Target tahun {year} tidak tersedia)
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

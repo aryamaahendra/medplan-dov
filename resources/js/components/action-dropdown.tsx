@@ -37,6 +37,7 @@ interface ActionDropdownProps {
   actions: (ActionItem | 'separator')[];
   align?: 'start' | 'end' | 'center';
   className?: string;
+  modal?: boolean;
 }
 
 export function ActionDropdown({
@@ -46,9 +47,10 @@ export function ActionDropdown({
   actions,
   align = 'end',
   className,
+  modal = false,
 }: ActionDropdownProps) {
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={modal}>
       <DropdownMenuTrigger asChild>
         {trigger || (
           <Button

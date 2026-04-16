@@ -48,7 +48,11 @@ export function NeedAttachmentsTab({ need }: NeedAttachmentsTabProps) {
       <CardContent className="px-0">
         <div className="border-y">
           <AttachmentList
-            attachments={need.attachments || []}
+            attachments={
+              need.attachments?.filter(
+                (a) => a.category !== 'technical_specifications',
+              ) ?? []
+            }
             showHeader={false}
             allowDelete={false}
             showCard={false}

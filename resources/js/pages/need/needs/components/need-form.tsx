@@ -101,6 +101,8 @@ export function NeedForm({
     },
     attachments: [] as File[],
     attachment_names: [] as string[],
+    technical_specification_attachments: [] as File[],
+    technical_specification_attachment_names: [] as string[],
     deleted_attachment_ids: [] as number[],
   });
 
@@ -179,11 +181,9 @@ export function NeedForm({
               <TabsTrigger value="detail" className="">
                 Detail KAK
               </TabsTrigger>
-              {!isEditing && (
-                <TabsTrigger value="lampiran" className="">
-                  Lampiran
-                </TabsTrigger>
-              )}
+              <TabsTrigger value="lampiran" className="">
+                Lampiran
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent
@@ -269,28 +269,50 @@ export function NeedForm({
                 initialValues={data.detail}
                 detailValuesRef={detailValuesRef}
                 errors={errors}
+                technicalSpecificationAttachments={
+                  data.technical_specification_attachments
+                }
+                technicalSpecificationAttachmentNames={
+                  data.technical_specification_attachment_names
+                }
+                setTechnicalSpecificationAttachments={(files) =>
+                  setData('technical_specification_attachments', files)
+                }
+                setTechnicalSpecificationAttachmentNames={(names) =>
+                  setData('technical_specification_attachment_names', names)
+                }
+                existingTechnicalSpecificationAttachments={
+                  need?.attachments?.filter(
+                    (a) => a.category === 'technical_specifications',
+                  ) ?? []
+                }
+                deletedAttachmentIds={data.deleted_attachment_ids}
+                setDeletedAttachmentIds={(ids) =>
+                  setData('deleted_attachment_ids', ids)
+                }
               />
             </TabsContent>
 
-            {!isEditing && (
-              <TabsContent
-                value="lampiran"
-                className="mt-0 focus-visible:outline-none"
-              >
-                <FileSection
-                  files={data.attachments}
-                  fileNames={data.attachment_names}
-                  setFiles={(files) => setData('attachments', files)}
-                  setFileNames={(names) => setData('attachment_names', names)}
-                  existingAttachments={[]}
-                  deletedAttachmentIds={data.deleted_attachment_ids}
-                  setDeletedAttachmentIds={(ids) =>
-                    setData('deleted_attachment_ids', ids)
-                  }
-                  errors={errors}
-                />
-              </TabsContent>
-            )}
+            <TabsContent
+              value="lampiran"
+              className="mt-0 focus-visible:outline-none"
+            >
+              <FileSection
+                files={data.attachments}
+                fileNames={data.attachment_names}
+                setFiles={(files) => setData('attachments', files)}
+                setFileNames={(names) => setData('attachment_names', names)}
+                existingAttachments={
+                  need?.attachments?.filter((a) => a.category === 'general') ??
+                  []
+                }
+                deletedAttachmentIds={data.deleted_attachment_ids}
+                setDeletedAttachmentIds={(ids) =>
+                  setData('deleted_attachment_ids', ids)
+                }
+                errors={errors}
+              />
+            </TabsContent>
           </Tabs>
         </CardContent>
         <CardFooter className="justify-end gap-2">

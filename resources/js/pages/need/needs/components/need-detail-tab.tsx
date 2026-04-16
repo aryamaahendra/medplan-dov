@@ -14,7 +14,14 @@ export function NeedDetailTab({ need }: NeedDetailTabProps) {
           Informasi dokumen proposal usulan kebutuhan.
         </p>
       </div>
-      <NeedDetailView detail={need.detail} />
+      <NeedDetailView
+        detail={need.detail}
+        attachments={
+          need.attachments?.filter(
+            (a) => a.category === 'technical_specifications',
+          ) ?? []
+        }
+      />
     </>
   );
 }

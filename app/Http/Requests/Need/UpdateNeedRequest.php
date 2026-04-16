@@ -72,6 +72,16 @@ class UpdateNeedRequest extends FormRequest
             'detail.expert_or_skilled_personnel' => ['nullable', 'string'],
             'detail.technical_specifications' => ['nullable', 'string'],
             'detail.training' => ['nullable', 'string'],
+            'technical_specification_attachments' => ['nullable', 'array'],
+            'technical_specification_attachments.*' => ['file', 'max:10240', 'mimes:jpg,jpeg,png,pdf,doc,docx'],
+            'technical_specification_attachment_names' => ['nullable', 'array'],
+            'technical_specification_attachment_names.*' => ['string', 'max:255'],
+            'attachments' => ['nullable', 'array'],
+            'attachments.*' => ['file', 'max:10240', 'mimes:jpg,jpeg,png,pdf,doc,docx,zip,rar'],
+            'attachment_names' => ['nullable', 'array'],
+            'attachment_names.*' => ['string', 'max:255'],
+            'deleted_attachment_ids' => ['nullable', 'array'],
+            'deleted_attachment_ids.*' => ['exists:need_attachments,id'],
         ];
     }
 }

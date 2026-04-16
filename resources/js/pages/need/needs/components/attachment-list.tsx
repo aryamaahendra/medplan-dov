@@ -1,19 +1,11 @@
 import { router } from '@inertiajs/react';
-import {
-  DownloadIcon,
-  EyeIcon,
-  FileIcon,
-  PaperclipIcon,
-  Trash2Icon,
-} from 'lucide-react';
+import { PaperclipIcon } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 
 import { FilePreviewDialog } from '@/components/file-preview-dialog';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -21,15 +13,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import type { Attachment } from '../columns';
+import { AttachmentGrid } from './attachment-grid';
+import { AttachmentTable } from './attachment-table';
 
 interface AttachmentListProps {
   attachments: Attachment[];
@@ -39,6 +25,7 @@ interface AttachmentListProps {
   allowDelete?: boolean;
   className?: string;
   showCard?: boolean;
+  variant?: 'table' | 'grid';
 }
 
 export function AttachmentList({
@@ -49,6 +36,7 @@ export function AttachmentList({
   allowDelete = true,
   className,
   showCard = true,
+  variant = 'table',
 }: AttachmentListProps) {
   const [previewAttachment, setPreviewAttachment] = useState<Attachment | null>(
     null,
@@ -113,75 +101,28 @@ export function AttachmentList({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const TableContent = (
+  const MainContent = (
     <div className={className}>
       {attachments.length > 0 ? (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nama File</TableHead>
-              <TableHead>Ukuran</TableHead>
-              <TableHead>Tipe</TableHead>
-              <TableHead className="w-1"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {attachments.map((attachment) => (
-              <TableRow key={attachment.id}>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <FileIcon className="h-4 w-4 text-primary" />
-                    <span className="font-medium">
-                      {attachment.display_name}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell className="text-muted-foreground">
-                  {formatFileSize(attachment.file_size)}
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className="uppercase">
-                    {attachment.extension || 'FILE'}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    {previewableExtensions.includes(
-                      attachment.extension?.toLowerCase() || '',
-                    ) && (
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={() => handlePreview(attachment)}
-                      >
-                        <EyeIcon />
-                      </Button>
-                    )}
-                    <Button variant="ghost" size="icon-sm" asChild>
-                      <a
-                        href={NeedAttachmentController.download.url({
-                          attachment: attachment.id,
-                        })}
-                        target="_blank"
-                      >
-                        <DownloadIcon />
-                      </a>
-                    </Button>
-                    {allowDelete && (
-                      <Button
-                        variant="destructive"
-                        size="icon-sm"
-                        onClick={() => handleDelete(attachment)}
-                      >
-                        <Trash2Icon />
-                      </Button>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        variant === 'table' ? (
+          <AttachmentTable
+            attachments={attachments}
+            allowDelete={allowDelete}
+            onPreview={handlePreview}
+            onDelete={handleDelete}
+            formatFileSize={formatFileSize}
+            previewableExtensions={previewableExtensions}
+          />
+        ) : (
+          <AttachmentGrid
+            attachments={attachments}
+            allowDelete={allowDelete}
+            onPreview={handlePreview}
+            onDelete={handleDelete}
+            formatFileSize={formatFileSize}
+            previewableExtensions={previewableExtensions}
+          />
+        )
       ) : (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <PaperclipIcon className="mb-4 h-12 w-12 text-muted-foreground/20" />
@@ -193,7 +134,7 @@ export function AttachmentList({
     </div>
   );
 
-  const Content = (
+  return (
     <>
       {showCard ? (
         <Card className="h-full">
@@ -204,11 +145,11 @@ export function AttachmentList({
             </CardHeader>
           )}
           <CardContent className="px-0">
-            <div className="border-y">{TableContent}</div>
+            <div className="border-y">{MainContent}</div>
           </CardContent>
         </Card>
       ) : (
-        TableContent
+        MainContent
       )}
 
       {previewAttachment && (
@@ -238,6 +179,4 @@ export function AttachmentList({
       />
     </>
   );
-
-  return Content;
 }

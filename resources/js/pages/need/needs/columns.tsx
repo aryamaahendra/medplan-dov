@@ -28,6 +28,7 @@ export type { KpiIndicator, BaseStrategicServicePlan };
 export interface Attachment {
   id: number;
   need_id: number;
+  category: string;
   display_name: string;
   file_path: string;
   file_size: number;

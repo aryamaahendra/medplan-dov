@@ -10,6 +10,7 @@ This document provides a comprehensive overview of the database tables and their
     - [need_groups](#need_groups)
     - [needs](#needs)
     - [need_details](#need_details)
+    - [need_attachments](#need_attachments)
     - [need_sasaran](#need_sasaran)
     - [need_indicator](#need_indicator)
 - [Strategic Planning Tables](#strategic-planning-tables)
@@ -28,7 +29,10 @@ This document provides a comprehensive overview of the database tables and their
 - [Planning Hierarchy Tables](#planning-hierarchy-tables)
     - [planning_versions](#planning_versions)
     - [planning_activity_versions](#planning_activity_versions)
+    - [planning_activity_indicators](#planning_activity_indicators)
     - [planning_activity_years](#planning_activity_years)
+    - [need_planning_activity_version](#need_planning_activity_version)
+    - [need_planning_activity_indicator](#need_planning_activity_indicator)
 - [Checklist Management Tables](#checklist-management-tables)
     - [checklist_questions](#checklist_questions)
     - [need_group_checklist_question](#need_group_checklist_question)
@@ -109,6 +113,9 @@ Stores the actual requests or needs from organizational units.
 | impact | string(20) | No | Default: 'medium' |
 | is_priority | boolean | No | Default: false |
 | status | string(20) | No | Default: 'draft' |
+| checklist_percentage | decimal(5,2) | No | Default: 0 |
+| notes | text | Yes | |
+| approved_by_director_at | timestamp | Yes | |
 | created_at | timestamp | Yes | |
 | updated_at | timestamp | Yes | |
 | deleted_at | timestamp | Yes | Soft Deletes |
@@ -129,6 +136,22 @@ Stores proposal/document-style fields for a need (1:1 relationship with needs).
 | expert_or_skilled_personnel | text | Yes | |
 | technical_specifications | text | Yes | |
 | training | text | Yes | |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+
+### `need_attachments`
+
+Stores file attachments related to a need.
+
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| need_id | bigint | No | Foreign Key (needs), cascadeOnDelete |
+| display_name | string | No | |
+| file_path | string | No | |
+| file_size | unsignedBigInteger | No | |
+| mime_type | string | No | |
+| extension | string | No | |
 | created_at | timestamp | Yes | |
 | updated_at | timestamp | Yes | |
 
@@ -358,6 +381,31 @@ Pivot table connecting KPI indicators and needs.
 | year | integer | No | Unique per yearable |
 | target | string | Yes | Nullable (used for indicators) |
 | budget | decimal(20,2) | Yes | Nullable (used for activities) |
+| total_budget | decimal(20,2) | Yes | Nullable (used for activities) |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+
+### `need_planning_activity_version`
+
+Pivot table connecting needs and planning activity versions.
+
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| need_id | bigint | No | Foreign Key (needs), cascadeOnDelete |
+| planning_activity_version_id | bigint | No | Foreign Key (planning_activity_versions), cascadeOnDelete |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+
+### `need_planning_activity_indicator`
+
+Pivot table connecting needs and planning activity indicators.
+
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| need_id | bigint | No | Foreign Key (needs), cascadeOnDelete |
+| planning_activity_indicator_id | bigint | No | Foreign Key (planning_activity_indicators), cascadeOnDelete |
 | created_at | timestamp | Yes | |
 | updated_at | timestamp | Yes | |
 

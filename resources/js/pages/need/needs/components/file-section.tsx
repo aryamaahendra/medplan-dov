@@ -1,16 +1,16 @@
-import { FileIcon, PaperclipIcon, Trash2Icon, XIcon } from 'lucide-react';
+import {
+  DownloadIcon,
+  EyeIcon,
+  PaperclipIcon,
+  Trash2Icon,
+  UploadIcon,
+  XIcon,
+} from 'lucide-react';
 import React, { useRef } from 'react';
-import { Badge } from '@/components/ui/badge';
+import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
+import { ActionDropdown } from '@/components/action-dropdown';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import type { Attachment } from '../columns';
 
@@ -37,6 +37,17 @@ export function FileSection({
 }: FileSectionProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const previewableExtensions = [
+    'jpg',
+    'jpeg',
+    'png',
+    'gif',
+    'webp',
+    'bmp',
+    'svg',
+    'pdf',
+  ];
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
@@ -44,7 +55,6 @@ export function FileSection({
       setFileNames([...fileNames, ...newFiles.map((f) => f.name)]);
     }
 
-    // Reset input so the same file can be picked again if removed
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -115,103 +125,103 @@ export function FileSection({
       </div>
 
       {(files.length > 0 || existingAttachments.length > 0) && (
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nama File</TableHead>
-                <TableHead className="w-[150px]">Ukuran</TableHead>
-                <TableHead className="w-[80px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {/* Existing Attachments */}
-              {existingAttachments.map((att) => (
-                <TableRow
-                  key={att.id}
-                  className={cn(
-                    deletedAttachmentIds.includes(att.id) &&
-                      'bg-muted/50 line-through opacity-50',
-                  )}
-                >
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <FileIcon className="h-4 w-4 text-blue-500" />
-                      <span className="font-medium">{att.display_name}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {formatFileSize(att.file_size)}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="text-[10px] uppercase">
-                      {att.extension || 'FILE'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-destructive"
-                      onClick={() => toggleExistingDeletion(att.id)}
-                    >
-                      {deletedAttachmentIds.includes(att.id) ? (
-                        <XIcon className="h-4 w-4" />
-                      ) : (
-                        <Trash2Icon className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {/* Existing Attachments */}
+          {existingAttachments.map((att) => (
+            <div
+              key={att.id}
+              className={cn(
+                'group flex items-center gap-3 rounded-lg border bg-card p-3 transition-colors hover:bg-muted/50',
+                deletedAttachmentIds.includes(att.id) &&
+                  'bg-muted/50 line-through opacity-50',
+              )}
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                <UploadIcon className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1 text-left">
+                <p className="truncate text-sm leading-tight font-medium text-foreground">
+                  {att.display_name}
+                </p>
+                <p className="mt-1 text-[10px] leading-none text-muted-foreground uppercase">
+                  {att.extension || 'FILE'} • {formatFileSize(att.file_size)}
+                </p>
+              </div>
+              <ActionDropdown
+                actions={[
+                  ...(previewableExtensions.includes(
+                    att.extension?.toLowerCase() || '',
+                  )
+                    ? [
+                        {
+                          label: 'Pratinjau',
+                          icon: EyeIcon,
+                          href: NeedAttachmentController.view.url({
+                            attachment: att.id,
+                          }),
+                        },
+                      ]
+                    : []),
+                  {
+                    label: 'Unduh',
+                    icon: DownloadIcon,
+                    href: NeedAttachmentController.download.url({
+                      attachment: att.id,
+                    }),
+                  },
+                  'separator',
+                  {
+                    label: deletedAttachmentIds.includes(att.id)
+                      ? 'Batal Hapus'
+                      : 'Hapus',
+                    icon: deletedAttachmentIds.includes(att.id)
+                      ? XIcon
+                      : Trash2Icon,
+                    variant: 'destructive',
+                    onClick: () => toggleExistingDeletion(att.id),
+                  },
+                ]}
+              />
+            </div>
+          ))}
 
-              {/* New Files */}
-              {files.map((file, index) => (
-                <TableRow key={index} className="bg-blue-50/10">
-                  <TableCell>
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-2">
-                        <FileIcon className="h-4 w-4 text-primary" />
-                        <Input
-                          value={fileNames[index]}
-                          onChange={(e) =>
-                            handleNameChange(index, e.target.value)
-                          }
-                          className="h-8 py-0 focus-visible:ring-1"
-                          placeholder="Beri nama file..."
-                        />
-                      </div>
-                      {errors?.[`attachments.${index}`] && (
-                        <p className="text-[0.8rem] font-medium text-destructive">
-                          {errors[`attachments.${index}`]}
-                        </p>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {formatFileSize(file.size)}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="text-[10px] uppercase">
-                      {file.name.split('.').pop()}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => removeNewFile(index)}
-                    >
-                      <Trash2Icon className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          {/* New Files */}
+          {files.map((file, index) => (
+            <div
+              key={index}
+              className="group flex items-center gap-3 rounded-lg border border-primary/20 bg-primary/5 p-3"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                <UploadIcon className="h-5 w-5" />
+              </div>
+              <div className="flex min-w-0 flex-1 flex-col gap-1">
+                <div className="flex items-center gap-1">
+                  <Input
+                    value={fileNames[index]}
+                    onChange={(e) => handleNameChange(index, e.target.value)}
+                    className="h-6 border-none bg-transparent p-0 py-0 text-sm font-medium text-foreground shadow-none focus-visible:ring-0 focus-visible:ring-1"
+                  />
+                </div>
+                <p className="text-[10px] leading-none text-muted-foreground uppercase">
+                  {file.name.split('.').pop()} • {formatFileSize(file.size)}
+                </p>
+                {errors?.[`attachments.${index}`] && (
+                  <p className="text-[0.8rem] font-medium text-destructive">
+                    {errors[`attachments.${index}`]}
+                  </p>
+                )}
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-destructive"
+                onClick={() => removeNewFile(index)}
+              >
+                <Trash2Icon className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
         </div>
       )}
 

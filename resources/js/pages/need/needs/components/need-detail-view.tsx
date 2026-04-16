@@ -1,10 +1,13 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { EditorRenderer } from '@/components/ui/editor-renderer';
 import { Label } from '@/components/ui/label';
-import type { NeedDetail } from '../columns';
+import type { Attachment, NeedDetail } from '../columns';
+
+import { AttachmentList } from './attachment-list';
 
 interface NeedDetailViewProps {
   detail?: NeedDetail | null;
+  attachments?: Attachment[];
 }
 
 const DETAIL_FIELDS: { key: keyof NeedDetail; label: string }[] = [
@@ -22,7 +25,10 @@ const DETAIL_FIELDS: { key: keyof NeedDetail; label: string }[] = [
   { key: 'training', label: 'Pelatihan' },
 ];
 
-export function NeedDetailView({ detail }: NeedDetailViewProps) {
+export function NeedDetailView({
+  detail,
+  attachments = [],
+}: NeedDetailViewProps) {
   const hasAnyValue = detail && DETAIL_FIELDS.some(({ key }) => detail[key]);
 
   if (!hasAnyValue) {
@@ -52,6 +58,19 @@ export function NeedDetailView({ detail }: NeedDetailViewProps) {
                 <div className="mb-0 min-h-[120px] w-full border-y border-input bg-background px-4 py-2 text-base md:text-sm">
                   <EditorRenderer value={value?.toString()} />
                 </div>
+                {key === 'technical_specifications' &&
+                  attachments.length > 0 && (
+                    <div className="-mb-6 p-2">
+                      <AttachmentList
+                        attachments={attachments}
+                        showHeader={false}
+                        allowDelete={false}
+                        showCard={false}
+                        variant="grid"
+                        className=""
+                      />
+                    </div>
+                  )}
               </div>
             );
           })}

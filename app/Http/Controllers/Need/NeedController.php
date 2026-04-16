@@ -99,7 +99,9 @@ class NeedController extends Controller
         $need = $action->execute(
             $request->validated(),
             $request->file('attachments'),
-            $request->input('attachment_names', [])
+            $request->input('attachment_names', []),
+            $request->file('technical_specification_attachments'),
+            $request->input('technical_specification_attachment_names', [])
         );
 
         return redirect()->route('needs.index', ['need_group_id' => $need->need_group_id])
@@ -153,6 +155,7 @@ class NeedController extends Controller
                 'planningActivityVersions:id',
                 'planningActivityIndicators:id',
                 'detail',
+                'attachments',
             ]),
             'currentGroup' => $need->needGroup,
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name', 'parent_id'])->get(),
@@ -188,7 +191,11 @@ class NeedController extends Controller
     {
         $action->execute(
             $need,
-            $request->validated()
+            $request->validated(),
+            $request->file('attachments'),
+            $request->input('attachment_names', []),
+            $request->file('technical_specification_attachments'),
+            $request->input('technical_specification_attachment_names', [])
         );
 
         return redirect()->route('needs.index', ['need_group_id' => $need->need_group_id])

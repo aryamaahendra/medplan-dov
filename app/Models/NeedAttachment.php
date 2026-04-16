@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
     'need_id',
+    'category',
     'display_name',
     'file_path',
     'file_size',

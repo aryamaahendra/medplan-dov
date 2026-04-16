@@ -13,46 +13,60 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::create([
-            'name' => 'Super Admin',
-            'email' => 'admin@admin.com',
-            'password' => Hash::make('E201admindev$$'),
-        ]);
+        $this->call(ISeedUsersTableSeeder::class);
+        
+        \DB::table('users')->updateOrInsert(
+            ['email' => 'admin@admin.com'],
+            [
+                'id' => 2,
+                'name' => 'Super Admin',
+                'password' => Hash::make('E201admindev$$'),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
 
-        $this->call(ISeedCacheTableSeeder::class);
-        $this->call(ISeedCacheLocksTableSeeder::class);
-        $this->call(ISeedChecklistQuestionsTableSeeder::class);
-        $this->call(ISeedFailedJobsTableSeeder::class);
-        $this->call(ISeedIndicatorTargetsTableSeeder::class);
-        $this->call(ISeedIndicatorsTableSeeder::class);
-        $this->call(ISeedJobBatchesTableSeeder::class);
         $this->call(ISeedJobsTableSeeder::class);
-        $this->call(ISeedKpiAnnualTargetsTableSeeder::class);
+        $this->call(ISeedJobBatchesTableSeeder::class);
+        
+        // System / Independent
+        $this->call(ISeedChecklistQuestionsTableSeeder::class);
+        $this->call(ISeedOrganizationalUnitsTableSeeder::class);
+        $this->call(ISeedNeedTypesTableSeeder::class);
+        $this->call(ISeedNeedGroupsTableSeeder::class);
+        $this->call(ISeedNeedGroupChecklistQuestionTableSeeder::class);
+
+        // Planning Hierarchy
+        $this->call(ISeedPlanningVersionsTableSeeder::class);
+        $this->call(ISeedPlanningActivityVersionsTableSeeder::class);
+        $this->call(ISeedPlanningActivityIndicatorsTableSeeder::class);
+        $this->call(ISeedPlanningActivityYearsTableSeeder::class);
+
+        // Strategic Planning
+        $this->call(ISeedRenstrasTableSeeder::class);
+        $this->call(ISeedTujuansTableSeeder::class);
+        $this->call(ISeedSasaransTableSeeder::class);
+        $this->call(ISeedIndicatorsTableSeeder::class);
+        $this->call(ISeedIndicatorTargetsTableSeeder::class);
+        
+        // KPI
         $this->call(ISeedKpiGroupsTableSeeder::class);
-        $this->call(ISeedKpiIndicatorNeedTableSeeder::class);
         $this->call(ISeedKpiIndicatorsTableSeeder::class);
-        $this->call(ISeedMigrationsTableSeeder::class);
+        $this->call(ISeedKpiAnnualTargetsTableSeeder::class);
+
+        // Service Plans
+        $this->call(ISeedStrategicServicePlansTableSeeder::class);
+
+        // Needs (Core)
+        $this->call(ISeedNeedsTableSeeder::class);
+
+        // Needs (Extended)
+        $this->call(ISeedNeedDetailsTableSeeder::class);
         $this->call(ISeedNeedAttachmentsTableSeeder::class);
         $this->call(ISeedNeedChecklistAnswersTableSeeder::class);
-        $this->call(ISeedNeedDetailsTableSeeder::class);
-        $this->call(ISeedNeedGroupChecklistQuestionTableSeeder::class);
-        $this->call(ISeedNeedGroupsTableSeeder::class);
         $this->call(ISeedNeedIndicatorTableSeeder::class);
         $this->call(ISeedNeedSasaranTableSeeder::class);
         $this->call(ISeedNeedStrategicServicePlanTableSeeder::class);
-        $this->call(ISeedNeedTypesTableSeeder::class);
-        $this->call(ISeedNeedsTableSeeder::class);
-        $this->call(ISeedOrganizationalUnitsTableSeeder::class);
-        $this->call(ISeedPasswordResetTokensTableSeeder::class);
-        $this->call(ISeedPlanningActivityIndicatorsTableSeeder::class);
-        $this->call(ISeedPlanningActivityVersionsTableSeeder::class);
-        $this->call(ISeedPlanningActivityYearsTableSeeder::class);
-        $this->call(ISeedPlanningVersionsTableSeeder::class);
-        $this->call(ISeedRenstrasTableSeeder::class);
-        $this->call(ISeedSasaransTableSeeder::class);
-        $this->call(ISeedSessionsTableSeeder::class);
-        $this->call(ISeedStrategicServicePlansTableSeeder::class);
-        $this->call(ISeedTujuansTableSeeder::class);
-        $this->call(ISeedUsersTableSeeder::class);
+        $this->call(ISeedKpiIndicatorNeedTableSeeder::class);
     }
 }

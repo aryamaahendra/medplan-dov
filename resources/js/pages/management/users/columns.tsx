@@ -8,6 +8,7 @@ import { getIndexColumn } from '@/components/data-table/data-table-index-column'
 export interface User {
   id: number;
   name: string;
+  nip?: string;
   email: string;
   created_at: string;
 }
@@ -20,6 +21,13 @@ export const getColumns = (
   {
     accessorKey: 'name',
     header: (props) => <DataTableColumnHeader {...props} title="Name" />,
+  },
+  {
+    accessorKey: 'nip',
+    header: (props) => <DataTableColumnHeader {...props} title="NIP" />,
+    meta: {
+      cellClassName: 'font-mono text-xs',
+    },
   },
   {
     accessorKey: 'email',

@@ -1,11 +1,16 @@
+import { FileDown, Eye } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { EditorRenderer } from '@/components/ui/editor-renderer';
 import { Label } from '@/components/ui/label';
+import needRoutes from '@/routes/needs';
+
 import type { Attachment, NeedDetail } from '../columns';
 
 import { AttachmentList } from './attachment-list';
 
 interface NeedDetailViewProps {
+  needId: number;
   detail?: NeedDetail | null;
   attachments?: Attachment[];
 }
@@ -26,29 +31,41 @@ const DETAIL_FIELDS: { key: keyof NeedDetail; label: string }[] = [
 ];
 
 export function NeedDetailView({
+  needId,
   detail,
   attachments = [],
 }: NeedDetailViewProps) {
-  const hasAnyValue = detail && DETAIL_FIELDS.some(({ key }) => detail[key]);
-
-  if (!hasAnyValue) {
-    return (
-      <div className="mt-6 rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-        Belum ada informasi detail proposal untuk usulan ini.
-      </div>
-    );
-  }
-
   return (
-    <Card className="mt-8 py-6">
+    <Card className="mt-8">
       <CardContent className="p-0">
+        <div className="mb-4 flex justify-end gap-1.5 px-4">
+          <Button variant="outline" size="sm" asChild>
+            <a
+              href={needRoutes.exportPdf.url({ need: needId })}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FileDown className="mr-1.5 h-4 w-4" />
+              Ekspor PDF
+            </a>
+          </Button>
+
+          {import.meta.env.DEV && (
+            <Button variant="destructive" size="icon-sm" asChild>
+              <a
+                href={`${needRoutes.exportPdf.url({ need: needId })}?preview=1`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Eye />
+              </a>
+            </Button>
+          )}
+        </div>
+
         <div className="space-y-6">
           {DETAIL_FIELDS.map(({ key, label }) => {
             const value = detail?.[key];
-
-            if (!value) {
-              return null;
-            }
 
             return (
               <div key={key} className="space-y-1.5">
@@ -56,7 +73,11 @@ export function NeedDetailView({
                   {label}
                 </Label>
                 <div className="mb-0 min-h-[120px] w-full border-y border-input bg-background px-4 py-2 text-base md:text-sm">
-                  <EditorRenderer value={value?.toString()} />
+                  {value ? (
+                    <EditorRenderer value={value?.toString()} />
+                  ) : (
+                    <p className="text-sm text-muted-foreground">-</p>
+                  )}
                 </div>
                 {key === 'technical_specifications' &&
                   attachments.length > 0 && (

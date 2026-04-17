@@ -15,6 +15,7 @@ export function NeedDetailTab({ need }: NeedDetailTabProps) {
         </p>
       </div>
       <NeedDetailView
+        needId={need.id}
         detail={need.detail}
         attachments={
           need.attachments?.filter(

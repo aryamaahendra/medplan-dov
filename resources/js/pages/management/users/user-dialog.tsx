@@ -69,6 +69,17 @@ export function UserDialog({ user, open, onOpenChange }: UserDialogProps) {
               </div>
 
               <div className="grid gap-2">
+                <Label htmlFor="nip">NIP (Optional)</Label>
+                <Input
+                  id="nip"
+                  name="nip"
+                  defaultValue={user?.nip ?? ''}
+                  placeholder="Employee Identification Number"
+                />
+                <InputError message={errors.nip} />
+              </div>
+
+              <div className="grid gap-2">
                 <Label htmlFor="email">Email address</Label>
                 <Input
                   id="email"

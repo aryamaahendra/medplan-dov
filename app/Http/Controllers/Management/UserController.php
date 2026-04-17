@@ -16,10 +16,10 @@ class UserController extends Controller
     use HasDataTable;
 
     /** Columns users can search across */
-    private const array SEARCH_COLUMNS = ['name', 'email'];
+    private const array SEARCH_COLUMNS = ['name', 'nip', 'email'];
 
     /** Columns users can sort by */
-    private const array SORTABLE_COLUMNS = ['name', 'email', 'created_at'];
+    private const array SORTABLE_COLUMNS = ['name', 'nip', 'email', 'created_at'];
 
     public function index(Request $request): Response
     {

@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserRole;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -12,9 +14,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(RoleSeeder::class);
         $this->call(ISeedUsersTableSeeder::class);
 
-        \DB::table('users')->updateOrInsert(
+        $admin = User::updateOrCreate(
             ['email' => 'admin@admin.com'],
             [
                 'id' => 2,
@@ -24,6 +27,8 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => now(),
             ]
         );
+
+        $admin->assignRole(UserRole::Admin->value);
 
         $this->call(ISeedJobsTableSeeder::class);
         $this->call(ISeedJobBatchesTableSeeder::class);

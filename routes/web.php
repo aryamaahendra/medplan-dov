@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Kpi\KpiGroupController;
 use App\Http\Controllers\Kpi\KpiIndicatorController;
 use App\Http\Controllers\Management\OrganizationalUnitController;
@@ -28,7 +29,7 @@ Route::inertia('/', 'welcome', [
 ])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('users', UserController::class)->except(['create', 'edit', 'show']);
     Route::resource('organizational-units', OrganizationalUnitController::class)->except(['create', 'edit', 'show']);
     Route::resource('need-types', NeedTypeController::class)->except(['create', 'edit', 'show']);

@@ -20,12 +20,14 @@ interface NeedShowProps {
   need: Need;
   checklistQuestions: { data: ChecklistQuestion[] };
   existingAnswers: { data: ChecklistAnswer[] };
+  users: { id: number; name: string; nip: string | null }[];
 }
 
 export default function NeedShow({
   need,
   checklistQuestions,
   existingAnswers,
+  users,
 }: NeedShowProps) {
   const groupedRenstra = useMemo(() => {
     if (!need.sasarans) {
@@ -102,7 +104,7 @@ export default function NeedShow({
                 />
               </TabsContent>
               <TabsContent value="detail" className="mt-0">
-                <NeedDetailTab need={need} />
+                <NeedDetailTab need={need} users={users} />
               </TabsContent>
               <TabsContent value="lampiran" className="mt-0">
                 <NeedAttachmentsTab need={need} />

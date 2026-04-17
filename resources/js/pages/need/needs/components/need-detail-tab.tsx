@@ -3,9 +3,10 @@ import { NeedDetailView } from './need-detail-view';
 
 interface NeedDetailTabProps {
   need: Need;
+  users: { id: number; name: string; nip: string | null }[];
 }
 
-export function NeedDetailTab({ need }: NeedDetailTabProps) {
+export function NeedDetailTab({ need, users }: NeedDetailTabProps) {
   return (
     <>
       <div className="mt-4 space-y-1">
@@ -17,6 +18,7 @@ export function NeedDetailTab({ need }: NeedDetailTabProps) {
       <NeedDetailView
         needId={need.id}
         detail={need.detail}
+        users={users}
         attachments={
           need.attachments?.filter(
             (a) => a.category === 'technical_specifications',

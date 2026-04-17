@@ -1,18 +1,19 @@
-import { FileDown, Eye } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { EditorRenderer } from '@/components/ui/editor-renderer';
 import { Label } from '@/components/ui/label';
-import needRoutes from '@/routes/needs';
 
 import type { Attachment, NeedDetail } from '../columns';
 
 import { AttachmentList } from './attachment-list';
+import { ExportPdfDialog } from './export-pdf-dialog';
 
 interface NeedDetailViewProps {
   needId: number;
   detail?: NeedDetail | null;
   attachments?: Attachment[];
+  users: { id: number; name: string; nip: string | null }[];
 }
 
 const DETAIL_FIELDS: { key: keyof NeedDetail; label: string }[] = [
@@ -33,33 +34,25 @@ const DETAIL_FIELDS: { key: keyof NeedDetail; label: string }[] = [
 export function NeedDetailView({
   needId,
   detail,
+  users = [],
   attachments = [],
 }: NeedDetailViewProps) {
   return (
     <Card className="mt-8">
       <CardContent className="p-0">
         <div className="mb-4 flex justify-end gap-1.5 px-4">
-          <Button variant="outline" size="sm" asChild>
-            <a
-              href={needRoutes.exportPdf.url({ need: needId })}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FileDown className="mr-1.5 h-4 w-4" />
-              Ekspor PDF
-            </a>
-          </Button>
+          <ExportPdfDialog needId={needId} users={users} />
 
           {import.meta.env.DEV && (
-            <Button variant="destructive" size="icon-sm" asChild>
-              <a
-                href={`${needRoutes.exportPdf.url({ need: needId })}?preview=1`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Eye />
-              </a>
-            </Button>
+            <ExportPdfDialog
+              needId={needId}
+              users={users}
+              trigger={
+                <Button variant="destructive" size="icon-sm">
+                  <Eye />
+                </Button>
+              }
+            />
           )}
         </div>
 

@@ -17,6 +17,7 @@ use App\Models\OrganizationalUnit;
 use App\Models\PlanningActivityVersion;
 use App\Models\StrategicServicePlan;
 use App\Models\Tujuan;
+use App\Models\User;
 use App\Traits\HasDataTable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -251,6 +252,7 @@ class NeedController extends Controller
             'existingAnswers' => NeedChecklistAnswerResource::collection(
                 $need->checklistAnswers
             ),
+            'users' => User::query()->select(['id', 'name', 'nip'])->orderBy('name')->get(),
         ]);
     }
 

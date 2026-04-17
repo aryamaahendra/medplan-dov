@@ -6,8 +6,7 @@
   <title>Detail Usulan: {{ $need->title }}</title>
   <style>
     @page {
-      margin: 50px 80px;
-      /* Top/Bottom, Left/Right */
+      margin: {{ $marginTop }}mm {{ $marginRight }}mm {{ $marginBottom }}mm {{ $marginLeft }}mm;
     }
 
     body {
@@ -193,14 +192,10 @@
       <p>KUASA PENGGUNA ANGGARAN</p>
 
       <div class="signature-space"></div>
-      <p class="signature-name">ARDIAN WIJAYA, S.T., M.T.</p>
-      <p>Nip. 72731 0004345 1 001</p>
+      <p class="signature-name">{{ $signer ? $signer->name : 'ARDIAN WIJAYA, S.T., M.T.' }}</p>
+      <p>Nip. {{ $signer ? $signer->nip : '72731 0004345 1 001' }}</p>
     </div>
     <div style="clear: both;"></div>
-  </div>
-
-  <div style="margin-top: 50px; text-align: right; color: #ccc; font-size: 10px;">
-    Dicetak pada: {{ now()->format('d/m/Y H:i:s') }}
   </div>
 </body>
 

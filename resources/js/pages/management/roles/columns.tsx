@@ -15,6 +15,7 @@ export interface Role {
 export const getColumns = (
   onEdit: (role: Role) => void,
   onDelete: (role: Role) => void,
+  hasPermission: (permission: string) => boolean,
 ): ColumnDef<Role>[] => [
   {
     accessorKey: 'name',
@@ -44,23 +45,27 @@ export const getColumns = (
         <div className="flex items-center gap-2">
           {!isSuperadmin && (
             <>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onEdit(role)}
-                title="Edit Role"
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                onClick={() => onDelete(role)}
-                title="Delete Role"
-              >
-                <Trash className="h-4 w-4" />
-              </Button>
+              {hasPermission('update roles') && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onEdit(role)}
+                  title="Edit Role"
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+              )}
+              {hasPermission('delete roles') && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  onClick={() => onDelete(role)}
+                  title="Delete Role"
+                >
+                  <Trash className="h-4 w-4" />
+                </Button>
+              )}
             </>
           )}
         </div>

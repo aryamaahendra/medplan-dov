@@ -14,6 +14,7 @@ export const getColumns = (
   onDelete: (group: KpiGroup) => void,
   onActivate: (group: KpiGroup) => void,
   isActivating: boolean,
+  hasPermission: (permission: string) => boolean,
 ): ColumnDef<KpiGroup>[] => [
   getIndexColumn(),
   {
@@ -64,37 +65,42 @@ export const getColumns = (
     cell: ({ row }) => {
       const group = row.original;
 
-      return (
-        <ActionDropdown
-          actions={
-            [
-              {
-                label: 'Detail',
-                icon: Eye,
-                href: groupRoutes.show.url({ group: group.id }),
-              },
-              !group.is_active && {
-                label: isActivating ? 'Mengaktifkan...' : 'Aktifkan',
-                icon: CheckCircle2,
-                onClick: () => onActivate(group),
-                disabled: isActivating,
-              },
-              {
-                label: 'Edit',
-                icon: PencilLine,
-                onClick: () => onEdit(group),
-              },
-              'separator',
-              {
-                label: 'Hapus',
-                icon: Trash2,
-                onClick: () => onDelete(group),
-                variant: 'destructive',
-              },
-            ].filter(Boolean) as (ActionItem | 'separator')[]
-          }
-        />
-      );
+      const actions: (ActionItem | 'separator')[] = [
+        {
+          label: 'Detail',
+          icon: Eye,
+          href: groupRoutes.show.url({ group: group.id }),
+        },
+      ];
+
+      if (!group.is_active && hasPermission('update kpi-groups')) {
+        actions.push({
+          label: isActivating ? 'Mengaktifkan...' : 'Aktifkan',
+          icon: CheckCircle2,
+          onClick: () => onActivate(group),
+          disabled: isActivating,
+        });
+      }
+
+      if (hasPermission('update kpi-groups')) {
+        actions.push({
+          label: 'Edit',
+          icon: PencilLine,
+          onClick: () => onEdit(group),
+        });
+      }
+
+      if (hasPermission('delete kpi-groups')) {
+        actions.push('separator');
+        actions.push({
+          label: 'Hapus',
+          icon: Trash2,
+          onClick: () => onDelete(group),
+          variant: 'destructive',
+        });
+      }
+
+      return <ActionDropdown actions={actions} />;
     },
   },
 ];

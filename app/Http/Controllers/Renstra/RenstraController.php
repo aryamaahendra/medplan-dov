@@ -15,6 +15,11 @@ class RenstraController extends Controller
 {
     use HasDataTable;
 
+    public function __construct()
+    {
+        $this->authorizeResource(Renstra::class);
+    }
+
     /** Columns searchable across */
     private const array SEARCH_COLUMNS = ['name', 'description', 'year_start', 'year_end'];
 

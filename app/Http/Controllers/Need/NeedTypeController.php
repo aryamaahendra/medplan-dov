@@ -15,6 +15,11 @@ class NeedTypeController extends Controller
 {
     use HasDataTable;
 
+    public function __construct()
+    {
+        //
+    }
+
     /** Columns searchable across */
     private const array SEARCH_COLUMNS = ['name', 'code', 'description'];
 
@@ -23,6 +28,7 @@ class NeedTypeController extends Controller
 
     public function index(Request $request): Response
     {
+        $this->authorize('viewAny', NeedType::class);
         $needTypes = $this->applyDataTable(
             NeedType::query()
                 ->orderBy('order_column', 'asc')
@@ -40,6 +46,7 @@ class NeedTypeController extends Controller
 
     public function store(StoreNeedTypeRequest $request)
     {
+        $this->authorize('create', NeedType::class);
         NeedType::create($request->validated());
 
         return redirect()->route('need-types.index')
@@ -48,6 +55,7 @@ class NeedTypeController extends Controller
 
     public function update(UpdateNeedTypeRequest $request, NeedType $needType)
     {
+        $this->authorize('update', $needType);
         $needType->update($request->validated());
 
         return redirect()->route('need-types.index')
@@ -56,6 +64,7 @@ class NeedTypeController extends Controller
 
     public function destroy(NeedType $needType)
     {
+        $this->authorize('delete', $needType);
         $needType->delete();
 
         return redirect()->route('need-types.index')

@@ -9,6 +9,11 @@ use App\Models\Sasaran;
 
 class SasaranController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Sasaran::class);
+    }
+
     /**
      * Display a listing of the resource.
      */

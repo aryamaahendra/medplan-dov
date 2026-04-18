@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 
 import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
+import { usePermission } from '@/hooks/use-permission';
 import needTypeRoutes from '@/routes/need-types';
 import { getColumns } from './columns';
 import type { NeedType } from './columns';
@@ -33,6 +34,7 @@ export default function NeedTypesIndex({
   needTypes,
   filters,
 }: NeedTypesIndexProps) {
+  const { hasPermission } = usePermission();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingNeedType, setEditingNeedType] = useState<NeedType | null>(null);
   const [deletingNeedType, setDeletingNeedType] = useState<NeedType | null>(
@@ -81,9 +83,6 @@ export default function NeedTypesIndex({
     );
   };
 
-  // Safe to memoize columns
-  const stableColumns = useMemo(() => getColumns(onEdit, onDelete), []);
-
   return (
     <>
       <Head title="Kategori Kebutuhan" />
@@ -98,14 +97,19 @@ export default function NeedTypesIndex({
               Kelola master data kategori kebutuhan.
             </p>
           </div>
-          <Button onClick={onCreate}>
-            <Plus />
-            Tambah Kategori Kebutuhan
-          </Button>
+          {hasPermission('create need-types') && (
+            <Button onClick={onCreate}>
+              <Plus className="mr-2 h-4 w-4" />
+              Tambah Jenis
+            </Button>
+          )}
         </div>
 
         <DataTable
-          columns={stableColumns}
+          columns={useMemo(
+            () => getColumns(onEdit, onDelete, hasPermission),
+            [hasPermission],
+          )}
           data={needTypes.data}
           meta={needTypes}
           filters={filters}

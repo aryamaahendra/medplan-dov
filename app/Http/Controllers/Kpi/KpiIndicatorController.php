@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\DB;
 
 class KpiIndicatorController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(KpiIndicator::class, 'indicator');
+    }
+
     /**
      * Store a newly created resource in storage.
      */

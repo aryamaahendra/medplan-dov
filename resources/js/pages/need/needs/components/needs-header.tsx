@@ -8,10 +8,12 @@ import {
   Trash2,
 } from 'lucide-react';
 
+
 import needGroupChecklistActions from '@/actions/App/Http/Controllers/Need/NeedGroupChecklistController';
 import { ActionDropdown } from '@/components/action-dropdown';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
+import { usePermission } from '@/hooks/use-permission';
 import { cn } from '@/lib/utils';
 
 interface NeedsHeaderProps {
@@ -31,6 +33,38 @@ export function NeedsHeader({
   onEditGroup,
   onDeleteGroup,
 }: NeedsHeaderProps) {
+  const { hasPermission } = usePermission();
+
+  const groupActions = [];
+
+  if (hasPermission('update need-groups')) {
+    groupActions.push({
+      label: 'Edit',
+      icon: PencilLine,
+      onClick: onEditGroup,
+    });
+    groupActions.push({
+      label: 'Checklist',
+      icon: ClipboardList,
+      href: needGroupChecklistActions.index.url({
+        need_group: currentGroup.id,
+      }),
+    });
+  }
+
+  if (hasPermission('delete need-groups')) {
+    if (groupActions.length > 0) {
+      groupActions.push('separator');
+    }
+
+    groupActions.push({
+      label: 'Hapus',
+      icon: Trash2,
+      onClick: onDeleteGroup,
+      variant: 'destructive',
+    });
+  }
+
   return (
     <div className="flex items-center justify-between">
       <div>
@@ -64,38 +98,24 @@ export function NeedsHeader({
             <span className="sr-only">Grid view</span>
           </Button>
         </ButtonGroup>
-        <Button onClick={onCreate}>
-          <Plus />
-          Tambah Usulan
-        </Button>
-        <ActionDropdown
-          trigger={
-            <Button variant={'outline'} size={'icon'}>
-              <Ellipsis />
-            </Button>
-          }
-          actions={[
-            {
-              label: 'Edit',
-              icon: PencilLine,
-              onClick: onEditGroup,
-            },
-            {
-              label: 'Checklist',
-              icon: ClipboardList,
-              href: needGroupChecklistActions.index.url({
-                need_group: currentGroup.id,
-              }),
-            },
-            'separator',
-            {
-              label: 'Hapus',
-              icon: Trash2,
-              onClick: onDeleteGroup,
-              variant: 'destructive',
-            },
-          ]}
-        />
+
+        {hasPermission('create needs') && (
+          <Button onClick={onCreate}>
+            <Plus />
+            Tambah Usulan
+          </Button>
+        )}
+
+        {groupActions.length > 0 && (
+          <ActionDropdown
+            trigger={
+              <Button variant={'outline'} size={'icon'}>
+                <Ellipsis />
+              </Button>
+            }
+            actions={groupActions as any}
+          />
+        )}
       </div>
     </div>
   );

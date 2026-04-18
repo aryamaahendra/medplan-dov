@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 
 import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
+import { usePermission } from '@/hooks/use-permission';
 import strategicServicePlansRoutes from '@/routes/strategic-service-plans';
 import type { StrategicServicePlan } from '@/types';
 import { getColumns } from './columns';
@@ -33,6 +34,7 @@ export default function StrategicServicePlansIndex({
   plans,
   filters,
 }: StrategicServicePlansIndexProps) {
+  const { hasPermission } = usePermission();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState<StrategicServicePlan | null>(
     null,
@@ -82,12 +84,6 @@ export default function StrategicServicePlansIndex({
     );
   };
 
-  const stableColumns = useMemo(
-    () => getColumns(onEdit, onDelete),
-
-    [],
-  );
-
   return (
     <>
       <Head title="Rencana Pengembangan Layanan Strategis" />
@@ -102,14 +98,19 @@ export default function StrategicServicePlansIndex({
               Kelola data rencana pengembangan layanan strategis rumah sakit.
             </p>
           </div>
-          <Button onClick={onCreate}>
-            <Plus className="mr-2 h-4 w-4" />
-            Tambah Rencana
-          </Button>
+          {hasPermission('manage ssp') && (
+            <Button onClick={onCreate}>
+              <Plus className="mr-2 h-4 w-4" />
+              Tambah Rencana
+            </Button>
+          )}
         </div>
 
         <DataTable
-          columns={stableColumns}
+          columns={useMemo(
+            () => getColumns(onEdit, onDelete, hasPermission),
+            [hasPermission],
+          )}
           data={plans.data}
           meta={plans}
           filters={filters}

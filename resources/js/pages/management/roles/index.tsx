@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 
 import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
+import { usePermission } from '@/hooks/use-permission';
 import rolesRoutes from '@/routes/roles';
 import type { Permission } from '../permissions/columns';
 import { getColumns } from './columns';
@@ -36,6 +37,7 @@ export default function RolesIndex({
   permissions,
   filters,
 }: RolesIndexProps) {
+  const { hasPermission } = usePermission();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [deletingRole, setDeletingRole] = useState<Role | null>(null);
@@ -88,8 +90,6 @@ export default function RolesIndex({
     });
   };
 
-  const stableColumns = useMemo(() => getColumns(onEdit, onDelete), []);
-
   return (
     <>
       <Head title="Roles" />
@@ -102,14 +102,19 @@ export default function RolesIndex({
               Manage roles and their associated permissions.
             </p>
           </div>
-          <Button onClick={onCreate}>
-            <Plus className="mr-2 h-4 w-4" />
-            Tambah Role
-          </Button>
+          {hasPermission('create roles') && (
+            <Button onClick={onCreate}>
+              <Plus className="mr-2 h-4 w-4" />
+              Tambah Role
+            </Button>
+          )}
         </div>
 
         <DataTable
-          columns={stableColumns}
+          columns={useMemo(
+            () => getColumns(onEdit, onDelete, hasPermission),
+            [hasPermission],
+          )}
           data={roles.data}
           meta={roles}
           filters={filters}

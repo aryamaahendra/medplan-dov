@@ -7,6 +7,7 @@ import { DataTable } from '@/components/data-table/data-table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
+import { usePermission } from '@/hooks/use-permission';
 import needGroupRoutes from '@/routes/need-groups';
 import needRoutes from '@/routes/needs';
 
@@ -153,9 +154,11 @@ export default function NeedsIndex({
     );
   };
 
+  const { hasPermission } = usePermission();
+
   const stableColumns = useMemo(
-    () => getColumns(onEdit, onDelete, onReview),
-    [],
+    () => getColumns(onEdit, onDelete, onReview, hasPermission),
+    [hasPermission],
   );
 
   return (

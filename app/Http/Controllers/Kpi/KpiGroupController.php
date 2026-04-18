@@ -16,6 +16,11 @@ class KpiGroupController extends Controller
 {
     use HasDataTable;
 
+    public function __construct()
+    {
+        $this->authorizeResource(KpiGroup::class, 'group');
+    }
+
     /** Columns searchable across */
     private const array SEARCH_COLUMNS = ['name', 'description', 'start_year', 'end_year'];
 

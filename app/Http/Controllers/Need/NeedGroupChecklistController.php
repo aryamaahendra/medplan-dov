@@ -17,6 +17,8 @@ class NeedGroupChecklistController extends Controller
      */
     public function index(NeedGroup $needGroup): Response
     {
+        $this->authorize('update', $needGroup);
+
         return Inertia::render('need/groups/checklists/index', [
             'needGroup' => $needGroup,
             'assignedQuestions' => $needGroup->checklistQuestions()
@@ -41,6 +43,8 @@ class NeedGroupChecklistController extends Controller
      */
     public function store(Request $request, NeedGroup $needGroup)
     {
+        $this->authorize('update', $needGroup);
+
         $validated = $request->validate([
             'checklist_question_id' => 'required|exists:checklist_questions,id',
             'is_active' => 'sometimes|boolean',
@@ -63,6 +67,8 @@ class NeedGroupChecklistController extends Controller
      */
     public function update(Request $request, NeedGroup $needGroup, ChecklistQuestion $checklistQuestion)
     {
+        $this->authorize('update', $needGroup);
+
         $validated = $request->validate([
             'is_active' => 'sometimes|boolean',
             'is_required' => 'sometimes|boolean',
@@ -80,6 +86,8 @@ class NeedGroupChecklistController extends Controller
      */
     public function reorder(Request $request, NeedGroup $needGroup)
     {
+        $this->authorize('update', $needGroup);
+
         $validated = $request->validate([
             'questions' => 'required|array',
             'questions.*.id' => 'required|exists:checklist_questions,id',
@@ -101,6 +109,8 @@ class NeedGroupChecklistController extends Controller
      */
     public function destroy(NeedGroup $needGroup, ChecklistQuestion $checklistQuestion)
     {
+        $this->authorize('update', $needGroup);
+
         $needGroup->checklistQuestions()->detach($checklistQuestion->id);
 
         return redirect()->back()

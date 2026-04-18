@@ -9,6 +9,11 @@ use App\Models\Tujuan;
 
 class TujuanController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Tujuan::class);
+    }
+
     /**
      * Display a listing of the resource.
      */

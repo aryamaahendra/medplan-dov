@@ -15,12 +15,18 @@ class NeedGroupController extends Controller
 {
     use HasDataTable;
 
+    public function __construct()
+    {
+        //
+    }
+
     private const array SEARCH_COLUMNS = ['name', 'description'];
 
     private const array SORTABLE_COLUMNS = ['name', 'year', 'is_active', 'need_count', 'created_at'];
 
     public function index(Request $request): Response
     {
+        $this->authorize('viewAny', NeedGroup::class);
         $needGroups = $this->applyDataTable(
             NeedGroup::query(),
             $request,
@@ -36,6 +42,7 @@ class NeedGroupController extends Controller
 
     public function store(StoreNeedGroupRequest $request)
     {
+        $this->authorize('create', NeedGroup::class);
         NeedGroup::create($request->validated());
 
         return redirect()->back()
@@ -44,6 +51,7 @@ class NeedGroupController extends Controller
 
     public function update(UpdateNeedGroupRequest $request, NeedGroup $needGroup)
     {
+        $this->authorize('update', $needGroup);
         $needGroup->update($request->validated());
 
         return redirect()->back()
@@ -52,6 +60,7 @@ class NeedGroupController extends Controller
 
     public function destroy(NeedGroup $needGroup)
     {
+        $this->authorize('delete', $needGroup);
         $needGroup->delete();
 
         return redirect()->back()

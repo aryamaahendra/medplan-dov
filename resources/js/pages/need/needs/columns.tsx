@@ -207,6 +207,7 @@ export const getColumns = (
   onEdit: (need: Need) => void,
   onDelete: (need: Need) => void,
   onReview: (need: Need) => void,
+  hasPermission: (permission: string) => boolean,
 ): ColumnDef<Need>[] => [
   getIndexColumn(),
   {
@@ -375,41 +376,48 @@ export const getColumns = (
     cell: ({ row }) => {
       const need = row.original;
 
-      return (
-        <ActionDropdown
-          actions={[
-            {
-              label: 'Detail',
-              icon: FileText,
-              href: needRoutes.show.url({ need: need.id }),
-            },
-            {
-              label: 'Edit',
-              icon: PencilLine,
-              onClick: () => onEdit(need),
-            },
-            {
-              label: 'Lampiran',
-              icon: Paperclip,
-              href: NeedAttachmentController.index.url({ need: need.id }),
-            },
-            'separator',
-            {
-              label: 'Hapus',
-              icon: Trash2,
-              onClick: () => onDelete(need),
-              variant: 'destructive',
-            },
-            'separator',
-            {
-              label: 'Review Direktur',
-              icon: Signature,
-              onClick: () => onReview(need),
-              indicator: !!need.notes,
-            },
-          ]}
-        />
-      );
+      const actions: any[] = [
+        {
+          label: 'Detail',
+          icon: FileText,
+          href: needRoutes.show.url({ need: need.id }),
+        },
+      ];
+
+      if (hasPermission('update needs')) {
+        actions.push({
+          label: 'Edit',
+          icon: PencilLine,
+          onClick: () => onEdit(need),
+        });
+        actions.push({
+          label: 'Lampiran',
+          icon: Paperclip,
+          href: NeedAttachmentController.index.url({ need: need.id }),
+        });
+      }
+
+      if (hasPermission('delete needs')) {
+        actions.push('separator');
+        actions.push({
+          label: 'Hapus',
+          icon: Trash2,
+          onClick: () => onDelete(need),
+          variant: 'destructive',
+        });
+      }
+
+      if (hasPermission('approve needs')) {
+        actions.push('separator');
+        actions.push({
+          label: 'Review Direktur',
+          icon: Signature,
+          onClick: () => onReview(need),
+          indicator: !!need.notes,
+        });
+      }
+
+      return <ActionDropdown actions={actions} />;
     },
   },
 ];

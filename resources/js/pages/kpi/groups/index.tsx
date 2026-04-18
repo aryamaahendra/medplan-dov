@@ -8,6 +8,7 @@ import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
 import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
+import { usePermission } from '@/hooks/use-permission';
 import groupRoutes from '@/routes/kpis/groups';
 import type { KpiGroup } from '@/types';
 
@@ -33,6 +34,7 @@ export default function KpiGroupsIndex({
   groups,
   filters,
 }: KpiGroupsIndexProps) {
+  const { hasPermission } = usePermission();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState<KpiGroup | null>(null);
   const [deletingGroup, setDeletingGroup] = useState<KpiGroup | null>(null);
@@ -86,11 +88,6 @@ export default function KpiGroupsIndex({
     });
   };
 
-  const stableColumns = useMemo(
-    () => getColumns(onEdit, onDelete, onActivate, isActivating),
-    [isActivating],
-  );
-
   return (
     <>
       <Head title="Manajemen Periode KPI" />
@@ -106,14 +103,26 @@ export default function KpiGroupsIndex({
               satu periode yang dapat aktif di satu waktu.
             </p>
           </div>
-          <Button onClick={onCreate}>
-            <Plus className="h-4 w-4" />
-            Tambah Periode
-          </Button>
+          {hasPermission('create kpi-groups') && (
+            <Button onClick={onCreate}>
+              <Plus className="h-4 w-4" />
+              Tambah Periode
+            </Button>
+          )}
         </div>
 
         <DataTable
-          columns={stableColumns}
+          columns={useMemo(
+            () =>
+              getColumns(
+                onEdit,
+                onDelete,
+                onActivate,
+                isActivating,
+                hasPermission,
+              ),
+            [isActivating, hasPermission],
+          )}
           data={groups.data}
           meta={groups}
           filters={filters}

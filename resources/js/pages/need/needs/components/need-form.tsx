@@ -1,4 +1,4 @@
-import { router, useForm } from '@inertiajs/react';
+import { router, useForm, usePage } from '@inertiajs/react';
 import { useRef } from 'react';
 import { toast } from 'sonner';
 
@@ -6,6 +6,7 @@ import NeedController from '@/actions/App/Http/Controllers/Need/NeedController';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { usePermission } from '@/hooks/use-permission';
 import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
 
@@ -49,10 +50,20 @@ export function NeedForm({
 }: NeedFormProps) {
   const isEditing = !!need;
 
+  const { auth } = usePage().props;
+  const user = auth.user;
+  const { hasRole } = usePermission();
+
+  const isRestricted =
+    !hasRole('super-admin') && !hasRole('admin') && !hasRole('planner');
+
   const { data, setData, post, processing, errors, transform } = useForm({
     need_group_id:
       need?.need_group_id?.toString() ?? currentGroup?.id?.toString() ?? '',
-    organizational_unit_id: need?.organizational_unit_id?.toString() ?? '',
+    organizational_unit_id:
+      need?.organizational_unit_id?.toString() ??
+      (isRestricted ? user?.organizational_unit_id?.toString() : '') ??
+      '',
     need_type_id: need?.need_type_id?.toString() ?? '',
     year:
       need?.year?.toString() ??
@@ -198,6 +209,7 @@ export function NeedForm({
                 needTypes={needTypes}
                 handleVolumeChange={handleVolumeChange}
                 handleUnitPriceChange={handleUnitPriceChange}
+                isRestricted={isRestricted}
               />
             </TabsContent>
 

@@ -8,6 +8,7 @@ import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
 import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
+import { usePermission } from '@/hooks/use-permission';
 import renstraRoutes from '@/routes/renstras';
 import type { Renstra } from '@/types';
 
@@ -33,6 +34,7 @@ export default function RenstrasIndex({
   renstras,
   filters,
 }: RenstrasIndexProps) {
+  const { hasPermission } = usePermission();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRenstra, setEditingRenstra] = useState<Renstra | null>(null);
   const [deletingRenstra, setDeletingRenstra] = useState<Renstra | null>(null);
@@ -71,8 +73,6 @@ export default function RenstrasIndex({
     });
   };
 
-  const stableColumns = useMemo(() => getColumns(onEdit, onDelete), []);
-
   return (
     <>
       <Head title="Manajemen Renstra" />
@@ -88,14 +88,19 @@ export default function RenstrasIndex({
               dapat aktif di satu waktu.
             </p>
           </div>
-          <Button onClick={onCreate}>
-            <Plus className="h-4 w-4" />
-            Tambah Renstra
-          </Button>
+          {hasPermission('create renstras') && (
+            <Button onClick={onCreate}>
+              <Plus className="h-4 w-4" />
+              Tambah Renstra
+            </Button>
+          )}
         </div>
 
         <DataTable
-          columns={stableColumns}
+          columns={useMemo(
+            () => getColumns(onEdit, onDelete, hasPermission),
+            [hasPermission],
+          )}
           data={renstras.data}
           meta={renstras}
           filters={filters}

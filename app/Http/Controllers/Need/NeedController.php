@@ -28,6 +28,11 @@ class NeedController extends Controller
 {
     use HasDataTable;
 
+    public function __construct()
+    {
+        //
+    }
+
     /** Columns searchable across */
     private const array SEARCH_COLUMNS = ['title', 'description'];
 
@@ -36,6 +41,7 @@ class NeedController extends Controller
 
     public function index(Request $request): Response|RedirectResponse
     {
+        $this->authorize('viewAny', Need::class);
         $groupId = $request->input('need_group_id');
 
         if (! $groupId) {
@@ -47,31 +53,37 @@ class NeedController extends Controller
 
         $currentGroup = $groupId ? NeedGroup::find($groupId) : null;
 
+        $query = Need::query()
+            ->with([
+                'needGroup:id,name',
+                'organizationalUnit:id,name,parent_id',
+                'organizationalUnit.parentsRecursive',
+                'needType:id,name',
+                'sasarans:id,tujuan_id,name',
+                'sasarans.tujuan:id,name',
+                'indicators:id,sasaran_id,name,baseline',
+                'indicators.sasaran:id,name',
+                'indicators.targets:id,indicator_id,year,target',
+                'kpiIndicators:id,name,unit',
+                'strategicServicePlans:id,strategic_program,service_plan',
+            ])
+            ->withCount(['sasarans', 'indicators', 'kpiIndicators', 'strategicServicePlans'])
+            ->when($request->input('year'), fn ($q, $v) => $q->whereIn('year', (array) $v))
+            ->when($request->input('status'), fn ($q, $v) => $q->whereIn('status', (array) $v))
+            ->when($request->input('need_type_id'), fn ($q, $v) => $q->whereIn('need_type_id', (array) $v))
+            ->when($request->input('organizational_unit_id'), fn ($q, $v) => $q->whereIn('organizational_unit_id', (array) $v))
+            ->when($request->input('urgency'), fn ($q, $v) => $q->whereIn('urgency', (array) $v))
+            ->when($request->input('impact'), fn ($q, $v) => $q->whereIn('impact', (array) $v))
+            ->when($request->input('is_priority'), fn ($q, $v) => $q->whereIn('is_priority', (array) $v))
+            ->where('need_group_id', $groupId);
+
+        // Unit-level scoping
+        if (! $request->user()->hasAnyRole(['super-admin', 'admin', 'planner'])) {
+            $query->where('organizational_unit_id', $request->user()->organizational_unit_id);
+        }
+
         $needs = $this->applyDataTable(
-            Need::query()
-                ->with([
-                    'needGroup:id,name',
-                    'organizationalUnit:id,name,parent_id',
-                    'organizationalUnit.parentsRecursive',
-                    'needType:id,name',
-                    'sasarans:id,tujuan_id,name',
-                    'sasarans.tujuan:id,name',
-                    'indicators:id,sasaran_id,name,baseline',
-                    'indicators.sasaran:id,name',
-                    'indicators.targets:id,indicator_id,year,target',
-                    'kpiIndicators:id,name,unit',
-                    'strategicServicePlans:id,strategic_program,service_plan',
-                ])
-                ->withCount(['sasarans', 'indicators', 'kpiIndicators', 'strategicServicePlans'])
-                ->when($request->input('year'), fn ($q, $v) => $q->whereIn('year', (array) $v))
-                ->when($request->input('status'), fn ($q, $v) => $q->whereIn('status', (array) $v))
-                ->when($request->input('need_type_id'), fn ($q, $v) => $q->whereIn('need_type_id', (array) $v))
-                ->when($request->input('organizational_unit_id'), fn ($q, $v) => $q->whereIn('organizational_unit_id', (array) $v))
-                ->when($request->input('urgency'), fn ($q, $v) => $q->whereIn('urgency', (array) $v))
-                ->when($request->input('impact'), fn ($q, $v) => $q->whereIn('impact', (array) $v))
-                ->when($request->input('is_priority'), fn ($q, $v) => $q->whereIn('is_priority', (array) $v))
-                ->where('need_group_id', $groupId)
-                ->orderBy('created_at', 'desc'),
+            $query->orderBy('created_at', 'desc'),
             $request,
             self::SEARCH_COLUMNS,
             self::SORTABLE_COLUMNS,
@@ -97,6 +109,7 @@ class NeedController extends Controller
 
     public function store(StoreNeedRequest $request, StoreNeedAction $action): RedirectResponse
     {
+        $this->authorize('create', Need::class);
         $need = $action->execute(
             $request->validated(),
             $request->file('attachments'),
@@ -111,6 +124,7 @@ class NeedController extends Controller
 
     public function create(Request $request): Response|RedirectResponse
     {
+        $this->authorize('create', Need::class);
         $groupId = $request->input('need_group_id');
         $currentGroup = $groupId ? NeedGroup::findOrFail($groupId) : null;
 
@@ -156,6 +170,8 @@ class NeedController extends Controller
 
     public function edit(Need $need): Response
     {
+        $this->authorize('update', $need);
+
         return Inertia::render('need/needs/edit', [
             'need' => $need->load([
                 'sasarans:id',
@@ -208,6 +224,7 @@ class NeedController extends Controller
 
     public function update(UpdateNeedRequest $request, Need $need, UpdateNeedAction $action): RedirectResponse
     {
+        $this->authorize('update', $need);
         $action->execute(
             $need,
             $request->validated(),
@@ -223,6 +240,8 @@ class NeedController extends Controller
 
     public function show(Need $need): Response
     {
+        $this->authorize('view', $need);
+
         return Inertia::render('need/needs/show', [
             'need' => $need->load([
                 'organizationalUnit:id,name,parent_id',
@@ -258,6 +277,7 @@ class NeedController extends Controller
 
     public function destroy(Need $need): RedirectResponse
     {
+        $this->authorize('delete', $need);
         $groupId = $need->need_group_id;
         $need->delete();
 
@@ -267,6 +287,8 @@ class NeedController extends Controller
 
     public function updateDirectorReview(Request $request, Need $need): RedirectResponse
     {
+        $this->authorize('approve', $need);
+
         $validated = $request->validate([
             'notes' => 'nullable|string',
             'is_approved' => 'required|boolean',

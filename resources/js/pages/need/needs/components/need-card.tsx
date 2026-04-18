@@ -22,6 +22,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { usePermission } from '@/hooks/use-permission';
 import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
 
@@ -41,6 +42,8 @@ interface NeedCardProps {
 }
 
 export function NeedCard({ need, onEdit, onDelete, onReview }: NeedCardProps) {
+  const { hasPermission } = usePermission();
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -55,39 +58,51 @@ export function NeedCard({ need, onEdit, onDelete, onReview }: NeedCardProps) {
               Detail
             </Link>
           </Button>
-          <Button variant="outline" size="sm" onClick={() => onEdit(need)}>
-            <PencilLine />
-            Edit
-          </Button>
-          <Button variant="outline" size="sm" asChild>
-            <Link href={NeedAttachmentController.index.url({ need: need.id })}>
-              <Paperclip />
-              Lampiran
-            </Link>
-          </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => onDelete(need)}
-          >
-            <Trash2 />
-            Hapus
-          </Button>
 
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => onReview(need)}
-            className="relative"
-          >
-            <Signature />
-            Review Direktur
-            {need.notes && (
-              <span className="absolute -top-1.5 -left-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-background">
-                <AlertCircle />
-              </span>
-            )}
-          </Button>
+          {hasPermission('update needs') && (
+            <>
+              <Button variant="outline" size="sm" onClick={() => onEdit(need)}>
+                <PencilLine />
+                Edit
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link
+                  href={NeedAttachmentController.index.url({ need: need.id })}
+                >
+                  <Paperclip />
+                  Lampiran
+                </Link>
+              </Button>
+            </>
+          )}
+
+          {hasPermission('delete needs') && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => onDelete(need)}
+            >
+              <Trash2 />
+              Hapus
+            </Button>
+          )}
+
+          {hasPermission('approve needs') && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => onReview(need)}
+              className="relative"
+            >
+              <Signature />
+              Review Direktur
+              {need.notes && (
+                <span className="absolute -top-1.5 -left-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-background">
+                  <AlertCircle />
+                </span>
+              )}
+            </Button>
+          )}
         </CardAction>
       </CardHeader>
 

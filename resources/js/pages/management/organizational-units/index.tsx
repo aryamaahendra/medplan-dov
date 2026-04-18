@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 
 import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
+import { usePermission } from '@/hooks/use-permission';
 import organizationalUnitRoutes from '@/routes/organizational-units';
 import { getColumns } from './columns';
 import type { OrganizationalUnit } from './columns';
@@ -35,6 +36,7 @@ export default function OrganizationalUnitsIndex({
   allUnits,
   filters,
 }: OrganizationalUnitsIndexProps) {
+  const { hasPermission } = usePermission();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingUnit, setEditingUnit] = useState<OrganizationalUnit | null>(
     null,
@@ -85,9 +87,6 @@ export default function OrganizationalUnitsIndex({
     );
   };
 
-  // Safe to memoize columns
-  const stableColumns = useMemo(() => getColumns(onEdit, onDelete), []);
-
   return (
     <>
       <Head title="Unit Organisasi" />
@@ -102,14 +101,19 @@ export default function OrganizationalUnitsIndex({
               Kelola struktur organisasi, bidang, dan subbagian.
             </p>
           </div>
-          <Button onClick={onCreate}>
-            <Plus />
-            Tambah Unit
-          </Button>
+          {hasPermission('create organizational-units') && (
+            <Button onClick={onCreate}>
+              <Plus />
+              Tambah Unit
+            </Button>
+          )}
         </div>
 
         <DataTable
-          columns={stableColumns}
+          columns={useMemo(
+            () => getColumns(onEdit, onDelete, hasPermission),
+            [hasPermission],
+          )}
           data={units.data}
           meta={units}
           filters={filters}

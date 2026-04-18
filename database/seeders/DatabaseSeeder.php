@@ -14,13 +14,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(RoleSeeder::class);
+        $this->call(RolesAndPermissionsSeeder::class);
         $this->call(ISeedUsersTableSeeder::class);
 
         $admin = User::updateOrCreate(
             ['email' => 'admin@admin.com'],
             [
-                'id' => 2,
                 'name' => 'Super Admin',
                 'password' => Hash::make('E201admindev$$'),
                 'created_at' => now(),
@@ -28,7 +27,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $admin->assignRole(UserRole::Admin->value);
+        $admin->assignRole(UserRole::SuperAdmin->value);
 
         $this->call(ISeedJobsTableSeeder::class);
         $this->call(ISeedJobBatchesTableSeeder::class);

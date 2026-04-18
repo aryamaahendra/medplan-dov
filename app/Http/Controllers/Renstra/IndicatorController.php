@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\DB;
 
 class IndicatorController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Indicator::class);
+    }
+
     /**
      * Store a newly created resource in storage.
      */

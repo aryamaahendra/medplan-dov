@@ -8,11 +8,19 @@ use App\Models\User;
 class SasaranPolicy
 {
     /**
+     * Perform pre-authorization checks.
+     */
+    public function before(User $user): ?bool
+    {
+        return $user->hasRole('super-admin') ? true : null;
+    }
+
+    /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('manage renstras');
     }
 
     /**
@@ -20,7 +28,7 @@ class SasaranPolicy
      */
     public function view(User $user, Sasaran $sasaran): bool
     {
-        return false;
+        return $user->hasPermissionTo('manage renstras');
     }
 
     /**
@@ -28,7 +36,7 @@ class SasaranPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('manage renstras');
     }
 
     /**
@@ -36,7 +44,7 @@ class SasaranPolicy
      */
     public function update(User $user, Sasaran $sasaran): bool
     {
-        return false;
+        return $user->hasPermissionTo('manage renstras');
     }
 
     /**
@@ -44,7 +52,7 @@ class SasaranPolicy
      */
     public function delete(User $user, Sasaran $sasaran): bool
     {
-        return false;
+        return $user->hasPermissionTo('manage renstras');
     }
 
     /**

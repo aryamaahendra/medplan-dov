@@ -9,6 +9,7 @@ import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
 import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
+import { usePermission } from '@/hooks/use-permission';
 import planningVersions from '@/routes/planning-versions';
 import type { PlanningVersion } from '@/types/planning-version';
 
@@ -34,6 +35,7 @@ export default function PlanningVersionsIndex({
   versions,
   filters,
 }: PlanningVersionsIndexProps) {
+  const { hasPermission } = usePermission();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedVersion, setSelectedVersion] =
     useState<PlanningVersion | null>(null);
@@ -133,12 +135,6 @@ export default function PlanningVersionsIndex({
     });
   }, []);
 
-  const columns = useMemo(
-    () =>
-      getColumns(onEdit, handleCreateRevision, handleSetCurrent, handleDelete),
-    [onEdit, handleCreateRevision, handleSetCurrent, handleDelete],
-  );
-
   return (
     <>
       <Head title="Versi Perencanaan" />
@@ -153,19 +149,37 @@ export default function PlanningVersionsIndex({
               Kelola siklus dan revisi perencanaan anggaran tahunan.
             </p>
           </div>
-          <Button
-            onClick={() => {
-              setSelectedVersion(null);
-              setDialogOpen(true);
-            }}
-          >
-            <Plus />
-            Buat Versi Baru
-          </Button>
+          {hasPermission('manage plannings') && (
+            <Button
+              onClick={() => {
+                setSelectedVersion(null);
+                setDialogOpen(true);
+              }}
+            >
+              <Plus />
+              Buat Versi Baru
+            </Button>
+          )}
         </div>
 
         <DataTable
-          columns={columns}
+          columns={useMemo(
+            () =>
+              getColumns(
+                onEdit,
+                handleCreateRevision,
+                handleSetCurrent,
+                handleDelete,
+                hasPermission,
+              ),
+            [
+              onEdit,
+              handleCreateRevision,
+              handleSetCurrent,
+              handleDelete,
+              hasPermission,
+            ],
+          )}
           data={versions.data}
           meta={versions}
           filters={filters}

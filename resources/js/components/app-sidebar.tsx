@@ -25,6 +25,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { usePermission } from '@/hooks/use-permission';
 import { dashboard } from '@/routes';
 import checklistQuestions from '@/routes/checklist-questions';
 import kpis from '@/routes/kpis';
@@ -118,22 +119,59 @@ const masterNavItems: NavItem[] = [
 // ];
 
 export function AppSidebar() {
+  const { hasPermission } = usePermission();
   const { activeNeedGroups } = usePage<{
     activeNeedGroups: { id: number; name: string; year: number }[];
   }>().props;
 
-  const dynamicNeedNavItems: NavItem[] = (activeNeedGroups || []).map(
-    (group) => ({
-      title: `${group.name} (${group.year})`,
-      href: needs.index.url({ query: { need_group_id: group.id } }),
-      icon: Pin,
-    }),
-  );
+  const dynamicNeedNavItems: NavItem[] = hasPermission('view any needs')
+    ? (activeNeedGroups || []).map((group) => ({
+        title: `${group.name} (${group.year})`,
+        href: needs.index.url({ query: { need_group_id: group.id } }),
+        icon: Pin,
+      }))
+    : [];
 
-  dynamicNeedNavItems.push({
-    title: 'Semua Usulan',
-    href: needGroups.index.url(),
-    icon: Database,
+  if (hasPermission('view any needs')) {
+    dynamicNeedNavItems.push({
+      title: 'Semua Usulan',
+      href: needGroups.index.url(),
+      icon: Database,
+    });
+  }
+
+  const filteredMasterNavItems = masterNavItems.filter((item) => {
+    switch (item.title) {
+      case 'Unit Kerja':
+        return hasPermission('view any organizational-units');
+      case 'Kategori Kebutuhan':
+        return hasPermission('view any need-types');
+      case 'Manajemen Renstra':
+        return hasPermission('view any renstras');
+      case 'Manajemen IKK':
+        return hasPermission('view any kpi-groups');
+      case 'Rencana Pengembangan Layanan Strategis':
+        return hasPermission('view any strategic-service-plans');
+      case 'Bank Pertanyaan Checklist':
+        return hasPermission('view any checklist-questions');
+      case 'Versi Perencanaan':
+        return hasPermission('view any planning-versions');
+      default:
+        return true;
+    }
+  });
+
+  const filteredUserRole = userRole.filter((item) => {
+    switch (item.title) {
+      case 'Users':
+        return hasPermission('view any users');
+      case 'Roles':
+        return hasPermission('view any roles');
+      case 'Permissions':
+        return hasPermission('view any permissions');
+      default:
+        return true;
+    }
   });
 
   return (
@@ -152,9 +190,15 @@ export function AppSidebar() {
 
       <SidebarContent>
         <NavMain items={mainNavItems} title="Main Menu" />
-        <NavMain items={dynamicNeedNavItems} title="Usulan Kebutuhan" />
-        <NavMain items={masterNavItems} title="Master Data" />
-        <NavMain items={userRole} title="User & Role" />
+        {dynamicNeedNavItems.length > 0 && (
+          <NavMain items={dynamicNeedNavItems} title="Usulan Kebutuhan" />
+        )}
+        {filteredMasterNavItems.length > 0 && (
+          <NavMain items={filteredMasterNavItems} title="Master Data" />
+        )}
+        {filteredUserRole.length > 0 && (
+          <NavMain items={filteredUserRole} title="User & Role" />
+        )}
       </SidebarContent>
 
       <SidebarFooter>

@@ -16,6 +16,11 @@ class PlanningVersionController extends Controller
 {
     use HasDataTable;
 
+    public function __construct()
+    {
+        $this->authorizeResource(PlanningVersion::class);
+    }
+
     /** Columns searchable across */
     private const array SEARCH_COLUMNS = ['name', 'year_start', 'year_end', 'notes'];
 

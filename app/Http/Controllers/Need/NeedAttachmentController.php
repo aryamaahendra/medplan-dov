@@ -21,6 +21,8 @@ class NeedAttachmentController extends Controller
      */
     public function index(Need $need): Response
     {
+        $this->authorize('view', $need);
+
         return Inertia::render('need/needs/attachments', [
             'need' => $need->load('attachments'),
         ]);
@@ -31,6 +33,8 @@ class NeedAttachmentController extends Controller
      */
     public function store(Request $request, Need $need, AddNeedAttachmentAction $action): RedirectResponse
     {
+        $this->authorize('update', $need);
+
         $request->validate([
             'file' => ['required', 'file', 'max:51200', 'mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,zip,rar,mp4,webm,ogg'],
             'display_name' => ['nullable', 'string', 'max:255'],
@@ -53,6 +57,8 @@ class NeedAttachmentController extends Controller
      */
     public function download(NeedAttachment $attachment): StreamedResponse
     {
+        $this->authorize('view', $attachment->need);
+
         if (! Storage::disk('local')->exists($attachment->file_path)) {
             abort(404);
         }
@@ -68,6 +74,8 @@ class NeedAttachmentController extends Controller
      */
     public function view(NeedAttachment $attachment)
     {
+        $this->authorize('view', $attachment->need);
+
         if (! Storage::disk('local')->exists($attachment->file_path)) {
             abort(404);
         }
@@ -80,6 +88,8 @@ class NeedAttachmentController extends Controller
      */
     public function destroy(NeedAttachment $attachment, DeleteNeedAttachmentAction $action): RedirectResponse
     {
+        $this->authorize('update', $attachment->need);
+
         $action->execute($attachment);
 
         return back()->with('success', 'Lampiran berhasil dihapus.');

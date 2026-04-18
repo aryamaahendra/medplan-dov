@@ -16,6 +16,11 @@ class UserController extends Controller
 {
     use HasDataTable;
 
+    public function __construct()
+    {
+        //
+    }
+
     /** Columns users can search across */
     private const array SEARCH_COLUMNS = ['name', 'nip', 'email'];
 
@@ -24,6 +29,7 @@ class UserController extends Controller
 
     public function index(Request $request): Response
     {
+        $this->authorize('viewAny', User::class);
         $users = $this->applyDataTable(
             User::with('roles'),
             $request,
@@ -42,6 +48,7 @@ class UserController extends Controller
 
     public function store(StoreUserRequest $request)
     {
+        $this->authorize('create', User::class);
         $user = User::create($request->validated());
 
         if ($request->has('roles')) {
@@ -53,6 +60,7 @@ class UserController extends Controller
 
     public function update(UpdateUserRequest $request, User $user)
     {
+        $this->authorize('update', $user);
         $data = $request->validated();
         if (empty($data['password'])) {
             unset($data['password']);
@@ -69,6 +77,7 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        $this->authorize('delete', $user);
         $user->delete();
 
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');

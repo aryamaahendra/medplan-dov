@@ -8,6 +8,7 @@ import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
 import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
+import { usePermission } from '@/hooks/use-permission';
 import checklistQuestionRoutes from '@/routes/checklist-questions';
 
 import { ChecklistQuestionDialog } from './checklist-question-dialog';
@@ -33,6 +34,7 @@ export default function ChecklistQuestionsIndex({
   questions,
   filters,
 }: ChecklistQuestionsIndexProps) {
+  const { hasPermission } = usePermission();
   const [editingQuestion, setEditingQuestion] =
     useState<ChecklistQuestion | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -50,6 +52,11 @@ export default function ChecklistQuestionsIndex({
 
   const onDelete = (question: ChecklistQuestion) => {
     setDeletingQuestion(question);
+  };
+
+  const onCreate = () => {
+    setEditingQuestion(null);
+    setIsDialogOpen(true);
   };
 
   const handleConfirmDelete = () => {
@@ -73,8 +80,6 @@ export default function ChecklistQuestionsIndex({
     );
   };
 
-  const stableColumns = useMemo(() => getColumns(onEdit, onDelete), []);
-
   return (
     <>
       <Head title="Bank Pertanyaan Checklist" />
@@ -90,19 +95,19 @@ export default function ChecklistQuestionsIndex({
               kebutuhan.
             </p>
           </div>
-          <Button
-            onClick={() => {
-              setEditingQuestion(null);
-              setIsDialogOpen(true);
-            }}
-          >
-            <Plus />
-            Tambah Pertanyaan
-          </Button>
+          {hasPermission('manage need-checklists') && (
+            <Button onClick={onCreate}>
+              <Plus className="mr-2 h-4 w-4" />
+              Tambah Pertanyaan
+            </Button>
+          )}
         </div>
 
         <DataTable
-          columns={stableColumns}
+          columns={useMemo(
+            () => getColumns(onEdit, onDelete, hasPermission),
+            [hasPermission],
+          )}
           data={questions.data}
           meta={questions}
           filters={filters}

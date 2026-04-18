@@ -1,10 +1,11 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import { ClipboardList, PencilLine, Trash2 } from 'lucide-react';
-import needGroupChecklistActions from '@/actions/App/Http/Controllers/Need/NeedGroupChecklistController';
+import { ListChecks, PencilLine, Trash2 } from 'lucide-react';
+import type { ActionItem } from '@/components/action-dropdown';
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { getIndexColumn } from '@/components/data-table/data-table-index-column';
 import { Badge } from '@/components/ui/badge';
+import groupRoutes from '@/routes/need-groups';
 
 export interface NeedGroup {
   id: number;
@@ -19,6 +20,7 @@ export interface NeedGroup {
 export const getColumns = (
   onEdit: (group: NeedGroup) => void,
   onDelete: (group: NeedGroup) => void,
+  hasPermission: (permission: string) => boolean,
 ): ColumnDef<NeedGroup>[] => [
   getIndexColumn('#', 'w-1 text-center'),
   {
@@ -62,31 +64,33 @@ export const getColumns = (
     cell: ({ row }) => {
       const group = row.original;
 
-      return (
-        <ActionDropdown
-          actions={[
-            {
-              label: 'Edit',
-              icon: PencilLine,
-              onClick: () => onEdit(group),
-            },
-            {
-              label: 'Checklist',
-              icon: ClipboardList,
-              href: needGroupChecklistActions.index.url({
-                need_group: group.id,
-              }),
-            },
-            'separator',
-            {
-              label: 'Hapus',
-              icon: Trash2,
-              onClick: () => onDelete(group),
-              variant: 'destructive',
-            },
-          ]}
-        />
-      );
+      const actions: (ActionItem | 'separator')[] = [
+        {
+          label: 'Kelola Checklist',
+          icon: ListChecks,
+          href: groupRoutes.checklists.index.url({ need_group: group.id }),
+        },
+      ];
+
+      if (hasPermission('update need-groups')) {
+        actions.push({
+          label: 'Edit',
+          icon: PencilLine,
+          onClick: () => onEdit(group),
+        });
+      }
+
+      if (hasPermission('delete need-groups')) {
+        actions.push('separator');
+        actions.push({
+          label: 'Hapus',
+          icon: Trash2,
+          onClick: () => onDelete(group),
+          variant: 'destructive',
+        });
+      }
+
+      return <ActionDropdown actions={actions} />;
     },
   },
 ];

@@ -1,8 +1,9 @@
 import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { Copy, Trash2, CheckCircle2, List, Edit } from 'lucide-react';
+import { Trash2, CheckCircle2, List, PencilLine } from 'lucide-react';
 
 import { ActionDropdown } from '@/components/action-dropdown';
+import type { ActionItem } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import planningVersions from '@/routes/planning-versions';
@@ -27,9 +28,10 @@ const statusVariants: Record<
 
 export const getColumns = (
   onEdit: (version: PlanningVersion) => void,
-  onCreateRevision: (version: PlanningVersion) => void,
+  onRevision: (version: PlanningVersion) => void,
   onSetCurrent: (version: PlanningVersion) => void,
   onDelete: (version: PlanningVersion) => void,
+  hasPermission: (permission: string) => boolean,
 ): ColumnDef<PlanningVersion>[] => [
   {
     accessorKey: 'name',
@@ -124,44 +126,45 @@ export const getColumns = (
     cell: ({ row }) => {
       const version = row.original;
 
-      return (
-        <ActionDropdown
-          actions={[
-            {
-              label: 'Lihat Snapshot',
-              icon: List,
-              onClick: () => {
-                window.location.href = planningVersions.activities.index.url({
-                  planning_version: version.id,
-                });
-              },
-            },
-            {
-              label: 'Edit',
-              icon: Edit,
-              onClick: () => onEdit(version),
-            },
-            {
-              label: 'Buat Revisi',
-              icon: Copy,
-              onClick: () => onCreateRevision(version),
-            },
-            {
-              label: 'Jadikan Utama',
-              icon: CheckCircle2,
-              onClick: () => onSetCurrent(version),
-              disabled: version.is_current,
-            },
-            'separator',
-            {
-              label: 'Hapus',
-              icon: Trash2,
-              onClick: () => onDelete(version),
-              variant: 'destructive',
-            },
-          ]}
-        />
-      );
+      const actions: (ActionItem | 'separator')[] = [
+        {
+          label: 'Lihat Snapshot',
+          icon: List,
+          onClick: () => {
+            window.location.href = planningVersions.activities.index.url({
+              planning_version: version.id,
+            });
+          },
+        },
+      ];
+
+      if (hasPermission('manage plannings')) {
+        actions.push({
+          label: 'Edit',
+          icon: PencilLine,
+          onClick: () => onEdit(version),
+        });
+        actions.push({
+          label: 'Jadikan Versi Utama',
+          icon: CheckCircle2,
+          onClick: () => onSetCurrent(version),
+          disabled: version.is_current,
+        });
+        actions.push('separator');
+        actions.push({
+          label: 'Hapus',
+          icon: Trash2,
+          onClick: () => onDelete(version),
+          variant: 'destructive',
+          disabled: version.is_current,
+        });
+      }
+
+      if (actions.length === 0) {
+        return null;
+      }
+
+      return <ActionDropdown actions={actions} />;
     },
   },
 ];

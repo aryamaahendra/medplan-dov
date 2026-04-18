@@ -8,11 +8,19 @@ use App\Models\User;
 class NeedTypePolicy
 {
     /**
+     * Perform pre-authorization checks.
+     */
+    public function before(User $user): ?bool
+    {
+        return $user->hasRole('super-admin') ? true : null;
+    }
+
+    /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('view any need-types');
     }
 
     /**
@@ -20,7 +28,7 @@ class NeedTypePolicy
      */
     public function view(User $user, NeedType $needType): bool
     {
-        return false;
+        return $user->hasPermissionTo('view any need-types');
     }
 
     /**
@@ -28,7 +36,7 @@ class NeedTypePolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('create need-types');
     }
 
     /**
@@ -36,7 +44,7 @@ class NeedTypePolicy
      */
     public function update(User $user, NeedType $needType): bool
     {
-        return false;
+        return $user->hasPermissionTo('update need-types');
     }
 
     /**
@@ -44,7 +52,7 @@ class NeedTypePolicy
      */
     public function delete(User $user, NeedType $needType): bool
     {
-        return false;
+        return $user->hasPermissionTo('delete need-types');
     }
 
     /**

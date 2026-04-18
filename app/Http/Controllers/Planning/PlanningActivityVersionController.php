@@ -22,6 +22,11 @@ class PlanningActivityVersionController extends Controller
 {
     use HasDataTable;
 
+    public function __construct()
+    {
+        $this->authorizeResource(PlanningActivityVersion::class);
+    }
+
     /** Columns searchable across */
     private const array SEARCH_COLUMNS = ['code', 'name', 'full_code'];
 

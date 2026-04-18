@@ -15,6 +15,11 @@ class ChecklistQuestionController extends Controller
 {
     use HasDataTable;
 
+    public function __construct()
+    {
+        //
+    }
+
     private const array SEARCH_COLUMNS = ['question', 'description'];
 
     private const array SORTABLE_COLUMNS = ['question', 'is_active', 'order_column', 'created_at'];
@@ -24,6 +29,7 @@ class ChecklistQuestionController extends Controller
      */
     public function index(Request $request): InertiaResponse
     {
+        $this->authorize('viewAny', ChecklistQuestion::class);
         $questions = $this->applyDataTable(
             ChecklistQuestion::query()->orderBy('order_column'),
             $request,
@@ -42,6 +48,7 @@ class ChecklistQuestionController extends Controller
      */
     public function store(StoreChecklistQuestionRequest $request): RedirectResponse
     {
+        $this->authorize('create', ChecklistQuestion::class);
         ChecklistQuestion::create($request->validated());
 
         return redirect()->route('checklist-questions.index')
@@ -51,8 +58,9 @@ class ChecklistQuestionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(StoreChecklistQuestionRequest $request, ChecklistQuestion $checklistQuestion): RedirectResponse
+    public function update(UpdateChecklistQuestionRequest $request, ChecklistQuestion $checklistQuestion): RedirectResponse
     {
+        $this->authorize('update', $checklistQuestion);
         $checklistQuestion->update($request->validated());
 
         return redirect()->route('checklist-questions.index')
@@ -64,6 +72,7 @@ class ChecklistQuestionController extends Controller
      */
     public function destroy(ChecklistQuestion $checklistQuestion): RedirectResponse
     {
+        $this->authorize('delete', $checklistQuestion);
         $checklistQuestion->delete();
 
         return redirect()->route('checklist-questions.index')

@@ -8,6 +8,7 @@ import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
 import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
+import { usePermission } from '@/hooks/use-permission';
 import needGroupRoutes from '@/routes/need-groups';
 
 import { getColumns } from './columns';
@@ -33,6 +34,7 @@ export default function NeedGroupsIndex({
   needGroups,
   filters,
 }: NeedGroupsIndexProps) {
+  const { hasPermission } = usePermission();
   const [editingGroup, setEditingGroup] = useState<NeedGroup | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deletingGroup, setDeletingGroup] = useState<NeedGroup | null>(null);
@@ -48,6 +50,11 @@ export default function NeedGroupsIndex({
 
   const onDelete = (group: NeedGroup) => {
     setDeletingGroup(group);
+  };
+
+  const onCreate = () => {
+    setEditingGroup(null);
+    setIsDialogOpen(true);
   };
 
   const handleConfirmDelete = () => {
@@ -69,8 +76,6 @@ export default function NeedGroupsIndex({
     );
   };
 
-  const stableColumns = useMemo(() => getColumns(onEdit, onDelete), []);
-
   return (
     <>
       <Head title="Kelompok Usulan" />
@@ -85,19 +90,19 @@ export default function NeedGroupsIndex({
               Kelola kelompok usulan kebutuhan per tahun anggaran.
             </p>
           </div>
-          <Button
-            onClick={() => {
-              setEditingGroup(null);
-              setIsDialogOpen(true);
-            }}
-          >
-            <Plus />
-            Tambah Kelompok
-          </Button>
+          {hasPermission('create need-groups') && (
+            <Button onClick={onCreate}>
+              <Plus className="mr-2 h-4 w-4" />
+              Tambah Kelompok
+            </Button>
+          )}
         </div>
 
         <DataTable
-          columns={stableColumns}
+          columns={useMemo(
+            () => getColumns(onEdit, onDelete, hasPermission),
+            [hasPermission],
+          )}
           data={needGroups.data}
           meta={needGroups}
           filters={filters}

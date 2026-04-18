@@ -8,11 +8,19 @@ use App\Models\User;
 class OrganizationalUnitPolicy
 {
     /**
+     * Perform pre-authorization checks.
+     */
+    public function before(User $user): ?bool
+    {
+        return $user->hasRole('super-admin') ? true : null;
+    }
+
+    /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('view any org-units');
     }
 
     /**
@@ -20,7 +28,7 @@ class OrganizationalUnitPolicy
      */
     public function view(User $user, OrganizationalUnit $organizationalUnit): bool
     {
-        return false;
+        return $user->hasPermissionTo('view any org-units');
     }
 
     /**
@@ -28,7 +36,7 @@ class OrganizationalUnitPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('create org-units');
     }
 
     /**
@@ -36,7 +44,7 @@ class OrganizationalUnitPolicy
      */
     public function update(User $user, OrganizationalUnit $organizationalUnit): bool
     {
-        return false;
+        return $user->hasPermissionTo('update org-units');
     }
 
     /**
@@ -44,7 +52,7 @@ class OrganizationalUnitPolicy
      */
     public function delete(User $user, OrganizationalUnit $organizationalUnit): bool
     {
-        return false;
+        return $user->hasPermissionTo('delete org-units');
     }
 
     /**

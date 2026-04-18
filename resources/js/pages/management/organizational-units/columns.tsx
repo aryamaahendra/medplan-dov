@@ -17,6 +17,7 @@ export interface OrganizationalUnit {
 export const getColumns = (
   onEdit: (unit: OrganizationalUnit) => void,
   onDelete: (unit: OrganizationalUnit) => void,
+  hasPermission: (permission: string) => boolean,
 ): ColumnDef<OrganizationalUnit>[] => [
   getIndexColumn(),
   {
@@ -59,24 +60,34 @@ export const getColumns = (
     cell: ({ row }) => {
       const unit = row.original;
 
-      return (
-        <ActionDropdown
-          actions={[
-            {
-              label: 'Edit',
-              icon: PencilLine,
-              onClick: () => onEdit(unit),
-            },
-            'separator',
-            {
-              label: 'Hapus',
-              icon: Trash2,
-              onClick: () => onDelete(unit),
-              variant: 'destructive',
-            },
-          ]}
-        />
-      );
+      const actions: any[] = [];
+
+      if (hasPermission('update organizational-units')) {
+        actions.push({
+          label: 'Edit',
+          icon: PencilLine,
+          onClick: () => onEdit(unit),
+        });
+      }
+
+      if (hasPermission('delete organizational-units')) {
+        if (actions.length > 0) {
+          actions.push('separator');
+        }
+
+        actions.push({
+          label: 'Hapus',
+          icon: Trash2,
+          onClick: () => onDelete(unit),
+          variant: 'destructive',
+        });
+      }
+
+      if (actions.length === 0) {
+        return null;
+      }
+
+      return <ActionDropdown actions={actions} />;
     },
   },
 ];

@@ -16,12 +16,18 @@ class RoleController extends Controller
 {
     use HasDataTable;
 
+    public function __construct()
+    {
+        //
+    }
+
     private const array SEARCH_COLUMNS = ['name'];
 
     private const array SORTABLE_COLUMNS = ['name', 'created_at'];
 
     public function index(Request $request): Response
     {
+        $this->authorize('viewAny', Role::class);
         $roles = $this->applyDataTable(
             Role::with('permissions'),
             $request,
@@ -40,6 +46,7 @@ class RoleController extends Controller
 
     public function store(StoreRoleRequest $request)
     {
+        $this->authorize('create', Role::class);
         $role = Role::create(['name' => $request->validated('name')]);
 
         if ($request->has('permissions')) {
@@ -51,6 +58,7 @@ class RoleController extends Controller
 
     public function update(UpdateRoleRequest $request, Role $role)
     {
+        $this->authorize('update', $role);
         if (strtolower($role->name) === 'superadmin' && strtolower($request->validated('name')) !== 'superadmin') {
             return redirect()->back()->with('error', 'Cannot rename Superadmin role.');
         }
@@ -66,6 +74,7 @@ class RoleController extends Controller
 
     public function destroy(Role $role)
     {
+        $this->authorize('delete', $role);
         if (strtolower($role->name) === 'superadmin') {
             return redirect()->back()->with('error', 'Cannot delete Superadmin role.');
         }

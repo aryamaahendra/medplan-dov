@@ -17,6 +17,7 @@ export interface User {
 export const getColumns = (
   onEdit: (user: User) => void,
   onDelete: (user: User) => void,
+  hasPermission: (permission: string) => boolean,
 ): ColumnDef<User>[] => [
   getIndexColumn(),
   {
@@ -82,24 +83,34 @@ export const getColumns = (
     cell: ({ row }) => {
       const user = row.original;
 
-      return (
-        <ActionDropdown
-          actions={[
-            {
-              label: 'Edit User',
-              icon: PencilLine,
-              onClick: () => onEdit(user),
-            },
-            'separator',
-            {
-              label: 'Delete User',
-              icon: Trash2,
-              onClick: () => onDelete(user),
-              variant: 'destructive',
-            },
-          ]}
-        />
-      );
+      const actions: any[] = [];
+
+      if (hasPermission('update users')) {
+        actions.push({
+          label: 'Edit User',
+          icon: PencilLine,
+          onClick: () => onEdit(user),
+        });
+      }
+
+      if (hasPermission('delete users')) {
+        if (actions.length > 0) {
+          actions.push('separator');
+        }
+
+        actions.push({
+          label: 'Delete User',
+          icon: Trash2,
+          onClick: () => onDelete(user),
+          variant: 'destructive',
+        });
+      }
+
+      if (actions.length === 0) {
+        return null;
+      }
+
+      return <ActionDropdown actions={actions} />;
     },
   },
 ];

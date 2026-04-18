@@ -1,6 +1,7 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { PencilLine, Trash2 } from 'lucide-react';
 
+import type { ActionItem } from '@/components/action-dropdown';
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { getIndexColumn } from '@/components/data-table/data-table-index-column';
@@ -9,6 +10,7 @@ import type { StrategicServicePlan } from '@/types';
 export const getColumns = (
   onEdit: (plan: StrategicServicePlan) => void,
   onDelete: (plan: StrategicServicePlan) => void,
+  hasPermission: (permission: string) => boolean,
 ): ColumnDef<StrategicServicePlan>[] => [
   getIndexColumn(),
   {
@@ -55,24 +57,28 @@ export const getColumns = (
     cell: ({ row }) => {
       const plan = row.original;
 
-      return (
-        <ActionDropdown
-          actions={[
-            {
-              label: 'Edit Rencana Pengembangan Layanan',
-              icon: PencilLine,
-              onClick: () => onEdit(plan),
-            },
-            'separator',
-            {
-              label: 'Hapus Rencana Pengembangan Layanan',
-              icon: Trash2,
-              onClick: () => onDelete(plan),
-              variant: 'destructive',
-            },
-          ]}
-        />
-      );
+      const actions: (ActionItem | 'separator')[] = [];
+
+      if (hasPermission('manage ssp')) {
+        actions.push({
+          label: 'Edit',
+          icon: PencilLine,
+          onClick: () => onEdit(plan),
+        });
+        actions.push('separator');
+        actions.push({
+          label: 'Hapus',
+          icon: Trash2,
+          onClick: () => onDelete(plan),
+          variant: 'destructive',
+        });
+      }
+
+      if (actions.length === 0) {
+        return null;
+      }
+
+      return <ActionDropdown actions={actions} />;
     },
   },
 ];

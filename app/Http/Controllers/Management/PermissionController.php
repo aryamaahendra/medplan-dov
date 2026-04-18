@@ -13,6 +13,11 @@ class PermissionController extends Controller
 {
     use HasDataTable;
 
+    public function __construct()
+    {
+        $this->authorizeResource(Permission::class, 'permission');
+    }
+
     /** Columns users can search across */
     private const array SEARCH_COLUMNS = ['name'];
 

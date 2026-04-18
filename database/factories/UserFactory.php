@@ -35,6 +35,7 @@ class UserFactory extends Factory
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
+            'organizational_unit_id' => null,
         ];
     }
 
@@ -44,8 +45,10 @@ class UserFactory extends Factory
     public function configure(): static
     {
         return $this->afterCreating(function (User $user) {
-            Role::firstOrCreate(['name' => UserRole::User->value]);
-            $user->assignRole(UserRole::User->value);
+            if ($user->roles()->count() === 0) {
+                $role = Role::firstOrCreate(['name' => UserRole::Staff->value, 'guard_name' => 'web']);
+                $user->assignRole($role);
+            }
         });
     }
 

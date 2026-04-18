@@ -1,5 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { PencilLine, Trash2 } from 'lucide-react';
+import type { ActionItem } from '@/components/action-dropdown';
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { getIndexColumn } from '@/components/data-table/data-table-index-column';
@@ -17,6 +18,7 @@ export interface ChecklistQuestion {
 export const getColumns = (
   onEdit: (question: ChecklistQuestion) => void,
   onDelete: (question: ChecklistQuestion) => void,
+  hasPermission: (permission: string) => boolean,
 ): ColumnDef<ChecklistQuestion>[] => [
   getIndexColumn('#', 'w-1 text-center'),
   {
@@ -73,24 +75,28 @@ export const getColumns = (
     cell: ({ row }) => {
       const question = row.original;
 
-      return (
-        <ActionDropdown
-          actions={[
-            {
-              label: 'Edit',
-              icon: PencilLine,
-              onClick: () => onEdit(question),
-            },
-            'separator',
-            {
-              label: 'Hapus',
-              icon: Trash2,
-              onClick: () => onDelete(question),
-              variant: 'destructive',
-            },
-          ]}
-        />
-      );
+      const actions: (ActionItem | 'separator')[] = [];
+
+      if (hasPermission('manage need-checklists')) {
+        actions.push({
+          label: 'Edit',
+          icon: PencilLine,
+          onClick: () => onEdit(question),
+        });
+        actions.push('separator');
+        actions.push({
+          label: 'Hapus',
+          icon: Trash2,
+          onClick: () => onDelete(question),
+          variant: 'destructive',
+        });
+      }
+
+      if (actions.length === 0) {
+        return null;
+      }
+
+      return <ActionDropdown actions={actions} />;
     },
   },
 ];

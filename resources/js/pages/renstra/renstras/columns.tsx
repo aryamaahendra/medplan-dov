@@ -11,6 +11,7 @@ import type { Renstra } from '@/types';
 export const getColumns = (
   onEdit: (renstra: Renstra) => void,
   onDelete: (renstra: Renstra) => void,
+  hasPermission: (permission: string) => boolean,
 ): ColumnDef<Renstra>[] => [
   getIndexColumn(),
   {
@@ -61,29 +62,33 @@ export const getColumns = (
     cell: ({ row }) => {
       const renstra = row.original;
 
-      return (
-        <ActionDropdown
-          actions={[
-            {
-              label: 'Lihat',
-              icon: Eye,
-              href: renstraRoutes.show.url({ renstra: renstra.id }),
-            },
-            {
-              label: 'Edit',
-              icon: PencilLine,
-              onClick: () => onEdit(renstra),
-            },
-            'separator',
-            {
-              label: 'Hapus',
-              icon: Trash2,
-              onClick: () => onDelete(renstra),
-              variant: 'destructive',
-            },
-          ]}
-        />
-      );
+      const actions: any[] = [
+        {
+          label: 'Lihat',
+          icon: Eye,
+          href: renstraRoutes.show.url({ renstra: renstra.id }),
+        },
+      ];
+
+      if (hasPermission('update renstras')) {
+        actions.push({
+          label: 'Edit',
+          icon: PencilLine,
+          onClick: () => onEdit(renstra),
+        });
+      }
+
+      if (hasPermission('delete renstras')) {
+        actions.push('separator');
+        actions.push({
+          label: 'Hapus',
+          icon: Trash2,
+          onClick: () => onDelete(renstra),
+          variant: 'destructive',
+        });
+      }
+
+      return <ActionDropdown actions={actions} />;
     },
   },
 ];

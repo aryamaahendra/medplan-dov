@@ -1,6 +1,7 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { PencilLine, Trash2 } from 'lucide-react';
 
+import type { ActionItem } from '@/components/action-dropdown';
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { getIndexColumn } from '@/components/data-table/data-table-index-column';
@@ -17,8 +18,9 @@ export interface NeedType {
 }
 
 export const getColumns = (
-  onEdit: (needType: NeedType) => void,
-  onDelete: (needType: NeedType) => void,
+  onEdit: (type: NeedType) => void,
+  onDelete: (type: NeedType) => void,
+  hasPermission: (permission: string) => boolean,
 ): ColumnDef<NeedType>[] => [
   getIndexColumn(),
   {
@@ -75,26 +77,36 @@ export const getColumns = (
       cellClassName: 'w-1',
     },
     cell: ({ row }) => {
-      const needType = row.original;
+      const type = row.original;
 
-      return (
-        <ActionDropdown
-          actions={[
-            {
-              label: 'Edit',
-              icon: PencilLine,
-              onClick: () => onEdit(needType),
-            },
-            'separator',
-            {
-              label: 'Hapus',
-              icon: Trash2,
-              onClick: () => onDelete(needType),
-              variant: 'destructive',
-            },
-          ]}
-        />
-      );
+      const actions: (ActionItem | 'separator')[] = [];
+
+      if (hasPermission('update need-types')) {
+        actions.push({
+          label: 'Edit',
+          icon: PencilLine,
+          onClick: () => onEdit(type),
+        });
+      }
+
+      if (hasPermission('delete need-types')) {
+        if (actions.length > 0) {
+          actions.push('separator');
+        }
+
+        actions.push({
+          label: 'Hapus',
+          icon: Trash2,
+          onClick: () => onDelete(type),
+          variant: 'destructive',
+        });
+      }
+
+      if (actions.length === 0) {
+        return null;
+      }
+
+      return <ActionDropdown actions={actions} />;
     },
   },
 ];

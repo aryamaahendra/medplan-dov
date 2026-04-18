@@ -15,6 +15,11 @@ class StrategicServicePlanController extends Controller
 {
     use HasDataTable;
 
+    public function __construct()
+    {
+        $this->authorizeResource(StrategicServicePlan::class);
+    }
+
     /** Columns searchable across */
     private const array SEARCH_COLUMNS = ['strategic_program', 'service_plan', 'target', 'policy_direction'];
 

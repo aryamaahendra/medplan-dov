@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 
 import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
+import { usePermission } from '@/hooks/use-permission';
 import userRoutes from '@/routes/users';
 import { getColumns } from './columns';
 import type { User } from './columns';
@@ -31,6 +32,7 @@ interface UsersIndexProps {
 }
 
 export default function UsersIndex({ users, roles, filters }: UsersIndexProps) {
+  const { hasPermission } = usePermission();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [deletingUser, setDeletingUser] = useState<User | null>(null);
@@ -73,7 +75,10 @@ export default function UsersIndex({ users, roles, filters }: UsersIndexProps) {
   };
 
   // Safe to memoize columns
-  const stableColumns = useMemo(() => getColumns(onEdit, onDelete), []);
+  const stableColumns = useMemo(
+    () => getColumns(onEdit, onDelete, hasPermission),
+    [hasPermission],
+  );
 
   return (
     <>
@@ -87,10 +92,12 @@ export default function UsersIndex({ users, roles, filters }: UsersIndexProps) {
               Manage and browse all registered users.
             </p>
           </div>
-          <Button onClick={onCreate}>
-            <Plus />
-            Tambah User
-          </Button>
+          {hasPermission('create users') && (
+            <Button onClick={onCreate}>
+              <Plus />
+              Tambah User
+            </Button>
+          )}
         </div>
 
         <DataTable

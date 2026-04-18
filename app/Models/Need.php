@@ -153,6 +153,18 @@ class Need extends Model
     }
 
     /**
+     * Scope a query to only include needs the user is authorized to see in index.
+     */
+    public function scopeIndexScope($query, User $user)
+    {
+        if ($user->hasAnyRole(['super-admin', 'admin', 'planner'])) {
+            return $query;
+        }
+
+        return $query->where('organizational_unit_id', $user->organizational_unit_id);
+    }
+
+    /**
      * The "booted" method of the model.
      */
     protected static function booted(): void

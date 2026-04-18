@@ -15,6 +15,11 @@ class OrganizationalUnitController extends Controller
 {
     use HasDataTable;
 
+    public function __construct()
+    {
+        //
+    }
+
     /** Columns searchable across */
     private const array SEARCH_COLUMNS = ['name', 'code'];
 
@@ -23,6 +28,7 @@ class OrganizationalUnitController extends Controller
 
     public function index(Request $request): Response
     {
+        $this->authorize('viewAny', OrganizationalUnit::class);
         $units = $this->applyDataTable(
             OrganizationalUnit::query()->with('parent'),
             $request,
@@ -39,6 +45,7 @@ class OrganizationalUnitController extends Controller
 
     public function store(StoreOrganizationalUnitRequest $request)
     {
+        $this->authorize('create', OrganizationalUnit::class);
         OrganizationalUnit::create($request->validated());
 
         return redirect()->route('organizational-units.index')
@@ -47,6 +54,7 @@ class OrganizationalUnitController extends Controller
 
     public function update(UpdateOrganizationalUnitRequest $request, OrganizationalUnit $organizationalUnit)
     {
+        $this->authorize('update', $organizationalUnit);
         $organizationalUnit->update($request->validated());
 
         return redirect()->route('organizational-units.index')
@@ -55,6 +63,7 @@ class OrganizationalUnitController extends Controller
 
     public function destroy(OrganizationalUnit $organizationalUnit)
     {
+        $this->authorize('delete', $organizationalUnit);
         $organizationalUnit->delete();
 
         return redirect()->route('organizational-units.index')

@@ -109,3 +109,15 @@ test('unit head can delete their own unit need', function () {
 
     $response->assertRedirect();
 });
+
+test('super admin can access role management', function () {
+    $response = $this->actingAs($this->superAdmin)->get(route('roles.index'));
+
+    $response->assertStatus(200);
+});
+
+test('super admin can access permission management', function () {
+    $response = $this->actingAs($this->superAdmin)->get(route('permissions.index'));
+
+    $response->assertStatus(200);
+});

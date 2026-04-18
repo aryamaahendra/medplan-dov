@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class ISeedRenstrasTableSeeder extends Seeder
 {
@@ -13,10 +14,12 @@ class ISeedRenstrasTableSeeder extends Seeder
      */
     public function run()
     {
-
+        Schema::disableForeignKeyConstraints();
         \DB::table('renstras')->delete();
+        Schema::enableForeignKeyConstraints();
 
         \DB::table('renstras')->insert([
+
             0 => [
                 'id' => 1,
                 'name' => 'Renstra RSUD 2025-2030',
@@ -29,5 +32,8 @@ class ISeedRenstrasTableSeeder extends Seeder
             ],
         ]);
 
+        if (config('database.default') === 'pgsql') {
+            \DB::statement("SELECT setval(pg_get_serial_sequence('renstras', 'id'), coalesce(max(id), 1), max(id) IS NOT null) FROM renstras;");
+        }
     }
 }

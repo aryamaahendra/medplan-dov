@@ -15,29 +15,28 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(RolesAndPermissionsSeeder::class);
-        $this->call(ISeedUsersTableSeeder::class);
 
-        $admin = User::updateOrCreate(
-            ['email' => 'admin@admin.com'],
-            [
-                'name' => 'Super Admin',
-                'password' => Hash::make('E201admindev$$'),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]
-        );
-
-        $admin->assignRole(UserRole::SuperAdmin->value);
-
-        $this->call(ISeedJobsTableSeeder::class);
-        $this->call(ISeedJobBatchesTableSeeder::class);
-
-        // System / Independent
-        $this->call(ISeedChecklistQuestionsTableSeeder::class);
+        // System / Independent Parent Tables
         $this->call(ISeedOrganizationalUnitsTableSeeder::class);
         $this->call(ISeedNeedTypesTableSeeder::class);
         $this->call(ISeedNeedGroupsTableSeeder::class);
+        $this->call(ISeedChecklistQuestionsTableSeeder::class);
         $this->call(ISeedNeedGroupChecklistQuestionTableSeeder::class);
+
+        foreach (UserRole::cases() as $role) {
+            $user = User::updateOrCreate(
+                ['email' => $role->value.'@admin.com'],
+                [
+                    'name' => $role->label(),
+                    'password' => Hash::make('password'),
+                    'email_verified_at' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+
+            $user->assignRole($role->value);
+        }
 
         // Planning Hierarchy
         $this->call(ISeedPlanningVersionsTableSeeder::class);

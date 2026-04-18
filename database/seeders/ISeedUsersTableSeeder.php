@@ -2,7 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserRole;
+use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class ISeedUsersTableSeeder extends Seeder
 {
@@ -13,10 +16,12 @@ class ISeedUsersTableSeeder extends Seeder
      */
     public function run()
     {
-
+        Schema::disableForeignKeyConstraints();
         \DB::table('users')->delete();
+        Schema::enableForeignKeyConstraints();
 
         \DB::table('users')->insert([
+
             0 => [
                 'id' => 1,
                 'name' => 'Test User',
@@ -32,5 +37,16 @@ class ISeedUsersTableSeeder extends Seeder
             ],
         ]);
 
+        if (config('database.default') === 'pgsql') {
+            \DB::statement("SELECT setval(pg_get_serial_sequence('users', 'id'), coalesce(max(id), 1), max(id) IS NOT null) FROM users;");
+        }
+
+        // Assign default role to seeded users if RBAC is enabled
+        $users = User::all();
+        foreach ($users as $user) {
+            if (! $user->hasAnyRole(UserRole::cases())) {
+                $user->assignRole(UserRole::Staff->value);
+            }
+        }
     }
 }

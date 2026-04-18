@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class ISeedNeedChecklistAnswersTableSeeder extends Seeder
 {
@@ -13,10 +14,12 @@ class ISeedNeedChecklistAnswersTableSeeder extends Seeder
      */
     public function run()
     {
-
+        Schema::disableForeignKeyConstraints();
         \DB::table('need_checklist_answers')->delete();
+        Schema::enableForeignKeyConstraints();
 
         \DB::table('need_checklist_answers')->insert([
+
             0 => [
                 'id' => 2,
                 'need_id' => 1,
@@ -145,5 +148,8 @@ class ISeedNeedChecklistAnswersTableSeeder extends Seeder
             ],
         ]);
 
+        if (config('database.default') === 'pgsql') {
+            \DB::statement("SELECT setval(pg_get_serial_sequence('need_checklist_answers', 'id'), coalesce(max(id), 1), max(id) IS NOT null) FROM need_checklist_answers;");
+        }
     }
 }

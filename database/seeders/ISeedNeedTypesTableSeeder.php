@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class ISeedNeedTypesTableSeeder extends Seeder
 {
@@ -13,10 +14,12 @@ class ISeedNeedTypesTableSeeder extends Seeder
      */
     public function run()
     {
-
+        Schema::disableForeignKeyConstraints();
         \DB::table('need_types')->delete();
+        Schema::enableForeignKeyConstraints();
 
         \DB::table('need_types')->insert([
+
             0 => [
                 'id' => 1,
                 'name' => 'SDM',
@@ -63,5 +66,8 @@ class ISeedNeedTypesTableSeeder extends Seeder
             ],
         ]);
 
+        if (config('database.default') === 'pgsql') {
+            \DB::statement("SELECT setval(pg_get_serial_sequence('need_types', 'id'), coalesce(max(id), 1), max(id) IS NOT null) FROM need_types;");
+        }
     }
 }

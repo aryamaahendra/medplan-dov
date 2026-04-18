@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class ISeedKpiAnnualTargetsTableSeeder extends Seeder
 {
@@ -13,10 +14,12 @@ class ISeedKpiAnnualTargetsTableSeeder extends Seeder
      */
     public function run()
     {
-
+        Schema::disableForeignKeyConstraints();
         \DB::table('kpi_annual_targets')->delete();
+        Schema::enableForeignKeyConstraints();
 
         \DB::table('kpi_annual_targets')->insert([
+
             0 => [
                 'id' => 1,
                 'indicator_id' => 2,
@@ -115,5 +118,8 @@ class ISeedKpiAnnualTargetsTableSeeder extends Seeder
             ],
         ]);
 
+        if (config('database.default') === 'pgsql') {
+            \DB::statement("SELECT setval(pg_get_serial_sequence('kpi_annual_targets', 'id'), coalesce(max(id), 1), max(id) IS NOT null) FROM kpi_annual_targets;");
+        }
     }
 }

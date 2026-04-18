@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class ISeedStrategicServicePlansTableSeeder extends Seeder
 {
@@ -13,10 +14,12 @@ class ISeedStrategicServicePlansTableSeeder extends Seeder
      */
     public function run()
     {
-
+        Schema::disableForeignKeyConstraints();
         \DB::table('strategic_service_plans')->delete();
+        Schema::enableForeignKeyConstraints();
 
         \DB::table('strategic_service_plans')->insert([
+
             0 => [
                 'id' => 1,
                 'year' => 2025,
@@ -107,5 +110,8 @@ class ISeedStrategicServicePlansTableSeeder extends Seeder
             ],
         ]);
 
+        if (config('database.default') === 'pgsql') {
+            \DB::statement("SELECT setval(pg_get_serial_sequence('strategic_service_plans', 'id'), coalesce(max(id), 1), max(id) IS NOT null) FROM strategic_service_plans;");
+        }
     }
 }

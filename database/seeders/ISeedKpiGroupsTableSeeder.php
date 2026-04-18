@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class ISeedKpiGroupsTableSeeder extends Seeder
 {
@@ -13,10 +14,12 @@ class ISeedKpiGroupsTableSeeder extends Seeder
      */
     public function run()
     {
-
+        Schema::disableForeignKeyConstraints();
         \DB::table('kpi_groups')->delete();
+        Schema::enableForeignKeyConstraints();
 
         \DB::table('kpi_groups')->insert([
+
             0 => [
                 'id' => 1,
                 'name' => 'IKK',
@@ -29,5 +32,8 @@ class ISeedKpiGroupsTableSeeder extends Seeder
             ],
         ]);
 
+        if (config('database.default') === 'pgsql') {
+            \DB::statement("SELECT setval(pg_get_serial_sequence('kpi_groups', 'id'), coalesce(max(id), 1), max(id) IS NOT null) FROM kpi_groups;");
+        }
     }
 }

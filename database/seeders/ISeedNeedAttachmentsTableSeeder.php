@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class ISeedNeedAttachmentsTableSeeder extends Seeder
 {
@@ -13,10 +14,12 @@ class ISeedNeedAttachmentsTableSeeder extends Seeder
      */
     public function run()
     {
-
+        Schema::disableForeignKeyConstraints();
         \DB::table('need_attachments')->delete();
+        Schema::enableForeignKeyConstraints();
 
         \DB::table('need_attachments')->insert([
+
             0 => [
                 'id' => 7,
                 'need_id' => 3,
@@ -85,5 +88,8 @@ class ISeedNeedAttachmentsTableSeeder extends Seeder
             ],
         ]);
 
+        if (config('database.default') === 'pgsql') {
+            \DB::statement("SELECT setval(pg_get_serial_sequence('need_attachments', 'id'), coalesce(max(id), 1), max(id) IS NOT null) FROM need_attachments;");
+        }
     }
 }

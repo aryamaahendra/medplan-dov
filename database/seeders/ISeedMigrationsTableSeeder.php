@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class ISeedMigrationsTableSeeder extends Seeder
 {
@@ -13,10 +14,12 @@ class ISeedMigrationsTableSeeder extends Seeder
      */
     public function run()
     {
-
+        Schema::disableForeignKeyConstraints();
         \DB::table('migrations')->delete();
+        Schema::enableForeignKeyConstraints();
 
         \DB::table('migrations')->insert([
+
             0 => [
                 'id' => 1,
                 'migration' => '0001_01_01_000000_create_users_table',
@@ -199,5 +202,8 @@ class ISeedMigrationsTableSeeder extends Seeder
             ],
         ]);
 
+        if (config('database.default') === 'pgsql') {
+            \DB::statement("SELECT setval(pg_get_serial_sequence('migrations', 'id'), coalesce(max(id), 1), max(id) IS NOT null) FROM migrations;");
+        }
     }
 }

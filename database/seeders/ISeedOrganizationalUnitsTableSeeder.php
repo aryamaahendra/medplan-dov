@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class ISeedOrganizationalUnitsTableSeeder extends Seeder
 {
@@ -13,10 +14,12 @@ class ISeedOrganizationalUnitsTableSeeder extends Seeder
      */
     public function run()
     {
-
+        Schema::disableForeignKeyConstraints();
         \DB::table('organizational_units')->delete();
+        Schema::enableForeignKeyConstraints();
 
         \DB::table('organizational_units')->insert([
+
             0 => [
                 'id' => 1,
                 'name' => 'Bagian Tata Usaha',
@@ -136,5 +139,8 @@ class ISeedOrganizationalUnitsTableSeeder extends Seeder
             ],
         ]);
 
+        if (config('database.default') === 'pgsql') {
+            \DB::statement("SELECT setval(pg_get_serial_sequence('organizational_units', 'id'), coalesce(max(id), 1), max(id) IS NOT null) FROM organizational_units;");
+        }
     }
 }

@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, router, Link } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -11,10 +11,8 @@ import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import { usePermission } from '@/hooks/use-permission';
 import rolesRoutes from '@/routes/roles';
-import type { Permission } from '../permissions/columns';
 import { getColumns } from './columns';
 import type { Role } from './columns';
-import { RoleDialog } from './role-dialog';
 
 interface PaginatedRoles {
   data: Role[];
@@ -28,18 +26,11 @@ interface PaginatedRoles {
 
 interface RolesIndexProps {
   roles: PaginatedRoles;
-  permissions: Permission[];
   filters: DataTableFilters;
 }
 
-export default function RolesIndex({
-  roles,
-  permissions,
-  filters,
-}: RolesIndexProps) {
+export default function RolesIndex({ roles, filters }: RolesIndexProps) {
   const { hasPermission } = usePermission();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [deletingRole, setDeletingRole] = useState<Role | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -55,13 +46,7 @@ export default function RolesIndex({
       return;
     }
 
-    setEditingRole(role);
-    setDialogOpen(true);
-  };
-
-  const onCreate = () => {
-    setEditingRole(null);
-    setDialogOpen(true);
+    router.visit(rolesRoutes.edit.url({ role: role.id }));
   };
 
   const onDelete = (role: Role) => {
@@ -103,9 +88,11 @@ export default function RolesIndex({
             </p>
           </div>
           {hasPermission('create roles') && (
-            <Button onClick={onCreate}>
-              <Plus className="mr-2 h-4 w-4" />
-              Tambah Role
+            <Button asChild>
+              <Link href={rolesRoutes.create.url()}>
+                <Plus />
+                Tambah Role
+              </Link>
             </Button>
           )}
         </div>
@@ -126,14 +113,6 @@ export default function RolesIndex({
           searchPlaceholder="Search by name..."
         />
       </div>
-
-      <RoleDialog
-        key={editingRole?.id ?? (dialogOpen ? 'create' : 'closed')}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        role={editingRole}
-        permissions={permissions}
-      />
 
       <ConfirmDialog
         open={!!deletingRole}

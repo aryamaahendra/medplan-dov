@@ -51,7 +51,9 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        return $user->hasPermissionTo('delete users') && $user->id !== $model->id;
+        return $user->hasPermissionTo('delete users')
+            && $user->id !== $model->id
+            && ! $model->hasRole('super-admin');
     }
 
     /**

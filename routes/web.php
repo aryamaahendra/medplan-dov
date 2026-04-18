@@ -33,7 +33,7 @@ Route::inertia('/', 'welcome', [
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('users', UserController::class)->except(['create', 'edit', 'show']);
-    Route::resource('roles', RoleController::class)->except(['create', 'edit', 'show']);
+    Route::resource('roles', RoleController::class)->except(['show']);
     Route::resource('permissions', PermissionController::class)->only(['index']);
     Route::resource('organizational-units', OrganizationalUnitController::class)->except(['create', 'edit', 'show']);
     Route::resource('need-types', NeedTypeController::class)->except(['create', 'edit', 'show']);

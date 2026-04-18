@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Management;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Management\StoreRoleRequest;
 use App\Http\Requests\Management\UpdateRoleRequest;
@@ -35,12 +36,31 @@ class RoleController extends Controller
             self::SORTABLE_COLUMNS,
         );
 
-        $permissions = Permission::all();
-
         return Inertia::render('management/roles/index', [
             'roles' => $roles,
-            'permissions' => $permissions,
             'filters' => $this->dataTableFilters($request),
+        ]);
+    }
+
+    public function create(): Response
+    {
+        $this->authorize('create', Role::class);
+        $permissions = Permission::all();
+
+        return Inertia::render('management/roles/create', [
+            'permissions' => $permissions,
+        ]);
+    }
+
+    public function edit(Role $role): Response
+    {
+        $this->authorize('update', $role);
+        $role->load('permissions');
+        $permissions = Permission::all();
+
+        return Inertia::render('management/roles/edit', [
+            'role' => $role,
+            'permissions' => $permissions,
         ]);
     }
 
@@ -59,7 +79,7 @@ class RoleController extends Controller
     public function update(UpdateRoleRequest $request, Role $role)
     {
         $this->authorize('update', $role);
-        if (strtolower($role->name) === 'superadmin' && strtolower($request->validated('name')) !== 'superadmin') {
+        if (strtolower($role->name) === UserRole::SuperAdmin->value && strtolower($request->validated('name')) !== UserRole::SuperAdmin->value) {
             return redirect()->back()->with('error', 'Cannot rename Superadmin role.');
         }
 
@@ -75,7 +95,7 @@ class RoleController extends Controller
     public function destroy(Role $role)
     {
         $this->authorize('delete', $role);
-        if (strtolower($role->name) === 'superadmin') {
+        if (strtolower($role->name) === UserRole::SuperAdmin->value) {
             return redirect()->back()->with('error', 'Cannot delete Superadmin role.');
         }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Management;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Management\StoreUserRequest;
 use App\Http\Requests\Management\UpdateUserRequest;
@@ -78,6 +79,11 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $this->authorize('delete', $user);
+
+        if ($user->hasRole(UserRole::SuperAdmin->value)) {
+            return redirect()->back()->with('error', 'Cannot delete Superadmin user.');
+        }
+
         $user->delete();
 
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');

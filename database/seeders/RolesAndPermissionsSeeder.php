@@ -18,33 +18,59 @@ class RolesAndPermissionsSeeder extends Seeder
         // Reset cached roles and permissions
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Define permissions
+        // Define permissions with descriptions
         $permissions = [
             // Users & Roles
-            'view any users', 'create users', 'update users', 'delete users',
-            'view any roles', 'create roles', 'update roles', 'delete roles',
-            'view any permissions', 'create permissions', 'update permissions', 'delete permissions',
+            'view any users' => 'Melihat daftar semua pengguna',
+            'create users' => 'Menambah pengguna baru',
+            'update users' => 'Mengubah data pengguna',
+            'delete users' => 'Menghapus pengguna',
+            'view any roles' => 'Melihat daftar semua role',
+            'create roles' => 'Menambah role baru',
+            'update roles' => 'Mengubah data role dan permissionnya',
+            'delete roles' => 'Menghapus role',
+            'view any permissions' => 'Melihat daftar semua permission',
+            'create permissions' => 'Menambah permission baru',
+            'update permissions' => 'Mengubah data permission',
+            'delete permissions' => 'Menghapus permission',
 
             // Organizational Units
-            'view any org-units', 'create org-units', 'update org-units', 'delete org-units',
+            'view any org-units' => 'Melihat daftar semua unit organisasi',
+            'create org-units' => 'Menambah unit organisasi baru',
+            'update org-units' => 'Mengubah data unit organisasi',
+            'delete org-units' => 'Menghapus unit organisasi',
 
             // Needs
-            'view any needs', 'view needs', 'create needs', 'update needs', 'delete needs', 'approve needs',
+            'view any needs' => 'Melihat daftar semua usulan kebutuhan',
+            'view needs' => 'Melihat detail usulan kebutuhan',
+            'create needs' => 'Membuat usulan kebutuhan baru',
+            'update needs' => 'Mengubah usulan kebutuhan',
+            'delete needs' => 'Menghapus usulan kebutuhan',
+            'approve needs' => 'Menyetujui usulan kebutuhan',
 
             // Need Configuration
-            'view any need-groups', 'create need-groups', 'update need-groups', 'delete need-groups',
-            'view any need-types', 'create need-types', 'update need-types', 'delete need-types',
-            'manage need-checklists',
+            'view any need-groups' => 'Melihat daftar semua grup usulan',
+            'create need-groups' => 'Menambah grup usulan baru',
+            'update need-groups' => 'Mengubah data grup usulan',
+            'delete need-groups' => 'Menghapus grup usulan',
+            'view any need-types' => 'Melihat daftar semua tipe usulan',
+            'create need-types' => 'Menambah tipe usulan baru',
+            'update need-types' => 'Mengubah data tipe usulan',
+            'delete need-types' => 'Menghapus tipe usulan',
+            'manage need-checklists' => 'Mengelola pertanyaan checklist untuk usulan',
 
             // Strategic Planning
-            'manage renstras',
-            'manage kpis',
-            'manage plannings',
-            'manage ssp',
+            'manage renstras' => 'Mengelola data Renstra',
+            'manage kpis' => 'Mengelola data IKK (Indikator Kinerja Kunci)',
+            'manage plannings' => 'Mengelola data perencanaan (RKAT)',
+            'manage ssp' => 'Mengelola Strategic Service Plan',
         ];
 
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
+        foreach ($permissions as $name => $description) {
+            Permission::updateOrCreate(
+                ['name' => $name, 'guard_name' => 'web'],
+                ['description' => $description]
+            );
         }
 
         // Create roles and assign permissions
@@ -54,7 +80,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Admin
         $adminRole = Role::firstOrCreate(['name' => UserRole::Admin->value, 'guard_name' => 'web']);
-        $adminRole->syncPermissions($permissions);
+        $adminRole->syncPermissions(array_keys($permissions));
 
         // Planner
         $plannerRole = Role::firstOrCreate(['name' => UserRole::Planner->value, 'guard_name' => 'web']);

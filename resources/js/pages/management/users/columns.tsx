@@ -94,16 +94,22 @@ export const getColumns = (
       }
 
       if (hasPermission('delete users')) {
-        if (actions.length > 0) {
-          actions.push('separator');
-        }
+        const isSuperAdmin = user.roles?.some(
+          (role) => role.name.toLowerCase() === 'super-admin',
+        );
 
-        actions.push({
-          label: 'Delete User',
-          icon: Trash2,
-          onClick: () => onDelete(user),
-          variant: 'destructive',
-        });
+        if (!isSuperAdmin) {
+          if (actions.length > 0) {
+            actions.push('separator');
+          }
+
+          actions.push({
+            label: 'Delete User',
+            icon: Trash2,
+            onClick: () => onDelete(user),
+            variant: 'destructive',
+          });
+        }
       }
 
       if (actions.length === 0) {

@@ -1,5 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import { Edit, Trash } from 'lucide-react';
+import { PencilLine, Trash2 } from 'lucide-react';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { Button } from '@/components/ui/button';
 import type { Permission } from '../permissions/columns';
@@ -37,12 +37,15 @@ export const getColumns = (
   },
   {
     id: 'actions',
+    meta: {
+      cellClassName: 'w-1',
+    },
     cell: ({ row }) => {
       const role = row.original;
-      const isSuperadmin = role.name.toLowerCase() === 'superadmin';
+      const isSuperadmin = role.name.toLowerCase() === 'super-admin';
 
       return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           {!isSuperadmin && (
             <>
               {hasPermission('update roles') && (
@@ -52,7 +55,7 @@ export const getColumns = (
                   onClick={() => onEdit(role)}
                   title="Edit Role"
                 >
-                  <Edit className="h-4 w-4" />
+                  <PencilLine />
                 </Button>
               )}
               {hasPermission('delete roles') && (
@@ -63,7 +66,7 @@ export const getColumns = (
                   onClick={() => onDelete(role)}
                   title="Delete Role"
                 >
-                  <Trash className="h-4 w-4" />
+                  <Trash2 />
                 </Button>
               )}
             </>

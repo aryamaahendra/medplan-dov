@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
 /**
  * @extends Factory<User>
@@ -43,6 +44,7 @@ class UserFactory extends Factory
     public function configure(): static
     {
         return $this->afterCreating(function (User $user) {
+            Role::firstOrCreate(['name' => UserRole::User->value]);
             $user->assignRole(UserRole::User->value);
         });
     }
@@ -53,6 +55,7 @@ class UserFactory extends Factory
     public function admin(): static
     {
         return $this->afterCreating(function (User $user) {
+            Role::firstOrCreate(['name' => UserRole::Admin->value]);
             $user->syncRoles([UserRole::Admin->value]);
         });
     }

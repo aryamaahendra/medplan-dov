@@ -4,6 +4,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Kpi\KpiGroupController;
 use App\Http\Controllers\Kpi\KpiIndicatorController;
 use App\Http\Controllers\Management\OrganizationalUnitController;
+use App\Http\Controllers\Management\PermissionController;
+use App\Http\Controllers\Management\RoleController;
 use App\Http\Controllers\Management\UserController;
 use App\Http\Controllers\Need\ChecklistQuestionController;
 use App\Http\Controllers\Need\ExportNeedPdfController;
@@ -31,6 +33,8 @@ Route::inertia('/', 'welcome', [
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('users', UserController::class)->except(['create', 'edit', 'show']);
+    Route::resource('roles', RoleController::class)->except(['create', 'edit', 'show']);
+    Route::resource('permissions', PermissionController::class)->only(['index']);
     Route::resource('organizational-units', OrganizationalUnitController::class)->except(['create', 'edit', 'show']);
     Route::resource('need-types', NeedTypeController::class)->except(['create', 'edit', 'show']);
     Route::resource('need-groups', NeedGroupController::class)->except(['create', 'edit', 'show']);

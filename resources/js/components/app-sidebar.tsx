@@ -10,6 +10,8 @@ import {
   Database,
   Pin,
   ListChecks,
+  ShieldUser,
+  UserKey,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
@@ -30,8 +32,10 @@ import needGroups from '@/routes/need-groups';
 import needTypes from '@/routes/need-types';
 import needs from '@/routes/needs';
 import organizationalUnits from '@/routes/organizational-units';
+import permissions from '@/routes/permissions';
 import planningVersions from '@/routes/planning-versions';
 import renstras from '@/routes/renstras';
+import roles from '@/routes/roles';
 import strategicServicePlans from '@/routes/strategic-service-plans';
 import users from '@/routes/users';
 import type { NavItem } from '@/types';
@@ -44,12 +48,25 @@ const mainNavItems: NavItem[] = [
   },
 ];
 
-const masterNavItems: NavItem[] = [
+const userRole: NavItem[] = [
   {
     title: 'Users',
     href: users.index.url(),
     icon: Users,
   },
+  {
+    title: 'Roles',
+    href: roles.index.url(),
+    icon: ShieldUser,
+  },
+  {
+    title: 'Permissions',
+    href: permissions.index.url(),
+    icon: UserKey,
+  },
+];
+
+const masterNavItems: NavItem[] = [
   {
     title: 'Unit Kerja',
     href: organizationalUnits.index.url(),
@@ -137,6 +154,7 @@ export function AppSidebar() {
         <NavMain items={mainNavItems} title="Main Menu" />
         <NavMain items={dynamicNeedNavItems} title="Usulan Kebutuhan" />
         <NavMain items={masterNavItems} title="Master Data" />
+        <NavMain items={userRole} title="User & Role" />
       </SidebarContent>
 
       <SidebarFooter>

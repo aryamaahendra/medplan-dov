@@ -19,11 +19,17 @@ import type { User } from './columns';
 
 interface UserDialogProps {
   user?: User | null;
+  roles: { id: number; name: string }[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function UserDialog({ user, open, onOpenChange }: UserDialogProps) {
+export function UserDialog({
+  user,
+  roles,
+  open,
+  onOpenChange,
+}: UserDialogProps) {
   const isEditing = !!user;
 
   return (
@@ -120,6 +126,33 @@ export function UserDialog({ user, open, onOpenChange }: UserDialogProps) {
                   placeholder="Repeat password"
                 />
                 <InputError message={errors.password_confirmation} />
+              </div>
+
+              <div className="grid gap-2">
+                <Label>Roles</Label>
+                <div className="mt-2 grid max-h-[150px] grid-cols-2 gap-2 overflow-y-auto rounded-md border p-3">
+                  {roles.map((role) => (
+                    <div key={role.id} className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id={`role-${role.id}`}
+                        name="roles[]"
+                        value={role.id}
+                        defaultChecked={user?.roles?.some(
+                          (r: any) => r.id === role.id,
+                        )}
+                        className="rounded border-gray-300 text-primary shadow-sm focus:ring-primary"
+                      />
+                      <Label
+                        htmlFor={`role-${role.id}`}
+                        className="cursor-pointer text-sm leading-none font-normal"
+                      >
+                        {role.name}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+                <InputError message={errors.roles} />
               </div>
 
               <DialogFooter className="mb-0!">

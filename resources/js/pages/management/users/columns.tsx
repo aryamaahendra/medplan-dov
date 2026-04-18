@@ -11,6 +11,7 @@ export interface User {
   nip?: string;
   email: string;
   created_at: string;
+  roles?: { id: number; name: string }[];
 }
 
 export const getColumns = (
@@ -34,6 +35,30 @@ export const getColumns = (
     header: (props) => <DataTableColumnHeader {...props} title="Email" />,
     meta: {
       cellClassName: 'text-blue-500 font-medium',
+    },
+  },
+  {
+    id: 'roles',
+    header: 'Roles',
+    cell: ({ row }) => {
+      const roles = row.original.roles;
+
+      if (!roles || roles.length === 0) {
+        return <span className="text-xs text-muted-foreground">No roles</span>;
+      }
+
+      return (
+        <div className="flex flex-wrap gap-1">
+          {roles.map((role) => (
+            <span
+              key={role.id}
+              className="rounded bg-primary/10 px-2 py-0.5 text-xs text-primary"
+            >
+              {role.name}
+            </span>
+          ))}
+        </div>
+      );
     },
   },
   {

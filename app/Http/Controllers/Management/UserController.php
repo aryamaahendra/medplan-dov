@@ -10,6 +10,7 @@ use App\Traits\HasDataTable;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -24,21 +25,28 @@ class UserController extends Controller
     public function index(Request $request): Response
     {
         $users = $this->applyDataTable(
-            User::query(),
+            User::with('roles'),
             $request,
             self::SEARCH_COLUMNS,
             self::SORTABLE_COLUMNS,
         );
 
+        $roles = Role::all();
+
         return Inertia::render('management/users/index', [
             'users' => $users,
+            'roles' => $roles,
             'filters' => $this->dataTableFilters($request),
         ]);
     }
 
     public function store(StoreUserRequest $request)
     {
-        User::create($request->validated());
+        $user = User::create($request->validated());
+
+        if ($request->has('roles')) {
+            $user->syncRoles($request->validated('roles'));
+        }
 
         return redirect()->route('users.index')->with('success', 'User created successfully.');
     }
@@ -51,6 +59,10 @@ class UserController extends Controller
         }
 
         $user->update($data);
+
+        if ($request->has('roles')) {
+            $user->syncRoles($request->validated('roles'));
+        }
 
         return redirect()->route('users.index')->with('success', 'User updated successfully.');
     }

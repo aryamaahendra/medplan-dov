@@ -13,6 +13,8 @@ interface NeedsTableToolbarProps {
     urgency?: string | string[];
     impact?: string | string[];
     is_priority?: string | string[];
+    is_approved_by_director?: string | string[];
+    min_checklist_score?: string | string[];
   };
   organizationalUnits: { id: number; name: string; parent_id: number | null }[];
   needTypes: { id: number; name: string }[];
@@ -75,6 +77,13 @@ export function NeedsTableToolbar({
     { label: 'Tidak', value: '0' },
   ];
 
+  const directorReviewOptions = [
+    { label: 'Sudah Direview', value: '1' },
+    { label: 'Belum Direview', value: '0' },
+  ];
+
+  const scoreOptions = [{ label: '≥ 85%', value: '85' }];
+
   const getFilterArray = (value: string | string[] | undefined) => {
     if (!value) {
       return [];
@@ -128,6 +137,22 @@ export function NeedsTableToolbar({
         options={priorityOptions}
         selectedValues={getFilterArray(filters.is_priority)}
         onSelect={(values) => mergeParams({ is_priority: values, page: 1 })}
+      />
+      <DataTableFacetedFilter
+        title="Review Direktur"
+        options={directorReviewOptions}
+        selectedValues={getFilterArray(filters.is_approved_by_director)}
+        onSelect={(values) =>
+          mergeParams({ is_approved_by_director: values, page: 1 })
+        }
+      />
+      <DataTableFacetedFilter
+        title="Skor Checklist"
+        options={scoreOptions}
+        selectedValues={getFilterArray(filters.min_checklist_score)}
+        onSelect={(values) =>
+          mergeParams({ min_checklist_score: values, page: 1 })
+        }
       />
     </>
   );

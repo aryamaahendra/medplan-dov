@@ -160,7 +160,11 @@ export function NeedCard({ need, onEdit, onDelete, onReview }: NeedCardProps) {
             )}
           </InfoItem>
 
-          <InfoItem label="Review Direktur" className="col-span-full border-t">
+          <InfoItem label="Checklist">
+            <Badge variant={'outline'}>{need.checklist_percentage}%</Badge>
+          </InfoItem>
+
+          <InfoItem label="Review Direktur" className="col-span-2">
             <div className="flex items-center gap-2">
               <Badge
                 variant={need.approved_by_director_at ? 'default' : 'secondary'}

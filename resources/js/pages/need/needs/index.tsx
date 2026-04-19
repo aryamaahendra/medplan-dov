@@ -67,6 +67,8 @@ interface NeedsIndexProps {
     urgency?: string | string[];
     impact?: string | string[];
     is_priority?: string | string[];
+    is_approved_by_director?: string | string[];
+    min_checklist_score?: string | string[];
     need_group_id?: string | string[];
   };
 }

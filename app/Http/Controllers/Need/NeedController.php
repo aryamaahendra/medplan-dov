@@ -75,6 +75,20 @@ class NeedController extends Controller
             ->when($request->input('urgency'), fn ($q, $v) => $q->whereIn('urgency', (array) $v))
             ->when($request->input('impact'), fn ($q, $v) => $q->whereIn('impact', (array) $v))
             ->when($request->input('is_priority'), fn ($q, $v) => $q->whereIn('is_priority', (array) $v))
+            ->when($request->input('is_approved_by_director'), function ($q, $v) {
+                $v = (array) $v;
+                if (in_array('1', $v) && ! in_array('0', $v)) {
+                    $q->whereNotNull('approved_by_director_at');
+                } elseif (in_array('0', $v) && ! in_array('1', $v)) {
+                    $q->whereNull('approved_by_director_at');
+                }
+            })
+            ->when($request->input('min_checklist_score'), function ($q, $v) {
+                $v = (array) $v;
+                if (in_array('85', $v)) {
+                    $q->where('checklist_percentage', '>=', 85);
+                }
+            })
             ->where('need_group_id', $groupId);
 
         // Unit-level scoping
@@ -102,6 +116,8 @@ class NeedController extends Controller
                 'urgency' => $request->input('urgency'),
                 'impact' => $request->input('impact'),
                 'is_priority' => $request->input('is_priority'),
+                'is_approved_by_director' => $request->input('is_approved_by_director'),
+                'min_checklist_score' => $request->input('min_checklist_score'),
                 'need_group_id' => $groupId,
             ]),
         ]);

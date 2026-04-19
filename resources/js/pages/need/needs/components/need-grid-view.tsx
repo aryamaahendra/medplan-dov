@@ -1,5 +1,5 @@
 import type { Need } from '../columns';
-import { NeedCard } from './need-card';
+import { NeedGridCard } from './need-grid-card';
 
 interface NeedGridViewProps {
   data: Need[];
@@ -15,9 +15,9 @@ export function NeedGridView({
   onReview,
 }: NeedGridViewProps) {
   return (
-    <div className="grid grid-cols-1 gap-4">
+    <div className="grid grid-cols-3 gap-4">
       {data.map((need) => (
-        <NeedCard
+        <NeedGridCard
           key={need.id}
           need={need}
           onEdit={onEdit}
@@ -26,7 +26,7 @@ export function NeedGridView({
         />
       ))}
       {data.length === 0 && (
-        <div className="rounded-lg border border-dashed p-8 text-center text-muted-foreground">
+        <div className="col-span-3 rounded-lg border border-dashed p-8 text-center text-muted-foreground">
           Tidak ada data yang ditemukan.
         </div>
       )}

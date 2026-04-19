@@ -1,6 +1,7 @@
 import {
   ClipboardList,
   Ellipsis,
+  FileDown,
   LayoutGrid,
   List,
   PencilLine,
@@ -20,6 +21,7 @@ interface NeedsHeaderProps {
   viewMode: 'table' | 'grid' | 'loading';
   setViewMode: (mode: 'table' | 'grid') => void;
   onCreate: () => void;
+  onExport: () => void;
   onEditGroup: () => void;
   onDeleteGroup: () => void;
 }
@@ -29,6 +31,7 @@ export function NeedsHeader({
   viewMode,
   setViewMode,
   onCreate,
+  onExport,
   onEditGroup,
   onDeleteGroup,
 }: NeedsHeaderProps) {
@@ -97,6 +100,11 @@ export function NeedsHeader({
             <span className="sr-only">Grid view</span>
           </Button>
         </ButtonGroup>
+
+        <Button variant="outline" onClick={onExport}>
+          <FileDown />
+          Export Excel
+        </Button>
 
         {hasPermission('create needs') && (
           <Button onClick={onCreate}>

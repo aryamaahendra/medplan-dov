@@ -2,6 +2,7 @@ import { Head, router } from '@inertiajs/react';
 import { useMemo, useState, useSyncExternalStore } from 'react';
 import { toast } from 'sonner';
 
+import needExportActions from '@/actions/App/Http/Controllers/Need/NeedExportController';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -116,6 +117,18 @@ export default function NeedsIndex({
     setReviewingNeedId(need.id);
   };
 
+  const onExport = () => {
+    const params = new URLSearchParams(window.location.search);
+
+    if (!params.has('need_group_id')) {
+      params.set('need_group_id', currentGroup.id.toString());
+    }
+
+    window.location.href = needExportActions.url({
+      query: Object.fromEntries(params) as any,
+    });
+  };
+
   const handleConfirmDelete = () => {
     if (!deletingNeed) {
       return;
@@ -164,6 +177,7 @@ export default function NeedsIndex({
           viewMode={viewMode}
           setViewMode={handleViewModeChange}
           onCreate={onCreate}
+          onExport={onExport}
           onEditGroup={() => setIsGroupDialogOpen(true)}
           onDeleteGroup={() => setIsDeletingGroup(true)}
         />

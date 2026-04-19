@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Need;
 
+use App\Actions\Need\GetFilteredNeedsAction;
 use App\Actions\Need\StoreNeedAction;
 use App\Actions\Need\UpdateNeedAction;
 use App\Http\Controllers\Controller;
@@ -39,7 +40,7 @@ class NeedController extends Controller
     /** Columns sortable by */
     private const array SORTABLE_COLUMNS = ['title', 'year', 'status', 'total_price', 'created_at'];
 
-    public function index(Request $request): Response|RedirectResponse
+    public function index(Request $request, GetFilteredNeedsAction $action): Response|RedirectResponse
     {
         $this->authorize('viewAny', Need::class);
         $groupId = $request->input('need_group_id');
@@ -53,48 +54,20 @@ class NeedController extends Controller
 
         $currentGroup = $groupId ? NeedGroup::find($groupId) : null;
 
-        $query = Need::query()
-            ->with([
-                'needGroup:id,name',
-                'organizationalUnit:id,name,parent_id',
-                'organizationalUnit.parentsRecursive',
-                'needType:id,name',
-                'sasarans:id,tujuan_id,name',
-                'sasarans.tujuan:id,name',
-                'indicators:id,sasaran_id,name,baseline',
-                'indicators.sasaran:id,name',
-                'indicators.targets:id,indicator_id,year,target',
-                'kpiIndicators:id,name,unit',
-                'strategicServicePlans:id,strategic_program,service_plan',
-            ])
-            ->withCount(['sasarans', 'indicators', 'kpiIndicators', 'strategicServicePlans'])
-            ->when($request->input('year'), fn ($q, $v) => $q->whereIn('year', (array) $v))
-            ->when($request->input('status'), fn ($q, $v) => $q->whereIn('status', (array) $v))
-            ->when($request->input('need_type_id'), fn ($q, $v) => $q->whereIn('need_type_id', (array) $v))
-            ->when($request->input('organizational_unit_id'), fn ($q, $v) => $q->whereIn('organizational_unit_id', (array) $v))
-            ->when($request->input('urgency'), fn ($q, $v) => $q->whereIn('urgency', (array) $v))
-            ->when($request->input('impact'), fn ($q, $v) => $q->whereIn('impact', (array) $v))
-            ->when($request->input('is_priority'), fn ($q, $v) => $q->whereIn('is_priority', (array) $v))
-            ->when($request->input('is_approved_by_director'), function ($q, $v) {
-                $v = (array) $v;
-                if (in_array('1', $v) && ! in_array('0', $v)) {
-                    $q->whereNotNull('approved_by_director_at');
-                } elseif (in_array('0', $v) && ! in_array('1', $v)) {
-                    $q->whereNull('approved_by_director_at');
-                }
-            })
-            ->when($request->input('min_checklist_score'), function ($q, $v) {
-                $v = (array) $v;
-                if (in_array('85', $v)) {
-                    $q->where('checklist_percentage', '>=', 85);
-                }
-            })
-            ->where('need_group_id', $groupId);
+        $filters = [
+            'year' => $request->input('year'),
+            'status' => $request->input('status'),
+            'need_type_id' => $request->input('need_type_id'),
+            'organizational_unit_id' => $request->input('organizational_unit_id'),
+            'urgency' => $request->input('urgency'),
+            'impact' => $request->input('impact'),
+            'is_priority' => $request->input('is_priority'),
+            'is_approved_by_director' => $request->input('is_approved_by_director'),
+            'min_checklist_score' => $request->input('min_checklist_score'),
+            'need_group_id' => $groupId,
+        ];
 
-        // Unit-level scoping
-        if (! $request->user()->hasAnyRole(['super-admin', 'admin', 'planner'])) {
-            $query->where('organizational_unit_id', $request->user()->organizational_unit_id);
-        }
+        $query = $action->execute($filters, $request->user());
 
         $needs = $this->applyDataTable(
             $query->orderBy('created_at', 'desc'),
@@ -108,18 +81,7 @@ class NeedController extends Controller
             'currentGroup' => $currentGroup,
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name', 'parent_id'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
-            'filters' => array_merge($this->dataTableFilters($request), [
-                'year' => $request->input('year'),
-                'status' => $request->input('status'),
-                'need_type_id' => $request->input('need_type_id'),
-                'organizational_unit_id' => $request->input('organizational_unit_id'),
-                'urgency' => $request->input('urgency'),
-                'impact' => $request->input('impact'),
-                'is_priority' => $request->input('is_priority'),
-                'is_approved_by_director' => $request->input('is_approved_by_director'),
-                'min_checklist_score' => $request->input('min_checklist_score'),
-                'need_group_id' => $groupId,
-            ]),
+            'filters' => array_merge($this->dataTableFilters($request), $filters),
         ]);
     }
 

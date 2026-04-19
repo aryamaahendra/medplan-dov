@@ -12,6 +12,7 @@ use App\Http\Controllers\Need\ExportNeedPdfController;
 use App\Http\Controllers\Need\NeedAttachmentController;
 use App\Http\Controllers\Need\NeedChecklistAnswerController;
 use App\Http\Controllers\Need\NeedController;
+use App\Http\Controllers\Need\NeedExportController;
 use App\Http\Controllers\Need\NeedGroupChecklistController;
 use App\Http\Controllers\Need\NeedGroupController;
 use App\Http\Controllers\Need\NeedTypeController;
@@ -44,6 +45,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('need-groups/{need_group}/checklists/{checklist_question}', [NeedGroupChecklistController::class, 'destroy'])->name('need-groups.checklists.destroy');
     Route::post('need-groups/{need_group}/checklists/reorder', [NeedGroupChecklistController::class, 'reorder'])->name('need-groups.checklists.reorder');
     Route::patch('needs/{need}/director-review', [NeedController::class, 'updateDirectorReview'])->name('needs.director-review');
+    Route::get('needs/export', NeedExportController::class)->name('needs.export');
     Route::get('needs/{need}/export-pdf', ExportNeedPdfController::class)->name('needs.export-pdf');
 
     Route::resource('needs', NeedController::class);

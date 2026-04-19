@@ -1,6 +1,7 @@
 import { Head } from '@inertiajs/react';
 import needRoutes from '@/routes/needs';
-import type { PlanningActivityVersion, Tujuan } from './columns';
+import type { PlanningActivityVersion, Tujuan } from '@/types';
+
 import { NeedForm } from './components/need-form';
 
 interface CreateProps {

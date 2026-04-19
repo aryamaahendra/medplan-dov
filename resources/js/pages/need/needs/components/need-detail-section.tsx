@@ -5,7 +5,7 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Editor } from '@/components/ui/editor';
 import { Label } from '@/components/ui/label';
-import type { Attachment } from '../columns';
+import type { Attachment } from '@/types';
 import { AttachmentCard } from './attachment-card';
 import { NewAttachmentItem } from './new-attachment-item';
 

@@ -1,4 +1,4 @@
-import type { Need } from '../columns';
+import type { Need } from '@/types';
 import { NeedGeneralInfo } from './need-general-info';
 
 interface NeedGeneralTabProps {

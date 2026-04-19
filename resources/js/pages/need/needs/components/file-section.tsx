@@ -12,7 +12,7 @@ import { ActionDropdown } from '@/components/action-dropdown';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import type { Attachment } from '../columns';
+import type { Attachment } from '@/types';
 
 interface FileSectionProps {
   files: File[];

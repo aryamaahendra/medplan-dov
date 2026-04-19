@@ -4,7 +4,6 @@ import {
   FileText,
   Paperclip,
   PencilLine,
-  Send,
   Signature,
   Trash2,
   XCircle,
@@ -16,192 +15,11 @@ import { DataTableColumnHeader } from '@/components/data-table/data-table-column
 import { getIndexColumn } from '@/components/data-table/data-table-index-column';
 import { PriorityBadge } from '@/components/priority-badge';
 import { Badge } from '@/components/ui/badge';
+import { STATUS_ICONS, STATUS_LABELS, STATUS_VARIANTS } from '@/constants/need';
+import { formatIDR } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
-import type {
-  KpiIndicator,
-  StrategicServicePlan as BaseStrategicServicePlan,
-} from '@/types';
-
-export type { KpiIndicator, BaseStrategicServicePlan };
-
-export interface Attachment {
-  id: number;
-  need_id: number;
-  category: string;
-  display_name: string;
-  file_path: string;
-  file_size: number;
-  mime_type: string;
-  extension: string;
-  created_at: string;
-}
-
-export interface Sasaran {
-  id: number;
-  name: string;
-  tujuan_id: number;
-  tujuan?: { id: number; name: string };
-  indicators?: Indicator[];
-}
-
-export interface Indicator {
-  id: number;
-  name: string;
-  baseline: string | null;
-  sasaran_id: number;
-  sasaran?: { id: number; name: string };
-  targets?: { id: number; year: number; target: string }[];
-}
-
-export interface Tujuan {
-  id: number;
-  name: string;
-  renstra?: { id: number; year_start: number; year_end: number };
-  sasarans: Sasaran[];
-}
-
-export interface PlanningActivityIndicator {
-  id: number;
-  planning_activity_version_id: number;
-  name: string;
-  baseline: string | null;
-  unit: string | null;
-}
-
-export interface PlanningActivityVersion {
-  id: number;
-  planning_version_id: number;
-  parent_id: number | null;
-  code: string | null;
-  type: string;
-  name: string;
-  full_code: string | null;
-  indicators?: PlanningActivityIndicator[];
-  children?: PlanningActivityVersion[];
-}
-
-export interface OrganizationalUnit {
-  id: number;
-  name: string;
-  parent_id: number | null;
-  parents_recursive?: OrganizationalUnit | null;
-}
-
-export type StrategicServicePlan = BaseStrategicServicePlan;
-
-export interface NeedDetail {
-  id?: number;
-  need_id?: number;
-  background: string | null;
-  purpose_and_objectives: string | null;
-  target_objective: string | null;
-  procurement_organization_name: string | null;
-  funding_source_and_estimated_cost: string | null;
-  implementation_period: string | null;
-  expert_or_skilled_personnel: string | null;
-  technical_specifications: string | null;
-  training: string | null;
-}
-
-export interface Need {
-  id: number;
-  need_group_id: number;
-  needGroup?: {
-    id: number;
-    name: string;
-  };
-  organizational_unit_id: number;
-  need_type_id: number;
-  year: number;
-  title: string;
-  description: string | null;
-  current_condition: string | null;
-  required_condition: string | null;
-  volume: string;
-  unit: string;
-  unit_price: string;
-  total_price: string;
-  urgency: 'high' | 'medium' | 'low';
-  impact: 'high' | 'medium' | 'low';
-  is_priority: boolean;
-  status: 'draft' | 'submitted' | 'approved' | 'rejected';
-  created_at: string;
-  organizational_unit?: {
-    id: number;
-    name: string;
-    parent_id: number | null;
-    parents_recursive?: OrganizationalUnit | null;
-  };
-  need_type?: { id: number; name: string };
-  sasarans?: Sasaran[];
-  indicators?: Indicator[];
-  kpi_indicators?: KpiIndicator[];
-  strategic_service_plans?: StrategicServicePlan[];
-  sasarans_count?: number;
-  indicators_count?: number;
-  kpi_indicators_count?: number;
-  strategic_service_plans_count?: number;
-  detail?: NeedDetail | null;
-  checklist_percentage?: number | string;
-  attachments?: Attachment[];
-  notes?: string | null;
-  approved_by_director_at?: string | null;
-  planning_activity_versions?: PlanningActivityVersion[];
-  planning_activity_indicators?: PlanningActivityIndicator[];
-}
-
-export const STATUS_LABELS: Record<Need['status'], string> = {
-  draft: 'Draft',
-  submitted: 'Diajukan',
-  approved: 'Disetujui',
-  rejected: 'Ditolak',
-};
-
-export const STATUS_VARIANTS: Record<
-  Need['status'],
-  'secondary' | 'default' | 'destructive' | 'outline'
-> = {
-  draft: 'secondary',
-  submitted: 'outline',
-  approved: 'default',
-  rejected: 'destructive',
-};
-
-export const STATUS_ICONS: Record<Need['status'], React.ElementType> = {
-  draft: FileText,
-  submitted: Send,
-  approved: CheckCircle2,
-  rejected: XCircle,
-};
-
-export const PRIORITY_LABELS: Record<string, string> = {
-  high: 'Tinggi',
-  medium: 'Sedang',
-  low: 'Rendah',
-  High: 'Tinggi',
-  Medium: 'Sedang',
-  Low: 'Rendah',
-};
-
-export const PRIORITY_VARIANTS: Record<
-  string,
-  'destructive' | 'default' | 'outline' | 'secondary'
-> = {
-  high: 'destructive',
-  medium: 'default',
-  low: 'outline',
-  High: 'destructive',
-  Medium: 'default',
-  Low: 'outline',
-};
-
-export const formatCurrency = (value: string | number) =>
-  new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    maximumFractionDigits: 0,
-  }).format(Number(value));
+import type { Need } from '@/types';
 
 export const getColumns = (
   onEdit: (need: Need) => void,
@@ -275,7 +93,7 @@ export const getColumns = (
   {
     accessorKey: 'total_price',
     header: (props) => <DataTableColumnHeader {...props} title="Total Harga" />,
-    cell: ({ row }) => formatCurrency(row.original.total_price),
+    cell: ({ row }) => formatIDR(row.original.total_price),
     meta: { cellClassName: 'tabular-nums font-mono' },
   },
   {

@@ -1,6 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
 
-import type { Sasaran, Tujuan } from '../columns';
+import type { Sasaran, Tujuan } from '@/types';
 import { TujuanAlignmentCard } from './tujuan-alignment-card';
 
 interface StrategicAlignmentSectionProps {

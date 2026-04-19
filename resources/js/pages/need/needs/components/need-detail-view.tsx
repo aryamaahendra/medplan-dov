@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { EditorRenderer } from '@/components/ui/editor-renderer';
 import { Label } from '@/components/ui/label';
 
-import type { Attachment, NeedDetail } from '../columns';
+import type { Attachment, NeedDetail } from '@/types';
 
 import { AttachmentList } from './attachment-list';
 import { ExportPdfDialog } from './export-pdf-dialog';

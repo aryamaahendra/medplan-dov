@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
 
-import type { Need } from '../columns';
+import type { Need } from '@/types';
 
 const STATUS_OPTIONS = [
   {

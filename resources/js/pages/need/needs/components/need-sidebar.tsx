@@ -4,7 +4,8 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import needRoutes from '@/routes/needs';
-import type { Need } from '../columns';
+import type { Need } from '@/types';
+
 import { NeedDirectorReviewDialog } from './need-director-review-dialog';
 import { NeedStatusOverview } from './need-status-overview';
 

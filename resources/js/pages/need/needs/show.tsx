@@ -5,7 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import needRoutes from '@/routes/needs';
 import type { ChecklistQuestion, ChecklistAnswer } from '@/types';
 
-import type { Need, Sasaran, Tujuan } from './columns';
+import type { Need, Sasaran, Tujuan } from '@/types';
+
 import { IkkAlignmentShow } from './components/ikk-alignment-show';
 import { NeedAttachmentsTab } from './components/need-attachments-tab';
 import { NeedDetailTab } from './components/need-detail-tab';

@@ -1,6 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { Need } from '../columns';
+import type { Need } from '@/types';
 
 interface PlanningAlignmentShowProps {
   need: Need;

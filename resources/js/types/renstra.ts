@@ -25,6 +25,7 @@ export type Sasaran = {
   name: string;
   description: string | null;
   indicators?: Indicator[];
+  tujuan?: Tujuan;
   created_at: string;
   updated_at: string;
 };
@@ -36,6 +37,7 @@ export type Tujuan = {
   description: string | null;
   sasarans?: Sasaran[];
   indicators?: Indicator[];
+  renstra?: Renstra;
   created_at: string;
   updated_at: string;
 };

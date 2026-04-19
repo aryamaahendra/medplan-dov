@@ -14,17 +14,19 @@ import { ActionDropdown } from '@/components/action-dropdown';
 import { PriorityBadge } from '@/components/priority-badge';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { usePermission } from '@/hooks/use-permission';
-import { cn } from '@/lib/utils';
-import needRoutes from '@/routes/needs';
-
 import {
-  formatCurrency,
+  LABELED_PRIORITY_CLASSES,
+  LABELED_PRIORITY_LABELS,
   STATUS_ICONS,
   STATUS_LABELS,
   STATUS_VARIANTS,
-} from '../columns';
-import type { Need } from '../columns';
+} from '@/constants/need';
+import { usePermission } from '@/hooks/use-permission';
+import { formatIDR } from '@/lib/formatters';
+import { cn } from '@/lib/utils';
+import needRoutes from '@/routes/needs';
+
+import type { Need } from '@/types';
 
 interface NeedGridCardProps {
   need: Need;
@@ -91,12 +93,12 @@ export function NeedGridCard({
   if (need.organizational_unit) {
     const traverse = (unit: typeof need.organizational_unit) => {
       if (!unit) {
-return;
-}
+        return;
+      }
 
       if (unit.parents_recursive) {
-traverse(unit.parents_recursive);
-}
+        traverse(unit.parents_recursive);
+      }
 
       unitPath.push(unit.name);
     };
@@ -142,11 +144,11 @@ traverse(unit.parents_recursive);
             <div className="flex items-baseline justify-between gap-1">
               <span className="text-[11px] text-muted-foreground tabular-nums">
                 {Number(need.volume).toLocaleString('id-ID')} {need.unit} ×{' '}
-                {formatCurrency(need.unit_price)}
+                {formatIDR(need.unit_price)}
               </span>
             </div>
             <div className="mt-0.5 font-mono text-lg font-semibold tabular-nums">
-              {formatCurrency(need.total_price)}
+              {formatIDR(need.total_price)}
             </div>
           </div>
 
@@ -223,19 +225,6 @@ traverse(unit.parents_recursive);
     </Card>
   );
 }
-
-const LABELED_PRIORITY_LABELS: Record<string, string> = {
-  high: 'Tinggi',
-  medium: 'Sedang',
-  low: 'Rendah',
-};
-
-const LABELED_PRIORITY_CLASSES: Record<string, string> = {
-  high: 'bg-orange-50 text-orange-700 border-orange-200/50 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20',
-  medium:
-    'bg-blue-50 text-blue-700 border-blue-200/50 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
-  low: 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
-};
 
 function LabeledPriorityBadge({
   prefix,

@@ -3,7 +3,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import type { Sasaran, Tujuan } from '../columns';
+import type { Sasaran, Tujuan } from '@/types';
 
 interface RenstraAlignmentSectionProps {
   data: any;

@@ -1,4 +1,4 @@
-import type { Need } from '../columns';
+import type { Need } from '@/types';
 import { NeedDetailView } from './need-detail-view';
 
 interface NeedDetailTabProps {

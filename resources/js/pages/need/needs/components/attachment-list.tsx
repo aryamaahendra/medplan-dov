@@ -13,7 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import type { Attachment } from '../columns';
+import type { Attachment } from '@/types';
 import { AttachmentGrid } from './attachment-grid';
 import { AttachmentTable } from './attachment-table';
 

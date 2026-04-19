@@ -17,7 +17,7 @@ import {
 import { Editor } from '@/components/ui/editor';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import type { Need } from '../columns';
+import type { Need } from '@/types';
 
 interface NeedDirectorReviewDialogProps {
   need: Need;

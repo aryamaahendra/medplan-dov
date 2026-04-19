@@ -9,7 +9,7 @@ import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAt
 import { ActionDropdown } from '@/components/action-dropdown';
 import type { ActionItem } from '@/components/action-dropdown';
 import { cn } from '@/lib/utils';
-import type { Attachment } from '../columns';
+import type { Attachment } from '@/types';
 
 interface AttachmentCardProps {
   attachment: Attachment;

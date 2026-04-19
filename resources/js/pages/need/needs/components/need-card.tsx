@@ -22,17 +22,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { STATUS_ICONS, STATUS_LABELS, STATUS_VARIANTS } from '@/constants/need';
 import { usePermission } from '@/hooks/use-permission';
+import { formatIDR } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
 
-import {
-  formatCurrency,
-  STATUS_ICONS,
-  STATUS_LABELS,
-  STATUS_VARIANTS,
-} from '../columns';
-import type { Need } from '../columns';
+import type { Need } from '@/types';
 
 interface NeedCardProps {
   need: Need;
@@ -126,7 +122,7 @@ export function NeedCard({ need, onEdit, onDelete, onReview }: NeedCardProps) {
 
           <InfoItem label="Total Harga">
             <span className="font-mono font-semibold">
-              {formatCurrency(need.total_price)}
+              {formatIDR(need.total_price)}
             </span>
           </InfoItem>
 

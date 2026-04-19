@@ -1,6 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
 
-import type { Need } from '../columns';
+import type { Need } from '@/types';
 
 interface RlsAlignmentShowProps {
   need: Need;

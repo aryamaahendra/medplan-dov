@@ -11,9 +11,10 @@ import { usePermission } from '@/hooks/use-permission';
 import needGroupRoutes from '@/routes/need-groups';
 import needRoutes from '@/routes/needs';
 
+import type { Need, PaginatedNeeds } from '@/types';
 import { NeedGroupDialog } from '../groups/need-group-dialog';
 import { getColumns } from './columns';
-import type { Need } from './columns';
+
 import { NeedDirectorReviewDialog } from './components/need-director-review-dialog';
 import { NeedGridView } from './components/need-grid-view';
 import { NeedsHeader } from './components/needs-header';
@@ -43,16 +44,6 @@ const viewModeStore = {
     window.dispatchEvent(new Event('view-mode-change'));
   },
 };
-
-interface PaginatedNeeds {
-  data: Need[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-  from: number | null;
-  to: number | null;
-}
 
 interface NeedsIndexProps {
   needs: PaginatedNeeds;

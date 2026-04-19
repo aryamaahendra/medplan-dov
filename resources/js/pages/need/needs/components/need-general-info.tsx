@@ -1,9 +1,9 @@
 import React, { Fragment } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { formatIDR } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
-import { formatCurrency } from '../columns';
-import type { Need } from '../columns';
+import type { Need } from '@/types';
 
 interface InfoRowProps {
   label: string;
@@ -124,9 +124,7 @@ export function NeedGeneralInfo({ need }: NeedGeneralInfoProps) {
         </InfoRow>
 
         <InfoRow label="Harga Satuan">
-          <p className="text-sm font-medium">
-            {formatCurrency(need.unit_price)}
-          </p>
+          <p className="text-sm font-medium">{formatIDR(need.unit_price)}</p>
         </InfoRow>
 
         <InfoRow
@@ -135,7 +133,7 @@ export function NeedGeneralInfo({ need }: NeedGeneralInfoProps) {
           labelClassName="text-primary/70 font-bold"
         >
           <p className="font-mono text-lg font-bold text-primary">
-            {formatCurrency(need.total_price)}
+            {formatIDR(need.total_price)}
           </p>
         </InfoRow>
       </CardContent>

@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-import type { Need } from '../columns';
+import type { Need } from '@/types';
 import { AttachmentList } from './attachment-list';
 
 interface NeedAttachmentsTabProps {

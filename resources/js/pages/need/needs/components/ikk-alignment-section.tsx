@@ -3,7 +3,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import type { KpiIndicator } from '../columns';
+import type { KpiIndicator } from '@/types';
 
 interface IkkAlignmentSectionProps {
   data: any;

@@ -4,6 +4,7 @@ export type * from './ui';
 export type * from './renstra';
 export type * from './kpi';
 export type * from './strategic-service-plan';
+export type * from './need';
 import './table';
 
 export interface ChecklistQuestion {

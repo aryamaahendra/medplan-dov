@@ -12,7 +12,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-import type { Attachment } from '../columns';
+import type { Attachment } from '@/types';
 
 export interface AttachmentLayoutProps {
   attachments: Attachment[];

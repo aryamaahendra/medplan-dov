@@ -15,7 +15,8 @@ import type {
   PlanningActivityVersion,
   StrategicServicePlan,
   Tujuan,
-} from '../columns';
+} from '@/types';
+
 import { FileSection } from './file-section';
 import { GeneralInfoSection } from './general-info-section';
 import { IkkAlignmentSection } from './ikk-alignment-section';

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
-import type { Indicator, Sasaran, Tujuan as BaseTujuan } from '../columns';
+import type { Indicator, Sasaran, Tujuan as BaseTujuan } from '@/types';
 
 interface TujuanAlignmentCardProps {
   tujuan: BaseTujuan;

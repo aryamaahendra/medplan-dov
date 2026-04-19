@@ -3,8 +3,8 @@ import { PriorityBadge } from '@/components/priority-badge';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 
-import { STATUS_ICONS, STATUS_LABELS, STATUS_VARIANTS } from '../columns';
-import type { Need } from '../columns';
+import { STATUS_ICONS, STATUS_LABELS, STATUS_VARIANTS } from '@/constants/need';
+import type { Need } from '@/types';
 
 interface NeedStatusOverviewProps {
   need: Need;

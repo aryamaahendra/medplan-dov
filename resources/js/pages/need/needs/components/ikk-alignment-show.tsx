@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { KpiIndicator } from '@/types';
-import type { Need } from '../columns';
+import type { Need } from '@/types';
 
 interface IkkAlignmentShowProps {
   need: Need;

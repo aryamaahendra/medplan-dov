@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
 
 import needRoutes from '@/routes/needs';
-import type { Attachment, Need } from './columns';
+import type { Attachment, Need } from '@/types';
 import { AttachmentList } from './components/attachment-list';
 import { AttachmentUploadForm } from './components/attachment-upload-form';
 import { NeedHeader } from './components/need-header';

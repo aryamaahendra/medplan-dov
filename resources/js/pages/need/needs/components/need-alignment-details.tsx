@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-import type { Need, Sasaran, Tujuan } from '../columns';
+import type { Need, Sasaran, Tujuan } from '@/types';
 import { TujuanAlignmentCard } from './tujuan-alignment-card';
 
 interface NeedAlignmentDetailsProps {

@@ -2,9 +2,9 @@ import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { formatIDR } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
-import type { PlanningActivityVersion } from '../columns';
-import { formatCurrency } from '../columns';
+import type { PlanningActivityVersion } from '@/types';
 
 interface PlanningAlignmentSectionProps {
   data: any;
@@ -197,7 +197,7 @@ function ActivityGroup({
                     Pagu:
                   </span>
                   <span className="font-medium text-foreground">
-                    {formatCurrency(targetForYear.budget)}
+                    {formatIDR(targetForYear.budget)}
                   </span>
                 </span>
               )}

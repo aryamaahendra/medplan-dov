@@ -1,4 +1,4 @@
-import type { Need } from '../columns';
+import type { Need } from '@/types';
 
 interface NeedHeaderProps {
   need: Need;

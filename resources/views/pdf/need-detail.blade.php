@@ -98,10 +98,92 @@
       text-transform: uppercase;
       margin-top: 5px;
     }
+
+    /* Cover Page Styles */
+    .cover-page {
+      width: 100%;
+      height: 90vh;
+      display: table;
+      text-align: center;
+    }
+
+    .cover-content {
+      display: table-cell;
+      vertical-align: middle;
+      width: 100%;
+      text-align: center;
+      padding-top: 100px;
+    }
+
+    .cover-page img {
+      width: 140px;
+      margin: 40px auto;
+      display: block;
+    }
+
+    .cover-page h1 {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    .cover-info {
+      margin-top: 40px;
+      width: 100%;
+    }
+
+    .cover-info table {
+      width: auto;
+      margin: 0 auto;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .cover-info td {
+      padding: 5px 10px;
+      font-size: 16px;
+      vertical-align: top;
+    }
+
+    .page-break {
+      page-break-after: always;
+    }
   </style>
 </head>
 
 <body>
+  <div class="cover-page">
+    <div class="cover-content">
+      <h1>SPESIFIKASI TEKNIS</h1>
+      <h1 class="need-title">PENGADAAN {{ $need->title }}</h1>
+
+      <img src="{{ public_path('logo_kabelota.png') }}" alt="Logo">
+
+      <div class="cover-info">
+        <table>
+          <tr>
+            <td style="width: 180px;">SATKER/SKPD</td>
+            <td style="width: 20px;">:</td>
+            <td style="">RSUD Kabelota Donggala</td>
+          </tr>
+          <tr>
+            <td style="">Nama KPA</td>
+            <td>:</td>
+            <td>{{ $signer?->name ?? 'ARDIAN WIJAYA, S.T., M.T.' }}</td>
+          </tr>
+          <tr>
+            <td style="">Nama Pekerjaan</td>
+            <td>:</td>
+            <td>Pengadaan {{ $need->title }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
   <div class="header">
     <h1>SPESIFIKASI TEKNIS PENGADAAN BARANG</h1>
   </div>

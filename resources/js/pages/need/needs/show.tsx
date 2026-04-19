@@ -76,7 +76,7 @@ export default function NeedShow({
                 <TabsTrigger value="strategic">Renstra</TabsTrigger>
                 <TabsTrigger value="ikk">IKK</TabsTrigger>
                 <TabsTrigger value="rls">RLS</TabsTrigger>
-                <TabsTrigger value="planning">Perencanaan</TabsTrigger>
+                {/* <TabsTrigger value="planning">Perencanaan</TabsTrigger> */}
                 <TabsTrigger value="detail">Detail KAK</TabsTrigger>
                 <TabsTrigger value="lampiran">Lampiran</TabsTrigger>
                 <TabsTrigger value="checklist">Checklist</TabsTrigger>

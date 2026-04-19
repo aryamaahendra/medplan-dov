@@ -187,9 +187,9 @@ export function NeedForm({
               <TabsTrigger value="rls" className="">
                 RLS
               </TabsTrigger>
-              <TabsTrigger value="perencanaan" className="">
+              {/* <TabsTrigger value="perencanaan" className="">
                 Perencanaan
-              </TabsTrigger>
+              </TabsTrigger> */}
               <TabsTrigger value="detail" className="">
                 Detail KAK
               </TabsTrigger>

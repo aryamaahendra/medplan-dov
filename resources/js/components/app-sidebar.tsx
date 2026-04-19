@@ -34,7 +34,6 @@ import needTypes from '@/routes/need-types';
 import needs from '@/routes/needs';
 import organizationalUnits from '@/routes/organizational-units';
 import permissions from '@/routes/permissions';
-import planningVersions from '@/routes/planning-versions';
 import renstras from '@/routes/renstras';
 import roles from '@/routes/roles';
 import strategicServicePlans from '@/routes/strategic-service-plans';
@@ -98,11 +97,11 @@ const masterNavItems: NavItem[] = [
     href: checklistQuestions.index.url(),
     icon: ClipboardList,
   },
-  {
-    title: 'Versi Perencanaan',
-    href: planningVersions.index.url(),
-    icon: ClipboardList,
-  },
+  // {
+  //   title: 'Versi Perencanaan',
+  //   href: planningVersions.index.url(),
+  //   icon: ClipboardList,
+  // },
 ];
 
 // const footerNavItems: NavItem[] = [

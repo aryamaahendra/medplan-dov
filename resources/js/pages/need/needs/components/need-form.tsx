@@ -58,6 +58,13 @@ export function NeedForm({
   const isRestricted =
     !hasRole('super-admin') && !hasRole('admin') && !hasRole('planner');
 
+  const filteredOrganizationalUnits =
+    isRestricted && user?.organizational_unit_id
+      ? organizationalUnits.filter(
+          (unit) => unit.id === user.organizational_unit_id,
+        )
+      : organizationalUnits;
+
   const { data, setData, post, processing, errors, transform } = useForm({
     need_group_id:
       need?.need_group_id?.toString() ?? currentGroup?.id?.toString() ?? '',
@@ -206,11 +213,10 @@ export function NeedForm({
                 data={data}
                 setData={setData}
                 errors={errors}
-                organizationalUnits={organizationalUnits}
+                organizationalUnits={filteredOrganizationalUnits}
                 needTypes={needTypes}
                 handleVolumeChange={handleVolumeChange}
                 handleUnitPriceChange={handleUnitPriceChange}
-                isRestricted={isRestricted}
               />
             </TabsContent>
 

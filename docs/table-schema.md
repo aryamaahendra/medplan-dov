@@ -37,6 +37,12 @@ This document provides a comprehensive overview of the database tables and their
     - [checklist_questions](#checklist_questions)
     - [need_group_checklist_question](#need_group_checklist_question)
     - [need_checklist_answers](#need_checklist_answers)
+- [Permission Management Tables](#permission-management-tables)
+    - [permissions](#permissions)
+    - [roles](#roles)
+    - [model_has_permissions](#model_has_permissions)
+    - [model_has_roles](#model_has_roles)
+    - [role_has_permissions](#role_has_permissions)
 - [System Tables](#system-tables)
     - [users](#users)
     - [password_reset_tokens](#password_reset_tokens)
@@ -147,6 +153,7 @@ Stores file attachments related to a need.
 | :--- | :--- | :---: | :--- |
 | id | bigint | No | Primary Key |
 | need_id | bigint | No | Foreign Key (needs), cascadeOnDelete |
+| category | string | No | Default: 'general' |
 | display_name | string | No | |
 | file_path | string | No | |
 | file_size | unsignedBigInteger | No | |
@@ -353,6 +360,7 @@ Pivot table connecting KPI indicators and needs.
 | planning_version_id | bigint | No | Foreign Key (planning_versions), cascadeOnDelete |
 | parent_id | bigint | Yes | Foreign Key (self), nullOnDelete |
 | code | string | Yes | Index |
+| type | string | Yes | |
 | name | text | No | |
 | full_code | string | Yes | |
 | perangkat_daerah | string | Yes | |
@@ -456,6 +464,49 @@ Stores the answers to checklist questions for each individual need.
 
 ---
 
+## Permission Management Tables
+
+### `permissions`
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| name | string | No | |
+| guard_name | string | No | |
+| description | string | Yes | |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+
+### `roles`
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| id | bigint | No | Primary Key |
+| name | string | No | |
+| guard_name | string | No | |
+| created_at | timestamp | Yes | |
+| updated_at | timestamp | Yes | |
+
+### `model_has_permissions`
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| permission_id | bigint | No | Foreign Key (permissions), cascadeOnDelete |
+| model_type | string | No | |
+| model_id | bigint | No | |
+
+### `model_has_roles`
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| role_id | bigint | No | Foreign Key (roles), cascadeOnDelete |
+| model_type | string | No | |
+| model_id | bigint | No | |
+
+### `role_has_permissions`
+| Column | Type | Nullable | Extra |
+| :--- | :--- | :---: | :--- |
+| permission_id | bigint | No | Foreign Key (permissions), cascadeOnDelete |
+| role_id | bigint | No | Foreign Key (roles), cascadeOnDelete |
+
+---
+
 ## System Tables
 
 ### `users`
@@ -465,8 +516,10 @@ Stores the answers to checklist questions for each individual need.
 | id                        | bigint      |    No    | Primary Key |
 | name                      | string      |    No    |             |
 | email                     | string      |    No    | Unique      |
+| nip                       | string      |   Yes    |             |
 | email_verified_at         | timestamp   |   Yes    |             |
 | password                  | string      |    No    |             |
+| organizational_unit_id    | bigint      |   Yes    | Foreign Key (organizational_units), nullOnDelete |
 | two_factor_secret         | text        |   Yes    |             |
 | two_factor_recovery_codes | text        |   Yes    |             |
 | two_factor_confirmed_at   | timestamp   |   Yes    |             |

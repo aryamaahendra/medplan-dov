@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Management\StoreUserRequest;
 use App\Http\Requests\Management\UpdateUserRequest;
+use App\Models\OrganizationalUnit;
 use App\Models\User;
 use App\Traits\HasDataTable;
 use Illuminate\Http\Request;
@@ -39,10 +40,12 @@ class UserController extends Controller
         );
 
         $roles = Role::all();
+        $organizationalUnits = OrganizationalUnit::all();
 
         return Inertia::render('management/users/index', [
             'users' => $users,
             'roles' => $roles,
+            'organizationalUnits' => $organizationalUnits,
             'filters' => $this->dataTableFilters($request),
         ]);
     }

@@ -49,7 +49,6 @@ interface GeneralInfoSectionProps {
   needTypes: { id: number; name: string }[];
   handleVolumeChange: (value: string) => void;
   handleUnitPriceChange: (value: string) => void;
-  isRestricted?: boolean;
 }
 
 export function GeneralInfoSection({
@@ -60,7 +59,6 @@ export function GeneralInfoSection({
   needTypes,
   handleVolumeChange,
   handleUnitPriceChange,
-  isRestricted = false,
 }: GeneralInfoSectionProps) {
   return (
     <div className="space-y-5 py-6">
@@ -73,7 +71,6 @@ export function GeneralInfoSection({
             onValueChange={(v) => setData('organizational_unit_id', v)}
             placeholder="Pilih unit kerja"
             className="bg-muted/20 transition-colors hover:bg-muted/40"
-            disabled={isRestricted}
           />
           <InputError message={errors.organizational_unit_id} />
         </div>

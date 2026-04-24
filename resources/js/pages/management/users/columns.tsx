@@ -12,6 +12,7 @@ export interface User {
   email: string;
   created_at: string;
   roles?: { id: number; name: string }[];
+  organizational_unit_id?: number;
 }
 
 export const getColumns = (

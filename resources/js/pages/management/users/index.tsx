@@ -28,10 +28,16 @@ interface PaginatedUsers {
 interface UsersIndexProps {
   users: PaginatedUsers;
   roles: { id: number; name: string }[];
+  organizationalUnits: { id: number; name: string; parent_id: number | null }[];
   filters: DataTableFilters;
 }
 
-export default function UsersIndex({ users, roles, filters }: UsersIndexProps) {
+export default function UsersIndex({
+  users,
+  roles,
+  organizationalUnits,
+  filters,
+}: UsersIndexProps) {
   const { hasPermission } = usePermission();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -119,6 +125,7 @@ export default function UsersIndex({ users, roles, filters }: UsersIndexProps) {
         onOpenChange={setDialogOpen}
         user={editingUser}
         roles={roles}
+        organizationalUnits={organizationalUnits}
       />
 
       <ConfirmDialog

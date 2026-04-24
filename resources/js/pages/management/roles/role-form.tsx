@@ -139,6 +139,7 @@ export function RoleForm({ role, permissions }: RoleFormProps) {
                             }
                             disabled={processing}
                             size="sm"
+                            className="mr-0"
                           />
                         </div>
                       ))}

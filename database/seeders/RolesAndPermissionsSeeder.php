@@ -42,13 +42,32 @@ class RolesAndPermissionsSeeder extends Seeder
 
             // Needs
             'view any needs' => 'Melihat daftar semua usulan kebutuhan',
-            'view needs' => 'Melihat detail usulan kebutuhan',
-            'create needs' => 'Membuat usulan kebutuhan baru',
+            'view descendant needs' => 'Melihat usulan kebutuhan milik unit sendiri dan unit bawahannya',
+            'view needs' => 'Melihat detail usulan kebutuhan unit sendiri',
+
+            'create any needs' => 'Membuat usulan kebutuhan untuk semua unit',
+            'create descendant needs' => 'Membuat usulan kebutuhan untuk unit sendiri dan unit bawahannya',
+            'create needs' => 'Membuat usulan kebutuhan untuk unit sendiri',
+
             'update any needs' => 'Mengubah semua usulan kebutuhan',
+            'update descendant needs' => 'Mengubah usulan kebutuhan milik unit sendiri dan unit bawahannya',
             'update needs' => 'Mengubah usulan kebutuhan milik unit sendiri',
+
             'delete any needs' => 'Menghapus semua usulan kebutuhan',
+            'delete descendant needs' => 'Menghapus usulan kebutuhan milik unit sendiri dan unit bawahannya',
             'delete needs' => 'Menghapus usulan kebutuhan milik unit sendiri',
-            'approve needs' => 'Menyetujui usulan kebutuhan',
+
+            'approve any needs' => 'Menyetujui semua usulan kebutuhan',
+            'approve descendant needs' => 'Menyetujui usulan kebutuhan milik unit sendiri dan unit bawahannya',
+            'approve needs' => 'Menyetujui usulan kebutuhan milik unit sendiri',
+
+            'restore any needs' => 'Mengembalikan semua usulan kebutuhan yang terhapus',
+            'restore descendant needs' => 'Mengembalikan usulan kebutuhan milik unit sendiri dan bawahannya yang terhapus',
+            'restore needs' => 'Mengembalikan usulan kebutuhan milik unit sendiri yang terhapus',
+
+            'force-delete any needs' => 'Menghapus permanen semua usulan kebutuhan',
+            'force-delete descendant needs' => 'Menghapus permanen usulan kebutuhan milik unit sendiri dan bawahannya',
+            'force-delete needs' => 'Menghapus permanen usulan kebutuhan milik unit sendiri',
 
             // Need Tabs Visibility
             'view need tab general' => 'Melihat tab Informasi Umum pada usulan',
@@ -114,7 +133,7 @@ class RolesAndPermissionsSeeder extends Seeder
         // Unit Head
         $unitHeadRole = Role::firstOrCreate(['name' => UserRole::UnitHead->value, 'guard_name' => 'web']);
         $unitHeadRole->syncPermissions([
-            'view any needs', 'view needs', 'create needs', 'update needs', 'delete needs',
+            'view descendant needs', 'create descendant needs', 'update descendant needs', 'delete descendant needs', 'approve descendant needs',
             'view need tab general', 'view need tab urgency', 'view need tab strategic',
             'view need tab ikk', 'view need tab rls', 'view need tab planning',
             'view need tab detail', 'view need tab lampiran', 'view need tab checklist',
@@ -126,7 +145,7 @@ class RolesAndPermissionsSeeder extends Seeder
         // Staff
         $staffRole = Role::firstOrCreate(['name' => UserRole::Staff->value, 'guard_name' => 'web']);
         $staffRole->syncPermissions([
-            'view any needs', 'view needs', 'create needs', 'update needs',
+            'view needs', 'create needs', 'update needs',
             'view need tab general', 'view need tab urgency', 'view need tab strategic',
             'view need tab ikk', 'view need tab rls', 'view need tab planning',
             'view need tab detail', 'view need tab lampiran', 'view need tab checklist',

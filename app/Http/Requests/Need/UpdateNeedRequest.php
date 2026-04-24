@@ -5,6 +5,7 @@ namespace App\Http\Requests\Need;
 use App\Enums\Impact;
 use App\Enums\Urgency;
 use App\Models\Indicator;
+use App\Models\OrganizationalUnit;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -64,7 +65,30 @@ class UpdateNeedRequest extends FormRequest
     {
         return [
             'need_group_id' => ['sometimes', 'required', 'integer', 'exists:need_groups,id'],
-            'organizational_unit_id' => ['sometimes', 'required', 'integer', 'exists:organizational_units,id'],
+            'organizational_unit_id' => [
+                'sometimes',
+                'required',
+                'integer',
+                'exists:organizational_units,id',
+                function ($attribute, $value, $fail) {
+                    $user = $this->user();
+                    if ($user->hasRole('super-admin') || $user->hasPermissionTo('update any needs')) {
+                        return;
+                    }
+                    if ($user->hasPermissionTo('update descendant needs')) {
+                        if ($value == $user->organizational_unit_id) {
+                            return;
+                        }
+                        $unit = OrganizationalUnit::find($value);
+                        if ($unit && $user->organizational_unit_id && $unit->isDescendantOf($user->organizational_unit_id)) {
+                            return;
+                        }
+                    } elseif ($user->hasPermissionTo('update needs') && $value == $user->organizational_unit_id) {
+                        return;
+                    }
+                    $fail('Anda tidak memiliki izin untuk memindahkan usulan ke unit organisasi ini.');
+                },
+            ],
             'need_type_id' => ['sometimes', 'required', 'integer', 'exists:need_types,id'],
             'year' => ['sometimes', 'required', 'integer', 'min:2000', 'max:2100'],
             'title' => ['sometimes', 'required', 'string', 'max:255'],

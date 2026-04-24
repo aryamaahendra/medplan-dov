@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Need;
+use App\Models\OrganizationalUnit;
 use App\Models\User;
 
 class NeedPolicy
@@ -20,7 +21,9 @@ class NeedPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('view any needs');
+        return $user->hasPermissionTo('view any needs')
+            || $user->hasPermissionTo('view descendant needs')
+            || $user->hasPermissionTo('view needs');
     }
 
     /**
@@ -28,12 +31,7 @@ class NeedPolicy
      */
     public function view(User $user, Need $need): bool
     {
-        if ($user->hasPermissionTo('view any needs')) {
-            return true;
-        }
-
-        return $user->hasPermissionTo('view needs')
-            && $user->organizational_unit_id === $need->organizational_unit_id;
+        return $this->checkTieredPermission($user, $need, 'view');
     }
 
     /**
@@ -41,7 +39,9 @@ class NeedPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create needs');
+        return $user->hasPermissionTo('create any needs')
+            || $user->hasPermissionTo('create descendant needs')
+            || $user->hasPermissionTo('create needs');
     }
 
     /**
@@ -49,12 +49,7 @@ class NeedPolicy
      */
     public function update(User $user, Need $need): bool
     {
-        if ($user->hasPermissionTo('update any needs')) {
-            return true;
-        }
-
-        return $user->hasPermissionTo('update needs')
-            && $user->organizational_unit_id === $need->organizational_unit_id;
+        return $this->checkTieredPermission($user, $need, 'update');
     }
 
     /**
@@ -62,12 +57,7 @@ class NeedPolicy
      */
     public function delete(User $user, Need $need): bool
     {
-        if ($user->hasPermissionTo('delete any needs')) {
-            return true;
-        }
-
-        return $user->hasPermissionTo('delete needs')
-            && $user->organizational_unit_id === $need->organizational_unit_id;
+        return $this->checkTieredPermission($user, $need, 'delete');
     }
 
     /**
@@ -75,7 +65,7 @@ class NeedPolicy
      */
     public function approve(User $user, Need $need): bool
     {
-        return $user->hasPermissionTo('approve needs');
+        return $this->checkTieredPermission($user, $need, 'approve');
     }
 
     /**
@@ -83,7 +73,7 @@ class NeedPolicy
      */
     public function restore(User $user, Need $need): bool
     {
-        return false;
+        return $this->checkTieredPermission($user, $need, 'restore');
     }
 
     /**
@@ -91,6 +81,32 @@ class NeedPolicy
      */
     public function forceDelete(User $user, Need $need): bool
     {
-        return false;
+        return $this->checkTieredPermission($user, $need, 'force-delete');
+    }
+
+    /**
+     * Helper to check tiered permissions.
+     */
+    private function checkTieredPermission(User $user, Need $need, string $action): bool
+    {
+        if ($user->hasPermissionTo("{$action} any needs")) {
+            return true;
+        }
+
+        if ($user->hasPermissionTo("{$action} descendant needs")) {
+            if ($user->organizational_unit_id === $need->organizational_unit_id) {
+                return true;
+            }
+
+            if ($need->organizational_unit_id !== null && $user->organizational_unit_id !== null) {
+                $needUnit = $need->organizationalUnit ?? OrganizationalUnit::find($need->organizational_unit_id);
+                if ($needUnit && $needUnit->isDescendantOf($user->organizational_unit_id)) {
+                    return true;
+                }
+            }
+        }
+
+        return $user->hasPermissionTo("{$action} needs")
+            && $user->organizational_unit_id === $need->organizational_unit_id;
     }
 }

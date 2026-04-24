@@ -3,6 +3,7 @@
 namespace App\Actions\Need;
 
 use App\Models\Need;
+use App\Models\OrganizationalUnit;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -53,10 +54,34 @@ class GetFilteredNeedsAction
             })
             ->when($filters['need_group_id'] ?? null, fn ($q, $v) => $q->where('need_group_id', $v));
 
-        if (! $user->hasAnyRole(['super-admin', 'admin', 'planner'])) {
-            $query->where('organizational_unit_id', $user->organizational_unit_id);
+        if (! $user->hasPermissionTo('view any needs')) {
+            if ($user->hasPermissionTo('view descendant needs') && $user->organizational_unit_id) {
+                $unit = $user->organizationalUnit;
+                if ($unit) {
+                    $unit->load('descendantsRecursive');
+                    $allowedIds = $this->extractUnitIds($unit);
+                    $query->whereIn('organizational_unit_id', $allowedIds);
+                } else {
+                    $query->where('organizational_unit_id', $user->organizational_unit_id);
+                }
+            } else {
+                $query->where('organizational_unit_id', $user->organizational_unit_id);
+            }
         }
 
         return $query;
+    }
+
+    /**
+     * @return array<int>
+     */
+    private function extractUnitIds(OrganizationalUnit $unit): array
+    {
+        $ids = [$unit->id];
+        foreach ($unit->descendantsRecursive as $child) {
+            $ids = array_merge($ids, $this->extractUnitIds($child));
+        }
+
+        return $ids;
     }
 }

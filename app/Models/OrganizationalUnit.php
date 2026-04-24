@@ -39,4 +39,51 @@ class OrganizationalUnit extends Model
     {
         return $this->hasMany(OrganizationalUnit::class, 'parent_id');
     }
+
+    /**
+     * Get all child units recursively.
+     */
+    public function descendantsRecursive(): HasMany
+    {
+        return $this->children()->with('descendantsRecursive');
+    }
+
+    /**
+     * Check if this unit is a descendant of the given unit ID.
+     */
+    public function isDescendantOf(int $parentId): bool
+    {
+        $currentParentId = $this->parent_id;
+
+        while ($currentParentId !== null) {
+            if ($currentParentId === $parentId) {
+                return true;
+            }
+
+            // Fetch the parent's parent_id without loading the whole model if possible,
+            // or just load the parent. Since we might do this multiple times, it's
+            // better if parentsRecursive was already loaded.
+            if ($this->relationLoaded('parentsRecursive')) {
+                // If loaded, we can traverse the loaded relations
+                return $this->isDescendantOfUsingLoadedRelations($parentId, $this->parent);
+            }
+
+            $parent = OrganizationalUnit::find($currentParentId);
+            $currentParentId = $parent ? $parent->parent_id : null;
+        }
+
+        return false;
+    }
+
+    private function isDescendantOfUsingLoadedRelations(int $parentId, ?OrganizationalUnit $parent): bool
+    {
+        while ($parent) {
+            if ($parent->id === $parentId) {
+                return true;
+            }
+            $parent = $parent->parent;
+        }
+
+        return false;
+    }
 }

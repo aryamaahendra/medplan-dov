@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 
 import UserController from '@/actions/App/Http/Controllers/Management/UserController';
 import InputError from '@/components/input-error';
+import PasswordInput from '@/components/password-input';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -14,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+
 
 import type { User } from './columns';
 
@@ -102,9 +104,8 @@ export function UserDialog({
                 <Label htmlFor="password">
                   {isEditing ? 'New Password (optional)' : 'Password'}
                 </Label>
-                <Input
+                <PasswordInput
                   id="password"
-                  type="password"
                   name="password"
                   required={!isEditing}
                   placeholder={
@@ -118,9 +119,8 @@ export function UserDialog({
 
               <div className="grid gap-2">
                 <Label htmlFor="password_confirmation">Confirm Password</Label>
-                <Input
+                <PasswordInput
                   id="password_confirmation"
-                  type="password"
                   name="password_confirmation"
                   required={!isEditing}
                   placeholder="Repeat password"

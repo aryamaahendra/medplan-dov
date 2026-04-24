@@ -2,6 +2,7 @@ import { Head } from '@inertiajs/react';
 import { useMemo } from 'react';
 import { ChecklistForm } from '@/components/needs/checklist-form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { usePermission } from '@/hooks/use-permission';
 import needRoutes from '@/routes/needs';
 import type { ChecklistQuestion, ChecklistAnswer } from '@/types';
 
@@ -30,6 +31,40 @@ export default function NeedShow({
   existingAnswers,
   users,
 }: NeedShowProps) {
+  const { hasPermission } = usePermission();
+
+  const tabs = [
+    {
+      value: 'general',
+      label: 'Informasi Umum',
+      permission: 'view need tab general',
+    },
+    {
+      value: 'strategic',
+      label: 'Renstra',
+      permission: 'view need tab strategic',
+    },
+    { value: 'ikk', label: 'IKK', permission: 'view need tab ikk' },
+    { value: 'rls', label: 'RLS', permission: 'view need tab rls' },
+    {
+      value: 'detail',
+      label: 'Detail KAK',
+      permission: 'view need tab detail',
+    },
+    {
+      value: 'lampiran',
+      label: 'Lampiran',
+      permission: 'view need tab lampiran',
+    },
+    {
+      value: 'checklist',
+      label: 'Checklist',
+      permission: 'view need tab checklist',
+    },
+  ];
+
+  const visibleTabs = tabs.filter((tab) => hasPermission(tab.permission));
+
   const groupedRenstra = useMemo(() => {
     if (!need.sasarans) {
       return [];
@@ -70,46 +105,59 @@ export default function NeedShow({
         <div className="grid grid-cols-1 items-start gap-4 pt-8 lg:grid-cols-3">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            <Tabs defaultValue="general">
+            <Tabs defaultValue={visibleTabs[0]?.value ?? 'general'}>
               <TabsList>
-                <TabsTrigger value="general">Informasi Umum</TabsTrigger>
-                <TabsTrigger value="strategic">Renstra</TabsTrigger>
-                <TabsTrigger value="ikk">IKK</TabsTrigger>
-                <TabsTrigger value="rls">RLS</TabsTrigger>
-                {/* <TabsTrigger value="planning">Perencanaan</TabsTrigger> */}
-                <TabsTrigger value="detail">Detail KAK</TabsTrigger>
-                <TabsTrigger value="lampiran">Lampiran</TabsTrigger>
-                <TabsTrigger value="checklist">Checklist</TabsTrigger>
+                {visibleTabs.map((tab) => (
+                  <TabsTrigger key={tab.value} value={tab.value}>
+                    {tab.label}
+                  </TabsTrigger>
+                ))}
               </TabsList>
-              <TabsContent value="general" className="mt-0">
-                <NeedGeneralTab need={need} />
-              </TabsContent>
-              <TabsContent value="strategic" className="mt-0">
-                <StrategicAlignmentSection groupedRenstra={groupedRenstra} />
-              </TabsContent>
-              <TabsContent value="ikk" className="mt-0">
-                <IkkAlignmentShow need={need} />
-              </TabsContent>
-              <TabsContent value="rls" className="mt-0">
-                <RlsAlignmentShow need={need} />
-              </TabsContent>
-              <TabsContent value="planning" className="mt-0">
-                <PlanningAlignmentShow need={need} />
-              </TabsContent>
-              <TabsContent value="checklist" className="mt-0">
-                <ChecklistForm
-                  key={need.id}
-                  needId={need.id}
-                  questions={checklistQuestions.data}
-                  existingAnswers={existingAnswers.data}
-                />
-              </TabsContent>
-              <TabsContent value="detail" className="mt-0">
-                <NeedDetailTab need={need} users={users} />
-              </TabsContent>
-              <TabsContent value="lampiran" className="mt-0">
-                <NeedAttachmentsTab need={need} />
-              </TabsContent>
+              {hasPermission('view need tab general') && (
+                <TabsContent value="general" className="mt-0">
+                  <NeedGeneralTab need={need} />
+                </TabsContent>
+              )}
+              {hasPermission('view need tab strategic') && (
+                <TabsContent value="strategic" className="mt-0">
+                  <StrategicAlignmentSection groupedRenstra={groupedRenstra} />
+                </TabsContent>
+              )}
+              {hasPermission('view need tab ikk') && (
+                <TabsContent value="ikk" className="mt-0">
+                  <IkkAlignmentShow need={need} />
+                </TabsContent>
+              )}
+              {hasPermission('view need tab rls') && (
+                <TabsContent value="rls" className="mt-0">
+                  <RlsAlignmentShow need={need} />
+                </TabsContent>
+              )}
+              {hasPermission('view need tab planning') && (
+                <TabsContent value="planning" className="mt-0">
+                  <PlanningAlignmentShow need={need} />
+                </TabsContent>
+              )}
+              {hasPermission('view need tab checklist') && (
+                <TabsContent value="checklist" className="mt-0">
+                  <ChecklistForm
+                    key={need.id}
+                    needId={need.id}
+                    questions={checklistQuestions.data}
+                    existingAnswers={existingAnswers.data}
+                  />
+                </TabsContent>
+              )}
+              {hasPermission('view need tab detail') && (
+                <TabsContent value="detail" className="mt-0">
+                  <NeedDetailTab need={need} users={users} />
+                </TabsContent>
+              )}
+              {hasPermission('view need tab lampiran') && (
+                <TabsContent value="lampiran" className="mt-0">
+                  <NeedAttachmentsTab need={need} />
+                </TabsContent>
+              )}
             </Tabs>
           </div>
 

@@ -53,10 +53,42 @@ export function NeedForm({
 
   const { auth } = usePage().props;
   const user = auth.user;
-  const { hasRole } = usePermission();
+  const { hasRole, hasPermission } = usePermission();
 
   const isRestricted =
     !hasRole('super-admin') && !hasRole('admin') && !hasRole('planner');
+
+  const tabs = [
+    {
+      value: 'usulan',
+      label: 'Data Usulan',
+      permission: 'update need tab general',
+    },
+    {
+      value: 'urgency',
+      label: 'Urgensi & Status',
+      permission: 'update need tab urgency',
+    },
+    {
+      value: 'renstra',
+      label: 'Renstra',
+      permission: 'update need tab strategic',
+    },
+    { value: 'ikk', label: 'IKK', permission: 'update need tab ikk' },
+    { value: 'rls', label: 'RLS', permission: 'update need tab rls' },
+    {
+      value: 'detail',
+      label: 'Detail KAK',
+      permission: 'update need tab detail',
+    },
+    {
+      value: 'lampiran',
+      label: 'Lampiran',
+      permission: 'update need tab lampiran',
+    },
+  ];
+
+  const visibleTabs = tabs.filter((tab) => hasPermission(tab.permission));
 
   const filteredOrganizationalUnits =
     isRestricted && user?.organizational_unit_id
@@ -177,164 +209,165 @@ export function NeedForm({
     <Card className={cn('w-full max-w-3xl overflow-hidden', className)}>
       <form onSubmit={handleSubmit}>
         <CardContent className="">
-          <Tabs defaultValue="usulan" className="w-full">
+          <Tabs
+            defaultValue={visibleTabs[0]?.value ?? 'usulan'}
+            className="w-full"
+          >
             <TabsList className="">
-              <TabsTrigger value="usulan" className="">
-                Data Usulan
-              </TabsTrigger>
-              <TabsTrigger value="urgency" className="">
-                Urgensi & Status
-              </TabsTrigger>
-              <TabsTrigger value="renstra" className="">
-                Renstra
-              </TabsTrigger>
-              <TabsTrigger value="ikk" className="">
-                IKK
-              </TabsTrigger>
-              <TabsTrigger value="rls" className="">
-                RLS
-              </TabsTrigger>
-              {/* <TabsTrigger value="perencanaan" className="">
-                Perencanaan
-              </TabsTrigger> */}
-              <TabsTrigger value="detail" className="">
-                Detail KAK
-              </TabsTrigger>
-              <TabsTrigger value="lampiran" className="">
-                Lampiran
-              </TabsTrigger>
+              {visibleTabs.map((tab) => (
+                <TabsTrigger key={tab.value} value={tab.value}>
+                  {tab.label}
+                </TabsTrigger>
+              ))}
             </TabsList>
 
-            <TabsContent
-              value="usulan"
-              className="mt-0 focus-visible:outline-none"
-            >
-              <GeneralInfoSection
-                data={data}
-                setData={setData}
-                errors={errors}
-                organizationalUnits={filteredOrganizationalUnits}
-                needTypes={needTypes}
-                handleVolumeChange={handleVolumeChange}
-                handleUnitPriceChange={handleUnitPriceChange}
-              />
-            </TabsContent>
+            {hasPermission('update need tab general') && (
+              <TabsContent
+                value="usulan"
+                className="mt-0 focus-visible:outline-none"
+              >
+                <GeneralInfoSection
+                  data={data}
+                  setData={setData}
+                  errors={errors}
+                  organizationalUnits={filteredOrganizationalUnits}
+                  needTypes={needTypes}
+                  handleVolumeChange={handleVolumeChange}
+                  handleUnitPriceChange={handleUnitPriceChange}
+                />
+              </TabsContent>
+            )}
 
-            <TabsContent
-              value="urgency"
-              className="mt-0 focus-visible:outline-none"
-            >
-              <PriorityStatusSection
-                data={data}
-                setData={setData}
-                errors={errors}
-              />
-            </TabsContent>
+            {hasPermission('update need tab urgency') && (
+              <TabsContent
+                value="urgency"
+                className="mt-0 focus-visible:outline-none"
+              >
+                <PriorityStatusSection
+                  data={data}
+                  setData={setData}
+                  errors={errors}
+                />
+              </TabsContent>
+            )}
 
-            <TabsContent
-              value="renstra"
-              className="mt-0 focus-visible:outline-none"
-            >
-              <RenstraAlignmentSection
-                data={data}
-                setData={setData}
-                errors={errors}
-                tujuans={tujuans}
-                year={parseInt(data.year)}
-              />
-            </TabsContent>
+            {hasPermission('update need tab strategic') && (
+              <TabsContent
+                value="renstra"
+                className="mt-0 focus-visible:outline-none"
+              >
+                <RenstraAlignmentSection
+                  data={data}
+                  setData={setData}
+                  errors={errors}
+                  tujuans={tujuans}
+                  year={parseInt(data.year)}
+                />
+              </TabsContent>
+            )}
 
-            <TabsContent
-              value="ikk"
-              className="mt-0 focus-visible:outline-none"
-            >
-              <IkkAlignmentSection
-                data={data}
-                setData={setData}
-                errors={errors}
-                kpiGroups={kpiGroups}
-                year={parseInt(data.year)}
-              />
-            </TabsContent>
+            {hasPermission('update need tab ikk') && (
+              <TabsContent
+                value="ikk"
+                className="mt-0 focus-visible:outline-none"
+              >
+                <IkkAlignmentSection
+                  data={data}
+                  setData={setData}
+                  errors={errors}
+                  kpiGroups={kpiGroups}
+                  year={parseInt(data.year)}
+                />
+              </TabsContent>
+            )}
 
-            <TabsContent
-              value="rls"
-              className="mt-0 focus-visible:outline-none"
-            >
-              <RlsAlignmentSection
-                data={data}
-                setData={setData}
-                errors={errors}
-                strategicServicePlans={strategicServicePlans}
-              />
-            </TabsContent>
+            {hasPermission('update need tab rls') && (
+              <TabsContent
+                value="rls"
+                className="mt-0 focus-visible:outline-none"
+              >
+                <RlsAlignmentSection
+                  data={data}
+                  setData={setData}
+                  errors={errors}
+                  strategicServicePlans={strategicServicePlans}
+                />
+              </TabsContent>
+            )}
 
-            <TabsContent
-              value="perencanaan"
-              className="mt-0 focus-visible:outline-none"
-            >
-              <PlanningAlignmentSection
-                data={data}
-                setData={setData}
-                errors={errors}
-                planningActivities={planningActivities}
-                year={parseInt(data.year)}
-              />
-            </TabsContent>
+            {hasPermission('update need tab planning') && (
+              <TabsContent
+                value="perencanaan"
+                className="mt-0 focus-visible:outline-none"
+              >
+                <PlanningAlignmentSection
+                  data={data}
+                  setData={setData}
+                  errors={errors}
+                  planningActivities={planningActivities}
+                  year={parseInt(data.year)}
+                />
+              </TabsContent>
+            )}
 
-            <TabsContent
-              value="detail"
-              className="mt-0 focus-visible:outline-none data-[state=inactive]:hidden"
-              forceMount
-            >
-              <NeedDetailSection
-                initialValues={data.detail}
-                detailValuesRef={detailValuesRef}
-                errors={errors}
-                technicalSpecificationAttachments={
-                  data.technical_specification_attachments
-                }
-                technicalSpecificationAttachmentNames={
-                  data.technical_specification_attachment_names
-                }
-                setTechnicalSpecificationAttachments={(files) =>
-                  setData('technical_specification_attachments', files)
-                }
-                setTechnicalSpecificationAttachmentNames={(names) =>
-                  setData('technical_specification_attachment_names', names)
-                }
-                existingTechnicalSpecificationAttachments={
-                  need?.attachments?.filter(
-                    (a) => a.category === 'technical_specifications',
-                  ) ?? []
-                }
-                deletedAttachmentIds={data.deleted_attachment_ids}
-                setDeletedAttachmentIds={(ids) =>
-                  setData('deleted_attachment_ids', ids)
-                }
-              />
-            </TabsContent>
+            {hasPermission('update need tab detail') && (
+              <TabsContent
+                value="detail"
+                className="mt-0 focus-visible:outline-none data-[state=inactive]:hidden"
+                forceMount
+              >
+                <NeedDetailSection
+                  initialValues={data.detail}
+                  detailValuesRef={detailValuesRef}
+                  errors={errors}
+                  technicalSpecificationAttachments={
+                    data.technical_specification_attachments
+                  }
+                  technicalSpecificationAttachmentNames={
+                    data.technical_specification_attachment_names
+                  }
+                  setTechnicalSpecificationAttachments={(files) =>
+                    setData('technical_specification_attachments', files)
+                  }
+                  setTechnicalSpecificationAttachmentNames={(names) =>
+                    setData('technical_specification_attachment_names', names)
+                  }
+                  existingTechnicalSpecificationAttachments={
+                    need?.attachments?.filter(
+                      (a) => a.category === 'technical_specifications',
+                    ) ?? []
+                  }
+                  deletedAttachmentIds={data.deleted_attachment_ids}
+                  setDeletedAttachmentIds={(ids) =>
+                    setData('deleted_attachment_ids', ids)
+                  }
+                />
+              </TabsContent>
+            )}
 
-            <TabsContent
-              value="lampiran"
-              className="mt-0 focus-visible:outline-none"
-            >
-              <FileSection
-                files={data.attachments}
-                fileNames={data.attachment_names}
-                setFiles={(files) => setData('attachments', files)}
-                setFileNames={(names) => setData('attachment_names', names)}
-                existingAttachments={
-                  need?.attachments?.filter((a) => a.category === 'general') ??
-                  []
-                }
-                deletedAttachmentIds={data.deleted_attachment_ids}
-                setDeletedAttachmentIds={(ids) =>
-                  setData('deleted_attachment_ids', ids)
-                }
-                errors={errors}
-              />
-            </TabsContent>
+            {hasPermission('update need tab lampiran') && (
+              <TabsContent
+                value="lampiran"
+                className="mt-0 focus-visible:outline-none"
+              >
+                <FileSection
+                  files={data.attachments}
+                  fileNames={data.attachment_names}
+                  setFiles={(files) => setData('attachments', files)}
+                  setFileNames={(names) => setData('attachment_names', names)}
+                  existingAttachments={
+                    need?.attachments?.filter(
+                      (a) => a.category === 'general',
+                    ) ?? []
+                  }
+                  deletedAttachmentIds={data.deleted_attachment_ids}
+                  setDeletedAttachmentIds={(ids) =>
+                    setData('deleted_attachment_ids', ids)
+                  }
+                  errors={errors}
+                />
+              </TabsContent>
+            )}
           </Tabs>
         </CardContent>
         <CardFooter className="justify-end gap-2">

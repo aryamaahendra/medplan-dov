@@ -44,9 +44,32 @@ class RolesAndPermissionsSeeder extends Seeder
             'view any needs' => 'Melihat daftar semua usulan kebutuhan',
             'view needs' => 'Melihat detail usulan kebutuhan',
             'create needs' => 'Membuat usulan kebutuhan baru',
-            'update needs' => 'Mengubah usulan kebutuhan',
-            'delete needs' => 'Menghapus usulan kebutuhan',
+            'update any needs' => 'Mengubah semua usulan kebutuhan',
+            'update needs' => 'Mengubah usulan kebutuhan milik unit sendiri',
+            'delete any needs' => 'Menghapus semua usulan kebutuhan',
+            'delete needs' => 'Menghapus usulan kebutuhan milik unit sendiri',
             'approve needs' => 'Menyetujui usulan kebutuhan',
+
+            // Need Tabs Visibility
+            'view need tab general' => 'Melihat tab Informasi Umum pada usulan',
+            'view need tab urgency' => 'Melihat tab Urgensi & Status pada usulan',
+            'view need tab strategic' => 'Melihat tab Renstra pada usulan',
+            'view need tab ikk' => 'Melihat tab IKK pada usulan',
+            'view need tab rls' => 'Melihat tab RLS pada usulan',
+            'view need tab planning' => 'Melihat tab Perencanaan pada usulan',
+            'view need tab detail' => 'Melihat tab Detail KAK pada usulan',
+            'view need tab lampiran' => 'Melihat tab Lampiran pada usulan',
+            'view need tab checklist' => 'Melihat tab Checklist pada usulan',
+
+            // Need Tabs Editing
+            'update need tab general' => 'Mengubah data pada tab Informasi Umum',
+            'update need tab urgency' => 'Mengubah data pada tab Urgensi & Status',
+            'update need tab strategic' => 'Mengubah data pada tab Renstra',
+            'update need tab ikk' => 'Mengubah data pada tab IKK',
+            'update need tab rls' => 'Mengubah data pada tab RLS',
+            'update need tab planning' => 'Mengubah data pada tab Perencanaan',
+            'update need tab detail' => 'Mengubah data pada tab Detail KAK',
+            'update need tab lampiran' => 'Mengubah data pada tab Lampiran',
 
             // Need Configuration
             'view any need-groups' => 'Melihat daftar semua grup usulan',
@@ -84,26 +107,30 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Planner
         $plannerRole = Role::firstOrCreate(['name' => UserRole::Planner->value, 'guard_name' => 'web']);
-        $plannerRole->syncPermissions([
-            'view any needs', 'view needs',
-            'view any need-groups', 'view any need-types',
-            'view any org-units',
-            'manage renstras',
-            'manage kpis',
-            'manage plannings',
-            'manage ssp',
-        ]);
+        $plannerRole->syncPermissions(array_merge(array_keys($permissions), [
+            'update any needs', 'delete any needs',
+        ]));
 
         // Unit Head
         $unitHeadRole = Role::firstOrCreate(['name' => UserRole::UnitHead->value, 'guard_name' => 'web']);
         $unitHeadRole->syncPermissions([
             'view any needs', 'view needs', 'create needs', 'update needs', 'delete needs',
+            'view need tab general', 'view need tab urgency', 'view need tab strategic',
+            'view need tab ikk', 'view need tab rls', 'view need tab planning',
+            'view need tab detail', 'view need tab lampiran', 'view need tab checklist',
+            'update need tab general', 'update need tab urgency', 'update need tab strategic',
+            'update need tab ikk', 'update need tab rls', 'update need tab planning',
+            'update need tab detail', 'update need tab lampiran',
         ]);
 
         // Staff
         $staffRole = Role::firstOrCreate(['name' => UserRole::Staff->value, 'guard_name' => 'web']);
         $staffRole->syncPermissions([
             'view any needs', 'view needs', 'create needs', 'update needs',
+            'view need tab general', 'view need tab urgency', 'view need tab strategic',
+            'view need tab ikk', 'view need tab rls', 'view need tab planning',
+            'view need tab detail', 'view need tab lampiran', 'view need tab checklist',
+            'update need tab general', 'update need tab detail', 'update need tab lampiran',
         ]);
     }
 }

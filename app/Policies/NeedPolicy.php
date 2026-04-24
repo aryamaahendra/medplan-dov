@@ -28,11 +28,12 @@ class NeedPolicy
      */
     public function view(User $user, Need $need): bool
     {
-        if ($user->hasPermissionTo('view any needs') && $user->hasAnyRole(['admin', 'planner'])) {
+        if ($user->hasPermissionTo('view any needs')) {
             return true;
         }
 
-        return $user->hasPermissionTo('view needs') && $user->organizational_unit_id === $need->organizational_unit_id;
+        return $user->hasPermissionTo('view needs')
+            && $user->organizational_unit_id === $need->organizational_unit_id;
     }
 
     /**
@@ -48,11 +49,12 @@ class NeedPolicy
      */
     public function update(User $user, Need $need): bool
     {
-        if ($user->hasPermissionTo('update needs') && $user->hasAnyRole(['admin', 'planner'])) {
+        if ($user->hasPermissionTo('update any needs')) {
             return true;
         }
 
-        return $user->hasPermissionTo('update needs') && $user->organizational_unit_id === $need->organizational_unit_id;
+        return $user->hasPermissionTo('update needs')
+            && $user->organizational_unit_id === $need->organizational_unit_id;
     }
 
     /**
@@ -60,11 +62,12 @@ class NeedPolicy
      */
     public function delete(User $user, Need $need): bool
     {
-        if ($user->hasPermissionTo('delete needs') && $user->hasAnyRole(['admin', 'planner'])) {
+        if ($user->hasPermissionTo('delete any needs')) {
             return true;
         }
 
-        return $user->hasPermissionTo('delete needs') && $user->organizational_unit_id === $need->organizational_unit_id;
+        return $user->hasPermissionTo('delete needs')
+            && $user->organizational_unit_id === $need->organizational_unit_id;
     }
 
     /**

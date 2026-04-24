@@ -24,23 +24,59 @@ class StoreNeedRequest extends FormRequest
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
+    protected function prepareForValidation(): void
+    {
+        $user = $this->user();
+        if ($user->hasRole('super-admin')) {
+            return;
+        }
+
+        $permissionMap = [
+            'update need tab general' => [
+                'need_group_id', 'organizational_unit_id', 'need_type_id', 'year',
+                'title', 'description', 'current_condition', 'required_condition',
+                'volume', 'unit', 'unit_price', 'total_price',
+            ],
+            'update need tab urgency' => ['urgency', 'impact', 'is_priority', 'status'],
+            'update need tab strategic' => ['sasaran_ids', 'indicator_ids'],
+            'update need tab ikk' => ['kpi_indicator_ids'],
+            'update need tab rls' => ['strategic_service_plan_ids'],
+            'update need tab planning' => ['planning_activity_version_ids', 'planning_activity_indicator_ids'],
+            'update need tab detail' => ['detail'],
+            'update need tab lampiran' => [
+                'attachments', 'attachment_names', 'technical_specification_attachments',
+                'technical_specification_attachment_names',
+            ],
+        ];
+
+        $allowedFields = [];
+        foreach ($permissionMap as $permission => $fields) {
+            if ($user->hasPermissionTo($permission)) {
+                $allowedFields = array_merge($allowedFields, $fields);
+            }
+        }
+
+        // Only keep allowed fields in the request
+        $this->replace($this->only($allowedFields));
+    }
+
     public function rules(): array
     {
         return [
-            'need_group_id' => ['required', 'integer', 'exists:need_groups,id'],
-            'organizational_unit_id' => ['required', 'integer', 'exists:organizational_units,id'],
-            'need_type_id' => ['required', 'integer', 'exists:need_types,id'],
-            'year' => ['required', 'integer', 'min:2000', 'max:2100'],
-            'title' => ['required', 'string', 'max:255'],
+            'need_group_id' => ['sometimes', 'required', 'integer', 'exists:need_groups,id'],
+            'organizational_unit_id' => ['sometimes', 'required', 'integer', 'exists:organizational_units,id'],
+            'need_type_id' => ['sometimes', 'required', 'integer', 'exists:need_types,id'],
+            'year' => ['sometimes', 'required', 'integer', 'min:2000', 'max:2100'],
+            'title' => ['sometimes', 'required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'current_condition' => ['nullable', 'string'],
             'required_condition' => ['nullable', 'string'],
-            'volume' => ['required', 'numeric', 'min:0'],
-            'unit' => ['required', 'string', Rule::in(['pcs', 'unit', 'orang', 'paket', 'set', 'buah', 'lembar', 'kg', 'liter', 'meter'])],
-            'unit_price' => ['required', 'numeric', 'min:0'],
-            'total_price' => ['required', 'numeric', 'min:0'],
-            'urgency' => ['required', Rule::enum(Urgency::class)],
-            'impact' => ['required', Rule::enum(Impact::class)],
+            'volume' => ['sometimes', 'required', 'numeric', 'min:0'],
+            'unit' => ['sometimes', 'required', 'string', Rule::in(['pcs', 'unit', 'orang', 'paket', 'set', 'buah', 'lembar', 'kg', 'liter', 'meter'])],
+            'unit_price' => ['sometimes', 'required', 'numeric', 'min:0'],
+            'total_price' => ['sometimes', 'required', 'numeric', 'min:0'],
+            'urgency' => ['sometimes', 'required', Rule::enum(Urgency::class)],
+            'impact' => ['sometimes', 'required', Rule::enum(Impact::class)],
             'is_priority' => ['boolean'],
             'status' => ['sometimes', 'string', Rule::in(['draft', 'submitted', 'approved', 'rejected'])],
             'sasaran_ids' => ['nullable', 'array'],

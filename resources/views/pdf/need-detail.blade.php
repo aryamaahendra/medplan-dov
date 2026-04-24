@@ -89,7 +89,7 @@
     }
 
     .signature-space {
-      height: 70px;
+      height: 90px;
     }
 
     .signature-name {
@@ -131,6 +131,7 @@
 
     .cover-info {
       margin-top: 40px;
+      margin-bottom: 150px;
       width: 100%;
     }
 
@@ -180,6 +181,9 @@
           </tr>
         </table>
       </div>
+
+      <h1 style="font-size: 18px; margin-top: 30px;">TAHUN ANGGARAN {{ now()->translatedFormat('Y') }}</h1>
+
     </div>
   </div>
 
@@ -268,7 +272,7 @@
 
   <div class="signature-wrapper">
     <div class="signature-block">
-      <p>Jakarta, {{ now()->translatedFormat('F Y') }}</p>
+      <p style="margin-bottom: 16px;">Donggala, {{ now()->translatedFormat('d F Y') }}</p>
       <p>RSUD KABELOTA</p>
       <p>KABUPATEN DONGGALA</p>
       <p>KUASA PENGGUNA ANGGARAN</p>

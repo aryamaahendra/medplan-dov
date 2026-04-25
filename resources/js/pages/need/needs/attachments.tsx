@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 
+import { usePermission } from '@/hooks/use-permission';
 import needRoutes from '@/routes/needs';
 import type { Attachment, Need } from '@/types';
 import { AttachmentList } from './components/attachment-list';
@@ -11,6 +12,11 @@ interface AttachmentsPageProps {
 }
 
 export default function AttachmentsPage({ need }: AttachmentsPageProps) {
+  const { hasPermission } = usePermission();
+
+  const canEditLampiran =
+    (need.can?.update ?? false) && hasPermission('update need tab lampiran');
+
   return (
     <>
       <Head title={`Manajemen Lampiran: ${need.title}`} />
@@ -19,13 +25,18 @@ export default function AttachmentsPage({ need }: AttachmentsPageProps) {
         <NeedHeader need={need} />
 
         <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <AttachmentList attachments={need.attachments} />
+          <div className={canEditLampiran ? 'lg:col-span-2' : 'lg:col-span-3'}>
+            <AttachmentList
+              attachments={need.attachments}
+              allowDelete={canEditLampiran}
+            />
           </div>
 
-          <div>
-            <AttachmentUploadForm needId={need.id} />
-          </div>
+          {canEditLampiran && (
+            <div>
+              <AttachmentUploadForm needId={need.id} />
+            </div>
+          )}
         </div>
       </div>
     </>
@@ -40,7 +51,8 @@ AttachmentsPage.layout = {
     },
     {
       title: 'Detail Usulan',
-      href: '#', // TODO: Add actual link back
+      href: (props: AttachmentsPageProps) =>
+        needRoutes.show.url({ need: props.need.id }),
     },
     {
       title: 'Manajemen Lampiran',

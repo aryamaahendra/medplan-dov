@@ -88,7 +88,7 @@ export default function RenstrasIndex({
               dapat aktif di satu waktu.
             </p>
           </div>
-          {hasPermission('create renstras') && (
+          {hasPermission('manage renstras') && (
             <Button onClick={onCreate}>
               <Plus className="h-4 w-4" />
               Tambah Renstra

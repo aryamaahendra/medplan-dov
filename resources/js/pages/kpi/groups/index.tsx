@@ -103,7 +103,7 @@ export default function KpiGroupsIndex({
               satu periode yang dapat aktif di satu waktu.
             </p>
           </div>
-          {hasPermission('create kpi-groups') && (
+          {hasPermission('manage kpis') && (
             <Button onClick={onCreate}>
               <Plus className="h-4 w-4" />
               Tambah Periode

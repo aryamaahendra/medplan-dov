@@ -6,6 +6,7 @@ interface ResponseOptionProps {
   label: string;
   isActive: boolean;
   activeClass: string;
+  disabled?: boolean;
 }
 
 export function ResponseOption({
@@ -14,13 +15,14 @@ export function ResponseOption({
   label,
   isActive,
   activeClass,
+  disabled = false,
 }: ResponseOptionProps) {
   return (
     <Label
       htmlFor={id}
-      className={`group flex cursor-pointer rounded-lg border px-3 py-1.5 text-xs font-medium transition-all hover:bg-muted/50 ${isActive ? activeClass : 'bg-background'}`}
+      className={`group flex rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-muted/50'} ${isActive ? activeClass : 'bg-background'}`}
     >
-      <RadioGroupItem value={value} id={id} />
+      <RadioGroupItem value={value} id={id} disabled={disabled} />
       {label}
     </Label>
   );

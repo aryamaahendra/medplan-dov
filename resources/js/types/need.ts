@@ -98,6 +98,11 @@ export interface Need {
   approved_by_director_at?: string | null;
   planning_activity_versions?: PlanningActivityVersion[];
   planning_activity_indicators?: PlanningActivityIndicator[];
+  can?: {
+    update: boolean;
+    delete: boolean;
+    approve: boolean;
+  };
 }
 
 export interface PaginatedNeeds {

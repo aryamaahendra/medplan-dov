@@ -70,7 +70,7 @@ export const getColumns = (
         },
       ];
 
-      if (hasPermission('update renstras')) {
+      if (hasPermission('manage renstras')) {
         actions.push({
           label: 'Edit',
           icon: PencilLine,
@@ -78,7 +78,7 @@ export const getColumns = (
         });
       }
 
-      if (hasPermission('delete renstras')) {
+      if (hasPermission('manage renstras')) {
         actions.push('separator');
         actions.push({
           label: 'Hapus',

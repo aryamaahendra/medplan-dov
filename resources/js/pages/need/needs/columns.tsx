@@ -25,7 +25,6 @@ export const getColumns = (
   onEdit: (need: Need) => void,
   onDelete: (need: Need) => void,
   onReview: (need: Need) => void,
-  hasPermission: (permission: string) => boolean,
 ): ColumnDef<Need>[] => [
   getIndexColumn(),
   {
@@ -202,7 +201,7 @@ export const getColumns = (
         },
       ];
 
-      if (hasPermission('update needs')) {
+      if (need.can?.update) {
         actions.push({
           label: 'Edit',
           icon: PencilLine,
@@ -215,7 +214,7 @@ export const getColumns = (
         });
       }
 
-      if (hasPermission('delete needs')) {
+      if (need.can?.delete) {
         actions.push('separator');
         actions.push({
           label: 'Hapus',
@@ -225,7 +224,7 @@ export const getColumns = (
         });
       }
 
-      if (hasPermission('approve needs')) {
+      if (need.can?.approve) {
         actions.push('separator');
         actions.push({
           label: 'Review Direktur',

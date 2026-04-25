@@ -18,12 +18,14 @@ interface ChecklistFormProps {
   needId: number;
   questions: ChecklistQuestion[];
   existingAnswers: ChecklistAnswer[];
+  readonly?: boolean;
 }
 
 export function ChecklistForm({
   needId,
   questions,
   existingAnswers,
+  readonly = false,
 }: ChecklistFormProps) {
   const { data, setData, post, processing } = useForm({
     answers: questions.map((q) => {
@@ -42,6 +44,10 @@ export function ChecklistForm({
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
 
   const performSave = (answersToSave: typeof data.answers) => {
+    if (readonly) {
+      return;
+    }
+
     post(NeedChecklistAnswerController.store.url({ need: needId }), {
       preserveScroll: true,
       optimistic: (props: any) => {
@@ -164,8 +170,9 @@ export function ChecklistForm({
               answer={data.answers.find(
                 (a) => a.checklist_question_id === q.id,
               )}
-              onAnswerChange={(val) => updateAnswer(q.id, val)}
-              onNotesChange={(val) => updateNotes(q.id, val)}
+              onAnswerChange={(val) => !readonly && updateAnswer(q.id, val)}
+              onNotesChange={(val) => !readonly && updateNotes(q.id, val)}
+              readonly={readonly}
             />
           ))}
         </CardContent>

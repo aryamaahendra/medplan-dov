@@ -21,7 +21,6 @@ import {
   STATUS_LABELS,
   STATUS_VARIANTS,
 } from '@/constants/need';
-import { usePermission } from '@/hooks/use-permission';
 import { formatIDR } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
@@ -41,8 +40,6 @@ export function NeedGridCard({
   onDelete,
   onReview,
 }: NeedGridCardProps) {
-  const { hasPermission } = usePermission();
-
   const actions: Parameters<typeof ActionDropdown>[0]['actions'] = [
     {
       label: 'Detail',
@@ -51,7 +48,7 @@ export function NeedGridCard({
     },
   ];
 
-  if (hasPermission('update needs')) {
+  if (need.can?.update) {
     actions.push({
       label: 'Edit',
       icon: PencilLine,
@@ -64,7 +61,7 @@ export function NeedGridCard({
     });
   }
 
-  if (hasPermission('delete needs')) {
+  if (need.can?.delete) {
     actions.push('separator');
     actions.push({
       label: 'Hapus',
@@ -74,7 +71,7 @@ export function NeedGridCard({
     });
   }
 
-  if (hasPermission('approve needs')) {
+  if (need.can?.approve) {
     actions.push('separator');
     actions.push({
       label: 'Review Direktur',

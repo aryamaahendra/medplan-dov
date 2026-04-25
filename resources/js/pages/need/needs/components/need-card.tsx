@@ -23,7 +23,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { STATUS_ICONS, STATUS_LABELS, STATUS_VARIANTS } from '@/constants/need';
-import { usePermission } from '@/hooks/use-permission';
 import { formatIDR } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
@@ -38,8 +37,6 @@ interface NeedCardProps {
 }
 
 export function NeedCard({ need, onEdit, onDelete, onReview }: NeedCardProps) {
-  const { hasPermission } = usePermission();
-
   return (
     <Card className="w-full">
       <CardHeader>
@@ -55,7 +52,7 @@ export function NeedCard({ need, onEdit, onDelete, onReview }: NeedCardProps) {
             </Link>
           </Button>
 
-          {hasPermission('update needs') && (
+          {need.can?.update && (
             <>
               <Button variant="outline" size="sm" onClick={() => onEdit(need)}>
                 <PencilLine />
@@ -72,7 +69,7 @@ export function NeedCard({ need, onEdit, onDelete, onReview }: NeedCardProps) {
             </>
           )}
 
-          {hasPermission('delete needs') && (
+          {need.can?.delete && (
             <Button
               variant="destructive"
               size="sm"
@@ -83,7 +80,7 @@ export function NeedCard({ need, onEdit, onDelete, onReview }: NeedCardProps) {
             </Button>
           )}
 
-          {hasPermission('approve needs') && (
+          {need.can?.approve && (
             <Button
               variant="secondary"
               size="sm"

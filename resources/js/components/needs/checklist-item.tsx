@@ -17,6 +17,7 @@ interface ChecklistItemProps {
   };
   onAnswerChange: (value: 'yes' | 'no' | 'skip') => void;
   onNotesChange: (value: string) => void;
+  readonly?: boolean;
 }
 
 export function ChecklistItem({
@@ -25,6 +26,7 @@ export function ChecklistItem({
   answer,
   onAnswerChange,
   onNotesChange,
+  readonly = false,
 }: ChecklistItemProps) {
   return (
     <div className="flex flex-col gap-4 p-4 transition-colors hover:bg-muted/5">
@@ -49,8 +51,9 @@ export function ChecklistItem({
               <RadioGroup
                 value={answer?.answer}
                 onValueChange={(val) =>
-                  onAnswerChange(val as 'yes' | 'no' | 'skip')
+                  !readonly && onAnswerChange(val as 'yes' | 'no' | 'skip')
                 }
+                disabled={readonly}
                 className="flex flex-wrap gap-2"
               >
                 <ResponseOption
@@ -59,6 +62,7 @@ export function ChecklistItem({
                   label="Ya"
                   isActive={answer?.answer === 'yes'}
                   activeClass=""
+                  disabled={readonly}
                 />
                 <ResponseOption
                   id={`q-${question.id}-no`}
@@ -66,6 +70,7 @@ export function ChecklistItem({
                   label="Tidak"
                   isActive={answer?.answer === 'no'}
                   activeClass=""
+                  disabled={readonly}
                 />
                 <ResponseOption
                   id={`q-${question.id}-skip`}
@@ -73,15 +78,17 @@ export function ChecklistItem({
                   label="Lewati"
                   isActive={answer?.answer === 'skip'}
                   activeClass=""
+                  disabled={readonly}
                 />
               </RadioGroup>
             </div>
 
             <div className="relative">
               <Textarea
-                placeholder="Tambahkan catatan khusus..."
+                placeholder={readonly ? '' : 'Tambahkan catatan khusus...'}
                 value={answer?.notes || ''}
-                onChange={(e) => onNotesChange(e.target.value)}
+                onChange={(e) => !readonly && onNotesChange(e.target.value)}
+                readOnly={readonly}
                 className="min-h-[80px] bg-muted/20 transition-colors focus-visible:bg-background"
               />
               {!answer?.notes && (

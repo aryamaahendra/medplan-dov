@@ -35,7 +35,7 @@ export function NeedsHeader({
   onEditGroup,
   onDeleteGroup,
 }: NeedsHeaderProps) {
-  const { hasPermission } = usePermission();
+  const { hasPermission, hasAnyPermission } = usePermission();
 
   const groupActions = [];
 
@@ -106,7 +106,11 @@ export function NeedsHeader({
           Export Excel
         </Button>
 
-        {hasPermission('create needs') && (
+        {hasAnyPermission([
+          'create needs',
+          'create descendant needs',
+          'create any needs',
+        ]) && (
           <Button onClick={onCreate}>
             <Plus />
             Tambah Usulan

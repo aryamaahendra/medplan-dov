@@ -10,6 +10,7 @@ use App\Http\Requests\Need\StoreNeedRequest;
 use App\Http\Requests\Need\UpdateNeedRequest;
 use App\Http\Resources\ChecklistQuestionResource;
 use App\Http\Resources\NeedChecklistAnswerResource;
+use App\Http\Resources\NeedResource;
 use App\Models\KpiGroup;
 use App\Models\Need;
 use App\Models\NeedGroup;
@@ -75,6 +76,8 @@ class NeedController extends Controller
             self::SEARCH_COLUMNS,
             self::SORTABLE_COLUMNS,
         );
+
+        $needs->getCollection()->transform(fn ($need) => NeedResource::make($need)->resolve());
 
         return Inertia::render('need/needs/index', [
             'needs' => $needs,
@@ -151,7 +154,7 @@ class NeedController extends Controller
         $this->authorize('update', $need);
 
         return Inertia::render('need/needs/edit', [
-            'need' => $need->load([
+            'need' => NeedResource::make($need->load([
                 'sasarans:id',
                 'indicators:id',
                 'kpiIndicators:id',
@@ -160,7 +163,7 @@ class NeedController extends Controller
                 'planningActivityIndicators:id',
                 'detail',
                 'attachments',
-            ]),
+            ]))->resolve(),
             'currentGroup' => $need->needGroup,
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name', 'parent_id'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
@@ -221,7 +224,7 @@ class NeedController extends Controller
         $this->authorize('view', $need);
 
         return Inertia::render('need/needs/show', [
-            'need' => $need->load([
+            'need' => NeedResource::make($need->load([
                 'organizationalUnit:id,name,parent_id',
                 'organizationalUnit.parentsRecursive',
                 'needType:id,name',
@@ -239,7 +242,7 @@ class NeedController extends Controller
                 'planningActivityIndicators:id,name,baseline,unit',
                 'detail',
                 'attachments',
-            ]),
+            ]))->resolve(),
             'checklistQuestions' => ChecklistQuestionResource::collection(
                 $need->needGroup->checklistQuestions()
                     ->wherePivot('is_active', true)

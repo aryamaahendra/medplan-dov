@@ -138,7 +138,7 @@ export const getColumns = (
         },
       ];
 
-      if (hasPermission('manage plannings')) {
+      if (hasPermission('update planning-versions')) {
         actions.push({
           label: 'Edit',
           icon: PencilLine,
@@ -150,6 +150,9 @@ export const getColumns = (
           onClick: () => onSetCurrent(version),
           disabled: version.is_current,
         });
+      }
+
+      if (hasPermission('delete planning-versions')) {
         actions.push('separator');
         actions.push({
           label: 'Hapus',

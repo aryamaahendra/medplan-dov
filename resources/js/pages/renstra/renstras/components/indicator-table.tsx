@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { usePermission } from '@/hooks/use-permission';
 import type { Indicator } from '@/types';
 
 interface IndicatorTableProps {
@@ -29,6 +30,7 @@ export function IndicatorTable({
   yearStart,
   yearEnd,
 }: IndicatorTableProps) {
+  const { hasPermission } = usePermission();
   const [deletingIndicator, setDeletingIndicator] = useState<Indicator | null>(
     null,
   );
@@ -132,20 +134,24 @@ export function IndicatorTable({
                   })}
                   <TableCell className="text-center">
                     <ActionDropdown
-                      actions={[
-                        {
-                          label: 'Edit',
-                          icon: Edit,
-                          onClick: () => onEdit(indicator),
-                        },
-                        'separator',
-                        {
-                          label: 'Hapus',
-                          icon: Trash2,
-                          onClick: () => setDeletingIndicator(indicator),
-                          variant: 'destructive',
-                        },
-                      ]}
+                      actions={
+                        [
+                          hasPermission('update indicators') && {
+                            label: 'Edit',
+                            icon: Edit,
+                            onClick: () => onEdit(indicator),
+                          },
+                          hasPermission('update indicators') &&
+                            hasPermission('delete indicators') &&
+                            'separator',
+                          hasPermission('delete indicators') && {
+                            label: 'Hapus',
+                            icon: Trash2,
+                            onClick: () => setDeletingIndicator(indicator),
+                            variant: 'destructive',
+                          },
+                        ].filter(Boolean) as any
+                      }
                     />
                   </TableCell>
                 </TableRow>

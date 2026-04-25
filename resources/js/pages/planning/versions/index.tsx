@@ -149,7 +149,7 @@ export default function PlanningVersionsIndex({
               Kelola siklus dan revisi perencanaan anggaran tahunan.
             </p>
           </div>
-          {hasPermission('manage plannings') && (
+          {hasPermission('create planning-versions') && (
             <Button
               onClick={() => {
                 setSelectedVersion(null);

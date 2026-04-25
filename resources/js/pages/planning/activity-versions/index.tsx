@@ -3,7 +3,9 @@ import { Download, Plus, RefreshCcw } from 'lucide-react';
 import { Fragment, useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-import PlanningActivityVersionController from '@/actions/App/Http/Controllers/Planning/PlanningActivityVersionController';
+import PlanningActivityVersionController, {
+  PlanningRecalculateController,
+} from '@/actions/App/Http/Controllers/Planning/PlanningActivityVersionController';
 import { DataTable } from '@/components/data-table/data-table';
 import {
   AlertDialog,
@@ -20,6 +22,7 @@ import { Button } from '@/components/ui/button';
 import { TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import { useDataTable } from '@/hooks/use-data-table';
+import { usePermission } from '@/hooks/use-permission';
 import { cn } from '@/lib/utils';
 import planningVersions from '@/routes/planning-versions';
 import type {
@@ -29,7 +32,6 @@ import type {
 
 import { getColumns } from './columns';
 import { ActivityImportDialog } from './import-dialog';
-import PlanningRecalculateController from '@/actions/App/Http/Controllers/Planning/PlanningRecalculateController';
 
 interface PaginatedActivities {
   data: PlanningActivityVersion[];
@@ -52,6 +54,7 @@ export default function PlanningActivityVersionsIndex({
   activities,
   filters,
 }: PlanningActivityVersionsIndexProps) {
+  const { hasPermission } = usePermission();
   const { onSearch, onSort, onReset, onPageChange, onPerPageChange } =
     useDataTable({
       only: ['activities', 'filters'],
@@ -88,8 +91,8 @@ export default function PlanningActivityVersionsIndex({
   };
 
   const columns = useMemo(
-    () => getColumns(version, handleEdit, handleDelete),
-    [version, handleEdit, handleDelete],
+    () => getColumns(version, handleEdit, handleDelete, hasPermission),
+    [version, handleEdit, handleDelete, hasPermission],
   );
 
   const years = Array.from({ length: 5 }, (_, i) => version.year_start + i);
@@ -117,30 +120,32 @@ export default function PlanningActivityVersionsIndex({
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              disabled={isRecalculating}
-              onClick={() => {
-                setIsRecalculating(true);
-                router.post(
-                  PlanningRecalculateController.url(version.id),
-                  {},
-                  {
-                    onSuccess: () =>
-                      toast.success('Berhasil menghitung ulang.'),
-                    onFinish: () => setIsRecalculating(false),
-                  },
-                );
-              }}
-            >
-              <RefreshCcw
-                className={cn(
-                  'mr-2 h-4 w-4',
-                  isRecalculating && 'animate-spin',
-                )}
-              />
-              {isRecalculating ? 'Recalculating...' : 'Recalculate'}
-            </Button>
+            {hasPermission('update planning-activity-versions') && (
+              <Button
+                variant="outline"
+                disabled={isRecalculating}
+                onClick={() => {
+                  setIsRecalculating(true);
+                  router.post(
+                    PlanningRecalculateController.url(version.id),
+                    {},
+                    {
+                      onSuccess: () =>
+                        toast.success('Berhasil menghitung ulang.'),
+                      onFinish: () => setIsRecalculating(false),
+                    },
+                  );
+                }}
+              >
+                <RefreshCcw
+                  className={cn(
+                    'mr-2 h-4 w-4',
+                    isRecalculating && 'animate-spin',
+                  )}
+                />
+                {isRecalculating ? 'Recalculating...' : 'Recalculate'}
+              </Button>
+            )}
             <Button variant="outline" asChild>
               <a
                 href={PlanningActivityVersionController.export.url(version.id)}
@@ -149,15 +154,21 @@ export default function PlanningActivityVersionsIndex({
                 Export
               </a>
             </Button>
-            <ActivityImportDialog version={version} />
-            <Button asChild>
-              <Link
-                href={PlanningActivityVersionController.create.url(version.id)}
-              >
-                <Plus className="mr-2" />
-                Tambah Aktivitas
-              </Link>
-            </Button>
+            {hasPermission('create planning-activity-versions') && (
+              <>
+                <ActivityImportDialog version={version} />
+                <Button asChild>
+                  <Link
+                    href={PlanningActivityVersionController.create.url(
+                      version.id,
+                    )}
+                  >
+                    <Plus className="mr-2" />
+                    Tambah Aktivitas
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
 

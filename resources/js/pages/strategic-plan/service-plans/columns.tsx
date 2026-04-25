@@ -59,13 +59,19 @@ export const getColumns = (
 
       const actions: (ActionItem | 'separator')[] = [];
 
-      if (hasPermission('manage ssp')) {
+      if (hasPermission('update ssps')) {
         actions.push({
           label: 'Edit',
           icon: PencilLine,
           onClick: () => onEdit(plan),
         });
-        actions.push('separator');
+      }
+
+      if (hasPermission('delete ssps')) {
+        if (actions.length > 0) {
+          actions.push('separator');
+        }
+
         actions.push({
           label: 'Hapus',
           icon: Trash2,

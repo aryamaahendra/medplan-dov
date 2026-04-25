@@ -73,7 +73,7 @@ export const getColumns = (
         },
       ];
 
-      if (!group.is_active && hasPermission('manage kpis')) {
+      if (!group.is_active && hasPermission('update kpi-groups')) {
         actions.push({
           label: isActivating ? 'Mengaktifkan...' : 'Aktifkan',
           icon: CheckCircle2,
@@ -82,7 +82,7 @@ export const getColumns = (
         });
       }
 
-      if (hasPermission('manage kpis')) {
+      if (hasPermission('update kpi-groups')) {
         actions.push({
           label: 'Edit',
           icon: PencilLine,
@@ -90,7 +90,7 @@ export const getColumns = (
         });
       }
 
-      if (hasPermission('manage kpis')) {
+      if (hasPermission('delete kpi-groups')) {
         actions.push('separator');
         actions.push({
           label: 'Hapus',

@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { usePermission } from '@/hooks/use-permission';
 import type { Indicator, Sasaran, Tujuan } from '@/types';
 
 import { IndicatorTable } from './indicator-table';
@@ -90,6 +91,8 @@ function TujuanHeader({
   onEditTujuan: (tujuan: Tujuan) => void;
   onDeleteTujuan: (tujuan: Tujuan) => void;
 }) {
+  const { hasPermission } = usePermission();
+
   return (
     <div className="flex flex-col border-b bg-muted/40 p-4 md:flex-row">
       <div className="flex-1">
@@ -101,38 +104,49 @@ function TujuanHeader({
         )}
       </div>
       <div className="mt-4 flex flex-wrap items-start justify-end gap-2 md:mt-0">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button size="sm" variant="outline">
-              <Plus />
-              Tambah
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onCreateSasaran(tujuan)}>
-              <Plus className="mr-1" />
-              Sasaran
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onCreateIndicator(tujuan)}>
-              <Plus className="mr-1" />
-              Indikator
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <Button
-          size="icon-sm"
-          variant="outline"
-          onClick={() => onEditTujuan(tujuan)}
-        >
-          <Edit />
-        </Button>
-        <Button
-          size="icon-sm"
-          variant="destructive"
-          onClick={() => onDeleteTujuan(tujuan)}
-        >
-          <Trash2 />
-        </Button>
+        {(hasPermission('create sasarans') ||
+          hasPermission('create indicators')) && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm" variant="outline">
+                <Plus />
+                Tambah
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {hasPermission('create sasarans') && (
+                <DropdownMenuItem onClick={() => onCreateSasaran(tujuan)}>
+                  <Plus className="mr-1" />
+                  Sasaran
+                </DropdownMenuItem>
+              )}
+              {hasPermission('create indicators') && (
+                <DropdownMenuItem onClick={() => onCreateIndicator(tujuan)}>
+                  <Plus className="mr-1" />
+                  Indikator
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+        {hasPermission('update tujuans') && (
+          <Button
+            size="icon-sm"
+            variant="outline"
+            onClick={() => onEditTujuan(tujuan)}
+          >
+            <Edit />
+          </Button>
+        )}
+        {hasPermission('delete tujuans') && (
+          <Button
+            size="icon-sm"
+            variant="destructive"
+            onClick={() => onDeleteTujuan(tujuan)}
+          >
+            <Trash2 />
+          </Button>
+        )}
       </div>
     </div>
   );

@@ -77,13 +77,19 @@ export const getColumns = (
 
       const actions: (ActionItem | 'separator')[] = [];
 
-      if (hasPermission('manage need-checklists')) {
+      if (hasPermission('update checklist-questions')) {
         actions.push({
           label: 'Edit',
           icon: PencilLine,
           onClick: () => onEdit(question),
         });
-        actions.push('separator');
+      }
+
+      if (hasPermission('delete checklist-questions')) {
+        if (actions.length > 0) {
+          actions.push('separator');
+        }
+
         actions.push({
           label: 'Hapus',
           icon: Trash2,

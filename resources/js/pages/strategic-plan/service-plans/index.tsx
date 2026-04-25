@@ -98,7 +98,7 @@ export default function StrategicServicePlansIndex({
               Kelola data rencana pengembangan layanan strategis rumah sakit.
             </p>
           </div>
-          {hasPermission('manage ssp') && (
+          {hasPermission('create ssps') && (
             <Button onClick={onCreate}>
               <Plus className="mr-2 h-4 w-4" />
               Tambah Rencana

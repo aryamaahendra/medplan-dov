@@ -54,7 +54,7 @@ export default function NeedShow({
     {
       value: 'lampiran',
       label: 'Lampiran',
-      permission: 'view need tab lampiran',
+      permission: 'view need-attachments',
     },
     {
       value: 'checklist',
@@ -154,7 +154,7 @@ export default function NeedShow({
                   <NeedDetailTab need={need} users={users} />
                 </TabsContent>
               )}
-              {hasPermission('view need tab lampiran') && (
+              {hasPermission('view need-attachments') && (
                 <TabsContent value="lampiran" className="mt-0">
                   <NeedAttachmentsTab need={need} />
                 </TabsContent>

@@ -2,6 +2,7 @@ import { PencilLine, Plus, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { usePermission } from '@/hooks/use-permission';
 import type { Indicator, Sasaran } from '@/types';
 
 import { IndicatorTable } from './indicator-table';
@@ -25,6 +26,8 @@ export function SasaranCard({
   onDeleteSasaran,
   onEditIndicator,
 }: SasaranCardProps) {
+  const { hasPermission } = usePermission();
+
   return (
     <Card className="gap-0 overflow-hidden rounded-none py-0 ring-0 last:border-b-0">
       <div className="flex flex-col border-b bg-muted/30 p-4 md:flex-row">
@@ -37,28 +40,34 @@ export function SasaranCard({
           )}
         </div>
         <div className="mt-4 flex items-start justify-end gap-2 md:mt-0">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => onCreateIndicator(sasaran)}
-          >
-            <Plus />
-            Indikator
-          </Button>
-          <Button
-            size="icon-sm"
-            variant="outline"
-            onClick={() => onEditSasaran(sasaran)}
-          >
-            <PencilLine />
-          </Button>
-          <Button
-            size="icon-sm"
-            variant="destructive"
-            onClick={() => onDeleteSasaran(sasaran)}
-          >
-            <Trash2 />
-          </Button>
+          {hasPermission('create indicators') && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onCreateIndicator(sasaran)}
+            >
+              <Plus />
+              Indikator
+            </Button>
+          )}
+          {hasPermission('update sasarans') && (
+            <Button
+              size="icon-sm"
+              variant="outline"
+              onClick={() => onEditSasaran(sasaran)}
+            >
+              <PencilLine />
+            </Button>
+          )}
+          {hasPermission('delete sasarans') && (
+            <Button
+              size="icon-sm"
+              variant="destructive"
+              onClick={() => onDeleteSasaran(sasaran)}
+            >
+              <Trash2 />
+            </Button>
+          )}
         </div>
       </div>
       <div className="p-0">

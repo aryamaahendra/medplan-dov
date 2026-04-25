@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { KpiIndicatorTree } from '@/components/kpis/kpi-indicator-tree';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { usePermission } from '@/hooks/use-permission';
 import groupRoutes from '@/routes/kpis/groups';
 import type { KpiGroup, KpiIndicator } from '@/types';
 
@@ -16,6 +17,7 @@ interface KpiGroupShowProps {
 }
 
 export default function KpiGroupShow({ group }: KpiGroupShowProps) {
+  const { hasPermission } = usePermission();
   const [indicatorDialogOpen, setIndicatorDialogOpen] = useState(false);
   const [editingIndicator, setEditingIndicator] = useState<KpiIndicator | null>(
     null,
@@ -74,19 +76,33 @@ export default function KpiGroupShow({ group }: KpiGroupShowProps) {
                 {indicators.length} indikator/kategori ditemukan.
               </p>
             </div>
-            <Button onClick={onCreateIndicator}>
-              <Plus />
-              Tambah Indikator Utama
-            </Button>
+            {hasPermission('create kpi-indicators') && (
+              <Button onClick={onCreateIndicator}>
+                <Plus />
+                Tambah Indikator Utama
+              </Button>
+            )}
           </div>
 
           <KpiIndicatorTree
             indicators={indicators}
             yearStart={group.start_year}
             yearEnd={group.end_year}
-            onEdit={onEditIndicator}
-            onCreateChild={onCreateChildIndicator}
-            onCreateFirst={onCreateIndicator}
+            onEdit={
+              hasPermission('update kpi-indicators')
+                ? onEditIndicator
+                : undefined
+            }
+            onCreateChild={
+              hasPermission('create kpi-indicators')
+                ? onCreateChildIndicator
+                : undefined
+            }
+            onCreateFirst={
+              hasPermission('create kpi-indicators')
+                ? onCreateIndicator
+                : undefined
+            }
             emptyMessage="Belum ada indikator atau kategori untuk periode ini."
           />
         </div>

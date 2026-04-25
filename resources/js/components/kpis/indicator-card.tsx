@@ -14,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { usePermission } from '@/hooks/use-permission';
 import { cn } from '@/lib/utils';
 import type { KpiIndicator } from '@/types';
 import { IndicatorTable } from './indicator-table';
@@ -37,6 +38,7 @@ export function IndicatorCard({
   onCreateChild,
   depth = 0,
 }: IndicatorCardProps) {
+  const { hasPermission } = usePermission();
   const { leafIndicators, childCategories } = useMemo(() => {
     const leafIndicators: KpiIndicator[] = [];
     const childCategories: KpiIndicator[] = [];
@@ -91,7 +93,7 @@ export function IndicatorCard({
           <CardDescription>Kategori Level {depth + 1}</CardDescription>
           {showActions && (
             <CardAction>
-              {onCreateChild && (
+              {onCreateChild && hasPermission('create kpi-indicators') && (
                 <Button
                   size="sm"
                   variant="outline"
@@ -100,7 +102,7 @@ export function IndicatorCard({
                   <Plus /> Tambah Sub
                 </Button>
               )}
-              {onEdit && (
+              {onEdit && hasPermission('update kpi-indicators') && (
                 <Button
                   size="icon-sm"
                   variant="ghost"
@@ -109,7 +111,7 @@ export function IndicatorCard({
                   <Edit className="h-4 w-4" />
                 </Button>
               )}
-              {onDelete && (
+              {onDelete && hasPermission('delete kpi-indicators') && (
                 <Button
                   size="icon-sm"
                   variant="ghost"
@@ -187,7 +189,7 @@ export function IndicatorCard({
         </div>
         {(onEdit || onDelete) && (
           <div className="flex items-center gap-1">
-            {onEdit && (
+            {onEdit && hasPermission('update kpi-indicators') && (
               <Button
                 size="icon-sm"
                 variant="ghost"
@@ -196,7 +198,7 @@ export function IndicatorCard({
                 <Edit className="h-3 w-3" />
               </Button>
             )}
-            {onDelete && (
+            {onDelete && hasPermission('delete kpi-indicators') && (
               <Button
                 size="icon-sm"
                 variant="ghost"

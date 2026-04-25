@@ -22,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { usePermission } from '@/hooks/use-permission';
 import type { KpiIndicator } from '@/types';
 
 interface IndicatorTableProps {
@@ -41,6 +42,7 @@ export function IndicatorTable({
   yearEnd,
   hideHeader = false,
 }: IndicatorTableProps) {
+  const { hasPermission } = usePermission();
   const [deletingIndicator, setDeletingIndicator] =
     useState<KpiIndicator | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -193,20 +195,22 @@ export function IndicatorTable({
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                          {onEdit && (
+                          {onEdit && hasPermission('update kpi-indicators') && (
                             <DropdownMenuItem onClick={() => onEdit(indicator)}>
                               <Edit className="mr-2 h-4 w-4" />
                               Edit
                             </DropdownMenuItem>
                           )}
                           {(onEdit || onDelete) && <DropdownMenuSeparator />}
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() => setDeletingIndicator(indicator)}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Hapus
-                          </DropdownMenuItem>
+                          {hasPermission('delete kpi-indicators') && (
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={() => setDeletingIndicator(indicator)}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Hapus
+                            </DropdownMenuItem>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>

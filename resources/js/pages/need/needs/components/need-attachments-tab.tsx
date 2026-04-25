@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { usePermission } from '@/hooks/use-permission';
 
 import type { Need } from '@/types';
 import { AttachmentList } from './attachment-list';
@@ -20,6 +21,14 @@ interface NeedAttachmentsTabProps {
 }
 
 export function NeedAttachmentsTab({ need }: NeedAttachmentsTabProps) {
+  const { hasPermission } = usePermission();
+
+  const canManageLampiran =
+    (need.can?.update ?? false) &&
+    (hasPermission('create need-attachments') ||
+      hasPermission('update need-attachments') ||
+      hasPermission('delete need-attachments'));
+
   return (
     <Card className="mt-6">
       <CardHeader>
@@ -28,22 +37,24 @@ export function NeedAttachmentsTab({ need }: NeedAttachmentsTabProps) {
           Dokumen bukti dukung usulan kebutuhan.
         </CardDescription>
 
-        <CardAction>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              router.visit(
-                NeedAttachmentController.index.url({
-                  need: need.id,
-                }),
-              )
-            }
-          >
-            <PaperclipIcon />
-            Kelola Lampiran
-          </Button>
-        </CardAction>
+        {canManageLampiran && (
+          <CardAction>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                router.visit(
+                  NeedAttachmentController.index.url({
+                    need: need.id,
+                  }),
+                )
+              }
+            >
+              <PaperclipIcon />
+              Kelola Lampiran
+            </Button>
+          </CardAction>
+        )}
       </CardHeader>
       <CardContent className="px-0">
         <div className="border-y">

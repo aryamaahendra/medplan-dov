@@ -15,7 +15,10 @@ export default function AttachmentsPage({ need }: AttachmentsPageProps) {
   const { hasPermission } = usePermission();
 
   const canEditLampiran =
-    (need.can?.update ?? false) && hasPermission('update need tab lampiran');
+    (need.can?.update ?? false) &&
+    (hasPermission('create need-attachments') ||
+      hasPermission('update need-attachments') ||
+      hasPermission('delete need-attachments'));
 
   return (
     <>

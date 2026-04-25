@@ -40,6 +40,7 @@ export const getColumns = (
   version: PlanningVersion,
   onEdit: (activity: PlanningActivityVersion) => void,
   onDelete: (activity: PlanningActivityVersion) => void,
+  hasPermission: (permission: string) => boolean,
 ): ColumnDef<PlanningActivityVersion>[] => {
   const startYear = version.year_start;
   const years = Array.from({ length: 5 }, (_, i) => startYear + i);
@@ -58,20 +59,24 @@ export const getColumns = (
 
         return (
           <ActionDropdown
-            actions={[
-              {
-                label: 'Edit',
-                icon: Pencil,
-                onClick: () => onEdit(activity),
-              },
-              'separator',
-              {
-                label: 'Hapus',
-                icon: Trash2,
-                onClick: () => onDelete(activity),
-                variant: 'destructive',
-              },
-            ]}
+            actions={
+              [
+                hasPermission('update planning-activity-versions') && {
+                  label: 'Edit',
+                  icon: Pencil,
+                  onClick: () => onEdit(activity),
+                },
+                hasPermission('update planning-activity-versions') &&
+                  hasPermission('delete planning-activity-versions') &&
+                  'separator',
+                hasPermission('delete planning-activity-versions') && {
+                  label: 'Hapus',
+                  icon: Trash2,
+                  onClick: () => onDelete(activity),
+                  variant: 'destructive',
+                },
+              ].filter(Boolean) as any
+            }
           />
         );
       },
@@ -243,6 +248,7 @@ export const getColumns = (
                 items={ind.activity_years ?? []}
                 year={year}
                 field="target"
+                disabled={!hasPermission('update planning-activity-versions')}
               />
             </div>
           );
@@ -267,6 +273,7 @@ export const getColumns = (
               field="budget"
               parentItems={activity.parent?.activity_years ?? []}
               parentCode={activity.parent?.code ?? undefined}
+              disabled={!hasPermission('update planning-activity-versions')}
             />
           );
         },

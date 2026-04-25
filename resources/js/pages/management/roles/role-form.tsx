@@ -47,36 +47,47 @@ export function RoleForm({ role, permissions }: RoleFormProps) {
       const name = permission.name.toLowerCase();
 
       if (name.includes('user')) {
-group = 'User Management';
-} else if (name.includes('role')) {
-group = 'Role Management';
-} else if (name.includes('permission')) {
-group = 'Permission Management';
-} else if (name.includes('org-unit')) {
-group = 'Organizational Units';
-} else if (name.includes('need-group')) {
-group = 'Need Configuration (Groups)';
-} else if (name.includes('need-type')) {
-group = 'Need Configuration (Types)';
-} else if (name.includes('need-checklist')) {
-group = 'Need Configuration (Checklists)';
-} else if (name.includes('view need tab')) {
-group = 'Need Tab Visibility';
-} else if (name.includes('update need tab')) {
-group = 'Need Tab Management';
-} else if (name.includes('any need')) {
-group = 'Need Management (Global Access)';
-} else if (name.includes('descendant need')) {
-group = 'Need Management (Parent/Descendant Access)';
-} else if (name.includes('need')) {
-group = 'Need Management (Basic Access)';
-} else if (
-        name.includes('renstra') ||
-        name.includes('kpi') ||
-        name.includes('planning') ||
-        name.includes('ssp')
-      ) {
-        group = 'Strategic Planning';
+        group = 'User Management';
+      } else if (name.includes('role')) {
+        group = 'Role Management';
+      } else if (name.includes('permission')) {
+        group = 'Permission Management';
+      } else if (name.includes('org-unit')) {
+        group = 'Organizational Units';
+      } else if (name.includes('need-group')) {
+        group = 'Need Configuration (Groups)';
+      } else if (name.includes('need-type')) {
+        group = 'Need Configuration (Types)';
+      } else if (name.includes('checklist')) {
+        group = 'Need Configuration (Checklists)';
+      } else if (name.includes('view need tab')) {
+        group = 'Need Tab Visibility';
+      } else if (name.includes('update need tab')) {
+        group = 'Need Tab Management';
+      } else if (name.includes('any need')) {
+        group = 'Need Management (Global Access)';
+      } else if (name.includes('descendant need')) {
+        group = 'Need Management (Parent/Descendant Access)';
+      } else if (name.includes('need')) {
+        group = 'Need Management (Basic Access)';
+      } else if (name.includes('kpi-group')) {
+        group = 'KPI (Groups)';
+      } else if (name.includes('kpi-indicator')) {
+        group = 'KPI (Indicators)';
+      } else if (name.includes('kpi-target')) {
+        group = 'KPI (Targets)';
+      } else if (name.includes('renstra')) {
+        group = 'Renstra';
+      } else if (name.includes('tujuan') || name.includes('sasaran')) {
+        group = 'Renstra (Tujuan & Sasaran)';
+      } else if (name.includes('indicator')) {
+        group = 'Renstra (Indicators)';
+      } else if (name.includes('planning-version')) {
+        group = 'Planning (Versions)';
+      } else if (name.includes('planning-activity')) {
+        group = 'Planning (Activities)';
+      } else if (name.includes('ssp')) {
+        group = 'SSP';
       }
 
       if (!acc[group]) {
@@ -103,7 +114,15 @@ group = 'Need Management (Basic Access)';
     'Need Configuration (Groups)',
     'Need Configuration (Types)',
     'Need Configuration (Checklists)',
-    'Strategic Planning',
+    'Renstra',
+    'Renstra (Tujuan & Sasaran)',
+    'Renstra (Indicators)',
+    'KPI (Groups)',
+    'KPI (Indicators)',
+    'KPI (Targets)',
+    'Planning (Versions)',
+    'Planning (Activities)',
+    'SSP',
     'Other',
   ];
 

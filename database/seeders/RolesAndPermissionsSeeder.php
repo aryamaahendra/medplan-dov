@@ -120,15 +120,26 @@ class RolesAndPermissionsSeeder extends Seeder
         // Super Admin - gets all permissions via Gate::before in a policy or AuthServiceProvider
         Role::firstOrCreate(['name' => UserRole::SuperAdmin->value, 'guard_name' => 'web']);
 
-        // Admin
-        $adminRole = Role::firstOrCreate(['name' => UserRole::Admin->value, 'guard_name' => 'web']);
-        $adminRole->syncPermissions(array_keys($permissions));
+        // Director
+        $directorRole = Role::firstOrCreate(['name' => UserRole::Director->value, 'guard_name' => 'web']);
+        $directorPermissions = array_filter(array_keys($permissions), function ($permission) {
+            // Read-only everything except user, role, permissions
+            $isRead = str_starts_with($permission, 'view');
+            $isAuthRelated = str_contains($permission, 'user') || str_contains($permission, 'role') || str_contains($permission, 'permission');
+
+            return $isRead && ! $isAuthRelated;
+        });
+        $directorRole->syncPermissions($directorPermissions);
 
         // Planner
         $plannerRole = Role::firstOrCreate(['name' => UserRole::Planner->value, 'guard_name' => 'web']);
-        $plannerRole->syncPermissions(array_merge(array_keys($permissions), [
-            'update any needs', 'delete any needs',
-        ]));
+        $plannerPermissions = array_filter(array_keys($permissions), function ($permission) {
+            // Everything except manage user, role, permissions
+            $isAuthRelated = str_contains($permission, 'user') || str_contains($permission, 'role') || str_contains($permission, 'permission');
+
+            return ! $isAuthRelated;
+        });
+        $plannerRole->syncPermissions($plannerPermissions);
 
         // Unit Head
         $unitHeadRole = Role::firstOrCreate(['name' => UserRole::UnitHead->value, 'guard_name' => 'web']);

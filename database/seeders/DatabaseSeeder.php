@@ -2,10 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Enums\UserRole;
-use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -23,20 +20,8 @@ class DatabaseSeeder extends Seeder
         $this->call(ISeedChecklistQuestionsTableSeeder::class);
         $this->call(ISeedNeedGroupChecklistQuestionTableSeeder::class);
 
-        foreach (UserRole::cases() as $role) {
-            $user = User::updateOrCreate(
-                ['email' => $role->value.'@admin.com'],
-                [
-                    'name' => $role->label(),
-                    'password' => Hash::make('password'),
-                    'email_verified_at' => now(),
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]
-            );
-
-            $user->assignRole($role->value);
-        }
+        // Users and Roles
+        $this->call(UserSeeder::class);
 
         // Planning Hierarchy
         $this->call(ISeedPlanningVersionsTableSeeder::class);

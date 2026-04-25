@@ -5,7 +5,7 @@ namespace App\Enums;
 enum UserRole: string
 {
     case SuperAdmin = 'super-admin';
-    case Admin = 'admin';
+    case Director = 'director';
     case Planner = 'planner';
     case UnitHead = 'unit-head';
     case Staff = 'staff';
@@ -14,7 +14,7 @@ enum UserRole: string
     {
         return match ($this) {
             self::SuperAdmin => 'Super Admin',
-            self::Admin => 'Admin',
+            self::Director => 'Director',
             self::Planner => 'Planner',
             self::UnitHead => 'Unit Head',
             self::Staff => 'Staff',

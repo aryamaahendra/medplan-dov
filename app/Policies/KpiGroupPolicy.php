@@ -14,26 +14,26 @@ class KpiGroupPolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('manage kpis');
+        return $user->hasPermissionTo('view any kpi-groups');
     }
 
     public function view(User $user, KpiGroup $kpiGroup): bool
     {
-        return $user->hasPermissionTo('manage kpis');
+        return $user->hasPermissionTo('view any kpi-groups');
     }
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('manage kpis');
+        return $user->hasPermissionTo('create kpi-groups');
     }
 
     public function update(User $user, KpiGroup $kpiGroup): bool
     {
-        return $user->hasPermissionTo('manage kpis');
+        return $user->hasPermissionTo('update kpi-groups');
     }
 
     public function delete(User $user, KpiGroup $kpiGroup): bool
     {
-        return $user->hasPermissionTo('manage kpis');
+        return $user->hasPermissionTo('delete kpi-groups');
     }
 }

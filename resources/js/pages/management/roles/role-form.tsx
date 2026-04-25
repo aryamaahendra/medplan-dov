@@ -46,21 +46,31 @@ export function RoleForm({ role, permissions }: RoleFormProps) {
       let group = 'Other';
       const name = permission.name.toLowerCase();
 
-      if (name.includes('user')) group = 'User Management';
-      else if (name.includes('role')) group = 'Role Management';
-      else if (name.includes('permission')) group = 'Permission Management';
-      else if (name.includes('org-unit')) group = 'Organizational Units';
-      else if (name.includes('need-group')) group = 'Need Configuration (Groups)';
-      else if (name.includes('need-type')) group = 'Need Configuration (Types)';
-      else if (name.includes('need-checklist'))
-        group = 'Need Configuration (Checklists)';
-      else if (name.includes('view need tab')) group = 'Need Tab Visibility';
-      else if (name.includes('update need tab')) group = 'Need Tab Management';
-      else if (name.includes('any need')) group = 'Need Management (Global Access)';
-      else if (name.includes('descendant need'))
-        group = 'Need Management (Parent/Descendant Access)';
-      else if (name.includes('need')) group = 'Need Management (Basic Access)';
-      else if (
+      if (name.includes('user')) {
+group = 'User Management';
+} else if (name.includes('role')) {
+group = 'Role Management';
+} else if (name.includes('permission')) {
+group = 'Permission Management';
+} else if (name.includes('org-unit')) {
+group = 'Organizational Units';
+} else if (name.includes('need-group')) {
+group = 'Need Configuration (Groups)';
+} else if (name.includes('need-type')) {
+group = 'Need Configuration (Types)';
+} else if (name.includes('need-checklist')) {
+group = 'Need Configuration (Checklists)';
+} else if (name.includes('view need tab')) {
+group = 'Need Tab Visibility';
+} else if (name.includes('update need tab')) {
+group = 'Need Tab Management';
+} else if (name.includes('any need')) {
+group = 'Need Management (Global Access)';
+} else if (name.includes('descendant need')) {
+group = 'Need Management (Parent/Descendant Access)';
+} else if (name.includes('need')) {
+group = 'Need Management (Basic Access)';
+} else if (
         name.includes('renstra') ||
         name.includes('kpi') ||
         name.includes('planning') ||
@@ -100,6 +110,7 @@ export function RoleForm({ role, permissions }: RoleFormProps) {
   const sortedGroups = Object.entries(groupedPermissions).sort(([a], [b]) => {
     const indexA = groupOrder.indexOf(a);
     const indexB = groupOrder.indexOf(b);
+
     return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
   });
 
@@ -165,10 +176,9 @@ export function RoleForm({ role, permissions }: RoleFormProps) {
                           />
                         </div>
                       ))}
-                    </div>
                   </div>
-                ),
-              )}
+                </div>
+              ))}
             </div>
             {errors.permissions && (
               <p className="text-sm text-destructive">{errors.permissions}</p>

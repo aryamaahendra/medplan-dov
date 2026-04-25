@@ -14,26 +14,26 @@ class PlanningVersionPolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('manage plannings');
+        return $user->hasPermissionTo('view any planning-versions');
     }
 
     public function view(User $user, PlanningVersion $planningVersion): bool
     {
-        return $user->hasPermissionTo('manage plannings');
+        return $user->hasPermissionTo('view any planning-versions');
     }
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('manage plannings');
+        return $user->hasPermissionTo('create planning-versions');
     }
 
     public function update(User $user, PlanningVersion $planningVersion): bool
     {
-        return $user->hasPermissionTo('manage plannings');
+        return $user->hasPermissionTo('update planning-versions');
     }
 
     public function delete(User $user, PlanningVersion $planningVersion): bool
     {
-        return $user->hasPermissionTo('manage plannings');
+        return $user->hasPermissionTo('delete planning-versions');
     }
 }

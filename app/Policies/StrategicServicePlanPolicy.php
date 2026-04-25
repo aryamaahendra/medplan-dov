@@ -14,26 +14,26 @@ class StrategicServicePlanPolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('manage ssp');
+        return $user->hasPermissionTo('view any ssps');
     }
 
     public function view(User $user, StrategicServicePlan $strategicServicePlan): bool
     {
-        return $user->hasPermissionTo('manage ssp');
+        return $user->hasPermissionTo('view any ssps');
     }
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('manage ssp');
+        return $user->hasPermissionTo('create ssps');
     }
 
     public function update(User $user, StrategicServicePlan $strategicServicePlan): bool
     {
-        return $user->hasPermissionTo('manage ssp');
+        return $user->hasPermissionTo('update ssps');
     }
 
     public function delete(User $user, StrategicServicePlan $strategicServicePlan): bool
     {
-        return $user->hasPermissionTo('manage ssp');
+        return $user->hasPermissionTo('delete ssps');
     }
 }

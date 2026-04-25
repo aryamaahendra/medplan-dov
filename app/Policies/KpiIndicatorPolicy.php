@@ -14,26 +14,26 @@ class KpiIndicatorPolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('manage kpis');
+        return $user->hasPermissionTo('view any kpi-indicators');
     }
 
     public function view(User $user, KpiIndicator $kpiIndicator): bool
     {
-        return $user->hasPermissionTo('manage kpis');
+        return $user->hasPermissionTo('view any kpi-indicators');
     }
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('manage kpis');
+        return $user->hasPermissionTo('create kpi-indicators');
     }
 
     public function update(User $user, KpiIndicator $kpiIndicator): bool
     {
-        return $user->hasPermissionTo('manage kpis');
+        return $user->hasPermissionTo('update kpi-indicators');
     }
 
     public function delete(User $user, KpiIndicator $kpiIndicator): bool
     {
-        return $user->hasPermissionTo('manage kpis');
+        return $user->hasPermissionTo('delete kpi-indicators');
     }
 }

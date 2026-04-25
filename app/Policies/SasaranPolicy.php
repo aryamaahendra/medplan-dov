@@ -20,7 +20,7 @@ class SasaranPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('manage renstras');
+        return $user->hasPermissionTo('view any sasarans');
     }
 
     /**
@@ -28,7 +28,7 @@ class SasaranPolicy
      */
     public function view(User $user, Sasaran $sasaran): bool
     {
-        return $user->hasPermissionTo('manage renstras');
+        return $user->hasPermissionTo('view any sasarans');
     }
 
     /**
@@ -36,7 +36,7 @@ class SasaranPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('manage renstras');
+        return $user->hasPermissionTo('create sasarans');
     }
 
     /**
@@ -44,7 +44,7 @@ class SasaranPolicy
      */
     public function update(User $user, Sasaran $sasaran): bool
     {
-        return $user->hasPermissionTo('manage renstras');
+        return $user->hasPermissionTo('update sasarans');
     }
 
     /**
@@ -52,7 +52,7 @@ class SasaranPolicy
      */
     public function delete(User $user, Sasaran $sasaran): bool
     {
-        return $user->hasPermissionTo('manage renstras');
+        return $user->hasPermissionTo('delete sasarans');
     }
 
     /**

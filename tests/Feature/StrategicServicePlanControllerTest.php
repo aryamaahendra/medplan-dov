@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\UserRole;
 use App\Models\StrategicServicePlan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -11,6 +12,7 @@ describe('StrategicServicePlanController', function () {
 
     beforeEach(function () {
         $this->user = User::factory()->create();
+        $this->user->assignRole(UserRole::SuperAdmin->value);
         $this->actingAs($this->user);
     });
 

@@ -20,7 +20,7 @@ class TujuanPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('manage renstras');
+        return $user->hasPermissionTo('view any tujuans');
     }
 
     /**
@@ -28,7 +28,7 @@ class TujuanPolicy
      */
     public function view(User $user, Tujuan $tujuan): bool
     {
-        return $user->hasPermissionTo('manage renstras');
+        return $user->hasPermissionTo('view any tujuans');
     }
 
     /**
@@ -36,7 +36,7 @@ class TujuanPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('manage renstras');
+        return $user->hasPermissionTo('create tujuans');
     }
 
     /**
@@ -44,7 +44,7 @@ class TujuanPolicy
      */
     public function update(User $user, Tujuan $tujuan): bool
     {
-        return $user->hasPermissionTo('manage renstras');
+        return $user->hasPermissionTo('update tujuans');
     }
 
     /**
@@ -52,7 +52,7 @@ class TujuanPolicy
      */
     public function delete(User $user, Tujuan $tujuan): bool
     {
-        return $user->hasPermissionTo('manage renstras');
+        return $user->hasPermissionTo('delete tujuans');
     }
 
     /**

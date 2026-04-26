@@ -22,13 +22,18 @@ class NeedGroupController extends Controller
 
     private const array SEARCH_COLUMNS = ['name', 'description'];
 
-    private const array SORTABLE_COLUMNS = ['name', 'year', 'is_active', 'need_count', 'created_at'];
+    private const array SORTABLE_COLUMNS = ['name', 'year', 'is_active', 'need_count', 'total_budget', 'approved_count', 'priority_count', 'created_at'];
 
     public function index(Request $request): Response
     {
         $this->authorize('viewAny', NeedGroup::class);
         $needGroups = $this->applyDataTable(
-            NeedGroup::query(),
+            NeedGroup::query()
+                ->withSum('needs as total_budget', 'total_price')
+                ->withCount([
+                    'needs as approved_count' => fn ($query) => $query->whereNotNull('approved_by_director_at'),
+                    'needs as priority_count' => fn ($query) => $query->where('is_priority', true),
+                ]),
             $request,
             self::SEARCH_COLUMNS,
             self::SORTABLE_COLUMNS,

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Need;
 use App\Models\NeedGroup;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -8,19 +9,28 @@ use Inertia\Testing\AssertableInertia as Assert;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
+    $this->user = User::factory()->admin()->create();
     $this->be($this->user);
 });
 
 it('can view need groups index', function () {
-    NeedGroup::factory()->count(3)->create();
+    $group = NeedGroup::factory()->create();
+    Need::factory()->count(2)->create([
+        'need_group_id' => $group->id,
+        'total_price' => 1000,
+        'approved_by_director_at' => now(),
+        'is_priority' => true,
+    ]);
 
     $response = $this->get(route('need-groups.index'));
 
     $response->assertStatus(200)
         ->assertInertia(fn (Assert $page) => $page
             ->component('need/groups/index')
-            ->has('needGroups.data', 3)
+            ->has('needGroups.data', 1)
+            ->where('needGroups.data.0.total_budget', '2000.00')
+            ->where('needGroups.data.0.approved_count', 2)
+            ->where('needGroups.data.0.priority_count', 2)
         );
 });
 

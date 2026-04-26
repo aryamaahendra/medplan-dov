@@ -1,11 +1,11 @@
+import { Area, AreaChart, XAxis } from 'recharts';
 import {
-  Line,
-  LineChart,
-  CartesianGrid,
-  XAxis,
-  ResponsiveContainer,
-} from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   ChartContainer,
   ChartTooltip,
@@ -25,79 +25,115 @@ interface DashboardData {
 }
 
 export function DashboardLineCharts({ data }: { data: DashboardData[] }) {
-  // Recharts renders data left-to-right, so we should reverse the data if it's descending order by year
-  // Let's assume data is sorted by latest year first, we reverse it for chart to show chronological progression.
   const chartData = [...data].reverse();
-
-  const chartConfig = {
-    value: {
-      label: 'Value',
-      color: 'hsl(var(--primary))',
-    },
-  };
 
   const renderChart = (
     title: string,
+    description: string,
     dataKey: keyof DashboardData,
     formatter: (v: any) => string,
-  ) => (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-sm font-medium text-muted-foreground">
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="h-[200px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <ChartContainer config={chartConfig} className="h-[200px] w-full">
-              <LineChart
-                accessibilityLayer
-                data={chartData}
-                margin={{ left: 12, right: 12, top: 10, bottom: 10 }}
-              >
-                <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="name"
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={8}
-                  tickFormatter={(value) =>
-                    value.length > 10 ? value.slice(0, 10) + '...' : value
-                  }
-                  style={{ fontSize: '10px' }}
-                />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                  formatter={(value: any) => formatter(value)}
-                />
-                <Line
-                  dataKey={dataKey}
-                  type="monotone"
-                  stroke="var(--color-value)"
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
-                  activeDot={{ r: 6 }}
-                />
-              </LineChart>
-            </ChartContainer>
-          </ResponsiveContainer>
-        </div>
-      </CardContent>
-    </Card>
-  );
+    color: string,
+  ) => {
+    const config = {
+      [dataKey]: {
+        label: title,
+        color,
+      },
+    };
+
+    return (
+      <Card className="overflow-hidden pt-3 pb-0">
+        <CardHeader className="px-3 pt-0">
+          <CardTitle className="text-sm">{title}</CardTitle>
+          <CardDescription className="text-xs leading-tight">
+            {description}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          <ChartContainer config={config} className="h-[80px] w-full">
+            <AreaChart
+              data={chartData}
+              margin={{ left: 0, right: 0, top: 10, bottom: 0 }}
+            >
+              <defs>
+                <linearGradient
+                  id={`fill-${dataKey}`}
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop
+                    offset="5%"
+                    stopColor={`var(--color-${dataKey as string})`}
+                    stopOpacity={0.3}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor={`var(--color-${dataKey as string})`}
+                    stopOpacity={0.1}
+                  />
+                </linearGradient>
+              </defs>
+              <XAxis dataKey="name" hide />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent />}
+                formatter={(value: any) => formatter(value)}
+              />
+              <Area
+                dataKey={dataKey as string}
+                type="natural"
+                fill={`url(#fill-${dataKey})`}
+                fillOpacity={1}
+                stroke={`var(--color-${dataKey as string})`}
+                strokeWidth={2}
+                dot={false}
+                activeDot={{ r: 4, strokeWidth: 0 }}
+              />
+            </AreaChart>
+          </ChartContainer>
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {renderChart('Total Usulan', 'total_needs', formatNumber)}
-      {renderChart('Total Anggaran', 'total_budget', formatCompactIDR)}
-      {renderChart('Usulan Prioritas', 'priority_needs', formatNumber)}
-      {renderChart('Disetujui Direktur', 'approved_by_director', formatNumber)}
+      {renderChart(
+        'Total Usulan',
+        'Jumlah item usulan dari seluruh unit',
+        'total_needs',
+        formatNumber,
+        'hsl(var(--chart-1))',
+      )}
+      {renderChart(
+        'Total Anggaran',
+        'Total nilai rupiah rencana belanja',
+        'total_budget',
+        formatCompactIDR,
+        'hsl(var(--chart-2))',
+      )}
+      {renderChart(
+        'Usulan Prioritas',
+        'Item yang ditandai mendesak/penting',
+        'priority_needs',
+        formatNumber,
+        'hsl(var(--chart-3))',
+      )}
+      {renderChart(
+        'Disetujui Direktur',
+        'Usulan yang sudah diverifikasi pimpinan',
+        'approved_by_director',
+        formatNumber,
+        'hsl(var(--chart-4))',
+      )}
       {renderChart(
         'Rata-rata Kelengkapan',
+        'Persentase pengisian checklist instrumen',
         'avg_completeness',
         (v) => `${Math.round(v)}%`,
+        'hsl(var(--chart-5))',
       )}
     </div>
   );

@@ -58,8 +58,8 @@ class UserFactory extends Factory
     public function admin(): static
     {
         return $this->afterCreating(function (User $user) {
-            Role::firstOrCreate(['name' => UserRole::Admin->value]);
-            $user->syncRoles([UserRole::Admin->value]);
+            Role::firstOrCreate(['name' => UserRole::SuperAdmin->value, 'guard_name' => 'web']);
+            $user->syncRoles([UserRole::SuperAdmin->value]);
         });
     }
 

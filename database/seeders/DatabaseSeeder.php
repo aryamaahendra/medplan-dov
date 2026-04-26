@@ -45,15 +45,15 @@ class DatabaseSeeder extends Seeder
         $this->call(ISeedStrategicServicePlansTableSeeder::class);
 
         // Needs (Core)
-        $this->call(ISeedNeedsTableSeeder::class);
+        // $this->call(ISeedNeedsTableSeeder::class);
 
         // Needs (Extended)
-        $this->call(ISeedNeedDetailsTableSeeder::class);
-        $this->call(ISeedNeedAttachmentsTableSeeder::class);
-        $this->call(ISeedNeedChecklistAnswersTableSeeder::class);
-        $this->call(ISeedNeedIndicatorTableSeeder::class);
-        $this->call(ISeedNeedSasaranTableSeeder::class);
-        $this->call(ISeedNeedStrategicServicePlanTableSeeder::class);
-        $this->call(ISeedKpiIndicatorNeedTableSeeder::class);
+        // $this->call(ISeedNeedDetailsTableSeeder::class);
+        // $this->call(ISeedNeedAttachmentsTableSeeder::class);
+        // $this->call(ISeedNeedChecklistAnswersTableSeeder::class);
+        // $this->call(ISeedNeedIndicatorTableSeeder::class);
+        // $this->call(ISeedNeedSasaranTableSeeder::class);
+        // $this->call(ISeedNeedStrategicServicePlanTableSeeder::class);
+        // $this->call(ISeedKpiIndicatorNeedTableSeeder::class);
     }
 }

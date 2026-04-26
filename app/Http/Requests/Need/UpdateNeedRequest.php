@@ -64,9 +64,8 @@ class UpdateNeedRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'need_group_id' => ['sometimes', 'required', 'integer', 'exists:need_groups,id'],
+            'need_group_id' => ['required', 'integer', 'exists:need_groups,id'],
             'organizational_unit_id' => [
-                'sometimes',
                 'required',
                 'integer',
                 'exists:organizational_units,id',
@@ -89,18 +88,18 @@ class UpdateNeedRequest extends FormRequest
                     $fail('Anda tidak memiliki izin untuk memindahkan usulan ke unit organisasi ini.');
                 },
             ],
-            'need_type_id' => ['sometimes', 'required', 'integer', 'exists:need_types,id'],
-            'year' => ['sometimes', 'required', 'integer', 'min:2000', 'max:2100'],
-            'title' => ['sometimes', 'required', 'string', 'max:255'],
+            'need_type_id' => ['required', 'integer', 'exists:need_types,id'],
+            'year' => ['required', 'integer', 'min:2000', 'max:2100'],
+            'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'current_condition' => ['nullable', 'string'],
             'required_condition' => ['nullable', 'string'],
-            'volume' => ['sometimes', 'required', 'numeric', 'min:0'],
-            'unit' => ['sometimes', 'required', 'string', Rule::in(['pcs', 'unit', 'orang', 'paket', 'set', 'buah', 'lembar', 'kg', 'liter', 'meter'])],
-            'unit_price' => ['sometimes', 'required', 'numeric', 'min:0'],
-            'total_price' => ['sometimes', 'required', 'numeric', 'min:0'],
-            'urgency' => ['sometimes', 'required', Rule::enum(Urgency::class)],
-            'impact' => ['sometimes', 'required', Rule::enum(Impact::class)],
+            'volume' => ['required', 'numeric', 'min:0'],
+            'unit' => ['required', 'string', Rule::in(['pcs', 'unit', 'orang', 'paket', 'set', 'buah', 'lembar', 'kg', 'liter', 'meter'])],
+            'unit_price' => ['required', 'numeric', 'min:0'],
+            'total_price' => ['required', 'numeric', 'min:0'],
+            'urgency' => ['required', Rule::enum(Urgency::class)],
+            'impact' => ['required', Rule::enum(Impact::class)],
             'is_priority' => ['boolean'],
             'status' => ['sometimes', 'string', Rule::in(['draft', 'submitted', 'approved', 'rejected'])],
             'sasaran_ids' => ['nullable', 'array'],

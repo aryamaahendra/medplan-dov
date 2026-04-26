@@ -54,8 +54,8 @@ class GetFilteredNeedsAction
             })
             ->when($filters['need_group_id'] ?? null, fn ($q, $v) => $q->where('need_group_id', $v));
 
-        if (! $user->hasPermissionTo('view any needs')) {
-            if ($user->hasPermissionTo('view descendant needs') && $user->organizational_unit_id) {
+        if (! $user->can('view any needs')) {
+            if ($user->can('view descendant needs') && $user->organizational_unit_id) {
                 $unit = $user->organizationalUnit;
                 if ($unit) {
                     $unit->load('descendantsRecursive');

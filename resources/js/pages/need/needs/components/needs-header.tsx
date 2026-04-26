@@ -1,4 +1,5 @@
 import {
+  BarChart2,
   ClipboardList,
   Ellipsis,
   FileDown,
@@ -24,6 +25,8 @@ interface NeedsHeaderProps {
   onExport: () => void;
   onEditGroup: () => void;
   onDeleteGroup: () => void;
+  showDashboard: boolean;
+  onToggleDashboard: () => void;
 }
 
 export function NeedsHeader({
@@ -34,6 +37,8 @@ export function NeedsHeader({
   onExport,
   onEditGroup,
   onDeleteGroup,
+  showDashboard,
+  onToggleDashboard,
 }: NeedsHeaderProps) {
   const { hasPermission, hasAnyPermission } = usePermission();
 
@@ -83,7 +88,7 @@ export function NeedsHeader({
             variant={'outline'}
             onClick={() => setViewMode('table')}
             className={cn({
-              'bg-muted': viewMode === 'table',
+              'bg-muted': viewMode === 'table' && !showDashboard,
             })}
           >
             <List />
@@ -93,11 +98,21 @@ export function NeedsHeader({
             variant={'outline'}
             onClick={() => setViewMode('grid')}
             className={cn({
-              'bg-muted': viewMode === 'grid',
+              'bg-muted': viewMode === 'grid' && !showDashboard,
             })}
           >
             <LayoutGrid />
             <span className="sr-only">Grid view</span>
+          </Button>
+          <Button
+            variant={'outline'}
+            onClick={onToggleDashboard}
+            className={cn({
+              'bg-muted': showDashboard,
+            })}
+          >
+            <BarChart2 />
+            <span className="sr-only">Dashboard view</span>
           </Button>
         </ButtonGroup>
 

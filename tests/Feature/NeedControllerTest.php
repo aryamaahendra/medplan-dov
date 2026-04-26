@@ -14,11 +14,17 @@ use App\Models\StrategicServicePlan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    app(PermissionRegistrar::class)->forgetCachedPermissions();
+    Role::firstOrCreate(['name' => 'super-admin']);
+
     $this->user = User::factory()->create();
+    $this->user->assignRole('super-admin');
     $this->be($this->user);
     $this->group = NeedGroup::factory()->create(['name' => 'Test Group', 'year' => 2026, 'is_active' => true]);
 });
@@ -112,7 +118,7 @@ it('provides active kpi groups and strategic plans to create view', function () 
 
     $response->assertStatus(200)
         ->assertInertia(fn (Assert $page) => $page
-            ->component('needs/create')
+            ->component('need/needs/create')
             ->has('kpiGroups', 1)
             ->where('kpiGroups.0.name', 'Active Group')
             ->has('strategicServicePlans', 1)
@@ -147,9 +153,10 @@ it('can filter needs by urgency, impact, and priority', function () {
         'urgency' => [Urgency::High->value],
     ]));
     $response->assertInertia(fn (Assert $page) => $page
-        ->component('needs/index')
+        ->component('need/needs/index')
         ->has('needs.data', 1)
         ->where('needs.data.0.urgency', Urgency::High->value)
+        ->has('stats')
     );
 
     $response = $this->get(route('needs.index', [
@@ -157,7 +164,7 @@ it('can filter needs by urgency, impact, and priority', function () {
         'impact' => [Impact::High->value],
     ]));
     $response->assertInertia(fn (Assert $page) => $page
-        ->component('needs/index')
+        ->component('need/needs/index')
         ->has('needs.data', 1)
         ->where('needs.data.0.impact', Impact::High->value)
     );
@@ -167,7 +174,7 @@ it('can filter needs by urgency, impact, and priority', function () {
         'is_priority' => ['1'],
     ]));
     $response->assertInertia(fn (Assert $page) => $page
-        ->component('needs/index')
+        ->component('need/needs/index')
         ->has('needs.data', 1)
         ->where('needs.data.0.is_priority', true)
     );
@@ -182,7 +189,7 @@ it('can view a need detail page', function () {
 
     $response->assertStatus(200)
         ->assertInertia(fn (Assert $page) => $page
-            ->component('needs/show')
+            ->component('need/needs/show')
             ->has('need')
             ->where('need.id', $need->id)
             ->has('need.sasarans', 1)

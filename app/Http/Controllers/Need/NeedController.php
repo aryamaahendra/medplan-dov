@@ -23,6 +23,7 @@ use App\Models\User;
 use App\Traits\HasDataTable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -82,6 +83,41 @@ class NeedController extends Controller
         return Inertia::render('need/needs/index', [
             'needs' => $needs,
             'currentGroup' => $currentGroup,
+            'stats' => fn () => [
+                'total_needs' => Need::where('need_group_id', $groupId)->count(),
+                'total_budget' => Need::where('need_group_id', $groupId)->sum('total_price'),
+                'priority_needs' => Need::where('need_group_id', $groupId)->where('is_priority', true)->count(),
+                'avg_completeness' => Need::where('need_group_id', $groupId)->avg('checklist_percentage') ?? 0,
+            ],
+            'statusDistribution' => Inertia::defer(fn () => Cache::remember("group-{$groupId}-status-dist", 300, fn () => Need::where('need_group_id', $groupId)
+                ->selectRaw('status, count(*) as count')
+                ->groupBy('status')
+                ->get()
+                ->pluck('count', 'status')
+                ->toArray()), 'charts'),
+            'needsByUnit' => Inertia::defer(fn () => Cache::remember("group-{$groupId}-by-unit", 300, fn () => Need::with('organizationalUnit:id,name')
+                ->where('need_group_id', $groupId)
+                ->selectRaw('organizational_unit_id, count(*) as count')
+                ->groupBy('organizational_unit_id')
+                ->orderByDesc('count')
+                ->limit(10)
+                ->get()
+                ->map(fn ($item) => [
+                    'name' => $item->organizationalUnit->name ?? 'Unknown',
+                    'count' => $item->count,
+                ])
+                ->all()), 'charts'),
+            'needsByType' => Inertia::defer(fn () => Cache::remember("group-{$groupId}-by-type", 300, fn () => Need::with('needType:id,name')
+                ->where('need_group_id', $groupId)
+                ->selectRaw('need_type_id, count(*) as count')
+                ->groupBy('need_type_id')
+                ->orderByDesc('count')
+                ->get()
+                ->map(fn ($item) => [
+                    'name' => $item->needType->name ?? 'Unknown',
+                    'count' => $item->count,
+                ])
+                ->all()), 'charts'),
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name', 'parent_id'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
             'filters' => array_merge($this->dataTableFilters($request), $filters),

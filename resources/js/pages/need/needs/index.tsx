@@ -1,13 +1,23 @@
-import { Head, router } from '@inertiajs/react';
+import { Deferred, Head, router } from '@inertiajs/react';
+import {
+  AlertCircle,
+  CheckCircle2,
+  ClipboardCheck,
+  DollarSign,
+} from 'lucide-react';
 import { useMemo, useState, useSyncExternalStore } from 'react';
 import { toast } from 'sonner';
 
 import needExportActions from '@/actions/App/Http/Controllers/Need/NeedExportController';
 import { ConfirmDialog } from '@/components/confirm-dialog';
+import { DistributionChart } from '@/components/dashboard/distribution-chart';
+import { StatsCard } from '@/components/dashboard/stats-card';
 import { DataTable } from '@/components/data-table/data-table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
+import { formatIDR, formatNumber, formatPercent } from '@/lib/formatters';
+import { cn } from '@/lib/utils';
 import needGroupRoutes from '@/routes/need-groups';
 import needRoutes from '@/routes/needs';
 
@@ -62,6 +72,15 @@ interface NeedsIndexProps {
     min_checklist_score?: string | string[];
     need_group_id?: string | string[];
   };
+  stats: {
+    total_needs: number;
+    total_budget: number;
+    priority_needs: number;
+    avg_completeness: number;
+  };
+  statusDistribution: Record<string, number>;
+  needsByUnit: { name: string; count: number }[];
+  needsByType: { name: string; count: number }[];
 }
 
 export default function NeedsIndex({
@@ -70,10 +89,15 @@ export default function NeedsIndex({
   organizationalUnits,
   needTypes,
   filters,
+  stats,
+  statusDistribution,
+  needsByUnit,
+  needsByType,
 }: NeedsIndexProps) {
   const [deletingNeed, setDeletingNeed] = useState<Need | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [reviewingNeedId, setReviewingNeedId] = useState<number | null>(null);
+  const [showDashboard, setShowDashboard] = useState(false);
 
   const viewMode = useSyncExternalStore(
     viewModeStore.subscribe,
@@ -172,12 +196,48 @@ export default function NeedsIndex({
         <NeedsHeader
           currentGroup={currentGroup}
           viewMode={viewMode}
-          setViewMode={handleViewModeChange}
+          setViewMode={(mode) => {
+            handleViewModeChange(mode);
+            setShowDashboard(false);
+          }}
+          showDashboard={showDashboard}
+          onToggleDashboard={() => setShowDashboard((v) => !v)}
           onCreate={onCreate}
           onExport={onExport}
           onEditGroup={() => setIsGroupDialogOpen(true)}
           onDeleteGroup={() => setIsDeletingGroup(true)}
         />
+
+        {/* Stats Cards */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <StatsCard
+            title="Total Usulan"
+            value={formatNumber(stats.total_needs)}
+            icon={ClipboardCheck}
+            description="Jumlah keseluruhan usulan kebutuhan"
+          />
+          <StatsCard
+            title="Total Estimasi Anggaran"
+            value={formatIDR(stats.total_budget)}
+            icon={DollarSign}
+            description="Total rencana anggaran yang diusulkan"
+            iconClassName="bg-emerald-500/10"
+          />
+          <StatsCard
+            title="Usulan Prioritas"
+            value={formatNumber(stats.priority_needs)}
+            icon={AlertCircle}
+            description="Kebutuhan dengan tingkat urgensi tinggi"
+            iconClassName="bg-amber-500/10"
+          />
+          <StatsCard
+            title="Rata-rata Kelengkapan"
+            value={formatPercent(stats.avg_completeness)}
+            icon={CheckCircle2}
+            description="Persentase pemenuhan checklist"
+            iconClassName="bg-blue-500/10"
+          />
+        </div>
 
         <NeedGroupDialog
           open={isGroupDialogOpen}
@@ -196,7 +256,42 @@ export default function NeedsIndex({
           loading={isDeletingGroupLoading}
         />
 
-        {viewMode === 'loading' ? (
+        {showDashboard ? (
+          <Deferred
+            data={['statusDistribution', 'needsByUnit', 'needsByType']}
+            fallback={
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <Skeleton className="h-[300px] w-full" />
+                <Skeleton className="h-[300px] w-full" />
+                <Skeleton className="h-[300px] w-full" />
+              </div>
+            }
+          >
+            {({ reloading }) => (
+              <div
+                className={cn('grid gap-6 md:grid-cols-2 lg:grid-cols-3', {
+                  'opacity-50': reloading,
+                })}
+              >
+                <DistributionChart
+                  title="Distribusi Status"
+                  data={statusDistribution}
+                  color="bg-blue-500"
+                />
+                <DistributionChart
+                  title="Top 10 Unit Pengusul"
+                  data={needsByUnit}
+                  color="bg-indigo-500"
+                />
+                <DistributionChart
+                  title="Berdasarkan Tipe"
+                  data={needsByType}
+                  color="bg-purple-500"
+                />
+              </div>
+            )}
+          </Deferred>
+        ) : viewMode === 'loading' ? (
           <div className="overflow-hidden rounded-md border">
             <div className="h-10 border-b bg-muted/20" />
             <div className="divide-y">

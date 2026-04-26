@@ -10,8 +10,15 @@ use App\Models\Sasaran;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    app(PermissionRegistrar::class)->forgetCachedPermissions();
+    Role::firstOrCreate(['name' => 'super-admin']);
+});
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -51,6 +58,7 @@ test('guest cannot access needs index', function () {
 
 test('index renders the correct component and props', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     $group = NeedGroup::factory()->create(['is_active' => true]);
     $unit = OrganizationalUnit::factory()->create();
     $needType = NeedType::factory()->create();
@@ -69,11 +77,13 @@ test('index renders the correct component and props', function () {
             ->has('organizationalUnits')
             ->has('needTypes')
             ->has('filters')
+            ->has('stats')
         );
 });
 
 test('index can search needs by title', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     $group = NeedGroup::factory()->create(['is_active' => true]);
     $unit = OrganizationalUnit::factory()->create();
     $needType = NeedType::factory()->create();
@@ -92,6 +102,7 @@ test('index can search needs by title', function () {
 
 test('index can filter needs by year', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     $group = NeedGroup::factory()->create(['is_active' => true]);
     $unit = OrganizationalUnit::factory()->create();
     $needType = NeedType::factory()->create();
@@ -118,6 +129,7 @@ test('index can filter needs by year', function () {
 
 test('index can filter needs by status', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     $group = NeedGroup::factory()->create(['is_active' => true]);
     $unit = OrganizationalUnit::factory()->create();
     $needType = NeedType::factory()->create();
@@ -136,6 +148,7 @@ test('index can filter needs by status', function () {
 
 test('index can filter needs by need_type_id and organizational_unit_id', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     $group = NeedGroup::factory()->create(['is_active' => true]);
     $unit1 = OrganizationalUnit::factory()->create();
     $unit2 = OrganizationalUnit::factory()->create();
@@ -158,6 +171,7 @@ test('index can filter needs by need_type_id and organizational_unit_id', functi
 
 test('index props only include active need types', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     $group = NeedGroup::factory()->create(['is_active' => true]);
 
     $activeType = NeedType::factory()->create(['name' => 'Active Type', 'is_active' => true]);
@@ -174,6 +188,7 @@ test('index props only include active need types', function () {
 
 test('index loads relationships for needs', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     $group = NeedGroup::factory()->create(['is_active' => true]);
     $unit = OrganizationalUnit::factory()->create();
     $needType = NeedType::factory()->create();
@@ -195,6 +210,7 @@ test('index loads relationships for needs', function () {
 
 test('index does not show soft-deleted needs', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     $group = NeedGroup::factory()->create(['is_active' => true]);
     $unit = OrganizationalUnit::factory()->create();
     $needType = NeedType::factory()->create();
@@ -214,6 +230,7 @@ test('index does not show soft-deleted needs', function () {
 
 test('store creates a new need', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     $group = NeedGroup::factory()->create(['is_active' => true]);
     $unit = OrganizationalUnit::factory()->create();
     $needType = NeedType::factory()->create();
@@ -233,6 +250,7 @@ test('store creates a new need', function () {
 
 test('store validates required fields', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
 
     $this->actingAs($user)
         ->post(route('needs.store'), [])
@@ -252,6 +270,7 @@ test('store validates required fields', function () {
 
 test('store validates unit must be a valid enum value', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     $group = NeedGroup::factory()->create(['is_active' => true]);
     $unit = OrganizationalUnit::factory()->create();
     $needType = NeedType::factory()->create();
@@ -263,6 +282,7 @@ test('store validates unit must be a valid enum value', function () {
 
 test('store validates status must be a valid value', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     $group = NeedGroup::factory()->create(['is_active' => true]);
     $unit = OrganizationalUnit::factory()->create();
     $needType = NeedType::factory()->create();
@@ -274,6 +294,7 @@ test('store validates status must be a valid value', function () {
 
 test('store validations on numeric fields ensuring values cannot be negative', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     $group = NeedGroup::factory()->create(['is_active' => true]);
     $unit = OrganizationalUnit::factory()->create();
     $needType = NeedType::factory()->create();
@@ -293,6 +314,7 @@ test('store validations on numeric fields ensuring values cannot be negative', f
 
 test('update modifies an existing need', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     $group = NeedGroup::factory()->create(['is_active' => true]);
     $unit = OrganizationalUnit::factory()->create();
     $needType = NeedType::factory()->create();
@@ -313,6 +335,7 @@ test('update modifies an existing need', function () {
 
 test('update validates required fields', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     $unit = OrganizationalUnit::factory()->create();
     $needType = NeedType::factory()->create();
     $need = Need::factory()->create([
@@ -338,6 +361,7 @@ test('update validates required fields', function () {
 
 test('update numerical fields cannot be negative', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     $group = NeedGroup::factory()->create(['is_active' => true]);
     $unit = OrganizationalUnit::factory()->create();
     $needType = NeedType::factory()->create();
@@ -362,6 +386,7 @@ test('update numerical fields cannot be negative', function () {
 
 test('destroy soft-deletes a need', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     $group = NeedGroup::factory()->create(['is_active' => true]);
     $need = Need::factory()->create(['need_group_id' => $group->id]);
 

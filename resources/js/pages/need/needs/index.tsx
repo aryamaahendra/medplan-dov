@@ -41,9 +41,24 @@ interface NeedsIndexProps {
     total_budget: number;
     priority_needs: number;
     avg_completeness: number;
+    approved_by_director: number;
+    prev_group: { id: number; name: string } | null;
+    prev_total_needs: number | null;
+    prev_total_budget: number | null;
+    prev_priority_needs: number | null;
+    prev_avg_completeness: number | null;
+    prev_approved_by_director: number | null;
   };
   statusDistribution: Record<string, number>;
-  needsByUnit: { name: string; count: number }[];
+  needsByUnit: {
+    unit_id: number | null;
+    name: string;
+    parents: string[];
+    count: number;
+    total_budget: number;
+    priority_count: number;
+    approved_count: number;
+  }[];
   needsByType: { name: string; count: number }[];
 }
 

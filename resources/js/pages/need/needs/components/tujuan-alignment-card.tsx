@@ -13,7 +13,7 @@ export function TujuanAlignmentCard({ tujuan }: TujuanAlignmentCardProps) {
       <TujuanHeader name={tujuan.name} />
       <CardContent className="p-0">
         <div className="divide-y">
-          {tujuan.sasarans.map((sasaran) => (
+          {tujuan.sasarans?.map((sasaran) => (
             <SasaranItem key={sasaran.id} sasaran={sasaran} />
           ))}
         </div>

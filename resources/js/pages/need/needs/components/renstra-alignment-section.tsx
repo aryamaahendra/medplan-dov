@@ -129,7 +129,7 @@ function TujuanGroup({
       </div>
 
       <div className="grid gap-4 border-l border-dashed pl-4">
-        {tujuan.sasarans.map((sasaran) => (
+        {tujuan.sasarans?.map((sasaran: any) => (
           <SasaranItem
             key={sasaran.id}
             sasaran={sasaran}

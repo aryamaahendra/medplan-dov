@@ -23,7 +23,6 @@ use App\Models\User;
 use App\Traits\HasDataTable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -83,31 +82,69 @@ class NeedController extends Controller
         return Inertia::render('need/needs/index', [
             'needs' => $needs,
             'currentGroup' => $currentGroup,
-            'stats' => Inertia::defer(fn () => [
-                'total_needs' => Need::where('need_group_id', $groupId)->count(),
-                'total_budget' => Need::where('need_group_id', $groupId)->sum('total_price'),
-                'priority_needs' => Need::where('need_group_id', $groupId)->where('is_priority', true)->count(),
-                'avg_completeness' => Need::where('need_group_id', $groupId)->avg('checklist_percentage') ?? 0,
-            ], 'dashboard'),
-            'statusDistribution' => Inertia::defer(fn () => Cache::remember("group-{$groupId}-status-dist", 300, fn () => Need::where('need_group_id', $groupId)
+            'stats' => Inertia::defer(function () use ($groupId, $currentGroup) {
+                $prevGroup = $currentGroup
+                    ? NeedGroup::query()
+                        ->where('id', '!=', $groupId)
+                        ->where('year', '<=', $currentGroup->year)
+                        ->orderByDesc('year')
+                        ->orderByDesc('id')
+                        ->first()
+                    : null;
+
+                $prevGroupId = $prevGroup?->id;
+
+                return [
+                    'total_needs' => Need::where('need_group_id', $groupId)->count(),
+                    'total_budget' => Need::where('need_group_id', $groupId)->sum('total_price'),
+                    'priority_needs' => Need::where('need_group_id', $groupId)->where('is_priority', true)->count(),
+                    'avg_completeness' => Need::where('need_group_id', $groupId)->avg('checklist_percentage') ?? 0,
+                    'approved_by_director' => Need::where('need_group_id', $groupId)->whereNotNull('approved_by_director_at')->count(),
+                    'prev_group' => $prevGroup ? ['id' => $prevGroup->id, 'name' => $prevGroup->name] : null,
+                    'prev_total_needs' => $prevGroupId ? Need::where('need_group_id', $prevGroupId)->count() : null,
+                    'prev_total_budget' => $prevGroupId ? Need::where('need_group_id', $prevGroupId)->sum('total_price') : null,
+                    'prev_priority_needs' => $prevGroupId ? Need::where('need_group_id', $prevGroupId)->where('is_priority', true)->count() : null,
+                    'prev_avg_completeness' => $prevGroupId ? (Need::where('need_group_id', $prevGroupId)->avg('checklist_percentage') ?? 0) : null,
+                    'prev_approved_by_director' => $prevGroupId ? Need::where('need_group_id', $prevGroupId)->whereNotNull('approved_by_director_at')->count() : null,
+                ];
+            }, 'dashboard'),
+            'statusDistribution' => Inertia::defer(fn () => Need::where('need_group_id', $groupId)
                 ->selectRaw('status, count(*) as count')
                 ->groupBy('status')
                 ->get()
                 ->pluck('count', 'status')
-                ->toArray()), 'dashboard'),
-            'needsByUnit' => Inertia::defer(fn () => Cache::remember("group-{$groupId}-by-unit", 300, fn () => Need::with('organizationalUnit:id,name')
-                ->where('need_group_id', $groupId)
-                ->selectRaw('organizational_unit_id, count(*) as count')
-                ->groupBy('organizational_unit_id')
-                ->orderByDesc('count')
-                ->limit(10)
-                ->get()
-                ->map(fn ($item) => [
-                    'name' => $item->organizationalUnit->name ?? 'Unknown',
-                    'count' => $item->count,
-                ])
-                ->all()), 'dashboard'),
-            'needsByType' => Inertia::defer(fn () => Cache::remember("group-{$groupId}-by-type", 300, fn () => Need::with('needType:id,name')
+                ->toArray(), 'dashboard'),
+            'needsByUnit' => Inertia::defer(function () use ($groupId) {
+                $aggregates = Need::where('need_group_id', $groupId)
+                    ->selectRaw('organizational_unit_id, count(*) as count, sum(total_price) as total_budget, sum(case when is_priority then 1 else 0 end) as priority_count, sum(case when approved_by_director_at is not null then 1 else 0 end) as approved_count')
+                    ->groupBy('organizational_unit_id')
+                    ->orderByDesc('count')
+                    ->get();
+
+                $unitIds = $aggregates->pluck('organizational_unit_id')->filter()->unique();
+                $units = OrganizationalUnit::with('parentsRecursive')->whereIn('id', $unitIds)->get()->keyBy('id');
+
+                return $aggregates->map(function ($item) use ($units) {
+                    $unit = $units->get($item->organizational_unit_id);
+                    $parents = [];
+                    $cursor = $unit?->parentsRecursive;
+                    while ($cursor) {
+                        array_unshift($parents, $cursor->name);
+                        $cursor = $cursor->parentsRecursive;
+                    }
+
+                    return [
+                        'unit_id' => $item->organizational_unit_id,
+                        'name' => $unit?->name ?? 'Unknown',
+                        'parents' => $parents,
+                        'count' => (int) $item->count,
+                        'total_budget' => (float) $item->total_budget,
+                        'priority_count' => (int) $item->priority_count,
+                        'approved_count' => (int) $item->approved_count,
+                    ];
+                })->values()->all();
+            }, 'dashboard'),
+            'needsByType' => Inertia::defer(fn () => Need::with('needType:id,name')
                 ->where('need_group_id', $groupId)
                 ->selectRaw('need_type_id, count(*) as count')
                 ->groupBy('need_type_id')
@@ -117,7 +154,7 @@ class NeedController extends Controller
                     'name' => $item->needType->name ?? 'Unknown',
                     'count' => $item->count,
                 ])
-                ->all()), 'dashboard'),
+                ->all(), 'dashboard'),
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name', 'parent_id'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
             'filters' => array_merge($this->dataTableFilters($request), $filters),

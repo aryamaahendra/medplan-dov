@@ -156,7 +156,6 @@ it('can filter needs by urgency, impact, and priority', function () {
         ->component('need/needs/index')
         ->has('needs.data', 1)
         ->where('needs.data.0.urgency', Urgency::High->value)
-        ->has('stats')
     );
 
     $response = $this->get(route('needs.index', [

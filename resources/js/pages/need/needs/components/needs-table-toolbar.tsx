@@ -1,8 +1,18 @@
-import { CheckCheck, Clock, SendIcon, TriangleAlert } from 'lucide-react';
+import {
+  CheckCheck,
+  Clock,
+  LayoutGrid,
+  SendIcon,
+  Table,
+  TriangleAlert,
+} from 'lucide-react';
 import { useMemo } from 'react';
 
 import { DataTableFacetedFilter } from '@/components/data-table/data-table-faceted-filter';
+import { Button } from '@/components/ui/button';
+import { ButtonGroup } from '@/components/ui/button-group';
 import type { DataTableFilters } from '@/hooks/use-data-table';
+import { cn } from '@/lib/utils';
 
 interface NeedsTableToolbarProps {
   filters: DataTableFilters & {
@@ -19,6 +29,8 @@ interface NeedsTableToolbarProps {
   organizationalUnits: { id: number; name: string; parent_id: number | null }[];
   needTypes: { id: number; name: string }[];
   mergeParams: (params: Record<string, any>) => void;
+  viewMode: 'table' | 'grid' | 'loading';
+  setViewMode: (mode: 'table' | 'grid') => void;
 }
 
 export function NeedsTableToolbar({
@@ -26,6 +38,8 @@ export function NeedsTableToolbar({
   organizationalUnits,
   needTypes,
   mergeParams,
+  viewMode,
+  setViewMode,
 }: NeedsTableToolbarProps) {
   const statusOptions = [
     { label: 'Draft', value: 'draft', icon: Clock },
@@ -94,6 +108,31 @@ export function NeedsTableToolbar({
 
   return (
     <>
+      <ButtonGroup>
+        <Button
+          variant={'outline'}
+          size={'icon'}
+          onClick={() => setViewMode('table')}
+          className={cn('border-dashed', {
+            'bg-muted': viewMode === 'table',
+          })}
+        >
+          <Table />
+          <span className="sr-only">Table view</span>
+        </Button>
+        <Button
+          variant={'outline'}
+          size={'icon'}
+          onClick={() => setViewMode('grid')}
+          className={cn('border-dashed', {
+            'bg-muted': viewMode === 'grid',
+          })}
+        >
+          <LayoutGrid />
+          <span className="sr-only">Grid view</span>
+        </Button>
+      </ButtonGroup>
+
       <DataTableFacetedFilter
         title="Tahun"
         options={yearOptions}

@@ -77,7 +77,6 @@ test('index renders the correct component and props', function () {
             ->has('organizationalUnits')
             ->has('needTypes')
             ->has('filters')
-            ->has('stats')
         );
 });
 

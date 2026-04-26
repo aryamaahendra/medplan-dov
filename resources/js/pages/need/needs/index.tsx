@@ -1,59 +1,23 @@
-import { Deferred, Head, router } from '@inertiajs/react';
-import {
-  AlertCircle,
-  CheckCircle2,
-  ClipboardCheck,
-  DollarSign,
-} from 'lucide-react';
-import { useMemo, useState, useSyncExternalStore } from 'react';
-import { toast } from 'sonner';
+import { Head } from '@inertiajs/react';
+import { useMemo } from 'react';
 
-import needExportActions from '@/actions/App/Http/Controllers/Need/NeedExportController';
 import { ConfirmDialog } from '@/components/confirm-dialog';
-import { DistributionChart } from '@/components/dashboard/distribution-chart';
-import { StatsCard } from '@/components/dashboard/stats-card';
 import { DataTable } from '@/components/data-table/data-table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
-import { formatIDR, formatNumber, formatPercent } from '@/lib/formatters';
-import { cn } from '@/lib/utils';
-import needGroupRoutes from '@/routes/need-groups';
+import { useNeedsIndex } from '@/hooks/use-needs-index';
+import { useViewMode } from '@/hooks/use-view-mode';
 import needRoutes from '@/routes/needs';
-
-import type { Need, PaginatedNeeds } from '@/types';
+import type { PaginatedNeeds } from '@/types';
 import { NeedGroupDialog } from '../groups/need-group-dialog';
 import { getColumns } from './columns';
 
 import { NeedDirectorReviewDialog } from './components/need-director-review-dialog';
 import { NeedGridView } from './components/need-grid-view';
+import { NeedsDashboard } from './components/needs-dashboard';
 import { NeedsHeader } from './components/needs-header';
 import { NeedsTableToolbar } from './components/needs-table-toolbar';
-
-// External store for viewMode to avoid hydration mismatch without useEffect
-const viewModeStore = {
-  subscribe(callback: () => void) {
-    window.addEventListener('storage', callback);
-    window.addEventListener('view-mode-change', callback);
-
-    return () => {
-      window.removeEventListener('storage', callback);
-      window.removeEventListener('view-mode-change', callback);
-    };
-  },
-  getSnapshot() {
-    return (
-      (localStorage.getItem('needs-view-mode') as 'table' | 'grid') || 'table'
-    );
-  },
-  getServerSnapshot() {
-    return 'loading' as const;
-  },
-  set(mode: 'table' | 'grid') {
-    localStorage.setItem('needs-view-mode', mode);
-    window.dispatchEvent(new Event('view-mode-change'));
-  },
-};
 
 interface NeedsIndexProps {
   needs: PaginatedNeeds;
@@ -94,24 +58,8 @@ export default function NeedsIndex({
   needsByUnit,
   needsByType,
 }: NeedsIndexProps) {
-  const [deletingNeed, setDeletingNeed] = useState<Need | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [reviewingNeedId, setReviewingNeedId] = useState<number | null>(null);
-  const [showDashboard, setShowDashboard] = useState(false);
-
-  const viewMode = useSyncExternalStore(
-    viewModeStore.subscribe,
-    viewModeStore.getSnapshot,
-    viewModeStore.getServerSnapshot,
-  );
-
-  const handleViewModeChange = (mode: 'table' | 'grid') => {
-    viewModeStore.set(mode);
-  };
-
-  const [isGroupDialogOpen, setIsGroupDialogOpen] = useState(false);
-  const [isDeletingGroup, setIsDeletingGroup] = useState(false);
-  const [isDeletingGroupLoading, setIsDeletingGroupLoading] = useState(false);
+  const [viewMode, setViewMode] = useViewMode();
+  const { state, actions } = useNeedsIndex({ currentGroup });
 
   const {
     onSearch,
@@ -122,70 +70,9 @@ export default function NeedsIndex({
     mergeParams,
   } = useDataTable({ only: ['needs', 'filters'] });
 
-  const onEdit = (need: Need) => {
-    router.visit(needRoutes.edit.url({ need: need.id }));
-  };
-
-  const onCreate = () => {
-    router.visit(
-      needRoutes.create.url({ query: { need_group_id: currentGroup.id } }),
-    );
-  };
-
-  const onDelete = (need: Need) => {
-    setDeletingNeed(need);
-  };
-
-  const onReview = (need: Need) => {
-    setReviewingNeedId(need.id);
-  };
-
-  const onExport = () => {
-    const params = new URLSearchParams(window.location.search);
-
-    if (!params.has('need_group_id')) {
-      params.set('need_group_id', currentGroup.id.toString());
-    }
-
-    window.location.href = needExportActions.url({
-      query: Object.fromEntries(params) as any,
-    });
-  };
-
-  const handleConfirmDelete = () => {
-    if (!deletingNeed) {
-      return;
-    }
-
-    setIsDeleting(true);
-
-    router.delete(needRoutes.destroy.url({ need: deletingNeed.id }), {
-      onSuccess: () => {
-        toast.success('Usulan kebutuhan berhasil dihapus.');
-        setDeletingNeed(null);
-      },
-      onFinish: () => setIsDeleting(false),
-    });
-  };
-
-  const handleConfirmDeleteGroup = () => {
-    setIsDeletingGroupLoading(true);
-
-    router.delete(
-      needGroupRoutes.destroy.url({ need_group: currentGroup.id }),
-      {
-        onSuccess: () => {
-          toast.success('Kelompok usulan berhasil dihapus.');
-          router.visit(needGroupRoutes.index.url());
-        },
-        onFinish: () => setIsDeletingGroupLoading(false),
-      },
-    );
-  };
-
   const stableColumns = useMemo(
-    () => getColumns(onEdit, onDelete, onReview),
-    [],
+    () => getColumns(actions.onEdit, actions.onDelete, actions.onReview),
+    [actions.onEdit, actions.onDelete, actions.onReview],
   );
 
   return (
@@ -195,102 +82,21 @@ export default function NeedsIndex({
       <div className="flex flex-col gap-6 p-4">
         <NeedsHeader
           currentGroup={currentGroup}
-          viewMode={viewMode}
-          setViewMode={(mode) => {
-            handleViewModeChange(mode);
-            setShowDashboard(false);
-          }}
-          showDashboard={showDashboard}
-          onToggleDashboard={() => setShowDashboard((v) => !v)}
-          onCreate={onCreate}
-          onExport={onExport}
-          onEditGroup={() => setIsGroupDialogOpen(true)}
-          onDeleteGroup={() => setIsDeletingGroup(true)}
+          showDashboard={state.showDashboard}
+          onToggleDashboard={() => actions.setShowDashboard((v) => !v)}
+          onCreate={actions.onCreate}
+          onExport={actions.onExport}
+          onEditGroup={() => actions.setIsGroupDialogOpen(true)}
+          onDeleteGroup={() => actions.setIsDeletingGroup(true)}
         />
 
-        {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <StatsCard
-            title="Total Usulan"
-            value={formatNumber(stats.total_needs)}
-            icon={ClipboardCheck}
-            description="Jumlah keseluruhan usulan kebutuhan"
+        {state.showDashboard ? (
+          <NeedsDashboard
+            stats={stats}
+            statusDistribution={statusDistribution}
+            needsByUnit={needsByUnit}
+            needsByType={needsByType}
           />
-          <StatsCard
-            title="Total Estimasi Anggaran"
-            value={formatIDR(stats.total_budget)}
-            icon={DollarSign}
-            description="Total rencana anggaran yang diusulkan"
-            iconClassName="bg-emerald-500/10"
-          />
-          <StatsCard
-            title="Usulan Prioritas"
-            value={formatNumber(stats.priority_needs)}
-            icon={AlertCircle}
-            description="Kebutuhan dengan tingkat urgensi tinggi"
-            iconClassName="bg-amber-500/10"
-          />
-          <StatsCard
-            title="Rata-rata Kelengkapan"
-            value={formatPercent(stats.avg_completeness)}
-            icon={CheckCircle2}
-            description="Persentase pemenuhan checklist"
-            iconClassName="bg-blue-500/10"
-          />
-        </div>
-
-        <NeedGroupDialog
-          open={isGroupDialogOpen}
-          onOpenChange={setIsGroupDialogOpen}
-          needGroup={currentGroup as any}
-        />
-
-        <ConfirmDialog
-          open={isDeletingGroup}
-          onOpenChange={setIsDeletingGroup}
-          onConfirm={handleConfirmDeleteGroup}
-          title="Hapus Kelompok Usulan"
-          description={`Apakah Anda yakin ingin menghapus "${currentGroup.name}"? Data usulan di dalam kelompok ini juga akan terdampak.`}
-          confirmText="Hapus"
-          variant="destructive"
-          loading={isDeletingGroupLoading}
-        />
-
-        {showDashboard ? (
-          <Deferred
-            data={['statusDistribution', 'needsByUnit', 'needsByType']}
-            fallback={
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <Skeleton className="h-[300px] w-full" />
-                <Skeleton className="h-[300px] w-full" />
-                <Skeleton className="h-[300px] w-full" />
-              </div>
-            }
-          >
-            {({ reloading }) => (
-              <div
-                className={cn('grid gap-6 md:grid-cols-2 lg:grid-cols-3', {
-                  'opacity-50': reloading,
-                })}
-              >
-                <DistributionChart
-                  title="Distribusi Status"
-                  data={statusDistribution}
-                  color="bg-blue-500"
-                />
-                <DistributionChart
-                  title="Top 10 Unit Pengusul"
-                  data={needsByUnit}
-                  color="bg-indigo-500"
-                />
-                <DistributionChart
-                  title="Berdasarkan Tipe"
-                  data={needsByType}
-                  color="bg-purple-500"
-                />
-              </div>
-            )}
-          </Deferred>
         ) : viewMode === 'loading' ? (
           <div className="overflow-hidden rounded-md border">
             <div className="h-10 border-b bg-muted/20" />
@@ -327,9 +133,9 @@ export default function NeedsIndex({
             renderGrid={(data) => (
               <NeedGridView
                 data={data}
-                onEdit={onEdit}
-                onDelete={onDelete}
-                onReview={onReview}
+                onEdit={actions.onEdit}
+                onDelete={actions.onDelete}
+                onReview={actions.onReview}
               />
             )}
             toolbarChildren={
@@ -338,6 +144,8 @@ export default function NeedsIndex({
                 organizationalUnits={organizationalUnits}
                 needTypes={needTypes}
                 mergeParams={mergeParams}
+                viewMode={viewMode}
+                setViewMode={setViewMode}
               />
             }
             toolbarPosition="between-search-and-table"
@@ -345,27 +153,46 @@ export default function NeedsIndex({
         )}
       </div>
 
+      <NeedGroupDialog
+        open={state.isGroupDialogOpen}
+        onOpenChange={actions.setIsGroupDialogOpen}
+        needGroup={currentGroup as any}
+      />
+
       <ConfirmDialog
-        open={!!deletingNeed}
-        onOpenChange={(open) => !open && setDeletingNeed(null)}
-        onConfirm={handleConfirmDelete}
-        title="Hapus Usulan Kebutuhan"
-        description={`Apakah Anda yakin ingin menghapus "${deletingNeed?.title}"? Data yang dihapus akan dipindahkan ke tempat sampah (Soft Delete).`}
+        open={state.isDeletingGroup}
+        onOpenChange={actions.setIsDeletingGroup}
+        onConfirm={actions.handleConfirmDeleteGroup}
+        title="Hapus Kelompok Usulan"
+        description={`Apakah Anda yakin ingin menghapus "${currentGroup.name}"? Data usulan di dalam kelompok ini juga akan terdampak.`}
         confirmText="Hapus"
         variant="destructive"
-        loading={isDeleting}
+        loading={state.isDeletingGroupLoading}
+      />
+
+      <ConfirmDialog
+        open={!!state.deletingNeed}
+        onOpenChange={(open) => !open && actions.setDeletingNeed(null)}
+        onConfirm={actions.handleConfirmDelete}
+        title="Hapus Usulan Kebutuhan"
+        description={`Apakah Anda yakin ingin menghapus "${state.deletingNeed?.title}"? Data yang dihapus akan dipindahkan ke tempat sampah (Soft Delete).`}
+        confirmText="Hapus"
+        variant="destructive"
+        loading={state.isDeleting}
       />
 
       {(() => {
-        const reviewingNeed = needs.data.find((n) => n.id === reviewingNeedId);
+        const reviewingNeed = needs.data.find(
+          (n) => n.id === state.reviewingNeedId,
+        );
 
         return (
           reviewingNeed && (
             <NeedDirectorReviewDialog
               key={reviewingNeed.id}
               need={reviewingNeed}
-              open={!!reviewingNeedId}
-              onOpenChange={(open) => !open && setReviewingNeedId(null)}
+              open={!!state.reviewingNeedId}
+              onOpenChange={(open) => !open && actions.setReviewingNeedId(null)}
             />
           )
         );

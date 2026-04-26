@@ -1,26 +1,21 @@
 import {
-  BarChart2,
   ClipboardList,
   Ellipsis,
   FileDown,
-  LayoutGrid,
-  List,
   PencilLine,
+  PieChart,
   Plus,
+  Table,
   Trash2,
 } from 'lucide-react';
 
 import needGroupChecklistActions from '@/actions/App/Http/Controllers/Need/NeedGroupChecklistController';
 import { ActionDropdown } from '@/components/action-dropdown';
 import { Button } from '@/components/ui/button';
-import { ButtonGroup } from '@/components/ui/button-group';
 import { usePermission } from '@/hooks/use-permission';
-import { cn } from '@/lib/utils';
 
 interface NeedsHeaderProps {
   currentGroup: { id: number; name: string; year: number };
-  viewMode: 'table' | 'grid' | 'loading';
-  setViewMode: (mode: 'table' | 'grid') => void;
   onCreate: () => void;
   onExport: () => void;
   onEditGroup: () => void;
@@ -31,8 +26,6 @@ interface NeedsHeaderProps {
 
 export function NeedsHeader({
   currentGroup,
-  viewMode,
-  setViewMode,
   onCreate,
   onExport,
   onEditGroup,
@@ -59,6 +52,12 @@ export function NeedsHeader({
     });
   }
 
+  groupActions.push({
+    label: 'Export Excel',
+    icon: FileDown,
+    onClick: onExport,
+  });
+
   if (hasPermission('delete need-groups')) {
     if (groupActions.length > 0) {
       groupActions.push('separator');
@@ -82,65 +81,45 @@ export function NeedsHeader({
           Tahun Anggaran {currentGroup.year}
         </p>
       </div>
-      <div className="flex gap-2">
-        <ButtonGroup>
-          <Button
-            variant={'outline'}
-            onClick={() => setViewMode('table')}
-            className={cn({
-              'bg-muted': viewMode === 'table' && !showDashboard,
-            })}
-          >
-            <List />
-            <span className="sr-only">Table view</span>
-          </Button>
-          <Button
-            variant={'outline'}
-            onClick={() => setViewMode('grid')}
-            className={cn({
-              'bg-muted': viewMode === 'grid' && !showDashboard,
-            })}
-          >
-            <LayoutGrid />
-            <span className="sr-only">Grid view</span>
-          </Button>
-          <Button
-            variant={'outline'}
-            onClick={onToggleDashboard}
-            className={cn({
-              'bg-muted': showDashboard,
-            })}
-          >
-            <BarChart2 />
-            <span className="sr-only">Dashboard view</span>
-          </Button>
-        </ButtonGroup>
-
-        <Button variant="outline" onClick={onExport}>
-          <FileDown />
-          Export Excel
+      <div className="flex gap-1">
+        <Button variant={'outline'} onClick={onToggleDashboard}>
+          {showDashboard ? (
+            <>
+              <Table />
+              Table
+            </>
+          ) : (
+            <>
+              <PieChart />
+              Dashboard
+            </>
+          )}
         </Button>
 
-        {hasAnyPermission([
-          'create needs',
-          'create descendant needs',
-          'create any needs',
-        ]) && (
-          <Button onClick={onCreate}>
-            <Plus />
-            Tambah Usulan
-          </Button>
-        )}
+        {!showDashboard && (
+          <>
+            {groupActions.length > 0 && (
+              <ActionDropdown
+                trigger={
+                  <Button variant={'outline'} size={'icon'}>
+                    <Ellipsis />
+                  </Button>
+                }
+                actions={groupActions as any}
+              />
+            )}
 
-        {groupActions.length > 0 && (
-          <ActionDropdown
-            trigger={
-              <Button variant={'outline'} size={'icon'}>
-                <Ellipsis />
+            {hasAnyPermission([
+              'create needs',
+              'create descendant needs',
+              'create any needs',
+            ]) && (
+              <Button onClick={onCreate}>
+                <Plus />
+                Tambah Usulan
               </Button>
-            }
-            actions={groupActions as any}
-          />
+            )}
+          </>
         )}
       </div>
     </div>

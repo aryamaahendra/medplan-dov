@@ -83,18 +83,18 @@ class NeedController extends Controller
         return Inertia::render('need/needs/index', [
             'needs' => $needs,
             'currentGroup' => $currentGroup,
-            'stats' => fn () => [
+            'stats' => Inertia::defer(fn () => [
                 'total_needs' => Need::where('need_group_id', $groupId)->count(),
                 'total_budget' => Need::where('need_group_id', $groupId)->sum('total_price'),
                 'priority_needs' => Need::where('need_group_id', $groupId)->where('is_priority', true)->count(),
                 'avg_completeness' => Need::where('need_group_id', $groupId)->avg('checklist_percentage') ?? 0,
-            ],
+            ], 'dashboard'),
             'statusDistribution' => Inertia::defer(fn () => Cache::remember("group-{$groupId}-status-dist", 300, fn () => Need::where('need_group_id', $groupId)
                 ->selectRaw('status, count(*) as count')
                 ->groupBy('status')
                 ->get()
                 ->pluck('count', 'status')
-                ->toArray()), 'charts'),
+                ->toArray()), 'dashboard'),
             'needsByUnit' => Inertia::defer(fn () => Cache::remember("group-{$groupId}-by-unit", 300, fn () => Need::with('organizationalUnit:id,name')
                 ->where('need_group_id', $groupId)
                 ->selectRaw('organizational_unit_id, count(*) as count')
@@ -106,7 +106,7 @@ class NeedController extends Controller
                     'name' => $item->organizationalUnit->name ?? 'Unknown',
                     'count' => $item->count,
                 ])
-                ->all()), 'charts'),
+                ->all()), 'dashboard'),
             'needsByType' => Inertia::defer(fn () => Cache::remember("group-{$groupId}-by-type", 300, fn () => Need::with('needType:id,name')
                 ->where('need_group_id', $groupId)
                 ->selectRaw('need_type_id, count(*) as count')
@@ -117,7 +117,7 @@ class NeedController extends Controller
                     'name' => $item->needType->name ?? 'Unknown',
                     'count' => $item->count,
                 ])
-                ->all()), 'charts'),
+                ->all()), 'dashboard'),
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name', 'parent_id'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
             'filters' => array_merge($this->dataTableFilters($request), $filters),

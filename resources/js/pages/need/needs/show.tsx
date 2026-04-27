@@ -145,7 +145,7 @@ export default function NeedShow({
                     needId={need.id}
                     questions={checklistQuestions.data}
                     existingAnswers={existingAnswers.data}
-                    readonly={!need.can?.update}
+                    readonly={!hasPermission('perform checklist')}
                   />
                 </TabsContent>
               )}

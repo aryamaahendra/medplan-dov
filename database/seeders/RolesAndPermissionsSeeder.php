@@ -167,6 +167,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'create ssps' => 'Menambah Strategic Service Plan baru',
             'update ssps' => 'Mengubah Strategic Service Plan',
             'delete ssps' => 'Menghapus Strategic Service Plan',
+            'perform checklist' => 'Mengisi checklist kelayakan pada usulan',
         ];
 
         foreach ($permissions as $name => $description) {
@@ -200,6 +201,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
             return ! $isAuthRelated;
         });
+        // perform checklist is already in array_keys, so it will be included if not auth related
         $plannerRole->syncPermissions($plannerPermissions);
 
         // Unit Head

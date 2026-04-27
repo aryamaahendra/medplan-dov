@@ -21,7 +21,7 @@ beforeEach(function () {
     $this->superAdmin->assignRole('super-admin');
 
     $this->admin = User::factory()->create(['organizational_unit_id' => $this->unitA->id]);
-    $this->admin->assignRole('admin');
+    $this->admin->assignRole('planner');
 
     $this->staffA = User::factory()->create(['organizational_unit_id' => $this->unitA->id]);
     $this->staffA->assignRole('staff');
@@ -69,7 +69,7 @@ test('staff can view their own unit need', function () {
     $response->assertStatus(200);
 });
 
-test('admin can view any need', function () {
+test('planner can view any need', function () {
     $needB = Need::factory()->create(['organizational_unit_id' => $this->unitB->id]);
 
     $response = $this->actingAs($this->admin)->get(route('needs.show', $needB));
@@ -83,10 +83,10 @@ test('staff cannot access user management', function () {
     $response->assertStatus(403);
 });
 
-test('admin can access user management', function () {
+test('planner cannot access user management', function () {
     $response = $this->actingAs($this->admin)->get(route('users.index'));
 
-    $response->assertStatus(200);
+    $response->assertStatus(403);
 });
 
 test('staff cannot delete their own need if they only have create/update permissions', function () {

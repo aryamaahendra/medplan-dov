@@ -66,12 +66,12 @@ export function DashboardLineCharts({ data }: { data: DashboardData[] }) {
                   <stop
                     offset="5%"
                     stopColor={`var(--color-${dataKey as string})`}
-                    stopOpacity={0.45}
+                    stopOpacity={0.6}
                   />
                   <stop
                     offset="95%"
                     stopColor={`var(--color-${dataKey as string})`}
-                    stopOpacity={0.15}
+                    stopOpacity={0.2}
                   />
                 </linearGradient>
               </defs>

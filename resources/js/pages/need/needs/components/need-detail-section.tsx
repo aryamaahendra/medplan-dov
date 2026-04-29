@@ -29,8 +29,8 @@ const DETAIL_FIELDS = [
   },
   {
     key: 'purpose_and_objectives',
-    label: 'Tujuan dan Sasaran',
-    placeholder: 'Jelaskan tujuan dan sasaran yang ingin dicapai...',
+    label: 'Maksud & Tujuan',
+    placeholder: 'Jelaskan maksud & tujuan yang ingin dicapai...',
   },
   {
     key: 'target_objective',

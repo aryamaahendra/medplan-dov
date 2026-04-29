@@ -95,7 +95,7 @@
     .signature-name {
       font-weight: bold;
       text-decoration: underline;
-      text-transform: uppercase;
+      white-space: nowrap;
       margin-top: 5px;
     }
 
@@ -199,7 +199,7 @@
       @php
         $detailFields = [
             ['key' => 'background', 'label' => '1. Latar Belakang'],
-            ['key' => 'purpose_and_objectives', 'label' => '2. Tujuan dan Sasaran'],
+            ['key' => 'purpose_and_objectives', 'label' => '2. Maksud & Tujuan'],
             ['key' => 'target_objective', 'label' => '3. Target / Sasaran Kegiatan'],
             ['key' => 'procurement_organization_name', 'label' => '4. Nama Organisasi Pengadaan'],
             ['key' => 'funding_source_id', 'label' => '5. Sumber Dana & Estimasi Biaya'],
@@ -223,7 +223,9 @@
                 if ($field['key'] === 'funding_source_id') {
                     echo '<ul style="list-style: none; padding-left: 0;">';
                     echo '<li>a. Sumber Dana</li>';
-                    echo '<p style="margin-left: 15px;">' . ($detail && $detail->fundingSource ? e($detail->fundingSource->name) : '-') . '</p>';
+                    echo '<p style="margin-left: 15px;">' .
+                        ($detail && $detail->fundingSource ? e($detail->fundingSource->name) : '-') .
+                        '</p>';
                     echo '<li style="margin-top: 10px;">b. Total perkiraan biaya:</li>';
                     echo '<p style="margin-left: 15px;">' . ($detail ? e($detail->estimated_cost) : '-') . '</p>';
                     echo '</ul>';

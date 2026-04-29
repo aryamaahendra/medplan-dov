@@ -79,6 +79,11 @@ export function NeedForm({
     { value: 'ikk', label: 'IKK', permission: 'update need tab ikk' },
     { value: 'rls', label: 'RLS', permission: 'update need tab rls' },
     {
+      value: 'perencanaan',
+      label: 'Perencanaan',
+      permission: 'update need tab planning',
+    },
+    {
       value: 'detail',
       label: 'Detail KAK',
       permission: 'update need tab detail',
@@ -161,6 +166,53 @@ export function NeedForm({
 
   const detailValuesRef = useRef(data.detail);
 
+  const getTabErrors = (tabValue: string) => {
+    const fieldMapping: Record<string, string[]> = {
+      usulan: [
+        'need_group_id',
+        'organizational_unit_id',
+        'need_type_id',
+        'year',
+        'title',
+        'description',
+        'current_condition',
+        'required_condition',
+        'unit',
+        'volume',
+        'unit_price',
+        'total_price',
+      ],
+      urgency: ['urgency', 'impact', 'is_priority', 'status'],
+      renstra: ['sasaran_ids', 'indicator_ids'],
+      ikk: ['kpi_indicator_ids'],
+      rls: ['strategic_service_plan_ids'],
+      perencanaan: [
+        'planning_activity_version_ids',
+        'planning_activity_indicator_ids',
+      ],
+      detail: [
+        'detail.background',
+        'detail.purpose_and_objectives',
+        'detail.target_objective',
+        'detail.procurement_organization_name',
+        'detail.funding_source_id',
+        'detail.estimated_cost',
+        'detail.implementation_period',
+        'detail.expert_or_skilled_personnel',
+        'detail.technical_specifications',
+        'detail.training',
+        'technical_specification_attachments',
+      ],
+      lampiran: ['attachments'],
+    };
+
+    const tabFields = fieldMapping[tabValue] || [];
+
+    return Object.keys(errors).filter((key) =>
+      tabFields.some((field) => key === field || key.startsWith(`${field}.`)),
+    );
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -171,6 +223,17 @@ export function NeedForm({
             ? 'Usulan kebutuhan berhasil diperbarui.'
             : 'Usulan kebutuhan berhasil dibuat.',
         );
+      },
+      onError: () => {
+        const errorTabs = visibleTabs.filter(
+          (tab) => getTabErrors(tab.value).length > 0,
+        );
+
+        if (errorTabs.length > 0) {
+          errorTabs.forEach((tab) => {
+            toast.error(`Ada kesalahan pada tab ${tab.label}`);
+          });
+        }
       },
     };
 
@@ -216,11 +279,26 @@ export function NeedForm({
             className="w-full"
           >
             <TabsList className="">
-              {visibleTabs.map((tab) => (
-                <TabsTrigger key={tab.value} value={tab.value}>
-                  {tab.label}
-                </TabsTrigger>
-              ))}
+              {visibleTabs.map((tab) => {
+                const tabErrors = getTabErrors(tab.value);
+                const hasError = tabErrors.length > 0;
+
+                return (
+                  <TabsTrigger
+                    key={tab.value}
+                    value={tab.value}
+                    className={cn(
+                      hasError &&
+                        'text-destructive data-[state=active]:text-destructive',
+                    )}
+                  >
+                    {tab.label}
+                    {hasError && (
+                      <span className="ml-1.5 flex h-2 w-2 rounded-full bg-destructive" />
+                    )}
+                  </TabsTrigger>
+                );
+              })}
             </TabsList>
 
             {hasPermission('update need tab general') && (

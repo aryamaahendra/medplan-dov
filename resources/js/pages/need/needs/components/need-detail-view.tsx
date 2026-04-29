@@ -18,7 +18,7 @@ interface NeedDetailViewProps {
 
 const DETAIL_FIELDS: { key: keyof NeedDetail; label: string }[] = [
   { key: 'background', label: 'Latar Belakang' },
-  { key: 'purpose_and_objectives', label: 'Tujuan dan Sasaran' },
+  { key: 'purpose_and_objectives', label: 'Maksud & Tujuan' },
   { key: 'target_objective', label: 'Target / Sasaran Kegiatan' },
   { key: 'procurement_organization_name', label: 'Nama Organisasi Pengadaan' },
   {

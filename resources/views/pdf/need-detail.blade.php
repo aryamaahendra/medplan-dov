@@ -165,14 +165,16 @@
       <div class="cover-info">
         <table>
           <tr>
-            <td style="width: 180px;">SATKER/SKPD</td>
-            <td style="width: 20px;">:</td>
+            <td style="width: 120px;">SATKER/SKPD</td>
+            <td style="width: 10px;">:</td>
             <td style="">RSUD Kabelota Donggala</td>
           </tr>
           <tr>
             <td style="">Nama KPA</td>
             <td>:</td>
-            <td>{{ $signer?->name ?? 'ARDIAN WIJAYA, S.T., M.T.' }}</td>
+            <td style="white-space: nowrap;">
+              {{ $signer?->name ?? 'ARDIAN WIJAYA, S.T., M.T.' }}
+            </td>
           </tr>
           <tr>
             <td style="">Nama Pekerjaan</td>

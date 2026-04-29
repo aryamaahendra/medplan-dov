@@ -155,7 +155,7 @@ export function NeedDetailSection({
           totalPrice={totalPrice}
           errors={errors}
           onChange={handleChange}
-          initialFundingSourceId={initialValues?.funding_source_id}
+          initialFundingSourceIds={initialValues?.funding_source_ids}
         />
 
         {DETAIL_FIELDS.map(({ key, ...field }) => (

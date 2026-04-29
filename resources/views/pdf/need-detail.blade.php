@@ -76,11 +76,12 @@
     .signature-wrapper {
       margin-top: 50px;
       width: 100%;
+      page-break-inside: avoid;
     }
 
     .signature-block {
       float: right;
-      width: 250px;
+      min-width: 250px;
       text-align: center;
     }
 
@@ -223,11 +224,19 @@
               @php
                 $value = $detail ? $detail->{$field['key']} : null;
                 if ($field['key'] === 'funding_source_id') {
+                    $names = $detail && $detail->fundingSources ? $detail->fundingSources->pluck('name')->toArray() : [];
+                    $joinedNames = '-';
+                    if (count($names) > 0) {
+                        if (count($names) === 1) {
+                            $joinedNames = $names[0];
+                        } else {
+                            $last = array_pop($names);
+                            $joinedNames = implode(', ', $names) . ' dan ' . $last;
+                        }
+                    }
                     echo '<ul style="list-style: none; padding-left: 0;">';
                     echo '<li>a. Sumber Dana</li>';
-                    echo '<p style="margin-left: 15px;">' .
-                        ($detail && $detail->fundingSource ? e($detail->fundingSource->name) : '-') .
-                        '</p>';
+                    echo '<p style="margin-left: 15px;">' . e($joinedNames) . '</p>';
                     echo '<li style="margin-top: 10px;">b. Total perkiraan biaya:</li>';
                     echo '<p style="margin-left: 15px;">' . ($detail ? e($detail->estimated_cost) : '-') . '</p>';
                     echo '</ul>';

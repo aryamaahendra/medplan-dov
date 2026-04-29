@@ -131,7 +131,7 @@ class StoreNeedRequest extends FormRequest
             'detail.purpose_and_objectives' => ['nullable', 'string'],
             'detail.target_objective' => ['nullable', 'string'],
             'detail.procurement_organization_name' => ['nullable', 'string'],
-            'detail.funding_source_id' => ['nullable'], // ID or string for new
+            'detail.funding_source_ids' => ['nullable', 'array'],
             'detail.estimated_cost' => ['nullable', 'string'],
             'detail.implementation_period' => ['nullable', 'string'],
             'detail.expert_or_skilled_personnel' => ['nullable', 'string'],

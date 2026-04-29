@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 #[Fillable([
     'need_id',
@@ -13,7 +14,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'purpose_and_objectives',
     'target_objective',
     'procurement_organization_name',
-    'funding_source_id',
     'estimated_cost',
     'implementation_period',
     'expert_or_skilled_personnel',
@@ -33,10 +33,10 @@ class NeedDetail extends Model
     }
 
     /**
-     * Get the funding source for this detail.
+     * Get the funding sources for this detail.
      */
-    public function fundingSource(): BelongsTo
+    public function fundingSources(): BelongsToMany
     {
-        return $this->belongsTo(FundingSource::class);
+        return $this->belongsToMany(FundingSource::class, 'need_detail_funding_source');
     }
 }

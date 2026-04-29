@@ -149,7 +149,9 @@ export function NeedForm({
       target_objective: need?.detail?.target_objective ?? '',
       procurement_organization_name:
         need?.detail?.procurement_organization_name ?? '',
-      funding_source_id: need?.detail?.funding_source_id?.toString() ?? '',
+      funding_source_ids:
+        need?.detail?.funding_sources?.map((s) => s.id.toString()) ??
+        ([] as string[]),
       estimated_cost: need?.detail?.estimated_cost ?? '',
       implementation_period: need?.detail?.implementation_period ?? '',
       expert_or_skilled_personnel:
@@ -195,7 +197,7 @@ export function NeedForm({
         'detail.purpose_and_objectives',
         'detail.target_objective',
         'detail.procurement_organization_name',
-        'detail.funding_source_id',
+        'detail.funding_source_ids',
         'detail.estimated_cost',
         'detail.implementation_period',
         'detail.expert_or_skilled_personnel',

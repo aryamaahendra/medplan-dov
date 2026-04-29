@@ -54,15 +54,25 @@ class UpdateNeedAction
             $need->planningActivityIndicators()->sync($data['planning_activity_indicator_ids'] ?? []);
 
             $detailData = $data['detail'] ?? [];
-            if (isset($detailData['funding_source_id']) && ! is_numeric($detailData['funding_source_id']) && ! empty($detailData['funding_source_id'])) {
-                $source = FundingSource::firstOrCreate(['name' => $detailData['funding_source_id']]);
-                $detailData['funding_source_id'] = $source->id;
+            $fundingSourceIds = $detailData['funding_source_ids'] ?? [];
+            unset($detailData['funding_source_ids']);
+
+            $resolvedIds = [];
+            foreach ($fundingSourceIds as $idOrName) {
+                if (! is_numeric($idOrName) && ! empty($idOrName)) {
+                    $source = FundingSource::firstOrCreate(['name' => $idOrName]);
+                    $resolvedIds[] = $source->id;
+                } elseif (! empty($idOrName)) {
+                    $resolvedIds[] = $idOrName;
+                }
             }
 
-            $need->detail()->updateOrCreate(
+            $detail = $need->detail()->updateOrCreate(
                 ['need_id' => $need->id],
                 $detailData
             );
+
+            $detail->fundingSources()->sync($resolvedIds);
 
             // Handle deletions
             if (! empty($data['deleted_attachment_ids'])) {

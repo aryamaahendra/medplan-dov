@@ -236,7 +236,7 @@ class NeedController extends Controller
                 'strategicServicePlans:id',
                 'planningActivityVersions:id',
                 'planningActivityIndicators:id',
-                'detail.fundingSource',
+                'detail.fundingSources',
                 'attachments',
             ]))->resolve(),
             'currentGroup' => $need->needGroup,
@@ -316,7 +316,7 @@ class NeedController extends Controller
                 'strategicServicePlans:id,strategic_program,service_plan,year,target,policy_direction',
                 'planningActivityVersions:id,name,type,code,full_code',
                 'planningActivityIndicators:id,name,baseline,unit',
-                'detail.fundingSource',
+                'detail.fundingSources',
                 'attachments',
             ]))->resolve(),
             'checklistQuestions' => ChecklistQuestionResource::collection(

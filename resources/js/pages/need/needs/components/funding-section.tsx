@@ -20,30 +20,48 @@ export function FundingSection({
   totalPrice,
   errors,
   onChange,
-  initialFundingSourceId,
+  initialFundingSourceIds,
 }: {
   fundingSources: { id: number; name: string }[];
   totalPrice: string | number;
   errors: any;
   onChange: (key: string, value: any) => void;
-  initialFundingSourceId?: string;
+  initialFundingSourceIds?: (string | number)[];
 }) {
   const [sourceSearch, setSourceSearch] = useState('');
   const [sourceOpen, setSourceOpen] = useState(false);
-  const [fundingSourceId, setFundingSourceId] = useState(
-    initialFundingSourceId || '',
+  const [fundingSourceIds, setFundingSourceIds] = useState<(string | number)[]>(
+    initialFundingSourceIds || [],
   );
 
-  const selectedSource = useMemo(() => {
-    if (!fundingSourceId) {
+  const selectedSourcesLabel = useMemo(() => {
+    if (fundingSourceIds.length === 0) {
       return null;
     }
 
-    return (
-      fundingSources.find((s) => s.id.toString() === fundingSourceId.toString())
-        ?.name || fundingSourceId
-    );
-  }, [fundingSourceId, fundingSources]);
+    const names = fundingSourceIds.map((id) => {
+      const found = fundingSources.find(
+        (s) => s.id.toString() === id.toString(),
+      );
+
+      return found ? found.name : id;
+    });
+
+    if (names.length <= 2) {
+      return names.join(', ');
+    }
+
+    return `${names.length} sumber dana terpilih`;
+  }, [fundingSourceIds, fundingSources]);
+
+  const toggleSource = (id: string | number) => {
+    const next = fundingSourceIds.some((i) => i.toString() === id.toString())
+      ? fundingSourceIds.filter((i) => i.toString() !== id.toString())
+      : [...fundingSourceIds, id];
+
+    setFundingSourceIds(next);
+    onChange('funding_source_ids', next);
+  };
 
   const filteredSources = useMemo(
     () =>
@@ -72,7 +90,9 @@ export function FundingSection({
                 variant="outline"
                 className="w-full justify-between font-normal"
               >
-                {selectedSource || 'Pilih sumber dana...'}
+                <span className="truncate">
+                  {selectedSourcesLabel || 'Pilih sumber dana...'}
+                </span>
                 <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
@@ -95,18 +115,14 @@ export function FundingSection({
                     <div
                       key={source.id}
                       className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm hover:bg-accent"
-                      onClick={() => {
-                        const id = source.id.toString();
-                        onChange('funding_source_id', id);
-                        setFundingSourceId(id);
-                        setSourceOpen(false);
-                        setSourceSearch('');
-                      }}
+                      onClick={() => toggleSource(source.id)}
                     >
                       <Check
                         className={cn(
                           'h-4 w-4',
-                          fundingSourceId?.toString() === source.id.toString()
+                          fundingSourceIds.some(
+                            (i) => i.toString() === source.id.toString(),
+                          )
                             ? 'opacity-100'
                             : 'opacity-0',
                         )}
@@ -118,9 +134,7 @@ export function FundingSection({
                     <div
                       className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm font-medium text-primary hover:bg-accent"
                       onClick={() => {
-                        onChange('funding_source_id', sourceSearch);
-                        setFundingSourceId(sourceSearch);
-                        setSourceOpen(false);
+                        toggleSource(sourceSearch);
                         setSourceSearch('');
                       }}
                     >
@@ -132,7 +146,7 @@ export function FundingSection({
               </ScrollArea>
             </PopoverContent>
           </Popover>
-          <InputError message={errors[`detail.funding_source_id`]} />
+          <InputError message={errors[`detail.funding_source_ids`]} />
         </div>
 
         <div className="space-y-1.5">

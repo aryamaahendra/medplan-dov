@@ -47,7 +47,10 @@ export interface NeedDetail {
   background: string | null;
   purpose_and_objectives: string | null;
   target_objective: string | null;
-  procurement_organization_name: string | null;
+  kldi: string | null;
+  satker_skpd: string | null;
+  kpa_id: number | null;
+  kpa?: { id: number; name: string; nip: string | null };
   funding_source_ids?: (number | string)[];
   estimated_cost: string | null;
   funding_sources?: { id: number; name: string }[];

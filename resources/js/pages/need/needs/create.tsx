@@ -13,6 +13,9 @@ interface CreateProps {
   strategicServicePlans: any[];
   planningActivities: PlanningActivityVersion[];
   fundingSources: { id: number; name: string }[];
+  users: { id: number; name: string; nip: string | null }[];
+  kldiOptions: { name: string; value: string }[];
+  satkerOptions: { name: string; value: string }[];
 }
 
 export default function Create({
@@ -24,6 +27,9 @@ export default function Create({
   strategicServicePlans,
   planningActivities,
   fundingSources,
+  users,
+  kldiOptions,
+  satkerOptions,
 }: CreateProps) {
   return (
     <>
@@ -48,6 +54,9 @@ export default function Create({
             strategicServicePlans={strategicServicePlans}
             planningActivities={planningActivities}
             fundingSources={fundingSources}
+            users={users}
+            kldiOptions={kldiOptions}
+            satkerOptions={satkerOptions}
           />
         </div>
       </div>

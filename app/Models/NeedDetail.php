@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\Kldi;
+use App\Enums\SatkerSkpd;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +15,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
     'background',
     'purpose_and_objectives',
     'target_objective',
-    'procurement_organization_name',
+    'kldi',
+    'satker_skpd',
+    'kpa_id',
     'estimated_cost',
     'implementation_period',
     'expert_or_skilled_personnel',
@@ -23,6 +27,27 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class NeedDetail extends Model
 {
     use HasFactory;
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'kldi' => Kldi::class,
+            'satker_skpd' => SatkerSkpd::class,
+        ];
+    }
+
+    /**
+     * Get the KPA user.
+     */
+    public function kpa(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'kpa_id');
+    }
 
     /**
      * Get the need this detail belongs to.

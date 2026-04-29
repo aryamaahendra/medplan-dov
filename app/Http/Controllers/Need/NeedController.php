@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Need;
 use App\Actions\Need\GetFilteredNeedsAction;
 use App\Actions\Need\StoreNeedAction;
 use App\Actions\Need\UpdateNeedAction;
+use App\Enums\Kldi;
+use App\Enums\SatkerSkpd;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Need\StoreNeedRequest;
 use App\Http\Requests\Need\UpdateNeedRequest;
@@ -221,6 +223,9 @@ class NeedController extends Controller
                 ])
                 ->get(),
             'fundingSources' => FundingSource::query()->select(['id', 'name'])->orderBy('name')->get(),
+            'users' => User::query()->select(['id', 'name', 'nip'])->orderBy('name')->get(),
+            'kldiOptions' => collect(Kldi::cases())->map(fn ($case) => ['name' => $case->value, 'value' => $case->value])->values()->all(),
+            'satkerOptions' => collect(SatkerSkpd::cases())->map(fn ($case) => ['name' => $case->value, 'value' => $case->value])->values()->all(),
         ]);
     }
 
@@ -237,6 +242,7 @@ class NeedController extends Controller
                 'planningActivityVersions:id',
                 'planningActivityIndicators:id',
                 'detail.fundingSources',
+                'detail.kpa',
                 'attachments',
             ]))->resolve(),
             'currentGroup' => $need->needGroup,
@@ -276,6 +282,9 @@ class NeedController extends Controller
                 ])
                 ->get(),
             'fundingSources' => FundingSource::query()->select(['id', 'name'])->orderBy('name')->get(),
+            'users' => User::query()->select(['id', 'name', 'nip'])->orderBy('name')->get(),
+            'kldiOptions' => collect(Kldi::cases())->map(fn ($case) => ['name' => $case->value, 'value' => $case->value])->values()->all(),
+            'satkerOptions' => collect(SatkerSkpd::cases())->map(fn ($case) => ['name' => $case->value, 'value' => $case->value])->values()->all(),
         ]);
     }
 
@@ -317,6 +326,7 @@ class NeedController extends Controller
                 'planningActivityVersions:id,name,type,code,full_code',
                 'planningActivityIndicators:id,name,baseline,unit',
                 'detail.fundingSources',
+                'detail.kpa',
                 'attachments',
             ]))->resolve(),
             'checklistQuestions' => ChecklistQuestionResource::collection(

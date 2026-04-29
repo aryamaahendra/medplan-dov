@@ -14,6 +14,7 @@ class ExportNeedPdfController extends Controller
     {
         $need->load([
             'detail.fundingSources',
+            'detail.kpa',
             'organizationalUnit',
             'organizationalUnit.parentsRecursive',
             'needType',

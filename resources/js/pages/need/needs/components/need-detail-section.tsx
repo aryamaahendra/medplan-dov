@@ -1,5 +1,14 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import type { MutableRefObject } from 'react';
+import InputError from '@/components/input-error';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { getFormattedCost } from '@/lib/formatters';
 import type { Attachment } from '@/types';
 import { DetailFieldItem } from './detail-field-item';
@@ -18,6 +27,9 @@ interface NeedDetailSectionProps {
   deletedAttachmentIds: number[];
   setDeletedAttachmentIds: (ids: number[]) => void;
   fundingSources: { id: number; name: string }[];
+  users?: { id: number; name: string; nip: string | null }[];
+  kldiOptions?: { name: string; value: string }[];
+  satkerOptions?: { name: string; value: string }[];
   totalPrice: string | number;
 }
 
@@ -36,11 +48,6 @@ const DETAIL_FIELDS = [
     key: 'target_objective',
     label: 'Target / Sasaran Kegiatan',
     placeholder: 'Siapa atau apa yang menjadi target kegiatan...',
-  },
-  {
-    key: 'procurement_organization_name',
-    label: 'Nama Organisasi Pengadaan',
-    placeholder: 'Nama unit/organisasi yang melaksanakan pengadaan...',
   },
   {
     key: 'implementation_period',
@@ -76,10 +83,17 @@ export function NeedDetailSection({
   deletedAttachmentIds,
   setDeletedAttachmentIds,
   fundingSources,
+  users = [],
+  kldiOptions = [],
+  satkerOptions = [],
   totalPrice,
 }: NeedDetailSectionProps) {
   const [initialValues] = useState(providedInitialValues);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [kldi, setKldi] = useState(initialValues?.kldi ?? '');
+  const [satker, setSatker] = useState(initialValues?.satker_skpd ?? '');
+  const [kpaId, setKpaId] = useState(initialValues?.kpa_id ?? '');
 
   const handleChange = useCallback(
     (key: string, value: any) => {
@@ -151,12 +165,99 @@ export function NeedDetailSection({
 
       <div className="-mx-4 space-y-6">
         <FundingSection
+          key="funding-section"
           fundingSources={fundingSources}
           totalPrice={totalPrice}
           errors={errors}
           onChange={handleChange}
           initialFundingSourceIds={initialValues?.funding_source_ids}
         />
+
+        {/* Organization Section */}
+        <div key="organization-section" className="space-y-4">
+          <div className="border-t bg-muted/40 px-4 py-3">
+            <Label className="mb-0">Organisasi Pengadaan Barang</Label>
+          </div>
+
+          <div className="space-y-4 px-4">
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">
+                a. K/L/D/I
+              </Label>
+              <Select
+                value={kldi}
+                onValueChange={(val) => {
+                  setKldi(val);
+                  handleChange('kldi', val);
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Pilih K/L/D/I" />
+                </SelectTrigger>
+                <SelectContent>
+                  {kldiOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      <span>{opt.name}</span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <InputError message={errors['detail.kldi']} />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">
+                b. Satker/SKPD
+              </Label>
+              <Select
+                value={satker}
+                onValueChange={(val) => {
+                  setSatker(val);
+                  handleChange('satker_skpd', val);
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Pilih Satker/SKPD" />
+                </SelectTrigger>
+                <SelectContent>
+                  {satkerOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      <span>{opt.name}</span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <InputError message={errors['detail.satker_skpd']} />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">c. KPA</Label>
+              <Select
+                value={kpaId.toString()}
+                onValueChange={(val) => {
+                  setKpaId(val);
+                  handleChange('kpa_id', val);
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Pilih KPA" />
+                </SelectTrigger>
+                <SelectContent>
+                  {users.map((u) => (
+                    <SelectItem key={u.id} value={u.id.toString()}>
+                      <span>{`${u.name}${u.nip ? ` (NIP: ${u.nip})` : ''}`}</span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <InputError message={errors['detail.kpa_id']} />
+            </div>
+          </div>
+
+          <Label className="mb-0 block border-b bg-muted/40 px-4 py-3 text-xs text-muted-foreground italic">
+            *Nama organisasi yang menyelanggarakan/melaksanakan pengadaan barang
+          </Label>
+        </div>
 
         {DETAIL_FIELDS.map(({ key, ...field }) => (
           <DetailFieldItem

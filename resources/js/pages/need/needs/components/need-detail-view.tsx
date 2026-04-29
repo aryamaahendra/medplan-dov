@@ -20,7 +20,7 @@ const DETAIL_FIELDS: { key: keyof NeedDetail; label: string }[] = [
   { key: 'background', label: 'Latar Belakang' },
   { key: 'purpose_and_objectives', label: 'Maksud & Tujuan' },
   { key: 'target_objective', label: 'Target / Sasaran Kegiatan' },
-  { key: 'procurement_organization_name', label: 'Nama Organisasi Pengadaan' },
+  { key: 'kldi' as any, label: 'Nama Organisasi Pengadaan' },
   {
     key: 'funding_source_id' as any,
     label: 'Sumber Dana & Estimasi Biaya',
@@ -73,7 +73,9 @@ export function NeedDetailView({
                           a. Sumber Dana
                         </p>
                         <p className="mt-1 ml-4">
-                          {detail?.funding_source?.name ?? '-'}
+                          {detail?.funding_sources
+                            ?.map((s) => s.name)
+                            .join(', ') || '-'}
                         </p>
                       </li>
                       <li className="list-none">
@@ -83,6 +85,29 @@ export function NeedDetailView({
                         <p className="mt-1 ml-4">
                           {detail?.estimated_cost ?? '-'}
                         </p>
+                      </li>
+                    </ul>
+                  ) : key === ('kldi' as any) ? (
+                    <ul className="list-inside space-y-4 py-2">
+                      <li className="list-none">
+                        <p className="font-semibold text-muted-foreground">
+                          a. K/L/D/I
+                        </p>
+                        <p className="mt-1 ml-4">{detail?.kldi ?? '-'}</p>
+                      </li>
+                      <li className="list-none">
+                        <p className="font-semibold text-muted-foreground">
+                          b. Satker/SKPD
+                        </p>
+                        <p className="mt-1 ml-4">
+                          {detail?.satker_skpd ?? '-'}
+                        </p>
+                      </li>
+                      <li className="list-none">
+                        <p className="font-semibold text-muted-foreground">
+                          c. KPA
+                        </p>
+                        <p className="mt-1 ml-4">{detail?.kpa?.name ?? '-'}</p>
                       </li>
                     </ul>
                   ) : value ? (

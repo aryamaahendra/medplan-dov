@@ -14,6 +14,9 @@ interface EditProps {
   strategicServicePlans: any[];
   planningActivities: PlanningActivityVersion[];
   fundingSources: { id: number; name: string }[];
+  users: { id: number; name: string; nip: string | null }[];
+  kldiOptions: { name: string; value: string }[];
+  satkerOptions: { name: string; value: string }[];
 }
 
 export default function Edit({
@@ -26,6 +29,9 @@ export default function Edit({
   strategicServicePlans,
   planningActivities,
   fundingSources,
+  users,
+  kldiOptions,
+  satkerOptions,
 }: EditProps) {
   return (
     <>
@@ -51,6 +57,9 @@ export default function Edit({
             strategicServicePlans={strategicServicePlans}
             planningActivities={planningActivities}
             fundingSources={fundingSources}
+            users={users}
+            kldiOptions={kldiOptions}
+            satkerOptions={satkerOptions}
           />
         </div>
       </div>

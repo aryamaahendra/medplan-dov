@@ -236,9 +236,19 @@
                     }
                     echo '<ul style="list-style: none; padding-left: 0;">';
                     echo '<li>a. Sumber Dana</li>';
-                    echo '<p style="margin-left: 15px;">' . e($joinedNames) . '</p>';
-                    echo '<li style="margin-top: 10px;">b. Total perkiraan biaya:</li>';
-                    echo '<p style="margin-left: 15px;">' . ($detail ? e($detail->estimated_cost) : '-') . '</p>';
+                    echo '<p style="margin-left: 15px; margin-bottom: 0;">' . e($joinedNames) . '</p>';
+                    echo '<li style="margin-top: 4px;">b. Total perkiraan biaya:</li>';
+                    echo '<p style="margin-left: 15px; margin-bottom: 0;">' . ($detail ? e($detail->estimated_cost) : '-') . '</p>';
+                    echo '</ul>';
+                } elseif ($field['key'] === 'procurement_organization_name') {
+                    echo '<p style="margin-bottom: 4px;">Nama organisasi yang menyelenggarakan / melaksanakan pengadaan barang</p>';
+                    echo '<ul style="list-style: none; padding-left: 0;">';
+                    echo '<li>a. K/L/D/I</li>';
+                    echo '<p style="margin-left: 15px; margin-bottom: 0;">' . ($detail ? e($detail->kldi) : '-') . '</p>';
+                    echo '<li style="margin-top: 4px;">b. Satker/SKPD</li>';
+                    echo '<p style="margin-left: 15px; margin-bottom: 0;">' . ($detail ? e($detail->satker_skpd) : '-') . '</p>';
+                    echo '<li style="margin-top: 4px;">c. KPA</li>';
+                    echo '<p style="margin-left: 15px; margin-bottom: 0;">' . ($detail && $detail->kpa ? e($detail->kpa->name) : '-') . '</p>';
                     echo '</ul>';
                 } elseif (!$value) {
                     echo '<p>-</p>';

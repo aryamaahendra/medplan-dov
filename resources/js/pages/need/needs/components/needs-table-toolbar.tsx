@@ -2,7 +2,6 @@ import {
   CheckCheck,
   Clock,
   LayoutGrid,
-  SendIcon,
   Table,
   TriangleAlert,
 } from 'lucide-react';
@@ -43,7 +42,6 @@ export function NeedsTableToolbar({
 }: NeedsTableToolbarProps) {
   const statusOptions = [
     { label: 'Draft', value: 'draft', icon: Clock },
-    { label: 'Submitted', value: 'submitted', icon: SendIcon },
     { label: 'Approved', value: 'approved', icon: CheckCheck },
     { label: 'Rejected', value: 'rejected', icon: TriangleAlert },
   ];

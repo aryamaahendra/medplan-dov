@@ -41,7 +41,7 @@ class NeedFactory extends Factory
             'urgency' => $this->faker->randomElement(Urgency::cases()),
             'impact' => $this->faker->randomElement(Impact::cases()),
             'is_priority' => $this->faker->boolean(20), // 20% chance to be true
-            'status' => $this->faker->randomElement(['draft', 'submitted', 'approved', 'rejected']),
+            'status' => $this->faker->randomElement(Need::STATUSES),
         ];
     }
 }

@@ -134,7 +134,7 @@ test('index can filter needs by status', function () {
     $needType = NeedType::factory()->create();
 
     Need::factory()->create(['need_group_id' => $group->id, 'status' => 'draft', 'organizational_unit_id' => $unit->id, 'need_type_id' => $needType->id]);
-    Need::factory()->create(['need_group_id' => $group->id, 'status' => 'submitted', 'organizational_unit_id' => $unit->id, 'need_type_id' => $needType->id]);
+    Need::factory()->create(['need_group_id' => $group->id, 'status' => 'approved', 'organizational_unit_id' => $unit->id, 'need_type_id' => $needType->id]);
 
     $this->actingAs($user)
         ->get(route('needs.index', ['need_group_id' => $group->id, 'status' => ['draft']]))

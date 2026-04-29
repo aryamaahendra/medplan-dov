@@ -8,6 +8,7 @@ use function Pest\Laravel\actingAs;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
+    $this->user->assignRole('super-admin');
     $this->needGroup = NeedGroup::factory()->create();
     $this->question = ChecklistQuestion::factory()->create();
 });

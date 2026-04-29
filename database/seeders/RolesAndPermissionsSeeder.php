@@ -99,6 +99,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'update need tab planning' => 'Mengubah data pada tab Perencanaan',
             'update need tab detail' => 'Mengubah data pada tab Detail KAK',
             'update need tab lampiran' => 'Mengubah data pada tab Lampiran',
+            'update need status' => 'Mengubah status usulan kebutuhan',
 
             // Need Configuration
             'view any need-groups' => 'Melihat daftar semua grup usulan',
@@ -216,6 +217,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'update need tab detail', 'update need tab lampiran',
             'view need-attachments', 'create need-attachments', 'delete need-attachments',
         ]);
+
+        // Planner
+        // (No changes needed for Planner as it uses array_filter)
 
         // Staff
         $staffRole = Role::firstOrCreate(['name' => UserRole::Staff->value, 'guard_name' => 'web']);

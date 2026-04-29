@@ -41,6 +41,18 @@ class Need extends Model
     /** @use HasFactory<NeedFactory> */
     use HasFactory, SoftDeletes;
 
+    public const STATUS_DRAFT = 'draft';
+
+    public const STATUS_APPROVED = 'approved';
+
+    public const STATUS_REJECTED = 'rejected';
+
+    public const STATUSES = [
+        self::STATUS_DRAFT,
+        self::STATUS_APPROVED,
+        self::STATUS_REJECTED,
+    ];
+
     protected function casts(): array
     {
         return [

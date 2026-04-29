@@ -14,6 +14,7 @@ test('guest cannot access need types index', function () {
 
 test('index renders the correct component and props', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     NeedType::factory()->count(3)->create();
 
     $this->actingAs($user)
@@ -28,6 +29,7 @@ test('index renders the correct component and props', function () {
 
 test('index can filter need types by search', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     NeedType::factory()->create(['name' => 'Regular Need', 'code' => 'REG']);
     NeedType::factory()->create(['name' => 'Urgent Need', 'code' => 'URG']);
 
@@ -42,6 +44,7 @@ test('index can filter need types by search', function () {
 
 test('store creates a new need type', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     $data = [
         'name' => 'New Need Type',
         'code' => 'NEW-01',
@@ -64,6 +67,7 @@ test('store creates a new need type', function () {
 
 test('store validates required fields', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
 
     $this->actingAs($user)
         ->post(route('need-types.store'), [])
@@ -72,6 +76,7 @@ test('store validates required fields', function () {
 
 test('store validates unique code', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     NeedType::factory()->create(['code' => 'EXISTING']);
 
     $this->actingAs($user)
@@ -85,6 +90,7 @@ test('store validates unique code', function () {
 
 test('update modifies an existing need type', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     $needType = NeedType::factory()->create(['name' => 'Old Name']);
 
     $this->actingAs($user)
@@ -102,6 +108,7 @@ test('update modifies an existing need type', function () {
 
 test('update validates unique code ignoring current model', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     $needType = NeedType::factory()->create(['code' => 'UNIQUE-CODE']);
 
     $this->actingAs($user)
@@ -116,6 +123,7 @@ test('update validates unique code ignoring current model', function () {
 
 test('destroy deletes a need type', function () {
     $user = User::factory()->create();
+    $user->assignRole('super-admin');
     $needType = NeedType::factory()->create();
 
     $this->actingAs($user)

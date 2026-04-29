@@ -9,59 +9,11 @@ import {
 } from '@/components/ui/field';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+
+import { PRIORITY_LEVELS, STATUS_OPTIONS } from '@/constants/need';
+import { usePermission } from '@/hooks/use-permission';
 import { cn } from '@/lib/utils';
-
 import type { Need } from '@/types';
-
-const STATUS_OPTIONS = [
-  {
-    value: 'draft',
-    label: 'Draft',
-    description: 'Usulan masih dalam tahap pengerjaan.',
-  },
-  {
-    value: 'submitted',
-    label: 'Diajukan',
-    description: 'Usulan telah dikirim untuk ditelaah.',
-  },
-  {
-    value: 'approved',
-    label: 'Disetujui',
-    description: 'Usulan telah disetujui untuk diproses.',
-  },
-  {
-    value: 'rejected',
-    label: 'Ditolak',
-    description: 'Usulan tidak dapat dilanjutkan.',
-  },
-] as const;
-
-const PRIORITY_LEVELS = [
-  {
-    value: 'high',
-    label: 'Tinggi',
-    description: {
-      urgency: 'Butuh penanganan segera dan mendesak.',
-      impact: 'Berpengaruh besar terhadap operasional utama.',
-    },
-  },
-  {
-    value: 'medium',
-    label: 'Sedang',
-    description: {
-      urgency: 'Dibutuhkan namun masih bisa dijadwalkan.',
-      impact: 'Berpengaruh pada efisiensi kerja tim.',
-    },
-  },
-  {
-    value: 'low',
-    label: 'Rendah',
-    description: {
-      urgency: 'Dapat dipenuhi sesuai ketersediaan sumber daya.',
-      impact: 'Dampak minimal terhadap keseluruhan sistem.',
-    },
-  },
-] as const;
 
 interface PriorityStatusSectionProps {
   data: any;
@@ -74,39 +26,44 @@ export function PriorityStatusSection({
   setData,
   errors,
 }: PriorityStatusSectionProps) {
+  const { hasPermission } = usePermission();
+  const canUpdateStatus = hasPermission('update need status');
+
   useEffect(() => {
     setData('is_priority', data.urgency === 'high' && data.impact === 'high');
   }, [data.urgency, data.impact, setData]);
 
   return (
     <div className="space-y-6 py-6">
-      <div className="space-y-3">
-        <Label>Status Usulan</Label>
-        <RadioGroup
-          value={data.status}
-          onValueChange={(v) => setData('status', v as Need['status'])}
-          className="grid grid-cols-1 gap-3 md:grid-cols-2"
-        >
-          {STATUS_OPTIONS.map((s) => (
-            <FieldLabel
-              key={s.value}
-              htmlFor={`status-${s.value}`}
-              className="cursor-pointer"
-            >
-              <Field orientation="horizontal" className="p-3">
-                <FieldContent>
-                  <FieldTitle>{s.label}</FieldTitle>
-                  <FieldDescription className="text-xs">
-                    {s.description}
-                  </FieldDescription>
-                </FieldContent>
-                <RadioGroupItem value={s.value} id={`status-${s.value}`} />
-              </Field>
-            </FieldLabel>
-          ))}
-        </RadioGroup>
-        <InputError message={errors.status} />
-      </div>
+      {canUpdateStatus && (
+        <div className="space-y-3">
+          <Label>Status Usulan</Label>
+          <RadioGroup
+            value={data.status}
+            onValueChange={(v) => setData('status', v as Need['status'])}
+            className="grid grid-cols-1 gap-3 md:grid-cols-2"
+          >
+            {STATUS_OPTIONS.map((s) => (
+              <FieldLabel
+                key={s.value}
+                htmlFor={`status-${s.value}`}
+                className="cursor-pointer"
+              >
+                <Field orientation="horizontal" className="p-3">
+                  <FieldContent>
+                    <FieldTitle>{s.label}</FieldTitle>
+                    <FieldDescription className="text-xs">
+                      {s.description}
+                    </FieldDescription>
+                  </FieldContent>
+                  <RadioGroupItem value={s.value} id={`status-${s.value}`} />
+                </Field>
+              </FieldLabel>
+            ))}
+          </RadioGroup>
+          <InputError message={errors.status} />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-6">
         <div className="space-y-3">

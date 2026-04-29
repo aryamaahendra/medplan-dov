@@ -10,6 +10,7 @@ use function Pest\Laravel\assertDatabaseHas;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
+    $this->user->assignRole('super-admin');
     $this->need = Need::factory()->create();
 });
 

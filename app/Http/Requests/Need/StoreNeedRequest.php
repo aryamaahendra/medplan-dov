@@ -5,6 +5,7 @@ namespace App\Http\Requests\Need;
 use App\Enums\Impact;
 use App\Enums\Urgency;
 use App\Models\Indicator;
+use App\Models\Need;
 use App\Models\OrganizationalUnit;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -38,7 +39,7 @@ class StoreNeedRequest extends FormRequest
                 'title', 'description', 'current_condition', 'required_condition',
                 'volume', 'unit', 'unit_price', 'total_price',
             ],
-            'update need tab urgency' => ['urgency', 'impact', 'is_priority', 'status'],
+            'update need tab urgency' => ['urgency', 'impact', 'is_priority'],
             'update need tab strategic' => ['sasaran_ids', 'indicator_ids'],
             'update need tab ikk' => ['kpi_indicator_ids'],
             'update need tab rls' => ['strategic_service_plan_ids'],
@@ -55,6 +56,10 @@ class StoreNeedRequest extends FormRequest
             if ($user->hasPermissionTo($permission)) {
                 $allowedFields = array_merge($allowedFields, $fields);
             }
+        }
+
+        if ($user->hasPermissionTo('update need status')) {
+            $allowedFields[] = 'status';
         }
 
         // Only keep allowed fields in the request
@@ -101,7 +106,7 @@ class StoreNeedRequest extends FormRequest
             'urgency' => ['required', Rule::enum(Urgency::class)],
             'impact' => ['required', Rule::enum(Impact::class)],
             'is_priority' => ['boolean'],
-            'status' => ['sometimes', 'string', Rule::in(['draft', 'submitted', 'approved', 'rejected'])],
+            'status' => ['sometimes', 'string', Rule::in(Need::STATUSES)],
             'sasaran_ids' => ['nullable', 'array'],
             'sasaran_ids.*' => ['exists:sasarans,id'],
             'indicator_ids' => ['nullable', 'array'],

@@ -55,7 +55,7 @@ export interface NeedDetail {
   training: string | null;
 }
 
-export type NeedStatus = 'draft' | 'submitted' | 'approved' | 'rejected';
+export type NeedStatus = 'draft' | 'approved' | 'rejected';
 export type NeedPriority = 'high' | 'medium' | 'low';
 
 export interface Need {

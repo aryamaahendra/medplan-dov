@@ -202,7 +202,7 @@
             ['key' => 'purpose_and_objectives', 'label' => '2. Tujuan dan Sasaran'],
             ['key' => 'target_objective', 'label' => '3. Target / Sasaran Kegiatan'],
             ['key' => 'procurement_organization_name', 'label' => '4. Nama Organisasi Pengadaan'],
-            ['key' => 'funding_source_and_estimated_cost', 'label' => '5. Sumber Dana & Estimasi Biaya'],
+            ['key' => 'funding_source_id', 'label' => '5. Sumber Dana & Estimasi Biaya'],
             ['key' => 'implementation_period', 'label' => '6. Periode Pelaksanaan'],
             ['key' => 'expert_or_skilled_personnel', 'label' => '7. Tenaga Ahli / SDM Terampil'],
             ['key' => 'technical_specifications', 'label' => '8. Spesifikasi Teknis'],
@@ -220,7 +220,14 @@
             <div class="content-value">
               @php
                 $value = $detail ? $detail->{$field['key']} : null;
-                if (!$value) {
+                if ($field['key'] === 'funding_source_id') {
+                    echo '<ul style="list-style: none; padding-left: 0;">';
+                    echo '<li>a. Sumber Dana</li>';
+                    echo '<p style="margin-left: 15px;">' . ($detail && $detail->fundingSource ? e($detail->fundingSource->name) : '-') . '</p>';
+                    echo '<li style="margin-top: 10px;">b. Total perkiraan biaya:</li>';
+                    echo '<p style="margin-left: 15px;">' . ($detail ? e($detail->estimated_cost) : '-') . '</p>';
+                    echo '</ul>';
+                } elseif (!$value) {
                     echo '<p>-</p>';
                 } else {
                     $data = json_decode($value, true);

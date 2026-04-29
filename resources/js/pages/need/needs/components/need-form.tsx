@@ -35,6 +35,7 @@ interface NeedFormProps {
   kpiGroups: any[];
   strategicServicePlans: StrategicServicePlan[];
   planningActivities: PlanningActivityVersion[];
+  fundingSources: { id: number; name: string }[];
   className?: string;
 }
 
@@ -47,6 +48,7 @@ export function NeedForm({
   kpiGroups,
   strategicServicePlans,
   planningActivities,
+  fundingSources,
   className,
 }: NeedFormProps) {
   const isEditing = !!need;
@@ -142,8 +144,8 @@ export function NeedForm({
       target_objective: need?.detail?.target_objective ?? '',
       procurement_organization_name:
         need?.detail?.procurement_organization_name ?? '',
-      funding_source_and_estimated_cost:
-        need?.detail?.funding_source_and_estimated_cost ?? '',
+      funding_source_id: need?.detail?.funding_source_id?.toString() ?? '',
+      estimated_cost: need?.detail?.estimated_cost ?? '',
       implementation_period: need?.detail?.implementation_period ?? '',
       expert_or_skilled_personnel:
         need?.detail?.expert_or_skilled_personnel ?? '',
@@ -341,6 +343,8 @@ export function NeedForm({
                   setDeletedAttachmentIds={(ids) =>
                     setData('deleted_attachment_ids', ids)
                   }
+                  fundingSources={fundingSources}
+                  totalPrice={data.total_price}
                 />
               </TabsContent>
             )}

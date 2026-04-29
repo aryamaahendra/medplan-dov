@@ -2,6 +2,7 @@
 
 namespace App\Actions\Need;
 
+use App\Models\FundingSource;
 use App\Models\Need;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -47,7 +48,12 @@ class StoreNeedAction
             $need->planningActivityIndicators()->sync($data['planning_activity_indicator_ids'] ?? []);
 
             if (! empty($data['detail'])) {
-                $need->detail()->create($data['detail']);
+                $detailData = $data['detail'];
+                if (isset($detailData['funding_source_id']) && ! is_numeric($detailData['funding_source_id']) && ! empty($detailData['funding_source_id'])) {
+                    $source = FundingSource::firstOrCreate(['name' => $detailData['funding_source_id']]);
+                    $detailData['funding_source_id'] = $source->id;
+                }
+                $need->detail()->create($detailData);
             }
 
             if ($attachments) {

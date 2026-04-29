@@ -11,6 +11,7 @@ use App\Http\Requests\Need\UpdateNeedRequest;
 use App\Http\Resources\ChecklistQuestionResource;
 use App\Http\Resources\NeedChecklistAnswerResource;
 use App\Http\Resources\NeedResource;
+use App\Models\FundingSource;
 use App\Models\KpiGroup;
 use App\Models\Need;
 use App\Models\NeedGroup;
@@ -219,6 +220,7 @@ class NeedController extends Controller
                     'children.children.children.children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
                 ])
                 ->get(),
+            'fundingSources' => FundingSource::query()->select(['id', 'name'])->orderBy('name')->get(),
         ]);
     }
 
@@ -234,7 +236,7 @@ class NeedController extends Controller
                 'strategicServicePlans:id',
                 'planningActivityVersions:id',
                 'planningActivityIndicators:id',
-                'detail',
+                'detail.fundingSource',
                 'attachments',
             ]))->resolve(),
             'currentGroup' => $need->needGroup,
@@ -273,6 +275,7 @@ class NeedController extends Controller
                     'children.children.children.children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
                 ])
                 ->get(),
+            'fundingSources' => FundingSource::query()->select(['id', 'name'])->orderBy('name')->get(),
         ]);
     }
 
@@ -313,7 +316,7 @@ class NeedController extends Controller
                 'strategicServicePlans:id,strategic_program,service_plan,year,target,policy_direction',
                 'planningActivityVersions:id,name,type,code,full_code',
                 'planningActivityIndicators:id,name,baseline,unit',
-                'detail',
+                'detail.fundingSource',
                 'attachments',
             ]))->resolve(),
             'checklistQuestions' => ChecklistQuestionResource::collection(

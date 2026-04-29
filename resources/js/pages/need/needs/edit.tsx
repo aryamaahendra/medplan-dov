@@ -13,6 +13,7 @@ interface EditProps {
   kpiGroups: any[];
   strategicServicePlans: any[];
   planningActivities: PlanningActivityVersion[];
+  fundingSources: { id: number; name: string }[];
 }
 
 export default function Edit({
@@ -24,6 +25,7 @@ export default function Edit({
   kpiGroups,
   strategicServicePlans,
   planningActivities,
+  fundingSources,
 }: EditProps) {
   return (
     <>
@@ -48,6 +50,7 @@ export default function Edit({
             kpiGroups={kpiGroups}
             strategicServicePlans={strategicServicePlans}
             planningActivities={planningActivities}
+            fundingSources={fundingSources}
           />
         </div>
       </div>

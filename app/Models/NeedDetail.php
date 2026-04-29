@@ -13,7 +13,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'purpose_and_objectives',
     'target_objective',
     'procurement_organization_name',
-    'funding_source_and_estimated_cost',
+    'funding_source_id',
+    'estimated_cost',
     'implementation_period',
     'expert_or_skilled_personnel',
     'technical_specifications',
@@ -29,5 +30,13 @@ class NeedDetail extends Model
     public function need(): BelongsTo
     {
         return $this->belongsTo(Need::class);
+    }
+
+    /**
+     * Get the funding source for this detail.
+     */
+    public function fundingSource(): BelongsTo
+    {
+        return $this->belongsTo(FundingSource::class);
     }
 }

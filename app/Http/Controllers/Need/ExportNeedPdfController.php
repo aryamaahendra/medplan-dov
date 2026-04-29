@@ -13,7 +13,7 @@ class ExportNeedPdfController extends Controller
     public function __invoke(Need $need, Request $request)
     {
         $need->load([
-            'detail',
+            'detail.fundingSource',
             'organizationalUnit',
             'organizationalUnit.parentsRecursive',
             'needType',

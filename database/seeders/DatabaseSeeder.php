@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         // System / Independent Parent Tables
         $this->call(ISeedOrganizationalUnitsTableSeeder::class);
         $this->call(ISeedNeedTypesTableSeeder::class);
+        $this->call(FundingSourceSeeder::class);
         $this->call(ISeedNeedGroupsTableSeeder::class);
         $this->call(ISeedChecklistQuestionsTableSeeder::class);
         $this->call(ISeedNeedGroupChecklistQuestionTableSeeder::class);

@@ -48,7 +48,9 @@ export interface NeedDetail {
   purpose_and_objectives: string | null;
   target_objective: string | null;
   procurement_organization_name: string | null;
-  funding_source_and_estimated_cost: string | null;
+  funding_source_id: number | string | null;
+  estimated_cost: string | null;
+  funding_source?: { id: number; name: string } | null;
   implementation_period: string | null;
   expert_or_skilled_personnel: string | null;
   technical_specifications: string | null;

@@ -2,6 +2,7 @@
 
 namespace App\Actions\Need;
 
+use App\Models\FundingSource;
 use App\Models\Need;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -52,9 +53,15 @@ class UpdateNeedAction
             $need->planningActivityVersions()->sync($data['planning_activity_version_ids'] ?? []);
             $need->planningActivityIndicators()->sync($data['planning_activity_indicator_ids'] ?? []);
 
+            $detailData = $data['detail'] ?? [];
+            if (isset($detailData['funding_source_id']) && ! is_numeric($detailData['funding_source_id']) && ! empty($detailData['funding_source_id'])) {
+                $source = FundingSource::firstOrCreate(['name' => $detailData['funding_source_id']]);
+                $detailData['funding_source_id'] = $source->id;
+            }
+
             $need->detail()->updateOrCreate(
                 ['need_id' => $need->id],
-                $data['detail'] ?? []
+                $detailData
             );
 
             // Handle deletions

@@ -12,6 +12,7 @@ interface CreateProps {
   kpiGroups: any[];
   strategicServicePlans: any[];
   planningActivities: PlanningActivityVersion[];
+  fundingSources: { id: number; name: string }[];
 }
 
 export default function Create({
@@ -22,6 +23,7 @@ export default function Create({
   kpiGroups,
   strategicServicePlans,
   planningActivities,
+  fundingSources,
 }: CreateProps) {
   return (
     <>
@@ -45,6 +47,7 @@ export default function Create({
             kpiGroups={kpiGroups}
             strategicServicePlans={strategicServicePlans}
             planningActivities={planningActivities}
+            fundingSources={fundingSources}
           />
         </div>
       </div>

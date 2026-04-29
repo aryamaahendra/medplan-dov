@@ -1,13 +1,10 @@
-import { UploadCloud } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import type { MutableRefObject } from 'react';
-import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Editor } from '@/components/ui/editor';
-import { Label } from '@/components/ui/label';
+import { getFormattedCost } from '@/lib/formatters';
 import type { Attachment } from '@/types';
-import { AttachmentCard } from './attachment-card';
-import { NewAttachmentItem } from './new-attachment-item';
+import { DetailFieldItem } from './detail-field-item';
+import { FundingSection } from './funding-section';
+import { TechSpecExtra } from './tech-spec-extra';
 
 interface NeedDetailSectionProps {
   initialValues: any;
@@ -20,15 +17,11 @@ interface NeedDetailSectionProps {
   existingTechnicalSpecificationAttachments?: Attachment[];
   deletedAttachmentIds: number[];
   setDeletedAttachmentIds: (ids: number[]) => void;
+  fundingSources: { id: number; name: string }[];
+  totalPrice: string | number;
 }
 
-interface DetailField {
-  key: string;
-  label: string;
-  placeholder: string;
-}
-
-const DETAIL_FIELDS: DetailField[] = [
+const DETAIL_FIELDS = [
   {
     key: 'background',
     label: 'Latar Belakang',
@@ -50,11 +43,6 @@ const DETAIL_FIELDS: DetailField[] = [
     placeholder: 'Nama unit/organisasi yang melaksanakan pengadaan...',
   },
   {
-    key: 'funding_source_and_estimated_cost',
-    label: 'Sumber Dana & Estimasi Biaya',
-    placeholder: 'Sebutkan sumber pendanaan dan perkiraan biaya...',
-  },
-  {
     key: 'implementation_period',
     label: 'Periode Pelaksanaan',
     placeholder: 'Kapan dan berapa lama kegiatan akan dilaksanakan...',
@@ -74,7 +62,7 @@ const DETAIL_FIELDS: DetailField[] = [
     label: 'Pelatihan',
     placeholder: 'Apakah diperlukan pelatihan? Jika ya, uraikan...',
   },
-];
+] as const;
 
 export function NeedDetailSection({
   initialValues: providedInitialValues,
@@ -87,27 +75,29 @@ export function NeedDetailSection({
   existingTechnicalSpecificationAttachments = [],
   deletedAttachmentIds,
   setDeletedAttachmentIds,
+  fundingSources,
+  totalPrice,
 }: NeedDetailSectionProps) {
   const [initialValues] = useState(providedInitialValues);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const previewableExtensions = [
-    'jpg',
-    'jpeg',
-    'png',
-    'gif',
-    'webp',
-    'bmp',
-    'svg',
-    'pdf',
-  ];
+  const handleChange = useCallback(
+    (key: string, value: any) => {
+      detailValuesRef.current = {
+        ...detailValuesRef.current,
+        [key]: value,
+      };
+    },
+    [detailValuesRef],
+  );
 
-  const handleChange = (key: string, value: string) => {
-    detailValuesRef.current = {
-      ...detailValuesRef.current,
-      [key]: value,
-    };
-  };
+  useEffect(() => {
+    const formatted = getFormattedCost(totalPrice);
+
+    if (formatted) {
+      handleChange('estimated_cost', formatted);
+    }
+  }, [totalPrice, handleChange]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -128,12 +118,12 @@ export function NeedDetailSection({
   };
 
   const removeNewFile = (index: number) => {
-    const nextFiles = [...technicalSpecificationAttachments];
-    const nextNames = [...technicalSpecificationAttachmentNames];
-    nextFiles.splice(index, 1);
-    nextNames.splice(index, 1);
-    setTechnicalSpecificationAttachments(nextFiles);
-    setTechnicalSpecificationAttachmentNames(nextNames);
+    setTechnicalSpecificationAttachments(
+      technicalSpecificationAttachments.filter((_, i) => i !== index),
+    );
+    setTechnicalSpecificationAttachmentNames(
+      technicalSpecificationAttachmentNames.filter((_, i) => i !== index),
+    );
   };
 
   const handleNameChange = (index: number, name: string) => {
@@ -143,23 +133,11 @@ export function NeedDetailSection({
   };
 
   const toggleExistingDeletion = (id: number) => {
-    if (deletedAttachmentIds.includes(id)) {
-      setDeletedAttachmentIds(deletedAttachmentIds.filter((d) => d !== id));
-    } else {
-      setDeletedAttachmentIds([...deletedAttachmentIds, id]);
-    }
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) {
-      return '0 Bytes';
-    }
-
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    setDeletedAttachmentIds(
+      deletedAttachmentIds.includes(id)
+        ? deletedAttachmentIds.filter((d) => d !== id)
+        : [...deletedAttachmentIds, id],
+    );
   };
 
   return (
@@ -172,75 +150,36 @@ export function NeedDetailSection({
       </div>
 
       <div className="-mx-4 space-y-6">
-        {DETAIL_FIELDS.map(({ key, label, placeholder }) => (
-          <div key={key} className="space-y-1.5">
-            <div className="flex items-center justify-between border-t bg-muted/40 px-4 py-3">
-              <Label className="mb-0">{label}</Label>
-              {key === 'technical_specifications' && (
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <UploadCloud />
-                    Unggah Dokumen
-                  </Button>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    className="hidden"
-                    multiple
-                    onChange={handleFileChange}
-                    accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
-                  />
-                </div>
-              )}
-            </div>
+        <FundingSection
+          fundingSources={fundingSources}
+          totalPrice={totalPrice}
+          errors={errors}
+          onChange={handleChange}
+          initialFundingSourceId={initialValues?.funding_source_id}
+        />
 
-            <Editor
-              id={`detail_${key}`}
-              placeholder={'Type here ...'}
-              value={initialValues?.[key] ?? ''}
-              onChange={(value) => handleChange(key, value)}
-              className="mb-0 bg-muted/10"
-            />
-            <InputError message={errors[`detail.${key}`]} />
-
-            {key === 'technical_specifications' &&
-              (technicalSpecificationAttachments.length > 0 ||
-                existingTechnicalSpecificationAttachments.length > 0) && (
-                <div className="mb-0 grid grid-cols-1 gap-2 border-b p-2 md:grid-cols-2">
-                  {existingTechnicalSpecificationAttachments.map((att) => (
-                    <AttachmentCard
-                      key={att.id}
-                      attachment={att}
-                      formatFileSize={formatFileSize}
-                      previewableExtensions={previewableExtensions}
-                      isDeleted={deletedAttachmentIds.includes(att.id)}
-                      onToggleDelete={toggleExistingDeletion}
-                    />
-                  ))}
-
-                  {technicalSpecificationAttachments.map((file, index) => (
-                    <NewAttachmentItem
-                      key={index}
-                      file={file}
-                      index={index}
-                      name={technicalSpecificationAttachmentNames[index]}
-                      onNameChange={handleNameChange}
-                      onRemove={removeNewFile}
-                      formatFileSize={formatFileSize}
-                    />
-                  ))}
-                </div>
-              )}
-
-            <Label className="mb-0 border-b bg-muted/40 px-4 py-3 text-xs text-muted-foreground italic">
-              *{placeholder}
-            </Label>
-          </div>
+        {DETAIL_FIELDS.map(({ key, ...field }) => (
+          <DetailFieldItem
+            key={key}
+            {...field}
+            initialValue={initialValues?.[key] ?? ''}
+            error={errors[`detail.${key}`]}
+            onChange={(val) => handleChange(key, val)}
+          >
+            {key === 'technical_specifications' && (
+              <TechSpecExtra
+                fileInputRef={fileInputRef}
+                onFileChange={handleFileChange}
+                existingAttachments={existingTechnicalSpecificationAttachments}
+                newAttachments={technicalSpecificationAttachments}
+                newAttachmentNames={technicalSpecificationAttachmentNames}
+                deletedIds={deletedAttachmentIds}
+                onToggleDelete={toggleExistingDeletion}
+                onRemoveNew={removeNewFile}
+                onNameChange={handleNameChange}
+              />
+            )}
+          </DetailFieldItem>
         ))}
       </div>
     </div>

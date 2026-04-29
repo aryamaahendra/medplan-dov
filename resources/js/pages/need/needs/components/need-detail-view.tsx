@@ -22,7 +22,7 @@ const DETAIL_FIELDS: { key: keyof NeedDetail; label: string }[] = [
   { key: 'target_objective', label: 'Target / Sasaran Kegiatan' },
   { key: 'procurement_organization_name', label: 'Nama Organisasi Pengadaan' },
   {
-    key: 'funding_source_and_estimated_cost',
+    key: 'funding_source_id' as any,
     label: 'Sumber Dana & Estimasi Biaya',
   },
   { key: 'implementation_period', label: 'Periode Pelaksanaan' },
@@ -66,7 +66,26 @@ export function NeedDetailView({
                   {label}
                 </Label>
                 <div className="mb-0 min-h-[120px] w-full border-y border-input bg-background px-4 py-2 text-base md:text-sm">
-                  {value ? (
+                  {key === ('funding_source_id' as any) ? (
+                    <ul className="list-inside space-y-4 py-2">
+                      <li className="list-none">
+                        <p className="font-semibold text-muted-foreground">
+                          a. Sumber Dana
+                        </p>
+                        <p className="mt-1 ml-4">
+                          {detail?.funding_source?.name ?? '-'}
+                        </p>
+                      </li>
+                      <li className="list-none">
+                        <p className="font-semibold text-muted-foreground">
+                          b. Total perkiraan biaya:
+                        </p>
+                        <p className="mt-1 ml-4">
+                          {detail?.estimated_cost ?? '-'}
+                        </p>
+                      </li>
+                    </ul>
+                  ) : value ? (
                     <EditorRenderer value={value?.toString()} />
                   ) : (
                     <p className="text-sm text-muted-foreground">-</p>

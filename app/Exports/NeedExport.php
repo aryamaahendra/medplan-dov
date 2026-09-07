@@ -49,6 +49,7 @@ class NeedExport implements FromQuery, ShouldAutoSize, WithColumnFormatting, Wit
             'Dampak',
             'Prioritas',
             'Status',
+            'Deskripsi/Justifikasi',
             'Skor Checklist (%)',
             'Disetujui Direktur Pada',
         ];
@@ -72,6 +73,7 @@ class NeedExport implements FromQuery, ShouldAutoSize, WithColumnFormatting, Wit
             $row->impact?->label() ?? $row->impact,
             $row->is_priority ? 'Ya' : 'Tidak',
             $row->status,
+            $row->description,
             (float) $row->checklist_percentage,
             $row->approved_by_director_at?->format('d/m/Y H:i') ?? '-',
         ];

@@ -8,16 +8,16 @@ use App\Models\NeedType;
 use App\Models\OrganizationalUnit;
 use App\Models\Sasaran;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
     app(PermissionRegistrar::class)->forgetCachedPermissions();
-    Role::firstOrCreate(['name' => 'super-admin']);
+    $this->seed(RolesAndPermissionsSeeder::class);
 });
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -308,6 +308,33 @@ test('store validations on numeric fields ensuring values cannot be negative', f
         ->post(route('needs.store'), $payload)
         ->assertSessionHasErrors(['volume', 'unit_price', 'total_price']);
 });
+test('staff without urgency permission can store a need with default urgency and impact', function () {
+    $unit = OrganizationalUnit::factory()->create();
+    $staff = User::factory()->create(['organizational_unit_id' => $unit->id]);
+    $staff->assignRole('staff');
+
+    $group = NeedGroup::factory()->create(['is_active' => true]);
+    $needType = NeedType::factory()->create();
+
+    $payload = validNeedPayload($group, $unit, $needType, [
+        'title' => 'Usulan dari Staff',
+        'organizational_unit_id' => $unit->id,
+    ]);
+    // Staff cannot update urgency tab, so urgency/impact shouldn't be required from user
+    unset($payload['urgency'], $payload['impact']);
+
+    $this->actingAs($staff)
+        ->post(route('needs.store'), $payload)
+        ->assertRedirect(route('needs.index', ['need_group_id' => $group->id]))
+        ->assertSessionHas('success', 'Usulan kebutuhan berhasil dibuat.');
+
+    $this->assertDatabaseHas('needs', [
+        'need_group_id' => $group->id,
+        'title' => 'Usulan dari Staff',
+        'urgency' => 'medium',
+        'impact' => 'medium',
+    ]);
+});
 
 // ─── Update ───────────────────────────────────────────────────────────────────
 
@@ -379,6 +406,50 @@ test('update numerical fields cannot be negative', function () {
     $this->actingAs($user)
         ->put(route('needs.update', $need), $payload)
         ->assertSessionHasErrors(['volume', 'unit_price', 'total_price']);
+});
+test('staff without urgency permission can update general fields without urgency validation error and without wiping relations', function () {
+    $unit = OrganizationalUnit::factory()->create();
+    $staff = User::factory()->create(['organizational_unit_id' => $unit->id]);
+    $staff->assignRole('staff');
+
+    $group = NeedGroup::factory()->create(['is_active' => true]);
+    $needType = NeedType::factory()->create();
+    $sasaran = Sasaran::factory()->create();
+
+    $need = Need::factory()->create([
+        'need_group_id' => $group->id,
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $needType->id,
+        'title' => 'Judul Awal Staff',
+        'urgency' => 'high',
+        'impact' => 'high',
+        'is_priority' => true,
+    ]);
+    $need->sasarans()->attach($sasaran->id);
+
+    // Staff payload only sends general info, does not send urgency or strategic tabs
+    $payload = [
+        'need_group_id' => $group->id,
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $needType->id,
+        'year' => 2025,
+        'title' => 'Judul Baru Staff',
+        'volume' => 10,
+        'unit' => 'unit',
+        'unit_price' => 1000,
+        'total_price' => 10000,
+    ];
+
+    $this->actingAs($staff)
+        ->put(route('needs.update', $need), $payload)
+        ->assertRedirect(route('needs.index', ['need_group_id' => $group->id]))
+        ->assertSessionHas('success', 'Usulan kebutuhan berhasil diperbarui.');
+
+    $refreshed = $need->fresh();
+    expect($refreshed->title)->toBe('Judul Baru Staff')
+        ->and($refreshed->urgency->value)->toBe('high')
+        ->and($refreshed->impact->value)->toBe('high')
+        ->and($refreshed->sasarans)->toHaveCount(1);
 });
 
 // ─── Destroy ─────────────────────────────────────────────────────────────────

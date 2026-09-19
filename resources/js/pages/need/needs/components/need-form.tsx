@@ -1,5 +1,5 @@
 import { router, useForm, usePage } from '@inertiajs/react';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import NeedController from '@/actions/App/Http/Controllers/Need/NeedController';
@@ -102,7 +102,9 @@ export function NeedForm({
   ];
 
   const visibleTabs = tabs.filter((tab) => hasPermission(tab.permission));
-
+  const [activeTab, setActiveTab] = useState<string>(
+    visibleTabs[0]?.value ?? 'usulan',
+  );
   const filteredOrganizationalUnits =
     isRestricted && user?.organizational_unit_id
       ? organizationalUnits.filter(
@@ -175,48 +177,70 @@ export function NeedForm({
 
   const detailValuesRef = useRef(data.detail);
 
-  const getTabErrors = (tabValue: string) => {
-    const fieldMapping: Record<string, string[]> = {
-      usulan: [
-        'need_group_id',
-        'organizational_unit_id',
-        'need_type_id',
-        'year',
-        'title',
-        'description',
-        'current_condition',
-        'required_condition',
-        'unit',
-        'volume',
-        'unit_price',
-        'total_price',
-      ],
-      urgency: ['urgency', 'impact', 'is_priority', 'status'],
-      renstra: ['sasaran_ids', 'indicator_ids'],
-      ikk: ['kpi_indicator_ids'],
-      rls: ['strategic_service_plan_ids'],
-      perencanaan: [
-        'planning_activity_version_ids',
-        'planning_activity_indicator_ids',
-      ],
-      detail: [
-        'detail.background',
-        'detail.purpose_and_objectives',
-        'detail.target_objective',
-        'detail.kldi',
-        'detail.satker_skpd',
-        'detail.kpa_id',
-        'detail.funding_source_ids',
-        'detail.estimated_cost',
-        'detail.implementation_period',
-        'detail.expert_or_skilled_personnel',
-        'detail.technical_specifications',
-        'detail.training',
-        'technical_specification_attachments',
-      ],
-      lampiran: ['attachments'],
-    };
+  const fieldMapping: Record<string, string[]> = {
+    usulan: [
+      'need_group_id',
+      'organizational_unit_id',
+      'need_type_id',
+      'year',
+      'title',
+      'description',
+      'current_condition',
+      'required_condition',
+      'unit',
+      'volume',
+      'unit_price',
+      'total_price',
+    ],
+    urgency: ['urgency', 'impact', 'is_priority', 'status'],
+    renstra: ['sasaran_ids', 'indicator_ids'],
+    ikk: ['kpi_indicator_ids'],
+    rls: ['strategic_service_plan_ids'],
+    perencanaan: [
+      'planning_activity_version_ids',
+      'planning_activity_indicator_ids',
+    ],
+    detail: [
+      'detail.background',
+      'detail.purpose_and_objectives',
+      'detail.target_objective',
+      'detail.kldi',
+      'detail.satker_skpd',
+      'detail.kpa_id',
+      'detail.funding_source_ids',
+      'detail.estimated_cost',
+      'detail.implementation_period',
+      'detail.expert_or_skilled_personnel',
+      'detail.technical_specifications',
+      'detail.training',
+      'technical_specification_attachments',
+      'technical_specification_attachment_names',
+    ],
+    lampiran: [
+      'attachments',
+      'attachment_names',
+      'deleted_attachment_ids',
+    ],
+  };
 
+  const getTabForField = (fieldKey: string) => {
+    for (const tab of tabs) {
+      const tabFields = fieldMapping[tab.value] || [];
+      if (
+        tabFields.some(
+          (field) =>
+            fieldKey === field ||
+            fieldKey.startsWith(`${field}.`) ||
+            fieldKey.startsWith(`${field}[`),
+        )
+      ) {
+        return tab;
+      }
+    }
+    return null;
+  };
+
+  const getTabErrors = (tabValue: string) => {
     const tabFields = fieldMapping[tabValue] || [];
 
     return Object.keys(errors).filter((key) =>
@@ -235,14 +259,62 @@ export function NeedForm({
             : 'Usulan kebutuhan berhasil dibuat.',
         );
       },
-      onError: () => {
-        const errorTabs = visibleTabs.filter(
-          (tab) => getTabErrors(tab.value).length > 0,
+      onError: (errs: Record<string, string>) => {
+        const errorEntries = Object.entries(errs || {});
+        if (errorEntries.length === 0) {
+          toast.error('Terjadi kesalahan validasi.');
+          return;
+        }
+
+        const tabErrorMessages: Record<string, string[]> = {};
+        const unmappedErrors: string[] = [];
+
+        errorEntries.forEach(([key, message]) => {
+          const tab = getTabForField(key);
+          if (tab) {
+            if (!tabErrorMessages[tab.value]) {
+              tabErrorMessages[tab.value] = [];
+            }
+            tabErrorMessages[tab.value].push(message);
+          } else {
+            unmappedErrors.push(message);
+          }
+        });
+
+        const errorVisibleTabs = visibleTabs.filter(
+          (tab) => (tabErrorMessages[tab.value]?.length || 0) > 0,
         );
 
-        if (errorTabs.length > 0) {
-          errorTabs.forEach((tab) => {
-            toast.error(`Ada kesalahan pada tab ${tab.label}`);
+        if (errorVisibleTabs.length > 0) {
+          setActiveTab(errorVisibleTabs[0].value);
+
+          errorVisibleTabs.forEach((tab) => {
+            const messages = tabErrorMessages[tab.value];
+            toast.error(`Ada kesalahan pada tab ${tab.label}`, {
+              description: messages.join(' • '),
+            });
+          });
+        }
+
+        const hiddenTabsWithErrors = tabs.filter(
+          (tab) =>
+            !visibleTabs.some((vt) => vt.value === tab.value) &&
+            (tabErrorMessages[tab.value]?.length || 0) > 0,
+        );
+
+        hiddenTabsWithErrors.forEach((tab) => {
+          const messages = tabErrorMessages[tab.value];
+          toast.error(
+            `Validasi gagal pada tab ${tab.label} (tidak dapat diakses)`,
+            {
+              description: messages.join(' • '),
+            },
+          );
+        });
+
+        if (unmappedErrors.length > 0) {
+          toast.error('Terjadi kesalahan validasi', {
+            description: unmappedErrors.join(' • '),
           });
         }
       },
@@ -286,7 +358,8 @@ export function NeedForm({
       <form onSubmit={handleSubmit}>
         <CardContent className="">
           <Tabs
-            defaultValue={visibleTabs[0]?.value ?? 'usulan'}
+            value={activeTab}
+            onValueChange={setActiveTab}
             className="w-full"
           >
             <TabsList className="">

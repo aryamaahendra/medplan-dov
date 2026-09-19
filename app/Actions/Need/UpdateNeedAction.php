@@ -46,34 +46,47 @@ class UpdateNeedAction
                 'is_priority' => ($data['urgency'] ?? $need->urgency) === 'high' && ($data['impact'] ?? $need->impact) === 'high',
             ])->toArray());
 
-            $need->sasarans()->sync($data['sasaran_ids'] ?? []);
-            $need->indicators()->sync($data['indicator_ids'] ?? []);
-            $need->kpiIndicators()->sync($data['kpi_indicator_ids'] ?? []);
-            $need->strategicServicePlans()->sync($data['strategic_service_plan_ids'] ?? []);
-            $need->planningActivityVersions()->sync($data['planning_activity_version_ids'] ?? []);
-            $need->planningActivityIndicators()->sync($data['planning_activity_indicator_ids'] ?? []);
-
-            $detailData = $data['detail'] ?? [];
-            $fundingSourceIds = $detailData['funding_source_ids'] ?? [];
-            unset($detailData['funding_source_ids']);
-
-            $resolvedIds = [];
-            foreach ($fundingSourceIds as $idOrName) {
-                if (! is_numeric($idOrName) && ! empty($idOrName)) {
-                    $source = FundingSource::firstOrCreate(['name' => $idOrName]);
-                    $resolvedIds[] = $source->id;
-                } elseif (! empty($idOrName)) {
-                    $resolvedIds[] = $idOrName;
-                }
+            if (array_key_exists('sasaran_ids', $data)) {
+                $need->sasarans()->sync($data['sasaran_ids'] ?? []);
+            }
+            if (array_key_exists('indicator_ids', $data)) {
+                $need->indicators()->sync($data['indicator_ids'] ?? []);
+            }
+            if (array_key_exists('kpi_indicator_ids', $data)) {
+                $need->kpiIndicators()->sync($data['kpi_indicator_ids'] ?? []);
+            }
+            if (array_key_exists('strategic_service_plan_ids', $data)) {
+                $need->strategicServicePlans()->sync($data['strategic_service_plan_ids'] ?? []);
+            }
+            if (array_key_exists('planning_activity_version_ids', $data)) {
+                $need->planningActivityVersions()->sync($data['planning_activity_version_ids'] ?? []);
+            }
+            if (array_key_exists('planning_activity_indicator_ids', $data)) {
+                $need->planningActivityIndicators()->sync($data['planning_activity_indicator_ids'] ?? []);
             }
 
-            $detail = $need->detail()->updateOrCreate(
-                ['need_id' => $need->id],
-                $detailData
-            );
+            if (array_key_exists('detail', $data)) {
+                $detailData = $data['detail'] ?? [];
+                $fundingSourceIds = $detailData['funding_source_ids'] ?? [];
+                unset($detailData['funding_source_ids']);
 
-            $detail->fundingSources()->sync($resolvedIds);
+                $resolvedIds = [];
+                foreach ($fundingSourceIds as $idOrName) {
+                    if (! is_numeric($idOrName) && ! empty($idOrName)) {
+                        $source = FundingSource::firstOrCreate(['name' => $idOrName]);
+                        $resolvedIds[] = $source->id;
+                    } elseif (! empty($idOrName)) {
+                        $resolvedIds[] = $idOrName;
+                    }
+                }
 
+                $detail = $need->detail()->updateOrCreate(
+                    ['need_id' => $need->id],
+                    $detailData
+                );
+
+                $detail->fundingSources()->sync($resolvedIds);
+            }
             // Handle deletions
             if (! empty($data['deleted_attachment_ids'])) {
                 $attachmentsToDelete = $need->attachments()

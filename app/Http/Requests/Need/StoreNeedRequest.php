@@ -62,6 +62,15 @@ class StoreNeedRequest extends FormRequest
             $allowedFields[] = 'status';
         }
 
+        if (! $user->hasPermissionTo('update need tab urgency')) {
+            $this->merge([
+                'urgency' => Urgency::Medium->value,
+                'impact' => Impact::Medium->value,
+                'is_priority' => false,
+            ]);
+            $allowedFields = array_merge($allowedFields, ['urgency', 'impact', 'is_priority']);
+        }
+
         // Only keep allowed fields in the request
         $this->replace($this->only($allowedFields));
     }

@@ -1,11 +1,12 @@
 {
     "agents": [
-        "opencode"
+        "opencode",
+        "antigravity"
     ],
-    "cloud": true,
+    "cloud": false,
     "guidelines": true,
     "mcp": true,
-    "nightwatch_mcp": false,
+    "nightwatch": false,
     "packages": [
         "spatie/laravel-permission",
         "maatwebsite/excel"
@@ -13,7 +14,6 @@
     "sail": true,
     "skills": [
         "infer-conventions",
-        "deploying-to-cloud",
         "fortify-development",
         "laravel-best-practices",
         "testing-best-practices",

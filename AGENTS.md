@@ -91,73 +91,50 @@ This project has domain-specific skills available. You MUST activate the relevan
 ===
 
 <laravel-boost-guidelines>
-=== .ai/caveman rules ===
-
-# Caveman Mode
-
-- Speak like smart caveman (Intensity: full).
-- No articles, filler, pleasantries.
-- Fragments OK. Short synonyms.
-- Pattern: `[thing] [action] [reason]. [next step].`
-- Tech terms + code blocks stay exact.
-- Mandatory for all project responses.
-- Apply to all conversation events:
-    - Normal chat responses.
-    - Implementation plans (artifacts).
-    - Walkthroughs (artifacts).
-    - Task summaries.
-    - Research notes.
-- Follow rules in `/home/meeatwork/.gemini/antigravity/caveman/skills/caveman/SKILL.md`.
-
 === foundation rules ===
 
-# Project Guidelines
+# Laravel Boost Guidelines
 
-## Laravel Boost Guidelines
+The Laravel Boost guidelines are specifically curated by Laravel maintainers for this application. These guidelines should be followed closely to ensure the best experience when building Laravel applications.
 
-### Foundational Context
+## Foundational Context
 
-- php - 8.5
-- inertiajs/inertia-laravel - v3
-- laravel/fortify - v1
-- laravel/framework - v13
-- laravel/octane - v2
-- laravel/prompts - v0
-- laravel/wayfinder - v0
-- laravel/boost - v2
-- laravel/mcp - v0
-- laravel/pail - v1
-- laravel/pint - v1
-- laravel/sail - v1
-- pestphp/pest - v4
-- phpunit/phpunit - v12
-- @inertiajs/react - v3
-- react - v19
-- tailwindcss - v4
-- @laravel/vite-plugin-wayfinder - v0
-- eslint - v9
-- prettier - v3
+This application is a Laravel application running on PHP 8.5. You are an expert with the Laravel ecosystem. Always use the APIs that match the installed major version of each package — do not assume a version.
 
-### Skills Activation
+Before relying on a package's API, confirm its installed version:
+- PHP packages: run `composer show --direct` to list direct dependencies with versions, or `composer show <vendor/package>` for a single package.
+- JS packages: check `package.json` for the installed versions.
 
-Domain skills available. MUST activate skill when working in domain.
+## Skills Activation
 
-- `fortify-development` — auth, login, register, 2FA, profile, `app/Actions/Fortify/`.
-- `laravel-best-practices` — write/refactor Laravel PHP (controllers, models, migrations).
-- `wayfinder-development` — frontend calls routes or imports `@/actions` / `@/routes`.
-- `pest-testing` — write/fix tests in `tests/`.
-- `inertia-react-development` — React pages, forms, navigation with Inertia v3.
-- `tailwindcss-development` — style UI / layout with Tailwind.
+This project has domain-specific skills available in `**/skills/**`. You MUST activate the relevant skill whenever you work in that domain—don't wait until you're stuck.
 
-### Conventions
+## Conventions
 
-- Follow code conventions. Check sibling files.
-- Descriptive names for vars/methods.
-- Reuse existing components before writing new.
-- Unit/feature tests over verification scripts.
-- Keep directory structure.
-- No dependency changes without approval.
-- Concise explanations.
+- You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach, and naming.
+- Use descriptive names for variables and methods. For example, `isRegisteredForDiscounts`, not `discount()`.
+- Check for existing components to reuse before writing a new one.
+
+## Verification Scripts
+
+- Do not create verification scripts or tinker when tests cover that functionality and prove they work. Unit and feature tests are more important.
+
+## Application Structure & Architecture
+
+- Stick to existing directory structure; don't create new base folders without approval.
+- Do not change the application's dependencies without approval.
+
+## Frontend Bundling
+
+- If the user doesn't see a frontend change reflected in the UI, it could mean they need to run `vendor/bin/sail npm run build`, `vendor/bin/sail npm run dev`, or `vendor/bin/sail composer run dev`. Ask them.
+
+## Documentation Files
+
+- You must only create documentation files if explicitly requested by the user.
+
+## Replies
+
+- Be concise in your explanations - focus on what's important rather than explaining obvious details.
 
 === boost rules ===
 
@@ -165,187 +142,194 @@ Domain skills available. MUST activate skill when working in domain.
 
 ## Tools
 
-- MCP tools available. Prefer Boost tools over manual shell / file reads.
-- `database-query`: read-only SQL queries (avoid tinker raw SQL).
-- `database-schema`: inspect tables before migrations/models.
-- `get-absolute-url`: resolve URL before sharing with user.
-- `browser-logs`: read recent browser errors. Ignore old logs.
+- Laravel Boost is an MCP server with tools designed specifically for this application. Prefer Boost tools over manual alternatives like shell commands or file reads.
+- Use `database-query` to run read-only queries against the database instead of writing raw SQL in tinker.
+- Use `database-schema` to inspect table structure before writing migrations or models.
+- Use `get-absolute-url` to resolve the correct scheme, domain, and port for project URLs. Always use this before sharing a URL with the user.
+- Use `browser-logs` to read browser logs, errors, and exceptions. Only recent logs are useful, ignore old entries.
 
 ## Searching Documentation (IMPORTANT)
 
-- `search-docs` before changes needing Laravel ecosystem APIs / syntax. Skip copy-only edits.
-- Pass `packages` array when known.
-- Use broad topic queries: `['rate limiting', 'routing rate limiting', 'routing']`.
-- No package names in queries (already scoped).
+- Use `search-docs` before changes that depend on Laravel ecosystem APIs, behavior, configuration, or version-specific syntax. Skip it for copy-only edits and other changes where package documentation is irrelevant. Reuse sufficient results already in context instead of searching again.
+- Pass a `packages` array to scope results when you know which packages are relevant.
+- Use multiple broad, topic-based queries: `['rate limiting', 'routing rate limiting', 'routing']`. Expect the most relevant results first.
+- Do not add package names to queries because package info is already shared. Use `test resource table`, not `filament 4 test resource table`.
 
 ### Search Syntax
 
-1. Words = AND: `rate limit`.
-2. Quotes = exact: `"infinite scroll"`.
-3. Mixed: `middleware "rate limit"`.
-4. Multiple queries = OR: `queries=["authentication", "middleware"]`.
+1. Use words for auto-stemmed AND logic: `rate limit` matches both "rate" AND "limit".
+2. Use `"quoted phrases"` for exact position matching: `"infinite scroll"` requires adjacent words in order.
+3. Combine words and phrases for mixed queries: `middleware "rate limit"`.
+4. Use multiple queries for OR logic: `queries=["authentication", "middleware"]`.
 
 ## Project Rules
 
-- Committed rules in `.ai/rules` if dir exists. Scoped rules under `.ai/rules/boost`. Open @.ai/rules/index.md, read matching rules, grep `.ai/rules`. If missing, continue without.
-- `record-rule` only when user explicitly asks. Never auto-record. Pass `glob`, `title`, `note`.
+- This project contains committed, area-grouped rules in `.ai/rules` when that directory exists (settled decisions, non-obvious traps, standing constraints). Framework and package guidelines that only apply to specific paths (testing, frontend, components) also live there, under `.ai/rules/boost` — this is not just recorded decisions, it is load-bearing guidance you have not seen inline. Before you enter plan mode or create/edit any file, you MUST first: open @.ai/rules/index.md (it maps file globs to rule files), read every rule file whose globs cover the path(s) in scope, and run `grep -rin 'keyword' .ai/rules` to catch what a path match alone misses. Do not write code until you have read and are following every matching rule. If `.ai/rules` does not exist, continue without it.
+- Record a rule with `record-rule` only when the user explicitly asks for one. Instructions for the work at hand are not rules, no matter how emphatic: "remove this typo", "use X here" are work to do, not rules to record. Never record a rule on your own initiative, as a byproduct of a change, or to summarize what you just did. When the user does ask, pass a `glob` (e.g. `app/Http/Controllers/**`), a short `title`, and a few-line `note`. Use `record-rule` rather than your native memory or notes tool, because native memory is personal and session-scoped, while only `.ai/rules` is shared with the team and persists in the repo.
 
 ## Artisan
 
-- Run Artisan CLI: `vendor/bin/sail artisan route:list`. Discover: `vendor/bin/sail artisan list` / `vendor/bin/sail artisan [command] --help`.
-- Inspect routes: `vendor/bin/sail artisan route:list` (`--method=GET`, `--name=users`, `--path=api`, `--except-vendor`, `--only-vendor`).
-- Config values: `vendor/bin/sail artisan config:show app.name` / read `config/`.
+- Run Artisan commands directly via the command line (e.g., `vendor/bin/sail artisan route:list`). Use `vendor/bin/sail artisan list` to discover available commands and `vendor/bin/sail artisan [command] --help` to check parameters.
+- Inspect routes with `vendor/bin/sail artisan route:list`. Filter with: `--method=GET`, `--name=users`, `--path=api`, `--except-vendor`, `--only-vendor`.
+- Read configuration values using dot notation: `vendor/bin/sail artisan config:show app.name`, `vendor/bin/sail artisan config:show database.default`. Or read config files directly from the `config/` directory.
 
 ## Tinker
 
-- App context PHP execution. No models without user approval; prefer test factories / Artisan.
-- Single quotes prevent shell expansion: `vendor/bin/sail artisan tinker --execute 'Your::code();'`
-  - Double quotes inside: `vendor/bin/sail artisan tinker --execute 'User::where("active", true)->count();'`
+- Execute PHP in app context for debugging and testing code. Do not create models without user approval, prefer tests with factories instead. Prefer existing Artisan commands over custom tinker code.
+- Always use single quotes to prevent shell expansion: `vendor/bin/sail artisan tinker --execute 'Your::code();'`
+  - Double quotes for PHP strings inside: `vendor/bin/sail artisan tinker --execute 'User::where("active", true)->count();'`
 
 === php rules ===
 
 # PHP
 
-- Always curly braces for control structures.
-- PHP 8 constructor promotion: `public function __construct(public GitHub $github) { }`. No empty zero-param `__construct()` unless private.
-- Explicit return types + parameter type hints: `function isAccessible(User $user, ?string $path = null): bool`
-- TitleCase Enum keys: `FavoritePerson`, `BestLake`, `Monthly`.
-- PHPDoc blocks over inline comments. Inline comments only for complex logic.
-- Array shape types in PHPDoc blocks.
+- Always use curly braces for control structures, even for single-line bodies.
+- Use PHP 8 constructor property promotion: `public function __construct(public GitHub $github) { }`. Do not leave empty zero-parameter `__construct()` methods unless the constructor is private.
+- Use explicit return type declarations and type hints for all method parameters: `function isAccessible(User $user, ?string $path = null): bool`
+- Use TitleCase for Enum keys: `FavoritePerson`, `BestLake`, `Monthly`.
+- Prefer PHPDoc blocks over inline comments. Only add inline comments for exceptionally complex logic.
+- Use array shape type definitions in PHPDoc blocks.
 
 === deployments rules ===
 
 # Deployment
 
-- Deploy via [Laravel Cloud](https://cloud.laravel.com/).
-- Activate `deploying-to-cloud` skill when deploying, configuring Cloud resources, using Cloud CLI, or troubleshooting deploys.
+- Laravel can be deployed using [Laravel Cloud](https://cloud.laravel.com/), which is the fastest way to deploy and scale production Laravel applications.
+- Activate the `deploying-to-cloud` skill whenever deploying to Laravel Cloud, configuring Cloud environments or resources, using the Cloud CLI, or troubleshooting Cloud deployments.
 
 === sail rules ===
 
 # Laravel Sail
 
-- Project runs in Laravel Sail Docker containers. Execute all commands via Sail.
-- Start: `vendor/bin/sail up -d`, stop: `vendor/bin/sail stop`.
-- Open browser: `vendor/bin/sail open`.
-- Prefix PHP, Artisan, Composer, Node commands with `vendor/bin/sail`:
-    - Artisan: `vendor/bin/sail artisan migrate`
-    - Composer: `vendor/bin/sail composer install`
-    - Node: `vendor/bin/sail npm run dev`
-    - PHP: `vendor/bin/sail php [script]`
-- View commands: `vendor/bin/sail`.
+- This project runs inside Laravel Sail's Docker containers. You MUST execute all commands through Sail.
+- Start services using `vendor/bin/sail up -d` and stop them with `vendor/bin/sail stop`.
+- Open the application in the browser by running `vendor/bin/sail open`.
+- Always prefix PHP, Artisan, Composer, and Node commands with `vendor/bin/sail`. Examples:
+    - Run Artisan Commands: `vendor/bin/sail artisan migrate`
+    - Install Composer packages: `vendor/bin/sail composer install`
+    - Execute Node commands: `vendor/bin/sail npm run dev`
+    - Execute PHP scripts: `vendor/bin/sail php [script]`
+- View all available Sail commands by running `vendor/bin/sail` without arguments.
 
 === tests rules ===
 
 # Test Enforcement
 
-- Add/update tests when change has regression risk.
-- Copy, style, layout changes do not need tests.
-- Run affected tests; ensure pass.
-- Test changed behavior + key failure modes only.
-- Read `testing-best-practices` skill before writing tests.
+- Add or update tests for behavior and logic changes when a test provides meaningful regression coverage.
+- Pure copy, styling, and layout-only changes do not require new or updated tests.
+- When test coverage applies, run the affected tests and ensure they pass.
+- Test the changed behavior and its important failure modes, but do not add tests beyond them.
+- Read the `testing-best-practices` skill before writing tests.
 
 === inertia-laravel/core rules ===
 
 # Inertia
 
-- Fully client-side rendered SPAs without SPA complexity; uses server routing.
-- Components live in `resources/js/pages`. Use `Inertia::render()`.
-- Use `search-docs` tool for Inertia docs/examples.
-- Activate `inertia-react-development` for client patterns.
+- Inertia creates fully client-side rendered SPAs without modern SPA complexity, leveraging existing server-side patterns.
+- Components live in `resources/js/pages` (unless specified in `vite.config.js`). Use `Inertia::render()` for server-side routing instead of Blade views.
+- ALWAYS use `search-docs` tool for version-specific Inertia documentation and updated code examples.
+- IMPORTANT: Activate `inertia-react-development` when working with Inertia client-side patterns.
 
 # Inertia v3
 
-- Check docs for v1/v2/v3 approach.
-- v3 features: standalone HTTP (`useHttp`), optimistic updates with rollback, layout props (`useLayoutProps`), instant visits, SSR via `@inertiajs/vite`, custom exception handling.
-- Carried from v2: deferred props, infinite scroll, merge props, polling, prefetch, once props, flash data.
-- Deferred props need empty state with skeleton.
-- Axios removed. Use built-in XHR client.
-- `Inertia::lazy()` removed. Use `Inertia::optional()`.
-- Prop types (`Inertia::optional()`, `Inertia::defer()`, `Inertia::merge()`) work with dot notation in nested arrays.
-- SSR works in Vite dev via `@inertiajs/vite`.
-- Renamed events: `invalid` -> `httpException`, `exception` -> `networkError`.
+- Use all Inertia features from v1, v2, and v3. Check the documentation before making changes to ensure the correct approach.
+- New v3 features: standalone HTTP requests (`useHttp` hook), optimistic updates with automatic rollback, layout props (`useLayoutProps` hook), instant visits, simplified SSR via `@inertiajs/vite` plugin, custom exception handling for error pages.
+- Carried over from v2: deferred props, infinite scroll, merging props, polling, prefetching, once props, flash data.
+- When using deferred props, add an empty state with a pulsing or animated skeleton.
+- Axios has been removed. Use the built-in XHR client with interceptors, or install Axios separately if needed.
+- `Inertia::lazy()` / `LazyProp` has been removed. Use `Inertia::optional()` instead.
+- Prop types (`Inertia::optional()`, `Inertia::defer()`, `Inertia::merge()`) work inside nested arrays with dot-notation paths.
+- SSR works automatically in Vite dev mode with `@inertiajs/vite` - no separate Node.js server needed during development.
+- Event renames: `invalid` is now `httpException`, `exception` is now `networkError`.
 - `router.cancel()` replaced by `router.cancelAll()`.
-- `future` config removed (v2 future options always on).
+- The `future` configuration namespace has been removed - all v2 future options are now always enabled.
 
 === laravel/core rules ===
 
 # Do Things the Laravel Way
 
-- Use `vendor/bin/sail artisan make:` to create files (migrations, controllers, models). List: `vendor/bin/sail artisan list`.
-- Generic class: `vendor/bin/sail artisan make:class`.
-- Pass `--no-interaction` to Artisan commands.
+- Use `vendor/bin/sail artisan make:` commands to create new files (i.e. migrations, controllers, models, etc.). You can list available Artisan commands using `vendor/bin/sail artisan list` and check their parameters with `vendor/bin/sail artisan [command] --help`.
+- If you're creating a generic PHP class, use `vendor/bin/sail artisan make:class`.
+- Pass `--no-interaction` to all Artisan commands to ensure they work without user input. You should also pass the correct `--options` to ensure correct behavior.
 
 ### Model Creation
 
-- Create factories/seeders with models.
+- When creating new models, create useful factories and seeders for them too. Ask the user if they need any other things, using `vendor/bin/sail artisan make:model --help` to check the available options.
 
 ## APIs & Eloquent Resources
 
-- Default to Eloquent API Resources + versioning unless existing code differs.
+- For APIs, default to using Eloquent API Resources and API versioning unless existing API routes do not, then you should follow existing application convention.
 
 ## URL Generation
 
-- Prefer named routes and `route()` function.
+- When generating links to other pages, prefer named routes and the `route()` function.
 
 ## Testing
 
-- Model tests use factories with custom states where available.
-- Faker: `$this->faker->word()` or `fake()->randomDigit()`. Match existing convention.
-- Create tests: `vendor/bin/sail artisan make:test [options] {name}`. Pass `--unit` for unit test; prefer feature tests.
+- When creating models for tests, use the factories for the models. Check if the factory has custom states that can be used before manually setting up the model.
+- Faker: Use methods such as `$this->faker->word()` or `fake()->randomDigit()`. Follow existing conventions whether to use `$this->faker` or `fake()`.
+- When creating tests, make use of `vendor/bin/sail artisan make:test [options] {name}` to create a feature test, and pass `--unit` to create a unit test. Most tests should be feature tests.
 
 ## Vite Error
 
-- "Illuminate\Foundation\ViteException: Unable to locate file in Vite manifest": run `vendor/bin/sail npm run build` or ask user to run dev server.
+- If you receive an "Illuminate\Foundation\ViteException: Unable to locate file in Vite manifest" error, you can run `vendor/bin/sail npm run build` or ask the user to run `vendor/bin/sail npm run dev` or `vendor/bin/sail composer run dev`.
 
 === laravel-octane/core rules ===
 
 # Laravel Octane
 
-Application runs on persistent server. Boots once; handles multiple requests.
+This application uses Laravel Octane, a long-running PHP server. The application bootstraps once and handles many requests within the same process.
 
-- Never store request state in singletons or static properties (leaks across requests).
-- Detect driver: `config('octane.server')` (`swoole`, `roadrunner`, `frankenphp`).
-- Scoped bindings (`$this->app->scoped()`) over singletons for per-request services.
+- Never store request-specific state in singletons or static properties, because it can leak across requests.
+- Use `config('octane.server')` to detect the active driver (`swoole`, `roadrunner`, or `frankenphp`).
+- Prefer scoped bindings (`$this->app->scoped()`) over singletons for per-request services.
 
-Activate `octane-development` for concurrency, shared tables, memory, config, testing.
+When working on Octane-specific features (concurrency, shared tables, memory, driver configuration, testing), invoke `octane-development` for detailed rules.
 
 === wayfinder/core rules ===
 
 # Laravel Wayfinder
 
-Use Wayfinder for TypeScript route functions. Import from `@/actions/` (controllers) or `@/routes/` (named routes).
+Use Wayfinder to generate TypeScript functions for Laravel routes. Import from `@/actions/` (controllers) or `@/routes/` (named routes).
+
+=== pint/core rules ===
+
+# Laravel Pint Code Formatter
+
+- If you have modified any PHP files, you must run `vendor/bin/sail bin pint --dirty --format agent` before finalizing changes to ensure your code matches the project's expected style.
+- Do not run `vendor/bin/sail bin pint --test --format agent`, simply run `vendor/bin/sail bin pint --format agent` to fix any formatting issues.
 
 === pest/core rules ===
 
 # Pest
 
-- Create tests: `vendor/bin/sail artisan make:test --pest {name}`.
-- Omit test suite directory in `{name}` (e.g. `SomeFeatureTest`, not `Feature/SomeFeatureTest`).
-- Read `testing-best-practices` skill.
-- Do not delete tests/test files without approval.
+- This project uses Pest. Create tests with `vendor/bin/sail artisan make:test --pest {name}`.
+- Do not include the test suite directory in `{name}`. Use `SomeFeatureTest`, not `Feature/SomeFeatureTest`.
+- Read the `testing-best-practices` skill for guidance on coverage, naming, structure, dependency isolation, and review.
+- Do not delete tests or test files without approval. They are part of the application.
 
 ## Running Tests
 
-- Run narrowest test set: `vendor/bin/sail artisan test --compact` with file path or `--filter=testName`.
-- Rerun test after each change.
-- Run `vendor/bin/sail bin pest` directly (accepts path and `--filter=testName`).
-- After feature tests pass, ask user to run complete suite with `vendor/bin/sail artisan test --compact`.
+- Run the narrowest set of tests that covers the change. Pass a file path or `--filter=testName` to `vendor/bin/sail artisan test --compact`.
+- Rerun a test after each change to it.
+- Run `vendor/bin/sail bin pest` to call the test runner directly. It accepts the same file path and `--filter=testName` arguments.
+- After the feature tests pass, ask the user to run the complete suite with `vendor/bin/sail artisan test --compact`.
 
 === inertia-react/core rules ===
 
 # Inertia + React
 
-- Activate `inertia-react-development` when working with Inertia React client patterns.
+- IMPORTANT: Activate `inertia-react-development` when working with Inertia React client-side patterns.
 
 === maatwebsite/excel/core rules ===
 
 # Laravel Excel
 
-- Use `maatwebsite/excel` for spreadsheet exports/imports, queued spreadsheets, CSV handling, PhpSpreadsheet.
-- Prefer explicit export/import classes with concerns over ad-hoc generation.
-- Activate `laravel-excel` skill for package APIs, queued jobs, concerns, validation, formulas, multi-sheet, `Excel::fake()`.
-- Check `references/package.md` feature matrix for broad docs / missing features.
-- Large datasets: `FromQuery` with queued exports; `WithChunkReading` and `WithBatchInserts` for imports.
-- Test with `Excel::fake()` for dispatch/download/store/import intent; inspect files only for cell contents/formatting/sheets proof.
+- Use `maatwebsite/excel` for spreadsheet exports, imports, queued spreadsheet work, CSV handling, and PhpSpreadsheet integration in Laravel applications.
+- Prefer explicit export/import classes with package concerns over ad-hoc spreadsheet generation in controllers, jobs, or commands.
+- Activate the `laravel-excel` skill when working with `Excel::download()`, `Excel::store()`, `Excel::queue()`, `Excel::raw()`, `Excel::import()`, `Excel::toArray()`, `Excel::toCollection()`, export/import concerns, queued imports/exports, validation, CSV settings, styling, events, formulas, charts, drawings, multiple sheets, mapped cells, macros, config, cache, transactions, temporary files, or `Excel::fake()`.
+- For broad docs, all-feature tasks, or missing-feature audits, use the skill's `references/package.md` feature matrix before answering.
+- For large datasets, prefer `FromQuery` with queued exports or `WithChunkReading` and `WithBatchInserts` for imports.
+- Test spreadsheet behavior with `Excel::fake()` when asserting dispatch/download/store/import intent, and inspect generated files only when cell contents, formatting, sheets, or writer behavior must be proven.
 
 </laravel-boost-guidelines>

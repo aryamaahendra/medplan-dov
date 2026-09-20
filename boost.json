@@ -7,7 +7,8 @@
     "mcp": true,
     "nightwatch_mcp": false,
     "packages": [
-        "spatie/laravel-permission"
+        "spatie/laravel-permission",
+        "maatwebsite/excel"
     ],
     "sail": true,
     "skills": [
@@ -20,6 +21,7 @@
         "wayfinder-development",
         "inertia-react-development",
         "tailwindcss-development",
+        "laravel-excel",
         "laravel-permission-development"
     ]
 }

@@ -29,7 +29,7 @@ class NeedExport implements FromQuery, ShouldAutoSize, WithColumnFormatting, Wit
         return 'B2';
     }
 
-    public function query()
+    public function query(): Builder
     {
         return $this->query;
     }
@@ -88,7 +88,7 @@ class NeedExport implements FromQuery, ShouldAutoSize, WithColumnFormatting, Wit
         ];
     }
 
-    public function styles(Worksheet $sheet)
+    public function styles(Worksheet $sheet): ?array
     {
         return [
             2 => [ // Row 2 is now the header row

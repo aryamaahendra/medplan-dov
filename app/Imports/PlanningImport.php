@@ -57,7 +57,7 @@ class PlanningImport implements ToCollection, WithLimit, WithStartRow
         return $this->endRow - $this->startRow + 1;
     }
 
-    public function collection(Collection $rows)
+    public function collection(Collection $rows): void
     {
         DB::transaction(function () use ($rows) {
             $lastActivity = null;

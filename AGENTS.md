@@ -91,6 +91,22 @@ This project has domain-specific skills available. You MUST activate the relevan
 ===
 
 <laravel-boost-guidelines>
+=== .ai/agent-skills rules ===
+
+## Agent skills
+
+### Issue tracker
+
+Local markdown files under `.scratch/<feature-slug>/`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Canonical roles: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context (`CONTEXT.md` + `docs/adr/`). See `docs/agents/domain.md`.
+
 === foundation rules ===
 
 # Laravel Boost Guidelines
@@ -104,10 +120,6 @@ This application is a Laravel application running on PHP 8.5. You are an expert 
 Before relying on a package's API, confirm its installed version:
 - PHP packages: run `composer show --direct` to list direct dependencies with versions, or `composer show <vendor/package>` for a single package.
 - JS packages: check `package.json` for the installed versions.
-
-## Skills Activation
-
-This project has domain-specific skills available in `**/skills/**`. You MUST activate the relevant skill whenever you work in that domain—don't wait until you're stuck.
 
 ## Conventions
 

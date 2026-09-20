@@ -1,12 +1,12 @@
 import {
-  BadgeCheck,
-  ClipboardList,
-  DollarSign,
-  ListTodo,
-  TrendingDown,
-  TrendingUp,
-  TriangleAlert,
-} from 'lucide-react';
+  RiVerifiedBadgeLine,
+  RiClipboardLine,
+  RiMoneyDollarCircleLine,
+  RiFileList3Line,
+  RiArrowRightDownLine,
+  RiArrowRightUpLine,
+  RiAlertLine,
+} from '@remixicon/react';
 
 import { StatsCard } from '@/components/dashboard/stats-card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -52,7 +52,7 @@ function DeltaBadge({
   }
 
   const isPositive = invert ? delta < 0 : delta > 0;
-  const Icon = delta > 0 ? TrendingUp : TrendingDown;
+  const Icon = delta > 0 ? RiArrowRightUpLine : RiArrowRightDownLine;
 
   return (
     <span
@@ -85,7 +85,7 @@ export function NeedsStats({ stats }: NeedsStatsProps) {
       <StatsCard
         title="Total Usulan"
         value={formatNumber(stats.total_needs)}
-        icon={ClipboardList}
+        icon={RiClipboardLine}
         description={
           stats.prev_group ? (
             <span className="flex items-center gap-1.5">
@@ -107,7 +107,7 @@ export function NeedsStats({ stats }: NeedsStatsProps) {
       <StatsCard
         title="Total Estimasi Anggaran"
         value={formatCompactIDR(stats.total_budget)}
-        icon={DollarSign}
+        icon={RiMoneyDollarCircleLine}
         description={
           stats.prev_group ? (
             <span className="flex items-center gap-1.5">
@@ -129,7 +129,7 @@ export function NeedsStats({ stats }: NeedsStatsProps) {
       <StatsCard
         title="Usulan Prioritas"
         value={formatNumber(stats.priority_needs)}
-        icon={TriangleAlert}
+        icon={RiAlertLine}
         description={
           stats.prev_group ? (
             <span className="flex items-center gap-1.5">
@@ -151,7 +151,7 @@ export function NeedsStats({ stats }: NeedsStatsProps) {
       <StatsCard
         title="Rata-rata Kelengkapan"
         value={formatPercent(stats.avg_completeness)}
-        icon={ListTodo}
+        icon={RiFileList3Line}
         description={
           stats.prev_group ? (
             <span className="flex items-center gap-1.5">
@@ -177,7 +177,7 @@ export function NeedsStats({ stats }: NeedsStatsProps) {
       <StatsCard
         title="Disetujui Direktur"
         value={formatNumber(stats.approved_by_director)}
-        icon={BadgeCheck}
+        icon={RiVerifiedBadgeLine}
         description={
           stats.prev_group ? (
             <span className="flex items-center gap-1.5">

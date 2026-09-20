@@ -1,4 +1,4 @@
-import { DownloadIcon, Loader2Icon } from 'lucide-react';
+import { RiDownloadLine, RiLoaderLine } from '@remixicon/react';
 import { lazy, Suspense, useSyncExternalStore } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -86,7 +86,7 @@ export function FilePreviewDialog({
               <Suspense
                 fallback={
                   <div className="flex flex-col items-center">
-                    <Loader2Icon className="h-8 w-8 animate-spin text-primary" />
+                    <RiLoaderLine className="h-8 w-8 animate-spin text-primary" />
                     <p className="mt-2 text-sm text-muted-foreground">
                       Menyiapkan viewer...
                     </p>
@@ -123,7 +123,7 @@ export function FilePreviewDialog({
               asChild
             >
               <a href={downloadUrl} download={fileName}>
-                <DownloadIcon />
+                <RiDownloadLine />
                 Download File
               </a>
             </Button>

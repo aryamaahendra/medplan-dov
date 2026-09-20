@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { RiAddLine } from '@remixicon/react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -92,7 +92,7 @@ export default function NeedGroupsIndex({
           </div>
           {hasPermission('create need-groups') && (
             <Button onClick={onCreate}>
-              <Plus className="mr-2 h-4 w-4" />
+              <RiAddLine className="mr-2 h-4 w-4" />
               Tambah Kelompok
             </Button>
           )}

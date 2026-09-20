@@ -1,6 +1,6 @@
 import { Head, router } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
-import { LayoutGrid, Table as TableIcon } from 'lucide-react';
+import { RiAddLine } from '@remixicon/react';
+import { RiLayoutGridLine, RiTableLine as TableIcon } from '@remixicon/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -173,7 +173,7 @@ export default function RenstraShow({ renstra }: RenstraShowProps) {
                 variant="outline"
               >
                 <ToggleGroupItem value="card" aria-label="Card View">
-                  <LayoutGrid className="mr-2 h-4 w-4" />
+                  <RiLayoutGridLine className="mr-2 h-4 w-4" />
                   Card
                 </ToggleGroupItem>
                 <ToggleGroupItem value="table" aria-label="Table View">
@@ -185,7 +185,7 @@ export default function RenstraShow({ renstra }: RenstraShowProps) {
                 <Separator orientation="vertical" className="h-4" />
               </div>
               <Button onClick={onCreateTujuan}>
-                <Plus />
+                <RiAddLine />
                 Tambah Tujuan
               </Button>
             </div>

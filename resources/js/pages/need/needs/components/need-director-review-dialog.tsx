@@ -1,5 +1,5 @@
 import { useForm } from '@inertiajs/react';
-import { CheckCircle2, XCircle } from 'lucide-react';
+import { RiCheckboxCircleLine, RiCloseCircleLine } from '@remixicon/react';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
@@ -120,9 +120,9 @@ export function NeedDirectorReviewDialog({
               </div>
               <div className="flex items-center gap-3">
                 {data.is_approved ? (
-                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  <RiCheckboxCircleLine className="h-5 w-5 text-primary" />
                 ) : (
-                  <XCircle className="h-5 w-5 text-muted-foreground/50" />
+                  <RiCloseCircleLine className="h-5 w-5 text-muted-foreground/50" />
                 )}
                 <Switch
                   checked={data.is_approved}

@@ -1,5 +1,5 @@
 import { useForm } from '@inertiajs/react';
-import { ClipboardList, Loader2 } from 'lucide-react';
+import { RiClipboardLine, RiLoaderLine } from '@remixicon/react';
 import { useRef } from 'react';
 import { toast } from 'sonner';
 
@@ -128,7 +128,7 @@ export function ChecklistForm({
       <Card className="border-dashed">
         <CardContent className="flex flex-col items-center justify-center py-12 text-center">
           <div className="mb-4 rounded-full bg-muted p-3">
-            <ClipboardList className="h-6 w-6 text-muted-foreground" />
+            <RiClipboardLine className="h-6 w-6 text-muted-foreground" />
           </div>
           <CardTitle>Tidak ada pertanyaan checklist</CardTitle>
           <CardDescription className="max-w-xs pt-1">
@@ -149,7 +149,7 @@ export function ChecklistForm({
           </h2>
           {processing && (
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Loader2 className="h-3 w-3 animate-spin" />
+              <RiLoaderLine className="h-3 w-3 animate-spin" />
               <span>Menyimpan...</span>
             </div>
           )}

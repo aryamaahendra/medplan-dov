@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { RiAddLine } from '@remixicon/react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -100,7 +100,7 @@ export default function UsersIndex({
           </div>
           {hasPermission('create users') && (
             <Button onClick={onCreate}>
-              <Plus />
+              <RiAddLine />
               Tambah User
             </Button>
           )}

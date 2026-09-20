@@ -1,4 +1,9 @@
-import { DownloadIcon, EyeIcon, FileIcon, Trash2Icon } from 'lucide-react';
+import {
+  RiDownloadLine,
+  RiEyeLine,
+  RiFileLine,
+  RiDeleteBinLine,
+} from '@remixicon/react';
 
 import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 import { Badge } from '@/components/ui/badge';
@@ -46,7 +51,7 @@ export function AttachmentTable({
           <TableRow key={attachment.id}>
             <TableCell>
               <div className="flex items-center gap-2">
-                <FileIcon className="h-4 w-4 text-primary" />
+                <RiFileLine className="h-4 w-4 text-primary" />
                 <span className="font-medium">{attachment.display_name}</span>
               </div>
             </TableCell>
@@ -68,7 +73,7 @@ export function AttachmentTable({
                     size="icon-sm"
                     onClick={() => onPreview(attachment)}
                   >
-                    <EyeIcon />
+                    <RiEyeLine />
                   </Button>
                 )}
                 <Button variant="ghost" size="icon-sm" asChild>
@@ -78,7 +83,7 @@ export function AttachmentTable({
                     })}
                     target="_blank"
                   >
-                    <DownloadIcon />
+                    <RiDownloadLine />
                   </a>
                 </Button>
                 {allowDelete && (
@@ -87,7 +92,7 @@ export function AttachmentTable({
                     size="icon-sm"
                     onClick={() => onDelete(attachment)}
                   >
-                    <Trash2Icon />
+                    <RiDeleteBinLine />
                   </Button>
                 )}
               </div>

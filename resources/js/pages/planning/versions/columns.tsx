@@ -1,6 +1,11 @@
 import { Link } from '@inertiajs/react';
+import {
+  RiDeleteBinLine,
+  RiCheckboxCircleLine,
+  RiListUnordered,
+  RiEdit2Line,
+} from '@remixicon/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { Trash2, CheckCircle2, List, PencilLine } from 'lucide-react';
 
 import { ActionDropdown } from '@/components/action-dropdown';
 import type { ActionItem } from '@/components/action-dropdown';
@@ -129,7 +134,7 @@ export const getColumns = (
       const actions: (ActionItem | 'separator')[] = [
         {
           label: 'Lihat Snapshot',
-          icon: List,
+          icon: RiListUnordered,
           onClick: () => {
             window.location.href = planningVersions.activities.index.url({
               planning_version: version.id,
@@ -141,12 +146,12 @@ export const getColumns = (
       if (hasPermission('update planning-versions')) {
         actions.push({
           label: 'Edit',
-          icon: PencilLine,
+          icon: RiEdit2Line,
           onClick: () => onEdit(version),
         });
         actions.push({
           label: 'Jadikan Versi Utama',
-          icon: CheckCircle2,
+          icon: RiCheckboxCircleLine,
           onClick: () => onSetCurrent(version),
           disabled: version.is_current,
         });
@@ -156,7 +161,7 @@ export const getColumns = (
         actions.push('separator');
         actions.push({
           label: 'Hapus',
-          icon: Trash2,
+          icon: RiDeleteBinLine,
           onClick: () => onDelete(version),
           variant: 'destructive',
           disabled: version.is_current,

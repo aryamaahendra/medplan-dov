@@ -1,4 +1,4 @@
-import { Trash2Icon, UploadIcon } from 'lucide-react';
+import { RiDeleteBinLine, RiUploadLine } from '@remixicon/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -22,7 +22,7 @@ export function NewAttachmentItem({
   return (
     <div className="flex items-center gap-3 rounded-lg border border-primary/20 bg-primary/5 p-2.5">
       <div className="flex shrink-0 items-center justify-center">
-        <UploadIcon className="h-4 w-4" />
+        <RiUploadLine className="h-4 w-4" />
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <Input
@@ -41,7 +41,7 @@ export function NewAttachmentItem({
         className="h-8 w-8 text-destructive"
         onClick={() => onRemove(index)}
       >
-        <Trash2Icon className="h-4 w-4" />
+        <RiDeleteBinLine className="h-4 w-4" />
       </Button>
     </div>
   );

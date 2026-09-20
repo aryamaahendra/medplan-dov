@@ -1,14 +1,14 @@
 import { Link } from '@inertiajs/react';
 import {
-  AlertCircle,
-  CheckCircle2,
-  FileText,
-  Paperclip,
-  PencilLine,
-  Signature,
-  Trash2,
-  XCircle,
-} from 'lucide-react';
+  RiErrorWarningLine,
+  RiCheckboxCircleLine,
+  RiFileTextLine,
+  RiAttachmentLine,
+  RiEdit2Line,
+  RiQuillPenLine,
+  RiDeleteBinLine,
+  RiCloseCircleLine,
+} from '@remixicon/react';
 import * as React from 'react';
 import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 import { PriorityBadge } from '@/components/priority-badge';
@@ -47,7 +47,7 @@ export function NeedCard({ need, onEdit, onDelete, onReview }: NeedCardProps) {
         <CardAction className="space-x-2">
           <Button variant="outline" size="sm" asChild>
             <Link href={needRoutes.show.url({ need: need.id })}>
-              <FileText />
+              <RiFileTextLine />
               Detail
             </Link>
           </Button>
@@ -55,14 +55,14 @@ export function NeedCard({ need, onEdit, onDelete, onReview }: NeedCardProps) {
           {need.can?.update && (
             <>
               <Button variant="outline" size="sm" onClick={() => onEdit(need)}>
-                <PencilLine />
+                <RiEdit2Line />
                 Edit
               </Button>
               <Button variant="outline" size="sm" asChild>
                 <Link
                   href={NeedAttachmentController.index.url({ need: need.id })}
                 >
-                  <Paperclip />
+                  <RiAttachmentLine />
                   Lampiran
                 </Link>
               </Button>
@@ -75,7 +75,7 @@ export function NeedCard({ need, onEdit, onDelete, onReview }: NeedCardProps) {
               size="sm"
               onClick={() => onDelete(need)}
             >
-              <Trash2 />
+              <RiDeleteBinLine />
               Hapus
             </Button>
           )}
@@ -87,11 +87,11 @@ export function NeedCard({ need, onEdit, onDelete, onReview }: NeedCardProps) {
               onClick={() => onReview(need)}
               className="relative"
             >
-              <Signature />
+              <RiQuillPenLine />
               Review Direktur
               {need.notes && (
                 <span className="absolute -top-1.5 -left-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-background">
-                  <AlertCircle />
+                  <RiErrorWarningLine />
                 </span>
               )}
             </Button>
@@ -164,9 +164,9 @@ export function NeedCard({ need, onEdit, onDelete, onReview }: NeedCardProps) {
                 className="flex items-center gap-1.5"
               >
                 {need.approved_by_director_at ? (
-                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  <RiCheckboxCircleLine className="h-3.5 w-3.5" />
                 ) : (
-                  <XCircle className="h-3.5 w-3.5" />
+                  <RiCloseCircleLine className="h-3.5 w-3.5" />
                 )}
                 {need.approved_by_director_at
                   ? 'Disetujui Direktur'

@@ -1,10 +1,10 @@
 import {
-  CheckCheck,
-  Clock,
-  LayoutGrid,
-  Table,
-  TriangleAlert,
-} from 'lucide-react';
+  RiCheckDoubleLine,
+  RiTimeLine,
+  RiLayoutGridLine,
+  RiTableLine,
+  RiAlertLine,
+} from '@remixicon/react';
 import { useMemo } from 'react';
 
 import { DataTableFacetedFilter } from '@/components/data-table/data-table-faceted-filter';
@@ -41,9 +41,9 @@ export function NeedsTableToolbar({
   setViewMode,
 }: NeedsTableToolbarProps) {
   const statusOptions = [
-    { label: 'Draft', value: 'draft', icon: Clock },
-    { label: 'Approved', value: 'approved', icon: CheckCheck },
-    { label: 'Rejected', value: 'rejected', icon: TriangleAlert },
+    { label: 'Draft', value: 'draft', icon: RiTimeLine },
+    { label: 'Approved', value: 'approved', icon: RiCheckDoubleLine },
+    { label: 'Rejected', value: 'rejected', icon: RiAlertLine },
   ];
 
   const yearOptions = useMemo(() => {
@@ -115,8 +115,8 @@ export function NeedsTableToolbar({
             'bg-muted': viewMode === 'table',
           })}
         >
-          <Table />
-          <span className="sr-only">Table view</span>
+          <RiTableLine />
+          <span className="sr-only">RiTableLine view</span>
         </Button>
         <Button
           variant={'outline'}
@@ -126,7 +126,7 @@ export function NeedsTableToolbar({
             'bg-muted': viewMode === 'grid',
           })}
         >
-          <LayoutGrid />
+          <RiLayoutGridLine />
           <span className="sr-only">Grid view</span>
         </Button>
       </ButtonGroup>

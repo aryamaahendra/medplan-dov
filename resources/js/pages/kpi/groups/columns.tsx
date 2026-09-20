@@ -1,5 +1,10 @@
+import {
+  RiCheckboxCircleLine,
+  RiEyeLine,
+  RiEdit2Line,
+  RiDeleteBinLine,
+} from '@remixicon/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { CheckCircle2, Eye, PencilLine, Trash2 } from 'lucide-react';
 
 import { ActionDropdown } from '@/components/action-dropdown';
 import type { ActionItem } from '@/components/action-dropdown';
@@ -68,7 +73,7 @@ export const getColumns = (
       const actions: (ActionItem | 'separator')[] = [
         {
           label: 'Detail',
-          icon: Eye,
+          icon: RiEyeLine,
           href: groupRoutes.show.url({ group: group.id }),
         },
       ];
@@ -76,7 +81,7 @@ export const getColumns = (
       if (!group.is_active && hasPermission('update kpi-groups')) {
         actions.push({
           label: isActivating ? 'Mengaktifkan...' : 'Aktifkan',
-          icon: CheckCircle2,
+          icon: RiCheckboxCircleLine,
           onClick: () => onActivate(group),
           disabled: isActivating,
         });
@@ -85,7 +90,7 @@ export const getColumns = (
       if (hasPermission('update kpi-groups')) {
         actions.push({
           label: 'Edit',
-          icon: PencilLine,
+          icon: RiEdit2Line,
           onClick: () => onEdit(group),
         });
       }
@@ -94,7 +99,7 @@ export const getColumns = (
         actions.push('separator');
         actions.push({
           label: 'Hapus',
-          icon: Trash2,
+          icon: RiDeleteBinLine,
           onClick: () => onDelete(group),
           variant: 'destructive',
         });

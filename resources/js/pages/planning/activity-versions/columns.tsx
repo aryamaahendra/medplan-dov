@@ -1,5 +1,5 @@
+import { RiFocusLine, RiPencilLine, RiDeleteBinLine } from '@remixicon/react';
 import type { ColumnDef, Row, Table } from '@tanstack/react-table';
-import { Dot, Pencil, Trash2 } from 'lucide-react';
 
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
@@ -63,7 +63,7 @@ export const getColumns = (
               [
                 hasPermission('update planning-activity-versions') && {
                   label: 'Edit',
-                  icon: Pencil,
+                  icon: RiPencilLine,
                   onClick: () => onEdit(activity),
                 },
                 hasPermission('update planning-activity-versions') &&
@@ -71,7 +71,7 @@ export const getColumns = (
                   'separator',
                 hasPermission('delete planning-activity-versions') && {
                   label: 'Hapus',
-                  icon: Trash2,
+                  icon: RiDeleteBinLine,
                   onClick: () => onDelete(activity),
                   variant: 'destructive',
                 },
@@ -111,7 +111,7 @@ export const getColumns = (
             <div className="flex items-center gap-1.5">
               <TypeBadge activity={activity} />
 
-              <Dot className="size-3" />
+              <RiFocusLine className="size-3" />
 
               <p className="font-mono text-xs">{activity.code || '-'}</p>
             </div>

@@ -1,4 +1,4 @@
-import { AlertCircle } from 'lucide-react';
+import { RiErrorWarningLine } from '@remixicon/react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -68,7 +68,7 @@ export function RenstraAlignmentSection({
     <div className="space-y-6">
       {renstraErrors && (
         <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
+          <RiErrorWarningLine className="h-4 w-4" />
           <AlertTitle>Kesalahan Validasi</AlertTitle>
           <AlertDescription>{renstraErrors}</AlertDescription>
         </Alert>

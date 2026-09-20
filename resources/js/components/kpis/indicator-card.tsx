@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { Edit, Plus, Trash2 } from 'lucide-react';
+import { RiEditLine, RiAddLine, RiDeleteBinLine } from '@remixicon/react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -99,7 +99,7 @@ export function IndicatorCard({
                   variant="outline"
                   onClick={() => onCreateChild(indicator)}
                 >
-                  <Plus /> Tambah Sub
+                  <RiAddLine /> Tambah Sub
                 </Button>
               )}
               {onEdit && hasPermission('update kpi-indicators') && (
@@ -108,7 +108,7 @@ export function IndicatorCard({
                   variant="ghost"
                   onClick={() => onEdit(indicator)}
                 >
-                  <Edit className="h-4 w-4" />
+                  <RiEditLine className="h-4 w-4" />
                 </Button>
               )}
               {onDelete && hasPermission('delete kpi-indicators') && (
@@ -118,7 +118,7 @@ export function IndicatorCard({
                   className="text-destructive"
                   onClick={() => setDeletingIndicator(indicator)}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <RiDeleteBinLine className="h-4 w-4" />
                 </Button>
               )}
             </CardAction>
@@ -195,7 +195,7 @@ export function IndicatorCard({
                 variant="ghost"
                 onClick={() => onEdit(indicator)}
               >
-                <Edit className="h-3 w-3" />
+                <RiEditLine className="h-3 w-3" />
               </Button>
             )}
             {onDelete && hasPermission('delete kpi-indicators') && (
@@ -205,7 +205,7 @@ export function IndicatorCard({
                 className="text-destructive"
                 onClick={() => setDeletingIndicator(indicator)}
               >
-                <Trash2 className="h-3 w-3" />
+                <RiDeleteBinLine className="h-3 w-3" />
               </Button>
             )}
           </div>

@@ -1,5 +1,5 @@
+import { RiEdit2Line, RiDeleteBinLine } from '@remixicon/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { PencilLine, Trash2 } from 'lucide-react';
 
 import type { ActionItem } from '@/components/action-dropdown';
 import { ActionDropdown } from '@/components/action-dropdown';
@@ -84,7 +84,7 @@ export const getColumns = (
       if (hasPermission('update need-types')) {
         actions.push({
           label: 'Edit',
-          icon: PencilLine,
+          icon: RiEdit2Line,
           onClick: () => onEdit(type),
         });
       }
@@ -96,7 +96,7 @@ export const getColumns = (
 
         actions.push({
           label: 'Hapus',
-          icon: Trash2,
+          icon: RiDeleteBinLine,
           onClick: () => onDelete(type),
           variant: 'destructive',
         });

@@ -1,4 +1,9 @@
-import { AlertCircle, CheckCircle2, Plus, XCircle } from 'lucide-react';
+import {
+  RiErrorWarningLine,
+  RiCheckboxCircleLine,
+  RiAddLine,
+  RiCloseCircleLine,
+} from '@remixicon/react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -33,7 +38,7 @@ export function QuestionBankDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
-          <Plus />
+          <RiAddLine />
           Tambah dari Bank
         </Button>
       </DialogTrigger>
@@ -47,7 +52,7 @@ export function QuestionBankDialog({
         <div className="flex flex-1 flex-col gap-2 overflow-y-auto py-4 pr-2">
           {availableQuestions.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-8 text-center">
-              <AlertCircle className="mb-2 h-8 w-8 text-muted-foreground" />
+              <RiErrorWarningLine className="mb-2 h-8 w-8 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">
                 Belum ada pertanyaan di bank.
               </p>
@@ -89,9 +94,9 @@ export function QuestionBankDialog({
                     onClick={() => onAdd(q)}
                   >
                     {isAssigned ? (
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <RiCheckboxCircleLine className="h-4 w-4 text-green-600" />
                     ) : !q.is_active ? (
-                      <XCircle className="h-4 w-4 text-destructive" />
+                      <RiCloseCircleLine className="h-4 w-4 text-destructive" />
                     ) : (
                       'Pilih'
                     )}

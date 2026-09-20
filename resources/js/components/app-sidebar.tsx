@@ -1,18 +1,18 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
-  Building2,
-  ClipboardList,
-  FileText,
-  LayoutGrid,
-  Layers,
-  Users,
-  BookKey,
-  Database,
-  Pin,
-  ListChecks,
-  ShieldUser,
-  UserKey,
-} from 'lucide-react';
+  RiBuilding2Line,
+  RiClipboardLine,
+  RiFileTextLine,
+  RiLayoutGridLine,
+  RiStackLine,
+  RiGroupLine,
+  RiBookMarkedLine,
+  RiDatabase2Line,
+  RiPushpinLine,
+  RiListCheck3,
+  RiShieldUserLine,
+  RiKey2Line,
+} from '@remixicon/react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -44,25 +44,25 @@ const mainNavItems: NavItem[] = [
   {
     title: 'Dashboard',
     href: dashboard(),
-    icon: LayoutGrid,
+    icon: RiLayoutGridLine,
   },
 ];
 
 const userRole: NavItem[] = [
   {
-    title: 'Users',
+    title: 'RiGroupLine',
     href: users.index.url(),
-    icon: Users,
+    icon: RiGroupLine,
   },
   {
     title: 'Roles',
     href: roles.index.url(),
-    icon: ShieldUser,
+    icon: RiShieldUserLine,
   },
   {
     title: 'Permissions',
     href: permissions.index.url(),
-    icon: UserKey,
+    icon: RiKey2Line,
   },
 ];
 
@@ -70,37 +70,37 @@ const masterNavItems: NavItem[] = [
   {
     title: 'Unit Kerja',
     href: organizationalUnits.index.url(),
-    icon: Building2,
+    icon: RiBuilding2Line,
   },
   {
     title: 'Kategori Kebutuhan',
     href: needTypes.index.url(),
-    icon: Layers,
+    icon: RiStackLine,
   },
   {
     title: 'Manajemen Renstra',
     href: renstras.index.url(),
-    icon: FileText,
+    icon: RiFileTextLine,
   },
   {
     title: 'Manajemen IKK',
     href: kpis.groups.index.url(),
-    icon: BookKey,
+    icon: RiBookMarkedLine,
   },
   {
     title: 'Rencana Pengembangan Layanan Strategis',
     href: strategicServicePlans.index.url(),
-    icon: ListChecks,
+    icon: RiListCheck3,
   },
   {
     title: 'Bank Pertanyaan Checklist',
     href: checklistQuestions.index.url(),
-    icon: ClipboardList,
+    icon: RiClipboardLine,
   },
   // {
   //   title: 'Versi Perencanaan',
   //   href: planningVersions.index.url(),
-  //   icon: ClipboardList,
+  //   icon: RiClipboardLine,
   // },
 ];
 
@@ -127,7 +127,7 @@ export function AppSidebar() {
     ? (activeNeedGroups || []).map((group) => ({
         title: `${group.name} (${group.year})`,
         href: needs.index.url({ query: { need_group_id: group.id } }),
-        icon: Pin,
+        icon: RiPushpinLine,
       }))
     : [];
 
@@ -135,7 +135,7 @@ export function AppSidebar() {
     dynamicNeedNavItems.push({
       title: 'Semua Usulan',
       href: needGroups.index.url(),
-      icon: Database,
+      icon: RiDatabase2Line,
     });
   }
 
@@ -162,7 +162,7 @@ export function AppSidebar() {
 
   const filteredUserRole = userRole.filter((item) => {
     switch (item.title) {
-      case 'Users':
+      case 'RiGroupLine':
         return hasPermission('view any users');
       case 'Roles':
         return hasPermission('view any roles');

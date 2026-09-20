@@ -1,4 +1,9 @@
-import { Search, Check, ChevronDown, Plus } from 'lucide-react';
+import {
+  RiSearchLine,
+  RiCheckLine,
+  RiArrowDownSLine,
+  RiAddLine,
+} from '@remixicon/react';
 import { useState, useMemo } from 'react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -93,7 +98,7 @@ export function FundingSection({
                 <span className="truncate">
                   {selectedSourcesLabel || 'Pilih sumber dana...'}
                 </span>
-                <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                <RiArrowDownSLine className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
             <PopoverContent
@@ -101,7 +106,7 @@ export function FundingSection({
               align="start"
             >
               <div className="flex items-center border-b px-3">
-                <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                <RiSearchLine className="mr-2 h-4 w-4 shrink-0 opacity-50" />
                 <Input
                   placeholder="Cari atau tambah sumber dana..."
                   className="h-10 border-none bg-transparent outline-none focus-visible:ring-0"
@@ -117,7 +122,7 @@ export function FundingSection({
                       className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm hover:bg-accent"
                       onClick={() => toggleSource(source.id)}
                     >
-                      <Check
+                      <RiCheckLine
                         className={cn(
                           'h-4 w-4',
                           fundingSourceIds.some(
@@ -138,7 +143,7 @@ export function FundingSection({
                         setSourceSearch('');
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <RiAddLine className="h-4 w-4" />
                       Tambah "{sourceSearch}"
                     </div>
                   )}

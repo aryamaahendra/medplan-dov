@@ -1,5 +1,5 @@
+import { RiEyeLine, RiEdit2Line, RiDeleteBinLine } from '@remixicon/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { Eye, PencilLine, Trash2 } from 'lucide-react';
 
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
@@ -65,7 +65,7 @@ export const getColumns = (
       const actions: any[] = [
         {
           label: 'Lihat',
-          icon: Eye,
+          icon: RiEyeLine,
           href: renstraRoutes.show.url({ renstra: renstra.id }),
         },
       ];
@@ -73,7 +73,7 @@ export const getColumns = (
       if (hasPermission('update renstras')) {
         actions.push({
           label: 'Edit',
-          icon: PencilLine,
+          icon: RiEdit2Line,
           onClick: () => onEdit(renstra),
         });
       }
@@ -82,7 +82,7 @@ export const getColumns = (
         actions.push('separator');
         actions.push({
           label: 'Hapus',
-          icon: Trash2,
+          icon: RiDeleteBinLine,
           onClick: () => onDelete(renstra),
           variant: 'destructive',
         });

@@ -1,6 +1,6 @@
 import { Transition } from '@headlessui/react';
 import { Form, Head } from '@inertiajs/react';
-import { ShieldCheck } from 'lucide-react';
+import { RiShieldCheckLine } from '@remixicon/react';
 import { useEffect, useRef, useState } from 'react';
 import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController';
 import Heading from '@/components/heading';
@@ -200,7 +200,7 @@ export default function Security({
               <div>
                 {hasSetupData ? (
                   <Button onClick={() => setShowSetupModal(true)}>
-                    <ShieldCheck />
+                    <RiShieldCheckLine />
                     Continue setup
                   </Button>
                 ) : (

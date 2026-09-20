@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Download, Plus, RefreshCcw } from 'lucide-react';
+import { RiDownloadLine, RiAddLine, RiRefreshLine } from '@remixicon/react';
 import { Fragment, useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -137,7 +137,7 @@ export default function PlanningActivityVersionsIndex({
                   );
                 }}
               >
-                <RefreshCcw
+                <RiRefreshLine
                   className={cn(
                     'mr-2 h-4 w-4',
                     isRecalculating && 'animate-spin',
@@ -150,7 +150,7 @@ export default function PlanningActivityVersionsIndex({
               <a
                 href={PlanningActivityVersionController.export.url(version.id)}
               >
-                <Download className="mr-2 h-4 w-4" />
+                <RiDownloadLine className="mr-2 h-4 w-4" />
                 Export
               </a>
             </Button>
@@ -163,7 +163,7 @@ export default function PlanningActivityVersionsIndex({
                       version.id,
                     )}
                   >
-                    <Plus className="mr-2" />
+                    <RiAddLine className="mr-2" />
                     Tambah Aktivitas
                   </Link>
                 </Button>

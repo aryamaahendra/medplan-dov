@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { PaperclipIcon } from 'lucide-react';
+import { RiAttachmentLine } from '@remixicon/react';
 
 import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 import { Button } from '@/components/ui/button';
@@ -50,7 +50,7 @@ export function NeedAttachmentsTab({ need }: NeedAttachmentsTabProps) {
                 )
               }
             >
-              <PaperclipIcon />
+              <RiAttachmentLine />
               Kelola Lampiran
             </Button>
           </CardAction>

@@ -1,4 +1,4 @@
-import { FileDown } from 'lucide-react';
+import { RiFileDownloadLine } from '@remixicon/react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -104,7 +104,7 @@ export function ExportPdfDialog({
       <DialogTrigger asChild>
         {trigger || (
           <Button variant="outline" size="sm">
-            <FileDown className="mr-1.5 h-4 w-4" />
+            <RiFileDownloadLine className="mr-1.5 h-4 w-4" />
             Ekspor PDF
           </Button>
         )}
@@ -226,7 +226,7 @@ export function ExportPdfDialog({
             Pratinjau
           </Button>
           <Button onClick={() => handleExport()}>
-            <FileDown className="mr-2 h-4 w-4" />
+            <RiFileDownloadLine className="mr-2 h-4 w-4" />
             Ekspor
           </Button>
         </DialogFooter>

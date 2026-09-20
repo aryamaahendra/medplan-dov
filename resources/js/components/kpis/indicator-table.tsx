@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { Edit, MoreHorizontal, Trash2 } from 'lucide-react';
+import { RiEditLine, RiMoreFill, RiDeleteBinLine } from '@remixicon/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -190,15 +190,15 @@ export function IndicatorTable({
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
+                            <RiMoreFill className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                           {onEdit && hasPermission('update kpi-indicators') && (
                             <DropdownMenuItem onClick={() => onEdit(indicator)}>
-                              <Edit className="mr-2 h-4 w-4" />
-                              Edit
+                              <RiEditLine className="mr-2 h-4 w-4" />
+                              RiEditLine
                             </DropdownMenuItem>
                           )}
                           {(onEdit || onDelete) && <DropdownMenuSeparator />}
@@ -207,7 +207,7 @@ export function IndicatorTable({
                               className="text-destructive"
                               onClick={() => setDeletingIndicator(indicator)}
                             >
-                              <Trash2 className="mr-2 h-4 w-4" />
+                              <RiDeleteBinLine className="mr-2 h-4 w-4" />
                               Hapus
                             </DropdownMenuItem>
                           )}

@@ -1,12 +1,12 @@
 import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  DownloadIcon,
-  Loader2Icon,
-  SearchIcon,
-  ZoomInIcon,
-  ZoomOutIcon,
-} from 'lucide-react';
+  RiArrowLeftSLine,
+  RiArrowRightSLine,
+  RiDownloadLine,
+  RiLoaderLine,
+  RiSearchLine,
+  RiZoomInLine,
+  RiZoomOutLine,
+} from '@remixicon/react';
 import { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { Button } from '@/components/ui/button';
@@ -61,7 +61,7 @@ export default function PdfViewer({
         onLoadSuccess={onDocumentLoadSuccess}
         loading={
           <div className="flex flex-col items-center">
-            <Loader2Icon className="h-8 w-8 animate-spin text-primary" />
+            <RiLoaderLine className="h-8 w-8 animate-spin text-primary" />
             <p className="mt-2 text-sm text-muted-foreground">Memuat PDF...</p>
           </div>
         }
@@ -89,7 +89,7 @@ export default function PdfViewer({
             disabled={pageNumber <= 1}
             onClick={() => changePage(-1)}
           >
-            <ChevronLeftIcon className="h-4 w-4" />
+            <RiArrowLeftSLine className="h-4 w-4" />
           </Button>
           <p className="min-w-[100px] text-center text-xs font-medium">
             Halaman {pageNumber} dari {numPages || '?'}
@@ -100,7 +100,7 @@ export default function PdfViewer({
             disabled={pageNumber >= (numPages || 0)}
             onClick={() => changePage(1)}
           >
-            <ChevronRightIcon className="h-4 w-4" />
+            <RiArrowRightSLine className="h-4 w-4" />
           </Button>
         </div>
 
@@ -111,7 +111,7 @@ export default function PdfViewer({
             onClick={handleZoomOut}
             title="Zoom Out"
           >
-            <ZoomOutIcon />
+            <RiZoomOutLine />
           </Button>
           <span className="w-12 text-center text-xs font-medium">
             {Math.round(scale * 100)}%
@@ -122,7 +122,7 @@ export default function PdfViewer({
             onClick={handleZoomIn}
             title="Zoom In"
           >
-            <ZoomInIcon />
+            <RiZoomInLine />
           </Button>
           <Button
             variant="ghost"
@@ -130,14 +130,14 @@ export default function PdfViewer({
             onClick={handleResetZoom}
             title="Reset Zoom"
           >
-            <SearchIcon />
+            <RiSearchLine />
           </Button>
         </div>
 
         <div className="ml-1 flex items-center border-l pl-2">
           <Button variant="ghost" size="icon-sm" asChild title="Download PDF">
             <a href={downloadUrl} download={fileName}>
-              <DownloadIcon className="h-4 w-4" />
+              <RiDownloadLine className="h-4 w-4" />
             </a>
           </Button>
         </div>

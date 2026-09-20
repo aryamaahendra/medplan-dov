@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { Edit, Trash2 } from 'lucide-react';
+import { RiEditLine, RiDeleteBinLine } from '@remixicon/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -137,8 +137,8 @@ export function IndicatorTable({
                       actions={
                         [
                           hasPermission('update indicators') && {
-                            label: 'Edit',
-                            icon: Edit,
+                            label: 'RiEditLine',
+                            icon: RiEditLine,
                             onClick: () => onEdit(indicator),
                           },
                           hasPermission('update indicators') &&
@@ -146,7 +146,7 @@ export function IndicatorTable({
                             'separator',
                           hasPermission('delete indicators') && {
                             label: 'Hapus',
-                            icon: Trash2,
+                            icon: RiDeleteBinLine,
                             onClick: () => setDeletingIndicator(indicator),
                             variant: 'destructive',
                           },

@@ -1,5 +1,5 @@
+import { RiEdit2Line, RiDeleteBinLine } from '@remixicon/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { PencilLine, Trash2 } from 'lucide-react';
 
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
@@ -65,7 +65,7 @@ export const getColumns = (
       if (hasPermission('update organizational-units')) {
         actions.push({
           label: 'Edit',
-          icon: PencilLine,
+          icon: RiEdit2Line,
           onClick: () => onEdit(unit),
         });
       }
@@ -77,7 +77,7 @@ export const getColumns = (
 
         actions.push({
           label: 'Hapus',
-          icon: Trash2,
+          icon: RiDeleteBinLine,
           onClick: () => onDelete(unit),
           variant: 'destructive',
         });

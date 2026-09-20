@@ -1,4 +1,4 @@
-import { Search as SearchIcon, XIcon } from 'lucide-react';
+import { RiSearchLine as SearchIcon, RiCloseLine } from '@remixicon/react';
 import type { ReactNode } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -67,7 +67,7 @@ export function DataTableToolbar({
             className="h-8 px-2 lg:px-3"
           >
             Reset
-            <XIcon className="ml-1 size-4" />
+            <RiCloseLine className="ml-1 size-4" />
           </Button>
         )}
 

@@ -1,5 +1,5 @@
 import { useForm } from '@inertiajs/react';
-import { Upload } from 'lucide-react';
+import { RiUploadLine } from '@remixicon/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -61,7 +61,7 @@ export function ActivityImportDialog({
     >
       <DialogTrigger asChild>
         <Button variant="outline">
-          <Upload className="mr-2 h-4 w-4" />
+          <RiUploadLine className="mr-2 h-4 w-4" />
           Import
         </Button>
       </DialogTrigger>

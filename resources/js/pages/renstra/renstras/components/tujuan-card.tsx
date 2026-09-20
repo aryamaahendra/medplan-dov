@@ -1,4 +1,4 @@
-import { Edit, Plus, Trash2 } from 'lucide-react';
+import { RiEditLine, RiAddLine, RiDeleteBinLine } from '@remixicon/react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -109,20 +109,20 @@ function TujuanHeader({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button size="sm" variant="outline">
-                <Plus />
+                <RiAddLine />
                 Tambah
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               {hasPermission('create sasarans') && (
                 <DropdownMenuItem onClick={() => onCreateSasaran(tujuan)}>
-                  <Plus className="mr-1" />
+                  <RiAddLine className="mr-1" />
                   Sasaran
                 </DropdownMenuItem>
               )}
               {hasPermission('create indicators') && (
                 <DropdownMenuItem onClick={() => onCreateIndicator(tujuan)}>
-                  <Plus className="mr-1" />
+                  <RiAddLine className="mr-1" />
                   Indikator
                 </DropdownMenuItem>
               )}
@@ -135,7 +135,7 @@ function TujuanHeader({
             variant="outline"
             onClick={() => onEditTujuan(tujuan)}
           >
-            <Edit />
+            <RiEditLine />
           </Button>
         )}
         {hasPermission('delete tujuans') && (
@@ -144,7 +144,7 @@ function TujuanHeader({
             variant="destructive"
             onClick={() => onDeleteTujuan(tujuan)}
           >
-            <Trash2 />
+            <RiDeleteBinLine />
           </Button>
         )}
       </div>

@@ -1,4 +1,8 @@
-import { CheckCircle2, FileText, XCircle } from 'lucide-react';
+import {
+  RiCheckboxCircleLine,
+  RiFileTextLine,
+  RiCloseCircleLine,
+} from '@remixicon/react';
 import type { ElementType } from 'react';
 
 import type { NeedStatus } from '@/types/need';
@@ -37,9 +41,9 @@ export const STATUS_VARIANTS: Record<
 };
 
 export const STATUS_ICONS: Record<NeedStatus, ElementType> = {
-  draft: FileText,
-  approved: CheckCircle2,
-  rejected: XCircle,
+  draft: RiFileTextLine,
+  approved: RiCheckboxCircleLine,
+  rejected: RiCloseCircleLine,
 };
 
 export const PRIORITY_LABELS: Record<string, string> = {

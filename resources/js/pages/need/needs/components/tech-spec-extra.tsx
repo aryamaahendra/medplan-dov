@@ -1,4 +1,4 @@
-import { UploadCloud } from 'lucide-react';
+import { RiUploadCloudLine } from '@remixicon/react';
 import type { MutableRefObject } from 'react';
 import { Button } from '@/components/ui/button';
 import { formatFileSize } from '@/lib/formatters';
@@ -50,7 +50,7 @@ export function TechSpecExtra({
           size="sm"
           onClick={() => fileInputRef.current?.click()}
         >
-          <UploadCloud className="h-4 w-4" />
+          <RiUploadCloudLine className="h-4 w-4" />
           Unggah Dokumen
         </Button>
         <input

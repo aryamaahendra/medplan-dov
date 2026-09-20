@@ -1,4 +1,4 @@
-import { Eye } from 'lucide-react';
+import { RiEyeLine } from '@remixicon/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { EditorRenderer } from '@/components/ui/editor-renderer';
@@ -49,7 +49,7 @@ export function NeedDetailView({
               users={users}
               trigger={
                 <Button variant="destructive" size="icon-sm">
-                  <Eye />
+                  <RiEyeLine />
                 </Button>
               }
             />

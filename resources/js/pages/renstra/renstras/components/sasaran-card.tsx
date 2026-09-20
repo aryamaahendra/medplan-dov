@@ -1,4 +1,4 @@
-import { PencilLine, Plus, Trash2 } from 'lucide-react';
+import { RiEdit2Line, RiAddLine, RiDeleteBinLine } from '@remixicon/react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -46,7 +46,7 @@ export function SasaranCard({
               variant="outline"
               onClick={() => onCreateIndicator(sasaran)}
             >
-              <Plus />
+              <RiAddLine />
               Indikator
             </Button>
           )}
@@ -56,7 +56,7 @@ export function SasaranCard({
               variant="outline"
               onClick={() => onEditSasaran(sasaran)}
             >
-              <PencilLine />
+              <RiEdit2Line />
             </Button>
           )}
           {hasPermission('delete sasarans') && (
@@ -65,7 +65,7 @@ export function SasaranCard({
               variant="destructive"
               onClick={() => onDeleteSasaran(sasaran)}
             >
-              <Trash2 />
+              <RiDeleteBinLine />
             </Button>
           )}
         </div>

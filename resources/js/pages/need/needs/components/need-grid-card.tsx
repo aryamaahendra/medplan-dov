@@ -1,13 +1,13 @@
 import { Link } from '@inertiajs/react';
 import {
-  CheckCircle2,
-  FileText,
-  Paperclip,
-  PencilLine,
-  Signature,
-  Trash2,
-  XCircle,
-} from 'lucide-react';
+  RiCheckboxCircleLine,
+  RiFileTextLine,
+  RiAttachmentLine,
+  RiEdit2Line,
+  RiQuillPenLine,
+  RiDeleteBinLine,
+  RiCloseCircleLine,
+} from '@remixicon/react';
 
 import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 import { ActionDropdown } from '@/components/action-dropdown';
@@ -43,7 +43,7 @@ export function NeedGridCard({
   const actions: Parameters<typeof ActionDropdown>[0]['actions'] = [
     {
       label: 'Detail',
-      icon: FileText,
+      icon: RiFileTextLine,
       href: needRoutes.show.url({ need: need.id }),
     },
   ];
@@ -51,12 +51,12 @@ export function NeedGridCard({
   if (need.can?.update) {
     actions.push({
       label: 'Edit',
-      icon: PencilLine,
+      icon: RiEdit2Line,
       onClick: () => onEdit(need),
     });
     actions.push({
       label: 'Lampiran',
-      icon: Paperclip,
+      icon: RiAttachmentLine,
       href: NeedAttachmentController.index.url({ need: need.id }),
     });
   }
@@ -65,7 +65,7 @@ export function NeedGridCard({
     actions.push('separator');
     actions.push({
       label: 'Hapus',
-      icon: Trash2,
+      icon: RiDeleteBinLine,
       onClick: () => onDelete(need),
       variant: 'destructive',
     });
@@ -75,7 +75,7 @@ export function NeedGridCard({
     actions.push('separator');
     actions.push({
       label: 'Review Direktur',
-      icon: Signature,
+      icon: RiQuillPenLine,
       onClick: () => onReview(need),
       indicator: !!need.notes,
     });
@@ -174,9 +174,9 @@ export function NeedGridCard({
               className="flex items-center gap-1"
             >
               {need.approved_by_director_at ? (
-                <CheckCircle2 className="h-3 w-3" />
+                <RiCheckboxCircleLine className="h-3 w-3" />
               ) : (
-                <XCircle className="h-3 w-3" />
+                <RiCloseCircleLine className="h-3 w-3" />
               )}
               {need.approved_by_director_at ? 'Disetujui' : 'Belum Review'}
             </Badge>

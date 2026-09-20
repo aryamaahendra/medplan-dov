@@ -1,4 +1,4 @@
-import { AlertCircle, Hash } from 'lucide-react';
+import { RiErrorWarningLine, RiHashtag } from '@remixicon/react';
 
 import { Badge } from '@/components/ui/badge';
 import { RadioGroup } from '@/components/ui/radio-group';
@@ -32,7 +32,7 @@ export function ChecklistItem({
     <div className="flex flex-col gap-4 p-4 transition-colors hover:bg-muted/5">
       <div className="flex items-start gap-6">
         <Badge variant="outline" className="mt-0.5">
-          <Hash />
+          <RiHashtag />
           {index + 1}
         </Badge>
 
@@ -92,7 +92,7 @@ export function ChecklistItem({
                 className="min-h-[80px] bg-muted/20 transition-colors focus-visible:bg-background"
               />
               {!answer?.notes && (
-                <AlertCircle className="absolute top-3 right-3 h-4 w-4 text-muted-foreground/20" />
+                <RiErrorWarningLine className="absolute top-3 right-3 h-4 w-4 text-muted-foreground/20" />
               )}
             </div>
           </div>

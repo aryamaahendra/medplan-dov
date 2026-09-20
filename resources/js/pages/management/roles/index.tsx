@@ -1,5 +1,5 @@
 import { Head, router, Link } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { RiAddLine } from '@remixicon/react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -90,7 +90,7 @@ export default function RolesIndex({ roles, filters }: RolesIndexProps) {
           {hasPermission('create roles') && (
             <Button asChild>
               <Link href={rolesRoutes.create.url()}>
-                <Plus />
+                <RiAddLine />
                 Tambah Role
               </Link>
             </Button>

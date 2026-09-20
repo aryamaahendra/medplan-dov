@@ -1,11 +1,11 @@
 import {
-  DownloadIcon,
-  EyeIcon,
-  PaperclipIcon,
-  Trash2Icon,
-  UploadIcon,
-  XIcon,
-} from 'lucide-react';
+  RiDownloadLine,
+  RiEyeLine,
+  RiAttachmentLine,
+  RiDeleteBinLine,
+  RiUploadLine,
+  RiCloseLine,
+} from '@remixicon/react';
 import React, { useRef } from 'react';
 import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 import { ActionDropdown } from '@/components/action-dropdown';
@@ -111,7 +111,7 @@ export function FileSection({
           size="sm"
           onClick={() => fileInputRef.current?.click()}
         >
-          <PaperclipIcon className="mr-2 h-4 w-4" />
+          <RiAttachmentLine className="mr-2 h-4 w-4" />
           Pilih File
         </Button>
         <input
@@ -137,7 +137,7 @@ export function FileSection({
               )}
             >
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                <UploadIcon className="h-5 w-5" />
+                <RiUploadLine className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1 text-left">
                 <p className="truncate text-sm leading-tight font-medium text-foreground">
@@ -155,7 +155,7 @@ export function FileSection({
                     ? [
                         {
                           label: 'Pratinjau',
-                          icon: EyeIcon,
+                          icon: RiEyeLine,
                           href: NeedAttachmentController.view.url({
                             attachment: att.id,
                           }),
@@ -164,7 +164,7 @@ export function FileSection({
                     : []),
                   {
                     label: 'Unduh',
-                    icon: DownloadIcon,
+                    icon: RiDownloadLine,
                     href: NeedAttachmentController.download.url({
                       attachment: att.id,
                     }),
@@ -175,8 +175,8 @@ export function FileSection({
                       ? 'Batal Hapus'
                       : 'Hapus',
                     icon: deletedAttachmentIds.includes(att.id)
-                      ? XIcon
-                      : Trash2Icon,
+                      ? RiCloseLine
+                      : RiDeleteBinLine,
                     variant: 'destructive',
                     onClick: () => toggleExistingDeletion(att.id),
                   },
@@ -192,7 +192,7 @@ export function FileSection({
               className="group flex items-center gap-3 rounded-lg border border-primary/20 bg-primary/5 p-3"
             >
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                <UploadIcon className="h-5 w-5" />
+                <RiUploadLine className="h-5 w-5" />
               </div>
               <div className="flex min-w-0 flex-1 flex-col gap-1">
                 <div className="flex items-center gap-1">
@@ -218,7 +218,7 @@ export function FileSection({
                 className="h-8 w-8 text-destructive"
                 onClick={() => removeNewFile(index)}
               >
-                <Trash2Icon className="h-4 w-4" />
+                <RiDeleteBinLine className="h-4 w-4" />
               </Button>
             </div>
           ))}
@@ -227,7 +227,7 @@ export function FileSection({
 
       {files.length === 0 && existingAttachments.length === 0 && (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-10 text-center">
-          <PaperclipIcon className="mb-2 h-10 w-10 text-muted-foreground/50" />
+          <RiAttachmentLine className="mb-2 h-10 w-10 text-muted-foreground/50" />
           <p className="text-sm text-muted-foreground">
             Belum ada lampiran. Klik "Pilih File" untuk mengunggah.
           </p>

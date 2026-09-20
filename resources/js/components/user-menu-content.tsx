@@ -1,5 +1,5 @@
 import { Link, router } from '@inertiajs/react';
-import { LogOut, Settings } from 'lucide-react';
+import { RiLogoutBoxRLine, RiSettings3Line } from '@remixicon/react';
 import {
   DropdownMenuGroup,
   DropdownMenuItem,
@@ -40,8 +40,8 @@ export function UserMenuContent({ user }: Props) {
             prefetch
             onClick={cleanup}
           >
-            <Settings className="mr-2" />
-            Settings
+            <RiSettings3Line className="mr-2" />
+            RiSettings3Line
           </Link>
         </DropdownMenuItem>
       </DropdownMenuGroup>
@@ -54,7 +54,7 @@ export function UserMenuContent({ user }: Props) {
           onClick={handleLogout}
           data-test="logout-button"
         >
-          <LogOut className="mr-2" />
+          <RiLogoutBoxRLine className="mr-2" />
           Log out
         </Link>
       </DropdownMenuItem>

@@ -1,10 +1,10 @@
-import type { Column } from '@tanstack/react-table';
 import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  ChevronsUpDownIcon,
-  EyeOffIcon,
-} from 'lucide-react';
+  RiArrowDownLine,
+  RiArrowUpLine,
+  RiExpandUpDownLine,
+  RiEyeOffLine,
+} from '@remixicon/react';
+import type { Column } from '@tanstack/react-table';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -56,27 +56,27 @@ export function DataTableColumnHeader<TData, TValue>({
           >
             <span>{title}</span>
             {direction === 'desc' ? (
-              <ArrowDownIcon className="ml-1 size-3.5" />
+              <RiArrowDownLine className="ml-1 size-3.5" />
             ) : direction === 'asc' ? (
-              <ArrowUpIcon className="ml-1 size-3.5" />
+              <RiArrowUpLine className="ml-1 size-3.5" />
             ) : (
-              <ChevronsUpDownIcon className="ml-1 size-3.5" />
+              <RiExpandUpDownLine className="ml-1 size-3.5" />
             )}
           </Button>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="start">
           <DropdownMenuItem onClick={() => onSort?.(column.id, 'asc')}>
-            <ArrowUpIcon className="mr-2 size-3.5 text-muted-foreground/70" />
+            <RiArrowUpLine className="mr-2 size-3.5 text-muted-foreground/70" />
             Asc
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => onSort?.(column.id, 'desc')}>
-            <ArrowDownIcon className="mr-2 size-3.5 text-muted-foreground/70" />
+            <RiArrowDownLine className="mr-2 size-3.5 text-muted-foreground/70" />
             Desc
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
-            <EyeOffIcon className="mr-2 size-3.5 text-muted-foreground/70" />
+            <RiEyeOffLine className="mr-2 size-3.5 text-muted-foreground/70" />
             Hide
           </DropdownMenuItem>
         </DropdownMenuContent>

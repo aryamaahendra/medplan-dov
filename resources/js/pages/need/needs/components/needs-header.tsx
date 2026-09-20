@@ -1,13 +1,13 @@
 import {
-  ClipboardList,
-  Ellipsis,
-  FileDown,
-  PencilLine,
-  PieChart,
-  Plus,
-  Table,
-  Trash2,
-} from 'lucide-react';
+  RiClipboardLine,
+  RiMoreFill,
+  RiFileDownloadLine,
+  RiEdit2Line,
+  RiPieChartLine,
+  RiAddLine,
+  RiTableLine,
+  RiDeleteBinLine,
+} from '@remixicon/react';
 
 import needGroupChecklistActions from '@/actions/App/Http/Controllers/Need/NeedGroupChecklistController';
 import { ActionDropdown } from '@/components/action-dropdown';
@@ -40,12 +40,12 @@ export function NeedsHeader({
   if (hasPermission('update need-groups')) {
     groupActions.push({
       label: 'Edit',
-      icon: PencilLine,
+      icon: RiEdit2Line,
       onClick: onEditGroup,
     });
     groupActions.push({
       label: 'Checklist',
-      icon: ClipboardList,
+      icon: RiClipboardLine,
       href: needGroupChecklistActions.index.url({
         need_group: currentGroup.id,
       }),
@@ -54,7 +54,7 @@ export function NeedsHeader({
 
   groupActions.push({
     label: 'Export Excel',
-    icon: FileDown,
+    icon: RiFileDownloadLine,
     onClick: onExport,
   });
 
@@ -65,7 +65,7 @@ export function NeedsHeader({
 
     groupActions.push({
       label: 'Hapus',
-      icon: Trash2,
+      icon: RiDeleteBinLine,
       onClick: onDeleteGroup,
       variant: 'destructive',
     });
@@ -85,12 +85,12 @@ export function NeedsHeader({
         <Button variant={'outline'} onClick={onToggleDashboard}>
           {showDashboard ? (
             <>
-              <Table />
-              Table
+              <RiTableLine />
+              RiTableLine
             </>
           ) : (
             <>
-              <PieChart />
+              <RiPieChartLine />
               Dashboard
             </>
           )}
@@ -102,7 +102,7 @@ export function NeedsHeader({
               <ActionDropdown
                 trigger={
                   <Button variant={'outline'} size={'icon'}>
-                    <Ellipsis />
+                    <RiMoreFill />
                   </Button>
                 }
                 actions={groupActions as any}
@@ -115,7 +115,7 @@ export function NeedsHeader({
               'create any needs',
             ]) && (
               <Button onClick={onCreate}>
-                <Plus />
+                <RiAddLine />
                 Tambah Usulan
               </Button>
             )}

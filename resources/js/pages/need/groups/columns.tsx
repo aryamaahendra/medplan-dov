@@ -1,5 +1,5 @@
+import { RiListCheck3, RiEdit2Line, RiDeleteBinLine } from '@remixicon/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { ListChecks, PencilLine, Trash2 } from 'lucide-react';
 import type { ActionItem } from '@/components/action-dropdown';
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
@@ -110,7 +110,7 @@ export const getColumns = (
       const actions: (ActionItem | 'separator')[] = [
         {
           label: 'Kelola Checklist',
-          icon: ListChecks,
+          icon: RiListCheck3,
           href: groupRoutes.checklists.index.url({ need_group: group.id }),
         },
       ];
@@ -118,7 +118,7 @@ export const getColumns = (
       if (hasPermission('update need-groups')) {
         actions.push({
           label: 'Edit',
-          icon: PencilLine,
+          icon: RiEdit2Line,
           onClick: () => onEdit(group),
         });
       }
@@ -127,7 +127,7 @@ export const getColumns = (
         actions.push('separator');
         actions.push({
           label: 'Hapus',
-          icon: Trash2,
+          icon: RiDeleteBinLine,
           onClick: () => onDelete(group),
           variant: 'destructive',
         });

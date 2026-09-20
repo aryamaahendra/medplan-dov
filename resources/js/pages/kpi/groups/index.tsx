@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { RiAddLine } from '@remixicon/react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -105,7 +105,7 @@ export default function KpiGroupsIndex({
           </div>
           {hasPermission('create kpi-groups') && (
             <Button onClick={onCreate}>
-              <Plus className="h-4 w-4" />
+              <RiAddLine className="h-4 w-4" />
               Tambah Periode
             </Button>
           )}

@@ -1,4 +1,4 @@
-import { PlusCircle } from 'lucide-react';
+import { RiAddCircleLine } from '@remixicon/react';
 import * as React from 'react';
 
 import { Badge } from '@/components/ui/badge';
@@ -41,7 +41,7 @@ export function DataTableFacetedFilter({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="h-8 border-dashed">
-          <PlusCircle className="mr-1" />
+          <RiAddCircleLine className="mr-1" />
           {title}
           {selectedValues?.length > 0 && (
             <>

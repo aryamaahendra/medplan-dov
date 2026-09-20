@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { RiAddLine } from '@remixicon/react';
 import { useState } from 'react';
 
 import { KpiIndicatorTree } from '@/components/kpis/kpi-indicator-tree';
@@ -78,7 +78,7 @@ export default function KpiGroupShow({ group }: KpiGroupShowProps) {
             </div>
             {hasPermission('create kpi-indicators') && (
               <Button onClick={onCreateIndicator}>
-                <Plus />
+                <RiAddLine />
                 Tambah Indikator Utama
               </Button>
             )}

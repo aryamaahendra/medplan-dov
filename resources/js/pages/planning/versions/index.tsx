@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { RiAddLine } from '@remixicon/react';
 import { useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -156,7 +156,7 @@ export default function PlanningVersionsIndex({
                 setDialogOpen(true);
               }}
             >
-              <Plus />
+              <RiAddLine />
               Buat Versi Baru
             </Button>
           )}

@@ -1,9 +1,9 @@
 import {
-  ChevronFirstIcon,
-  ChevronLastIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from 'lucide-react';
+  RiArrowLeftDoubleLine,
+  RiArrowRightDoubleLine,
+  RiArrowLeftSLine,
+  RiArrowRightSLine,
+} from '@remixicon/react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -76,7 +76,7 @@ export function DataTablePagination({
             disabled={current_page === 1}
           >
             <span className="sr-only">Go to first page</span>
-            <ChevronFirstIcon className="size-4" />
+            <RiArrowLeftDoubleLine className="size-4" />
           </Button>
           <Button
             variant="outline"
@@ -85,7 +85,7 @@ export function DataTablePagination({
             disabled={current_page === 1}
           >
             <span className="sr-only">Go to previous page</span>
-            <ChevronLeftIcon className="size-4" />
+            <RiArrowLeftSLine className="size-4" />
           </Button>
           <Button
             variant="outline"
@@ -94,7 +94,7 @@ export function DataTablePagination({
             disabled={current_page === last_page}
           >
             <span className="sr-only">Go to next page</span>
-            <ChevronRightIcon className="size-4" />
+            <RiArrowRightSLine className="size-4" />
           </Button>
           <Button
             variant="outline"
@@ -103,7 +103,7 @@ export function DataTablePagination({
             disabled={current_page === last_page}
           >
             <span className="sr-only">Go to last page</span>
-            <ChevronLastIcon className="size-4" />
+            <RiArrowRightDoubleLine className="size-4" />
           </Button>
         </div>
       </div>

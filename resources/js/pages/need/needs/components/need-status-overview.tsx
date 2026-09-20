@@ -1,4 +1,4 @@
-import { CheckCircle2, XCircle } from 'lucide-react';
+import { RiCheckboxCircleLine, RiCloseCircleLine } from '@remixicon/react';
 import { PriorityBadge } from '@/components/priority-badge';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -53,9 +53,9 @@ export function NeedStatusOverview({ need }: NeedStatusOverviewProps) {
               className="flex items-center gap-1.5"
             >
               {need.approved_by_director_at ? (
-                <CheckCircle2 className="h-3.5 w-3.5" />
+                <RiCheckboxCircleLine className="h-3.5 w-3.5" />
               ) : (
-                <XCircle className="h-3.5 w-3.5" />
+                <RiCloseCircleLine className="h-3.5 w-3.5" />
               )}
               {need.approved_by_director_at ? 'Disetujui' : 'Belum'}
             </Badge>

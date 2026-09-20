@@ -1,5 +1,5 @@
+import { RiEdit2Line, RiDeleteBinLine } from '@remixicon/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { PencilLine, Trash2 } from 'lucide-react';
 
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
@@ -89,7 +89,7 @@ export const getColumns = (
       if (hasPermission('update users')) {
         actions.push({
           label: 'Edit User',
-          icon: PencilLine,
+          icon: RiEdit2Line,
           onClick: () => onEdit(user),
         });
       }
@@ -106,7 +106,7 @@ export const getColumns = (
 
           actions.push({
             label: 'Delete User',
-            icon: Trash2,
+            icon: RiDeleteBinLine,
             onClick: () => onDelete(user),
             variant: 'destructive',
           });

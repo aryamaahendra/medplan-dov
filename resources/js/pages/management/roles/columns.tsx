@@ -1,5 +1,5 @@
+import { RiEdit2Line, RiDeleteBinLine } from '@remixicon/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { PencilLine, Trash2 } from 'lucide-react';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { Button } from '@/components/ui/button';
 import type { Permission } from '../permissions/columns';
@@ -55,7 +55,7 @@ export const getColumns = (
                   onClick={() => onEdit(role)}
                   title="Edit Role"
                 >
-                  <PencilLine />
+                  <RiEdit2Line />
                 </Button>
               )}
               {hasPermission('delete roles') && (
@@ -66,7 +66,7 @@ export const getColumns = (
                   onClick={() => onDelete(role)}
                   title="Delete Role"
                 >
-                  <Trash2 />
+                  <RiDeleteBinLine />
                 </Button>
               )}
             </>

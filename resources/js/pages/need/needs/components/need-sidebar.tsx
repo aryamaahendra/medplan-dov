@@ -1,5 +1,10 @@
 import { Link } from '@inertiajs/react';
-import { ArrowLeft, PencilLine, Signature, AlertCircle } from 'lucide-react';
+import {
+  RiArrowLeftLine,
+  RiEdit2Line,
+  RiQuillPenLine,
+  RiErrorWarningLine,
+} from '@remixicon/react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -21,13 +26,13 @@ export function NeedSidebar({ need }: NeedSidebarProps) {
       <div className="flex items-center gap-2">
         <Button variant="outline" asChild>
           <Link href={needRoutes.index.url()}>
-            <ArrowLeft />
+            <RiArrowLeftLine />
             Kembali
           </Link>
         </Button>
         <Button variant={'outline'} asChild>
           <Link href={needRoutes.edit.url({ need: need.id })}>
-            <PencilLine />
+            <RiEdit2Line />
             Edit Usulan
           </Link>
         </Button>
@@ -37,11 +42,11 @@ export function NeedSidebar({ need }: NeedSidebarProps) {
         className="relative w-full"
         onClick={() => setIsReviewDialogOpen(true)}
       >
-        <Signature />
+        <RiQuillPenLine />
         Review Direktur
         {need.notes && (
           <span className="absolute -top-1.5 -left-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-background">
-            <AlertCircle />
+            <RiErrorWarningLine />
           </span>
         )}
       </Button>

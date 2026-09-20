@@ -1,13 +1,13 @@
-import type { ColumnDef } from '@tanstack/react-table';
 import {
-  CheckCircle2,
-  FileText,
-  Paperclip,
-  PencilLine,
-  Signature,
-  Trash2,
-  XCircle,
-} from 'lucide-react';
+  RiCheckboxCircleLine,
+  RiFileTextLine,
+  RiAttachmentLine,
+  RiEdit2Line,
+  RiQuillPenLine,
+  RiDeleteBinLine,
+  RiCloseCircleLine,
+} from '@remixicon/react';
+import type { ColumnDef } from '@tanstack/react-table';
 
 import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 import { ActionDropdown } from '@/components/action-dropdown';
@@ -147,9 +147,9 @@ export const getColumns = (
           className="flex w-fit items-center gap-1.5"
         >
           {isApproved ? (
-            <CheckCircle2 className="h-3.5 w-3.5" />
+            <RiCheckboxCircleLine className="h-3.5 w-3.5" />
           ) : (
-            <XCircle className="h-3.5 w-3.5" />
+            <RiCloseCircleLine className="h-3.5 w-3.5" />
           )}
           {isApproved ? 'Disetujui' : 'Belum'}
         </Badge>
@@ -196,7 +196,7 @@ export const getColumns = (
       const actions: any[] = [
         {
           label: 'Detail',
-          icon: FileText,
+          icon: RiFileTextLine,
           href: needRoutes.show.url({ need: need.id }),
         },
       ];
@@ -204,12 +204,12 @@ export const getColumns = (
       if (need.can?.update) {
         actions.push({
           label: 'Edit',
-          icon: PencilLine,
+          icon: RiEdit2Line,
           onClick: () => onEdit(need),
         });
         actions.push({
           label: 'Lampiran',
-          icon: Paperclip,
+          icon: RiAttachmentLine,
           href: NeedAttachmentController.index.url({ need: need.id }),
         });
       }
@@ -218,7 +218,7 @@ export const getColumns = (
         actions.push('separator');
         actions.push({
           label: 'Hapus',
-          icon: Trash2,
+          icon: RiDeleteBinLine,
           onClick: () => onDelete(need),
           variant: 'destructive',
         });
@@ -228,7 +228,7 @@ export const getColumns = (
         actions.push('separator');
         actions.push({
           label: 'Review Direktur',
-          icon: Signature,
+          icon: RiQuillPenLine,
           onClick: () => onReview(need),
           indicator: !!need.notes,
         });

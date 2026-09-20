@@ -1,5 +1,5 @@
 import { Form, router } from '@inertiajs/react';
-import { Plus, Trash2 } from 'lucide-react';
+import { RiAddLine, RiDeleteBinLine } from '@remixicon/react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -311,7 +311,7 @@ export function ActivityVersionForm({
                           size="icon-sm"
                           onClick={() => removeIndicator(index)}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <RiDeleteBinLine className="h-4 w-4" />
                         </Button>
                       )}
                     </CardHeader>
@@ -372,7 +372,7 @@ export function ActivityVersionForm({
                     onClick={addIndicator}
                     className="w-full border-dashed"
                   >
-                    <Plus className="mr-2 h-4 w-4" />
+                    <RiAddLine className="mr-2 h-4 w-4" />
                     Tambah Indikator
                   </Button>
                 </div>

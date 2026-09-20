@@ -1,5 +1,5 @@
 import { useForm } from '@inertiajs/react';
-import { Upload } from 'lucide-react';
+import { RiUploadLine } from '@remixicon/react';
 import { useRef } from 'react';
 import { toast } from 'sonner';
 
@@ -122,7 +122,7 @@ export function AttachmentUploadForm({ needId }: AttachmentUploadFormProps) {
             className="w-full"
             disabled={processing || !data.file}
           >
-            <Upload />
+            <RiUploadLine />
             Unggah Berkas
           </Button>
         </form>

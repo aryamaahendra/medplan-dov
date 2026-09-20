@@ -183,7 +183,7 @@ Skills in `**/skills/**`. Must activate matching domain skill immediately.
 
 - Debug/test PHP in app context. Never create models without approval; use factories in tests. Prefer Artisan over tinker code.
 - Escape shell with single quotes: `vendor/bin/sail artisan tinker --execute 'Your::code();'`
-  - Inner PHP strings use double quotes: `vendor/bin/sail artisan tinker --execute 'User::where("active", true)->count();'`
+- Inner PHP strings use double quotes: `vendor/bin/sail artisan tinker --execute 'User::where("active", true)->count();'`
 
 === php rules ===
 
@@ -195,13 +195,6 @@ Skills in `**/skills/**`. Must activate matching domain skill immediately.
 - TitleCase Enum keys: `FavoritePerson`, `BestLake`, `Monthly`.
 - Prefer PHPDoc blocks over inline comments. Inline comments only for complex logic.
 - Use array shape type definitions in PHPDoc blocks.
-
-=== deployments rules ===
-
-# Deployment
-
-- Deploy Laravel with [Laravel Cloud](https://cloud.laravel.com/).
-- Use `deploying-to-cloud` skill for Laravel Cloud deploy, config, CLI, troubleshoot.
 
 === sail rules ===
 
@@ -287,7 +280,7 @@ Skills in `**/skills/**`. Must activate matching domain skill immediately.
 App use Laravel Octane long-running PHP server. Boot once, handle many requests same process.
 
 - Never store request state in singletons or static properties (leak across requests).
-- Use `config('octane.server')` detect driver (`swoole`, `roadrunner`, `frankenphp`).
+- Use `config('octane.server')` detect driver (`frankenphp`).
 - Prefer scoped bindings (`$this->app->scoped()`) over singletons for per-request services.
 
 Octane features (concurrency, shared tables, memory, driver config, testing): invoke `octane-development` for rules.
@@ -297,13 +290,6 @@ Octane features (concurrency, shared tables, memory, driver config, testing): in
 # Laravel Wayfinder
 
 Generate TypeScript functions for Laravel routes. Import from `@/actions/` or `@/routes/`.
-
-=== pint/core rules ===
-
-# Laravel Pint Code Formatter
-
-- Modified PHP files: run `vendor/bin/sail bin pint --dirty --format agent` before finalize changes match code style.
-- No run `vendor/bin/sail bin pint --test --format agent`. Run `vendor/bin/sail bin pint --format agent` fix format issues.
 
 === pest/core rules ===
 

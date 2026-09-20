@@ -37,4 +37,4 @@
 
 - Debug/test PHP in app context. Never create models without approval; use factories in tests. Prefer Artisan over tinker code.
 - Escape shell with single quotes: `vendor/bin/sail artisan tinker --execute 'Your::code();'`
-  - Inner PHP strings use double quotes: `vendor/bin/sail artisan tinker --execute 'User::where("active", true)->count();'`
+- Inner PHP strings use double quotes: `vendor/bin/sail artisan tinker --execute 'User::where("active", true)->count();'`

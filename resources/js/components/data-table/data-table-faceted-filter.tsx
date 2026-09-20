@@ -39,43 +39,45 @@ export function DataTableFacetedFilter({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 border-dashed">
-          <RiAddCircleLine className="mr-1" />
-          {title}
-          {selectedValues?.length > 0 && (
-            <>
-              <Badge
-                variant="secondary"
-                className="rounded-sm px-1 font-normal lg:hidden"
-              >
-                {selectedValues.length}
-              </Badge>
-              <div className="hidden space-x-1 lg:flex">
-                {selectedValues.length > 2 ? (
-                  <Badge
-                    variant="secondary"
-                    className="rounded-sm px-1 font-normal"
-                  >
-                    {selectedValues.length} selected
-                  </Badge>
-                ) : (
-                  options
-                    .filter((option) => selectedValues.includes(option.value))
-                    .map((option) => (
-                      <Badge
-                        variant="secondary"
-                        key={option.value}
-                        className="rounded-sm px-1 font-normal"
-                      >
-                        {option.label}
-                      </Badge>
-                    ))
-                )}
-              </div>
-            </>
-          )}
-        </Button>
+      <DropdownMenuTrigger
+        render={
+          <Button variant="outline" size="sm" className="h-8 border-dashed" />
+        }
+      >
+        <RiAddCircleLine className="mr-1" />
+        {title}
+        {selectedValues?.length > 0 && (
+          <>
+            <Badge
+              variant="secondary"
+              className="rounded-sm px-1 font-normal lg:hidden"
+            >
+              {selectedValues.length}
+            </Badge>
+            <div className="hidden space-x-1 lg:flex">
+              {selectedValues.length > 2 ? (
+                <Badge
+                  variant="secondary"
+                  className="rounded-sm px-1 font-normal"
+                >
+                  {selectedValues.length} selected
+                </Badge>
+              ) : (
+                options
+                  .filter((option) => selectedValues.includes(option.value))
+                  .map((option) => (
+                    <Badge
+                      variant="secondary"
+                      key={option.value}
+                      className="rounded-sm px-1 font-normal"
+                    >
+                      {option.label}
+                    </Badge>
+                  ))
+              )}
+            </div>
+          </>
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-[200px]">
         <DropdownMenuLabel>{title}</DropdownMenuLabel>

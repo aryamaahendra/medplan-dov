@@ -48,21 +48,23 @@ export function DataTableColumnHeader<TData, TValue>({
   return (
     <div className={cn('flex items-center gap-2', className)}>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="-ml-3 h-8 data-[state=open]:bg-accent"
-          >
-            <span>{title}</span>
-            {direction === 'desc' ? (
-              <RiArrowDownLine className="ml-1 size-3.5" />
-            ) : direction === 'asc' ? (
-              <RiArrowUpLine className="ml-1 size-3.5" />
-            ) : (
-              <RiExpandUpDownLine className="ml-1 size-3.5" />
-            )}
-          </Button>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              variant="ghost"
+              size="sm"
+              className="-ml-3 h-8 data-open:bg-accent"
+            />
+          }
+        >
+          <span>{title}</span>
+          {direction === 'desc' ? (
+            <RiArrowDownLine className="ml-1 size-3.5" />
+          ) : direction === 'asc' ? (
+            <RiArrowUpLine className="ml-1 size-3.5" />
+          ) : (
+            <RiExpandUpDownLine className="ml-1 size-3.5" />
+          )}
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="start">

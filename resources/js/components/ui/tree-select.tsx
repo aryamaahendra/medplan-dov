@@ -175,19 +175,21 @@ export function TreeSelect({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className={cn("w-full h-9 justify-between font-normal", className)}
-          disabled={disabled}
-        >
-          <span className="truncate">
-            {selectedItem ? selectedItem.name : placeholder}
-          </span>
-          <RiArrowDownSLine className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
+      <DialogTrigger
+        render={
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className={cn("w-full h-9 justify-between font-normal", className)}
+            disabled={disabled}
+          />
+        }
+      >
+        <span className="truncate">
+          {selectedItem ? selectedItem.name : placeholder}
+        </span>
+        <RiArrowDownSLine className="ml-2 h-4 w-4 shrink-0 opacity-50" />
       </DialogTrigger>
       <DialogContent className="max-w-md p-0 flex flex-col gap-0 max-h-[85vh]">
         <DialogHeader className="p-4 border-b">

@@ -101,14 +101,18 @@ export function ExportPdfDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger || (
-          <Button variant="outline" size="sm">
-            <RiFileDownloadLine className="mr-1.5 h-4 w-4" />
-            Ekspor PDF
-          </Button>
-        )}
-      </DialogTrigger>
+      <DialogTrigger
+        render={
+          trigger ? (
+            (trigger as React.ReactElement)
+          ) : (
+            <Button variant="outline" size="sm">
+              <RiFileDownloadLine className="mr-1.5 h-4 w-4" />
+              Ekspor PDF
+            </Button>
+          )
+        }
+      />
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Kustomisasi Ekspor PDF</DialogTitle>

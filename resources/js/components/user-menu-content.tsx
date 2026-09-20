@@ -33,30 +33,34 @@ export function UserMenuContent({ user }: Props) {
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
-        <DropdownMenuItem asChild>
-          <Link
-            className="block w-full cursor-pointer"
-            href={edit()}
-            prefetch
-            onClick={cleanup}
-          >
-            <RiSettings3Line className="mr-2" />
-            RiSettings3Line
-          </Link>
+        <DropdownMenuItem
+          render={
+            <Link
+              className="block w-full cursor-pointer"
+              href={edit()}
+              prefetch
+              onClick={cleanup}
+            />
+          }
+        >
+          <RiSettings3Line className="mr-2" />
+          RiSettings3Line
         </DropdownMenuItem>
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
-      <DropdownMenuItem asChild>
-        <Link
-          className="block w-full cursor-pointer"
-          href={logout()}
-          as="button"
-          onClick={handleLogout}
-          data-test="logout-button"
-        >
-          <RiLogoutBoxRLine className="mr-2" />
-          Log out
-        </Link>
+      <DropdownMenuItem
+        render={
+          <Link
+            className="block w-full cursor-pointer"
+            href={logout()}
+            as="button"
+            onClick={handleLogout}
+            data-test="logout-button"
+          />
+        }
+      >
+        <RiLogoutBoxRLine className="mr-2" />
+        Log out
       </DropdownMenuItem>
     </>
   );

@@ -46,18 +46,22 @@ export function ActionDropdown({
 }: ActionDropdownProps) {
   return (
     <DropdownMenu modal={modal}>
-      <DropdownMenuTrigger asChild>
-        {trigger || (
-          <Button
-            size={'icon-sm'}
-            variant={triggerVariant}
-            className={cn('', className)}
-          >
-            <span className="sr-only">Open menu</span>
-            <RiMoreFill />
-          </Button>
-        )}
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger
+        render={
+          trigger ? (
+            (trigger as React.ReactElement)
+          ) : (
+            <Button
+              size={'icon-sm'}
+              variant={triggerVariant}
+              className={cn('', className)}
+            >
+              <span className="sr-only">Open menu</span>
+              <RiMoreFill />
+            </Button>
+          )
+        }
+      />
       <DropdownMenuContent align={align} className="w-auto">
         {label && <DropdownMenuLabel>{label}</DropdownMenuLabel>}
         {actions.map((action, index) => {
@@ -82,28 +86,16 @@ export function ActionDropdown({
               onClick={onClick}
               variant={variant}
               disabled={disabled}
-              asChild={!!href}
+              render={
+                href ? <Link href={href} className="flex-1" /> : undefined
+              }
             >
-              {href ? (
-                <Link href={href} className="flex-1">
-                  {Icon && <Icon className="mr-2 h-4 w-4" />}
-                  {label}
-                  {indicator && (
-                    <span className="ml-auto flex h-3.5 w-3.5 items-center justify-center rounded-full bg-foreground text-background ring-2 ring-foreground">
-                      <RiErrorWarningLine />
-                    </span>
-                  )}
-                </Link>
-              ) : (
-                <>
-                  {Icon && <Icon className="mr-2 h-4 w-4" />}
-                  <span className="flex-1">{label}</span>
-                  {indicator && (
-                    <span className="ml-auto flex h-3.5 w-3.5 items-center justify-center rounded-full bg-foreground text-background ring-2 ring-foreground">
-                      <RiErrorWarningLine />
-                    </span>
-                  )}
-                </>
+              {Icon && <Icon className="mr-2 h-4 w-4" />}
+              <span className="flex-1">{label}</span>
+              {indicator && (
+                <span className="ml-auto flex h-3.5 w-3.5 items-center justify-center rounded-full bg-foreground text-background ring-2 ring-foreground">
+                  <RiErrorWarningLine />
+                </span>
               )}
             </DropdownMenuItem>
           );

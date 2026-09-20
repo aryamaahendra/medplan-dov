@@ -90,21 +90,20 @@ export function FundingSection({
             Sumber Dana
           </Label>
           <Popover open={sourceOpen} onOpenChange={setSourceOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-between font-normal"
-              >
-                <span className="truncate">
-                  {selectedSourcesLabel || 'Pilih sumber dana...'}
-                </span>
-                <RiArrowDownSLine className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-[--radix-popover-trigger-width] p-0"
-              align="start"
+            <PopoverTrigger
+              render={
+                <Button
+                  variant="outline"
+                  className="w-full justify-between font-normal"
+                />
+              }
             >
+              <span className="truncate">
+                {selectedSourcesLabel || 'Pilih sumber dana...'}
+              </span>
+              <RiArrowDownSLine className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </PopoverTrigger>
+            <PopoverContent className="w-(--anchor-width) p-0" align="start">
               <div className="flex items-center border-b px-3">
                 <RiSearchLine className="mr-2 h-4 w-4 shrink-0 opacity-50" />
                 <Input

@@ -479,8 +479,8 @@ export function NeedForm({
             {hasPermission('update need tab detail') && (
               <TabsContent
                 value="detail"
-                className="mt-0 focus-visible:outline-none data-[state=inactive]:hidden"
-                forceMount
+                className="mt-0 focus-visible:outline-none data-hidden:hidden"
+                keepMounted
               >
                 <NeedDetailSection
                   initialValues={data.detail}

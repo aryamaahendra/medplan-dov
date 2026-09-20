@@ -36,11 +36,9 @@ export function QuestionBankDialog({
 }: QuestionBankDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <RiAddLine />
-          Tambah dari Bank
-        </Button>
+      <DialogTrigger render={<Button variant="outline" size="sm" />}>
+        <RiAddLine />
+        Tambah dari Bank
       </DialogTrigger>
       <DialogContent className="flex max-h-[80vh] flex-col sm:max-w-[600px]">
         <DialogHeader>

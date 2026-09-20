@@ -107,11 +107,11 @@ function TujuanHeader({
         {(hasPermission('create sasarans') ||
           hasPermission('create indicators')) && (
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="sm" variant="outline">
-                <RiAddLine />
-                Tambah
-              </Button>
+            <DropdownMenuTrigger
+              render={<Button size="sm" variant="outline" />}
+            >
+              <RiAddLine />
+              Tambah
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               {hasPermission('create sasarans') && (

@@ -188,10 +188,12 @@ export function IndicatorTable({
                   {showActions && (
                     <TableCell className="text-center">
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <RiMoreFill className="h-4 w-4" />
-                          </Button>
+                        <DropdownMenuTrigger
+                          render={
+                            <Button variant="ghost" className="h-8 w-8 p-0" />
+                          }
+                        >
+                          <RiMoreFill className="h-4 w-4" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Aksi</DropdownMenuLabel>

@@ -59,12 +59,14 @@ export function ActivityImportDialog({
         }
       }}
     >
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          <RiUploadLine className="mr-2 h-4 w-4" />
-          Import
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger
+        render={
+          <Button variant="outline">
+            <RiUploadLine className="mr-2 h-4 w-4" />
+            Import
+          </Button>
+        }
+      />
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={onSubmit}>
           <DialogHeader>

@@ -216,16 +216,13 @@ export function NeedForm({
       'technical_specification_attachments',
       'technical_specification_attachment_names',
     ],
-    lampiran: [
-      'attachments',
-      'attachment_names',
-      'deleted_attachment_ids',
-    ],
+    lampiran: ['attachments', 'attachment_names', 'deleted_attachment_ids'],
   };
 
   const getTabForField = (fieldKey: string) => {
     for (const tab of tabs) {
       const tabFields = fieldMapping[tab.value] || [];
+
       if (
         tabFields.some(
           (field) =>
@@ -237,6 +234,7 @@ export function NeedForm({
         return tab;
       }
     }
+
     return null;
   };
 
@@ -261,8 +259,10 @@ export function NeedForm({
       },
       onError: (errs: Record<string, string>) => {
         const errorEntries = Object.entries(errs || {});
+
         if (errorEntries.length === 0) {
           toast.error('Terjadi kesalahan validasi.');
+
           return;
         }
 
@@ -271,10 +271,12 @@ export function NeedForm({
 
         errorEntries.forEach(([key, message]) => {
           const tab = getTabForField(key);
+
           if (tab) {
             if (!tabErrorMessages[tab.value]) {
               tabErrorMessages[tab.value] = [];
             }
+
             tabErrorMessages[tab.value].push(message);
           } else {
             unmappedErrors.push(message);

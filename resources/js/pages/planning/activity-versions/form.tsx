@@ -90,7 +90,11 @@ export function ActivityVersionForm({
     return () => clearTimeout(timer);
   }, [code, version.id, activity?.id]);
 
-  const handleParentChange = (id: string) => {
+  const handleParentChange = (id: string | null) => {
+    if (!id) {
+      return;
+    }
+
     setParentId(id);
     const parent = parents.find((p) => p.id.toString() === id);
 
@@ -222,7 +226,11 @@ export function ActivityVersionForm({
                       <Label htmlFor="type">Tipe</Label>
                       <Select
                         value={type}
-                        onValueChange={(val) => setType(val)}
+                        onValueChange={(val) => {
+                          if (val) {
+                            setType(val);
+                          }
+                        }}
                         name="type"
                       >
                         <SelectTrigger id="type">

@@ -167,9 +167,12 @@ export default function RenstraShow({ renstra }: RenstraShowProps) {
           action={
             <div className="flex items-center gap-2">
               <ToggleGroup
-                type="single"
-                value={view}
-                onValueChange={(val) => val && setView(val as 'card' | 'table')}
+                value={[view]}
+                onValueChange={(val) => {
+                  if (val[0]) {
+                    setView(val[0] as 'card' | 'table');
+                  }
+                }}
                 variant="outline"
               >
                 <ToggleGroupItem value="card" aria-label="Card View">

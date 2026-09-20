@@ -182,9 +182,12 @@ export function GeneralInfoSection({
           </Label>
           <div className="flex flex-wrap items-center gap-2">
             <ToggleGroup
-              type="single"
-              value={data.unit}
-              onValueChange={(v) => v && setData('unit', v)}
+              value={data.unit ? [data.unit] : []}
+              onValueChange={(v) => {
+                if (v[0]) {
+                  setData('unit', v[0]);
+                }
+              }}
               variant="outline"
               className="flex-wrap items-center justify-start"
             >

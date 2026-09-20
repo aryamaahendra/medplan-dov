@@ -121,9 +121,11 @@ export function ExportPdfDialog({
             <Label htmlFor="signer">Penandatangan</Label>
             <Select
               value={settings.signer_id}
-              onValueChange={(v) =>
-                setSettings((s) => ({ ...s, signer_id: v }))
-              }
+              onValueChange={(v) => {
+                if (v) {
+                  setSettings((s) => ({ ...s, signer_id: v }));
+                }
+              }}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Choose a signer" />
@@ -142,9 +144,11 @@ export function ExportPdfDialog({
             <Label htmlFor="paper_size">Ukuran Kertas</Label>
             <Select
               value={settings.paper_size}
-              onValueChange={(v) =>
-                setSettings((s) => ({ ...s, paper_size: v }))
-              }
+              onValueChange={(v) => {
+                if (v) {
+                  setSettings((s) => ({ ...s, paper_size: v }));
+                }
+              }}
             >
               <SelectTrigger id="paper_size" className="w-full">
                 <SelectValue placeholder="Pilih ukuran kertas" />

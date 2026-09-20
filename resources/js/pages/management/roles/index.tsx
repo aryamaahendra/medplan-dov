@@ -88,12 +88,14 @@ export default function RolesIndex({ roles, filters }: RolesIndexProps) {
             </p>
           </div>
           {hasPermission('create roles') && (
-            <Button asChild>
-              <Link href={rolesRoutes.create.url()}>
-                <RiAddLine />
-                Tambah Role
-              </Link>
-            </Button>
+            <Button
+              render={
+                <Link href={rolesRoutes.create.url()}>
+                  <RiAddLine />
+                  Tambah Role
+                </Link>
+              }
+            />
           )}
         </div>
 

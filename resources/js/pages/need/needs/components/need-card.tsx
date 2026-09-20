@@ -45,12 +45,16 @@ export function NeedCard({ need, onEdit, onDelete, onReview }: NeedCardProps) {
           {need.description}
         </CardDescription>
         <CardAction className="space-x-2">
-          <Button variant="outline" size="sm" asChild>
-            <Link href={needRoutes.show.url({ need: need.id })}>
-              <RiFileTextLine />
-              Detail
-            </Link>
-          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            render={
+              <Link href={needRoutes.show.url({ need: need.id })}>
+                <RiFileTextLine />
+                Detail
+              </Link>
+            }
+          />
 
           {need.can?.update && (
             <>
@@ -58,14 +62,18 @@ export function NeedCard({ need, onEdit, onDelete, onReview }: NeedCardProps) {
                 <RiEdit2Line />
                 Edit
               </Button>
-              <Button variant="outline" size="sm" asChild>
-                <Link
-                  href={NeedAttachmentController.index.url({ need: need.id })}
-                >
-                  <RiAttachmentLine />
-                  Lampiran
-                </Link>
-              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                render={
+                  <Link
+                    href={NeedAttachmentController.index.url({ need: need.id })}
+                  >
+                    <RiAttachmentLine />
+                    Lampiran
+                  </Link>
+                }
+              />
             </>
           )}
 

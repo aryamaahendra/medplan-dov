@@ -106,9 +106,7 @@ export function FilePreviewDialog({
                 <p className="mb-4 text-muted-foreground">
                   Preview tidak tersedia untuk tipe file ini.
                 </p>
-                <Button asChild>
-                  <a href={downloadUrl}>Unduh File</a>
-                </Button>
+                <Button render={<a href={downloadUrl}>Unduh File</a>} />
               </div>
             )}
           </div>
@@ -120,13 +118,13 @@ export function FilePreviewDialog({
               variant="default"
               size="lg"
               className="rounded-full shadow-2xl transition-transform hover:scale-105"
-              asChild
-            >
-              <a href={downloadUrl} download={fileName}>
-                <RiDownloadLine />
-                Download File
-              </a>
-            </Button>
+              render={
+                <a href={downloadUrl} download={fileName}>
+                  <RiDownloadLine />
+                  Download File
+                </a>
+              }
+            />
           </div>
         )}
       </DialogContent>

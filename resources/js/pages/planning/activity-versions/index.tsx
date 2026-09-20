@@ -146,27 +146,34 @@ export default function PlanningActivityVersionsIndex({
                 {isRecalculating ? 'Recalculating...' : 'Recalculate'}
               </Button>
             )}
-            <Button variant="outline" asChild>
-              <a
-                href={PlanningActivityVersionController.export.url(version.id)}
-              >
-                <RiDownloadLine className="mr-2 h-4 w-4" />
-                Export
-              </a>
-            </Button>
+            <Button
+              variant="outline"
+              render={
+                <a
+                  href={PlanningActivityVersionController.export.url(
+                    version.id,
+                  )}
+                >
+                  <RiDownloadLine className="mr-2 h-4 w-4" />
+                  Export
+                </a>
+              }
+            />
             {hasPermission('create planning-activity-versions') && (
               <>
                 <ActivityImportDialog version={version} />
-                <Button asChild>
-                  <Link
-                    href={PlanningActivityVersionController.create.url(
-                      version.id,
-                    )}
-                  >
-                    <RiAddLine className="mr-2" />
-                    Tambah Aktivitas
-                  </Link>
-                </Button>
+                <Button
+                  render={
+                    <Link
+                      href={PlanningActivityVersionController.create.url(
+                        version.id,
+                      )}
+                    >
+                      <RiAddLine className="mr-2" />
+                      Tambah Aktivitas
+                    </Link>
+                  }
+                />
               </>
             )}
           </div>

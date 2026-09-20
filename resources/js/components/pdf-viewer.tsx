@@ -135,11 +135,16 @@ export default function PdfViewer({
         </div>
 
         <div className="ml-1 flex items-center border-l pl-2">
-          <Button variant="ghost" size="icon-sm" asChild title="Download PDF">
-            <a href={downloadUrl} download={fileName}>
-              <RiDownloadLine className="h-4 w-4" />
-            </a>
-          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            title="Download PDF"
+            render={
+              <a href={downloadUrl} download={fileName}>
+                <RiDownloadLine className="h-4 w-4" />
+              </a>
+            }
+          />
         </div>
       </div>
     </div>

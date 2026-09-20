@@ -207,9 +207,10 @@ export function RoleForm({ role, permissions }: RoleFormProps) {
       </div>
 
       <div className="flex items-center justify-end gap-2">
-        <Button variant="outline" asChild>
-          <Link href={rolesRoutes.index.url()}>Cancel</Link>
-        </Button>
+        <Button
+          variant="outline"
+          render={<Link href={rolesRoutes.index.url()}>Cancel</Link>}
+        />
         <Button type="submit" disabled={processing}>
           {processing ? 'Saving...' : 'Save Role'}
         </Button>

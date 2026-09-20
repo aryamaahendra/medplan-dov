@@ -24,18 +24,24 @@ export function NeedSidebar({ need }: NeedSidebarProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <Button variant="outline" asChild>
-          <Link href={needRoutes.index.url()}>
-            <RiArrowLeftLine />
-            Kembali
-          </Link>
-        </Button>
-        <Button variant={'outline'} asChild>
-          <Link href={needRoutes.edit.url({ need: need.id })}>
-            <RiEdit2Line />
-            Edit Usulan
-          </Link>
-        </Button>
+        <Button
+          variant="outline"
+          render={
+            <Link href={needRoutes.index.url()}>
+              <RiArrowLeftLine />
+              Kembali
+            </Link>
+          }
+        />
+        <Button
+          variant="outline"
+          render={
+            <Link href={needRoutes.edit.url({ need: need.id })}>
+              <RiEdit2Line />
+              Edit Usulan
+            </Link>
+          }
+        />
       </div>
 
       <Button

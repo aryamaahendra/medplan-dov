@@ -76,16 +76,20 @@ export function AttachmentTable({
                     <RiEyeLine />
                   </Button>
                 )}
-                <Button variant="ghost" size="icon-sm" asChild>
-                  <a
-                    href={NeedAttachmentController.download.url({
-                      attachment: attachment.id,
-                    })}
-                    target="_blank"
-                  >
-                    <RiDownloadLine />
-                  </a>
-                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  render={
+                    <a
+                      href={NeedAttachmentController.download.url({
+                        attachment: attachment.id,
+                      })}
+                      target="_blank"
+                    >
+                      <RiDownloadLine />
+                    </a>
+                  }
+                />
                 {allowDelete && (
                   <Button
                     variant="destructive"

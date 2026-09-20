@@ -1,7 +1,7 @@
 # Test Enforcement
 
-- Add or update tests for behavior + logic changes when test provides meaningful regression coverage.
-- Pure copy, styling, layout-only changes do not require new or updated tests.
-- Run affected tests when coverage applies; ensure pass.
-- Test changed behavior + important failure modes; do not add tests beyond them.
+- Add/update tests for behavior + logic changes giving regression coverage.
+- Pure copy, styling, layout-only changes skip tests.
+- Run affected tests; ensure pass.
+- Test changed behavior + key failure modes only.
 - Read `testing-best-practices` skill before writing tests.

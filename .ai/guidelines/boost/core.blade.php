@@ -2,39 +2,39 @@
 
 ## Tools
 
-- Laravel Boost MCP server tools designed for app. Prefer Boost tools over manual alternatives like shell commands or file reads.
-- Use `database-query` for read-only database queries instead of raw SQL in tinker.
-- Use `database-schema` to inspect table structure before migrations or models.
-- Use `get-absolute-url` to resolve correct scheme, domain, port for project URLs before sharing with user.
-- Use `browser-logs` for browser logs, errors, exceptions. Recent logs only; ignore old entries.
+- Laravel Boost MCP server built for app. Prefer Boost tools over shell commands or file reads.
+- Use `database-query` for read-only queries, not raw SQL in tinker.
+- Use `database-schema` inspect tables before migrations/models.
+- Use `get-absolute-url` resolve URL scheme, domain, port before sharing.
+- Use `browser-logs` fetch recent browser logs/errors. Ignore old.
 
 ## Searching Documentation (IMPORTANT)
 
-- Use `search-docs` before changes depending on Laravel ecosystem APIs, behavior, configuration, or version-specific syntax. Skip for copy-only edits where package docs irrelevant. Reuse context results instead of searching again.
-- Pass `packages` array to scope results when relevant packages known.
-- Use multiple broad topic-based queries: `['rate limiting', 'routing rate limiting', 'routing']`.
-- Do not add package names to queries (package info already shared). Use `test resource table`, not `filament 4 test resource table`.
+- Run `search-docs` before changes touching Laravel APIs, behavior, config, or syntax. Skip copy edits. Reuse context.
+- Pass `packages` array scope results when packages known.
+- Query multiple broad topics: `['rate limiting', 'routing rate limiting', 'routing']`.
+- Omit package names from queries. Use `test resource table`, not `filament 4 test resource table`.
 
 ### Search Syntax
 
-1. Words for auto-stemmed AND logic: `rate limit` matches "rate" AND "limit".
-2. `"quoted phrases"` for exact position matching: `"infinite scroll"` requires adjacent words in order.
-3. Combine words + phrases for mixed queries: `middleware "rate limit"`.
-4. Multiple queries for OR logic: `queries=["authentication", "middleware"]`.
+1. Words auto-stemmed AND logic: `rate limit` matches "rate" AND "limit".
+2. `"quoted phrases"` exact order: `"infinite scroll"`.
+3. Combine words + phrases: `middleware "rate limit"`.
+4. Multiple queries OR logic: `queries=["authentication", "middleware"]`.
 
 ## Project Rules
 
-- Committed area-grouped rules live in `.ai/rules` when directory exists (settled decisions, traps, standing constraints). Package and framework rules under `.ai/rules/boost` apply to specific paths. Before entering plan mode or create/edit any file: open @.ai/rules/index.md, read rule files matching path globs, run `grep -rin 'keyword' .ai/rules`. Do not write code until reading + following matching rules. If `.ai/rules` missing, continue without `.ai/rules`.
-- Record rule with `record-rule` only when user explicitly asks. Task instructions not rules ("remove typo", "use X here" are work, not rules). Never record rule on own initiative. When asked, pass `glob` (e.g. `app/Http/Controllers/**`), short `title`, few-line `note`. Use `record-rule` (shared across team in repo), not personal session memory.
+- Rules live in `.ai/rules`. Framework rules in `.ai/rules/boost`. Before plan mode or create/edit file: check @.ai/rules/index.md, read matching glob files, run `grep -rin 'keyword' .ai/rules`. Follow rules before writing code. Skip if `.ai/rules` missing, continue without `.ai/rules`.
+- Run `record-rule` only on explicit user request. User task steps not rules. Pass `glob` (e.g. `app/Http/Controllers/**`), short `title`, short `note`. Use `record-rule`, never personal session memory.
 
 ## Artisan
 
-- Run Artisan commands via CLI (e.g., `vendor/bin/sail artisan route:list`). Discover: `vendor/bin/sail artisan list`. Check params: `vendor/bin/sail artisan [command] --help`.
-- Inspect routes: `vendor/bin/sail artisan route:list`. Filter: `--method=GET`, `--name=users`, `--path=api`, `--except-vendor`, `--only-vendor`.
-- Read config via dot notation: `vendor/bin/sail artisan config:show app.name`, `vendor/bin/sail artisan config:show database.default`. Or read files in `config/`.
+- Run CLI Artisan commands: `vendor/bin/sail artisan route:list`. List: `vendor/bin/sail artisan list`. Help: `vendor/bin/sail artisan [command] --help`.
+- Routes: `vendor/bin/sail artisan route:list`. Flags: `--method=GET`, `--name=users`, `--path=api`, `--except-vendor`, `--only-vendor`.
+- Read config: `vendor/bin/sail artisan config:show app.name`, `vendor/bin/sail artisan config:show database.default`. Or read `config/` files.
 
 ## Tinker
 
-- Execute PHP in app context for debugging + testing. Do not create models without approval; prefer factories in tests. Prefer existing Artisan commands over custom tinker code.
-- Always use single quotes to prevent shell expansion: `vendor/bin/sail artisan tinker --execute 'Your::code();'`
-  - Double quotes for inner PHP strings: `vendor/bin/sail artisan tinker --execute 'User::where("active", true)->count();'`
+- Debug/test PHP in app context. Never create models without approval; use factories in tests. Prefer Artisan over tinker code.
+- Escape shell with single quotes: `vendor/bin/sail artisan tinker --execute 'Your::code();'`
+  - Inner PHP strings use double quotes: `vendor/bin/sail artisan tinker --execute 'User::where("active", true)->count();'`

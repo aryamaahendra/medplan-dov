@@ -1,13 +1,13 @@
 # Pest
 
-- Project uses Pest. Create tests with `vendor/bin/sail artisan make:test --pest {name}`.
-- Do not include test suite directory in `{name}`. Use `SomeFeatureTest`, not `Feature/SomeFeatureTest`.
-- Read `testing-best-practices` skill for guidance on coverage, naming, structure, dependency isolation, review.
-- Do not delete tests or test files without approval. Part of application.
+- Project uses Pest. Create tests: `vendor/bin/sail artisan make:test --pest {name}`.
+- Omit suite directory in `{name}`. Use `SomeFeatureTest`, not `Feature/SomeFeatureTest`.
+- Read `testing-best-practices` skill for coverage, naming, structure, dependency isolation, review.
+- Never delete tests or test files without approval.
 
 ## Running Tests
 
-- Run narrowest set of tests covering change. Pass file path or `--filter=testName` to `vendor/bin/sail artisan test --compact`.
-- Rerun test after each change.
-- Run `vendor/bin/sail bin pest` to call test runner directly. Accepts file path + `--filter=testName` arguments.
-- After feature tests pass, ask user to run complete suite with `vendor/bin/sail artisan test --compact`.
+- Run narrowest tests covering change. Pass file path or `--filter=testName` to `vendor/bin/sail artisan test --compact`.
+- Rerun after each change.
+- Call runner directly: `vendor/bin/sail bin pest`. Accepts file path + `--filter=testName`.
+- When feature tests pass, ask user run full suite: `vendor/bin/sail artisan test --compact`.

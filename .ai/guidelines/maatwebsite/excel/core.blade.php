@@ -1,8 +1,8 @@
 # Laravel Excel
 
-- Use `maatwebsite/excel` for spreadsheet exports, imports, queued spreadsheet work, CSV handling, PhpSpreadsheet integration in Laravel applications.
-- Prefer explicit export/import classes with package concerns over ad-hoc spreadsheet generation in controllers, jobs, commands.
-- Activate `laravel-excel` skill when working with `Excel::download()`, `Excel::store()`, `Excel::queue()`, `Excel::raw()`, `Excel::import()`, `Excel::toArray()`, `Excel::toCollection()`, export/import concerns, queued imports/exports, validation, CSV settings, styling, events, formulas, charts, drawings, multiple sheets, mapped cells, macros, config, cache, transactions, temporary files, or `Excel::fake()`.
-- For broad docs, all-feature tasks, or missing-feature audits, use skill's `references/package.md` feature matrix before answering.
-- For large datasets, prefer `FromQuery` with queued exports or `WithChunkReading` and `WithBatchInserts` for imports.
-- Test spreadsheet behavior with `Excel::fake()` when asserting dispatch/download/store/import intent; inspect generated files only when cell contents, formatting, sheets, or writer behavior must be proven.
+- Use `maatwebsite/excel` for spreadsheet exports, imports, queued work, CSV, PhpSpreadsheet in Laravel.
+- Use explicit export/import classes with concerns; avoid ad-hoc generation in controllers, jobs, commands.
+- Trigger `laravel-excel` skill for `Excel::download()`, `Excel::store()`, `Excel::queue()`, `Excel::raw()`, `Excel::import()`, `Excel::toArray()`, `Excel::toCollection()`, export/import concerns, queued jobs, validation, CSV settings, styling, events, formulas, charts, drawings, sheets, mapped cells, macros, config, cache, transactions, temp files, `Excel::fake()`.
+- Check `references/package.md` feature matrix for broad docs, full-feature tasks, missing-feature audits.
+- Large datasets: use `FromQuery` + queued exports, or `WithChunkReading` + `WithBatchInserts` for imports.
+- Test intent with `Excel::fake()`. Inspect files only to verify cell contents, formatting, sheets, writer behavior.

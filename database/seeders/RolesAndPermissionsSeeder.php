@@ -193,7 +193,7 @@ class RolesAndPermissionsSeeder extends Seeder
             $isRead = str_starts_with($permission, 'view');
             $isAuthRelated = str_contains($permission, 'user') || str_contains($permission, 'role') || str_contains($permission, 'permission');
 
-            return $isRead && ! $isAuthRelated;
+            return ($isRead && ! $isAuthRelated) || $permission === 'approve any needs';
         });
         $directorRole->syncPermissions($directorPermissions);
 

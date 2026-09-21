@@ -88,7 +88,7 @@ This document lists the granular permissions added to the application to replace
 - `manage plannings`
 - `manage ssp`
 - **Super Admin**: Has all permissions.
-- **Director**: Has all `view` permissions (read-only).
+- **Director**: Has all `view` permissions (read-only) and `approve any needs` for executive review.
 - **Planner**: Has full CRUD permissions for all strategic planning modules, checklist evaluation (`perform checklist`), and need locking (`lock needs`, `unlock needs`).
 - **Unit Head**: Has CRUD permissions for attachments on their unit's needs.
 - **Staff**: Has view and create permissions for attachments on their unit's needs.

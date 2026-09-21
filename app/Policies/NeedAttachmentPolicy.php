@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\Need;
 use App\Models\NeedAttachment;
 use App\Models\User;
 
@@ -23,9 +24,17 @@ class NeedAttachmentPolicy
             && $user->can('view', $needAttachment->need);
     }
 
-    public function create(User $user): bool
+    public function create(User $user, ?Need $need = null): bool
     {
-        return $user->hasPermissionTo('create need-attachments');
+        if (! $user->hasPermissionTo('create need-attachments')) {
+            return false;
+        }
+
+        if ($need) {
+            return $user->can('update', $need);
+        }
+
+        return true;
     }
 
     public function update(User $user, NeedAttachment $needAttachment): bool

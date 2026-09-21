@@ -79,6 +79,10 @@ class NeedPolicy
             if ($needGroup && ! $needGroup->isOpenForSubmission()) {
                 return Response::deny('Periode pengajuan usulan kebutuhan untuk kelompok ini sedang ditutup.');
             }
+
+            if ($need->isLocked($user)) {
+                return Response::deny('Usulan kebutuhan terkunci dan tidak dapat diubah.');
+            }
         }
 
         return true;
@@ -87,9 +91,19 @@ class NeedPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Need $need): bool
+    public function delete(User $user, Need $need): Response|bool
     {
-        return $this->checkTieredPermission($user, $need, 'delete');
+        if (! $this->checkTieredPermission($user, $need, 'delete')) {
+            return false;
+        }
+
+        if (! $this->canBypassSubmissionWindow($user)) {
+            if ($need->isLocked($user)) {
+                return Response::deny('Usulan kebutuhan terkunci dan tidak dapat dihapus.');
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -103,17 +117,37 @@ class NeedPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Need $need): bool
+    public function restore(User $user, Need $need): Response|bool
     {
-        return $this->checkTieredPermission($user, $need, 'restore');
+        if (! $this->checkTieredPermission($user, $need, 'restore')) {
+            return false;
+        }
+
+        if (! $this->canBypassSubmissionWindow($user)) {
+            if ($need->isLocked($user)) {
+                return Response::deny('Usulan kebutuhan terkunci dan tidak dapat dipulihkan.');
+            }
+        }
+
+        return true;
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Need $need): bool
+    public function forceDelete(User $user, Need $need): Response|bool
     {
-        return $this->checkTieredPermission($user, $need, 'force-delete');
+        if (! $this->checkTieredPermission($user, $need, 'force-delete')) {
+            return false;
+        }
+
+        if (! $this->canBypassSubmissionWindow($user)) {
+            if ($need->isLocked($user)) {
+                return Response::deny('Usulan kebutuhan terkunci dan tidak dapat dihapus permanen.');
+            }
+        }
+
+        return true;
     }
 
     /**

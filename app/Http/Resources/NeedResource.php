@@ -15,10 +15,12 @@ class NeedResource extends JsonResource
     public function toArray(Request $request): array
     {
         return array_merge(parent::toArray($request), [
+            'is_locked' => $this->resource->isLocked($request->user()),
             'can' => [
                 'update' => $request->user()?->can('update', $this->resource),
                 'delete' => $request->user()?->can('delete', $this->resource),
                 'approve' => $request->user()?->can('approve', $this->resource),
+                'performChecklist' => $request->user()?->can('performChecklist', $this->resource),
             ],
             'organizational_unit' => $this->whenLoaded('organizationalUnit'),
             'need_type' => $this->whenLoaded('needType'),

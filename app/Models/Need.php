@@ -35,6 +35,10 @@ use Illuminate\Support\Facades\Storage;
     'checklist_percentage',
     'notes',
     'approved_by_director_at',
+    'is_locked',
+    'locked_at',
+    'locked_by_user_id',
+    'lock_reason',
 ])]
 class Need extends Model
 {
@@ -65,6 +69,8 @@ class Need extends Model
             'impact' => Impact::class,
             'checklist_percentage' => 'decimal:2',
             'approved_by_director_at' => 'datetime',
+            'is_locked' => 'boolean',
+            'locked_at' => 'datetime',
         ];
     }
 
@@ -82,6 +88,39 @@ class Need extends Model
     public function needGroup(): BelongsTo
     {
         return $this->belongsTo(NeedGroup::class);
+    }
+
+    /**
+     * Get the user who locked this need.
+     */
+    public function lockedByUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'locked_by_user_id');
+    }
+
+    /**
+     * Determine whether the need is locked for the given user.
+     */
+    public function isLocked(?User $user = null): bool
+    {
+        if ($user && $user->hasRole('super-admin')) {
+            return false;
+        }
+
+        if ($this->approved_by_director_at !== null) {
+            return true;
+        }
+
+        if ($this->is_locked === true) {
+            return true;
+        }
+
+        $needGroup = $this->needGroup ?? NeedGroup::find($this->need_group_id);
+        if ($needGroup && ! $needGroup->isOpenForSubmission()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

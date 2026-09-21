@@ -362,10 +362,32 @@ class NeedController extends Controller
             'is_approved' => 'required|boolean',
         ]);
 
-        $need->update([
-            'notes' => $validated['notes'],
-            'approved_by_director_at' => $validated['is_approved'] ? now() : null,
-        ]);
+        $needGroup = $need->needGroup ?? NeedGroup::find($need->need_group_id);
+        $isGroupOpen = $needGroup ? $needGroup->isOpenForSubmission() : true;
+
+        if ($validated['is_approved']) {
+            $need->update([
+                'notes' => $validated['notes'],
+                'approved_by_director_at' => now(),
+                'is_locked' => true,
+                'locked_at' => now(),
+                'locked_by_user_id' => $request->user()?->id,
+            ]);
+        } else {
+            $attributes = [
+                'notes' => $validated['notes'],
+                'approved_by_director_at' => null,
+            ];
+
+            if ($isGroupOpen) {
+                $attributes['is_locked'] = false;
+                $attributes['locked_at'] = null;
+                $attributes['locked_by_user_id'] = null;
+                $attributes['lock_reason'] = null;
+            }
+
+            $need->update($attributes);
+        }
 
         return back()->with('success', 'Review direktur berhasil diperbarui.');
     }

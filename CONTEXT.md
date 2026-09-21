@@ -34,6 +34,24 @@ _Avoid_: Need description, proposal body
 The financial appropriation or revenue source allocated to cover the estimated expenditure of a need.
 _Avoid_: Budget source, payment origin
 
+### Governance & Locking
+
+**Need Lock**:
+The restricted state of a Need preventing submitter modifications to its core proposal, budget details, and attachments.
+_Avoid_: Request lock, item lock, frozen proposal
+
+**Submission Window**:
+The scheduled time interval defined on a Need Group during which organizational units may create and edit needs.
+_Avoid_: Open period, proposal timeframe, intake window
+
+**Lock Override**:
+An explicit exemption granting temporary or individual edit access to a specific Need when its submission window is closed or group is locked.
+_Avoid_: Exception pass, manual unlock bypass
+
+**Whitelisted Operation**:
+An operational evaluation or executive action (such as checklist assessment or director review) permitted on a Need regardless of whether its content is locked.
+_Avoid_: Allowed action, permitted task
+
 ### Strategic Planning & Alignment
 
 **Renstra**:

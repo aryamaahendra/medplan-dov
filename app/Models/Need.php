@@ -101,36 +101,66 @@ class Need extends Model
     }
 
     /**
-     * Determine whether the need is locked for the given user.
+     * Resolve the lock status and optional reason based on the system precedence hierarchy:
+     * 1. Super Admin Bypass
+     * 2. Temporary Extension Override (unlocked_until > now())
+     * 3. Explicit Manual Override (is_locked === false or is_locked === true)
+     * 4. Director Approval Trigger (approved_by_director_at IS NOT NULL)
+     * 5. Need Group Submission Window
+     *
+     * @return array{is_locked: bool, reason: ?string}
      */
-    public function isLocked(?User $user = null): bool
+    public function resolveLockStatus(?User $user = null): array
     {
         if ($user && $user->hasRole('super-admin')) {
-            return false;
-        }
-
-        if ($this->approved_by_director_at !== null) {
-            return true;
-        }
-
-        if ($this->is_locked === true) {
-            return true;
+            return ['is_locked' => false, 'reason' => null];
         }
 
         if ($this->unlocked_until !== null && $this->unlocked_until->isFuture()) {
-            return false;
+            return ['is_locked' => false, 'reason' => $this->lock_reason];
         }
 
         if ($this->is_locked === false) {
-            return false;
+            return ['is_locked' => false, 'reason' => $this->lock_reason];
+        }
+
+        if ($this->is_locked === true) {
+            return [
+                'is_locked' => true,
+                'reason' => $this->lock_reason ?: 'Usulan dikunci secara manual oleh perencana.',
+            ];
+        }
+
+        if ($this->approved_by_director_at !== null) {
+            return [
+                'is_locked' => true,
+                'reason' => $this->lock_reason ?: 'Usulan telah disetujui oleh Direktur.',
+            ];
         }
 
         $needGroup = $this->needGroup ?? NeedGroup::find($this->need_group_id);
         if ($needGroup && ! $needGroup->isOpenForSubmission()) {
-            return true;
+            if ($this->lock_reason) {
+                return ['is_locked' => true, 'reason' => $this->lock_reason];
+            }
+
+            $status = $needGroup->getSubmissionWindowStatus();
+            $reason = $status === 'upcoming'
+                ? 'Periode pengajuan usulan kebutuhan untuk kelompok ini belum dibuka.'
+                : 'Periode pengajuan usulan kebutuhan untuk kelompok ini telah ditutup.';
+
+            return ['is_locked' => true, 'reason' => $reason];
         }
 
-        return false;
+        return ['is_locked' => false, 'reason' => $this->lock_reason];
+    }
+
+    /**
+     * Determine whether the need is locked for the given user.
+     */
+    public function isLocked(?User $user = null): bool
+    {
+        return $this->resolveLockStatus($user)['is_locked'];
     }
 
     /**
@@ -138,41 +168,15 @@ class Need extends Model
      */
     public function getEffectiveLockReason(?User $user = null): ?string
     {
-        if ($user && $user->hasRole('super-admin')) {
-            return null;
-        }
+        return $this->resolveLockStatus($user)['reason'];
+    }
 
-        if ($this->approved_by_director_at !== null) {
-            return $this->lock_reason ?: 'Usulan telah disetujui oleh Direktur.';
-        }
-
-        if ($this->is_locked === true) {
-            return $this->lock_reason ?: 'Usulan dikunci secara manual oleh perencana.';
-        }
-
-        if ($this->unlocked_until !== null && $this->unlocked_until->isFuture()) {
-            return $this->lock_reason;
-        }
-
-        if ($this->is_locked === false) {
-            return $this->lock_reason;
-        }
-
-        $needGroup = $this->needGroup ?? NeedGroup::find($this->need_group_id);
-        if ($needGroup && ! $needGroup->isOpenForSubmission()) {
-            if ($this->lock_reason) {
-                return $this->lock_reason;
-            }
-
-            $status = $needGroup->getSubmissionWindowStatus();
-            if ($status === 'upcoming') {
-                return 'Periode pengajuan usulan kebutuhan untuk kelompok ini belum dibuka.';
-            }
-
-            return 'Periode pengajuan usulan kebutuhan untuk kelompok ini telah ditutup.';
-        }
-
-        return $this->lock_reason;
+    /**
+     * Determine whether the need has an explicit manual lock override.
+     */
+    public function isExplicitlyLocked(): bool
+    {
+        return $this->is_locked === true;
     }
 
     /**

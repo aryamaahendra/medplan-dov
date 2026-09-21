@@ -381,13 +381,15 @@ class NeedController extends Controller
                 'approved_by_director_at' => null,
             ];
 
-            if ($isGroupOpen) {
-                $attributes['is_locked'] = false;
+            // Releasing director approval clears the approval lock state.
+            // When group window is open or active extension window exists, clear lock overrides so schedule inheritance resumes.
+            $hasActiveExtension = $need->unlocked_until !== null && $need->unlocked_until->isFuture();
+            if ($isGroupOpen || $hasActiveExtension) {
+                $attributes['is_locked'] = null;
                 $attributes['locked_at'] = null;
                 $attributes['locked_by_user_id'] = null;
                 $attributes['lock_reason'] = null;
             }
-
             $need->update($attributes);
         }
 

@@ -329,6 +329,40 @@ describe('Policy enforcement on locked Needs', function () {
 
         $response->assertForbidden();
     });
+    it('permits Planners to add and delete attachments on a locked need', function () {
+        Storage::fake('local');
+
+        $need = Need::factory()->create([
+            'need_group_id' => $this->openGroup->id,
+            'organizational_unit_id' => $this->orgUnit->id,
+            'is_locked' => true,
+            'lock_reason' => 'Locked by planner for review',
+        ]);
+
+        $file = UploadedFile::fake()->create('planner_evaluation_notes.pdf', 500, 'application/pdf');
+
+        $response = $this->actingAs($this->plannerUser)
+            ->post(route('needs.attachments.store', $need), [
+                'file' => $file,
+                'display_name' => 'Planner Evaluation Notes',
+                'extension' => 'pdf',
+                'file_size' => 500 * 1024,
+            ]);
+
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect();
+
+        $attachment = $need->attachments()->first();
+        expect($attachment)->not->toBeNull();
+        expect($attachment->display_name)->toBe('Planner Evaluation Notes');
+
+        $deleteResponse = $this->actingAs($this->plannerUser)
+            ->delete(route('needs.attachments.destroy', $attachment));
+
+        $deleteResponse->assertSessionHasNoErrors();
+        $deleteResponse->assertRedirect();
+        expect($need->fresh()->attachments()->count())->toBe(0);
+    });
 
     it('permits Directors to approve a locked need', function () {
         $need = Need::factory()->create([
@@ -407,10 +441,11 @@ describe('Director Review lifecycle freezing and releasing', function () {
         $response->assertSessionHasNoErrors();
         $freshNeed = $need->fresh();
         expect($freshNeed->approved_by_director_at)->toBeNull();
-        expect($freshNeed->is_locked)->toBeFalse();
+        expect($freshNeed->is_locked)->toBeNull();
         expect($freshNeed->locked_at)->toBeNull();
         expect($freshNeed->locked_by_user_id)->toBeNull();
         expect($freshNeed->lock_reason)->toBeNull();
+        expect($freshNeed->isLocked($this->staffUser))->toBeFalse();
     });
 
     it('keeps need locked when rejected if group submission window is closed', function () {

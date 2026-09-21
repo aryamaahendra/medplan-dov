@@ -182,14 +182,13 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Create roles and assign permissions
 
-        // Super Admin - gets all permissions via Gate::before as well as direct role sync
-        $superAdminRole = Role::firstOrCreate(['name' => UserRole::SuperAdmin->value, 'guard_name' => 'web']);
-        $superAdminRole->syncPermissions(array_keys($permissions));
+        // Super Admin - gets all permissions via Gate::before in a policy or AuthServiceProvider
+        Role::firstOrCreate(['name' => UserRole::SuperAdmin->value, 'guard_name' => 'web']);
 
         // Director
         $directorRole = Role::firstOrCreate(['name' => UserRole::Director->value, 'guard_name' => 'web']);
         $directorPermissions = array_filter(array_keys($permissions), function ($permission) {
-            // Read-only everything except user, role, permissions
+            // Read-only everything except user, role, permissions, plus executive approval
             $isRead = str_starts_with($permission, 'view');
             $isAuthRelated = str_contains($permission, 'user') || str_contains($permission, 'role') || str_contains($permission, 'permission');
 

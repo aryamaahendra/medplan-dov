@@ -39,9 +39,14 @@ class NeedLockController extends Controller
             $need,
             $request->validated('lock_reason'),
             $request->user(),
-            $request->validated('unlocked_until')
+            $request->validated('unlocked_until'),
+            (bool) $request->boolean('inherit_schedule')
         );
 
-        return back()->with('success', 'Kunci usulan kebutuhan berhasil dibuka.');
+        $message = $request->boolean('inherit_schedule')
+            ? 'Override kunci berhasil dicabut dan jadwal kelompok dipulihkan.'
+            : 'Kunci usulan kebutuhan berhasil dibuka.';
+
+        return back()->with('success', $message);
     }
 }

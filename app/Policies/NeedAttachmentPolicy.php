@@ -31,6 +31,11 @@ class NeedAttachmentPolicy
         }
 
         if ($need) {
+            // Planners and Super Admins can attach review notes and evaluation documentation to locked Needs
+            if ($user->hasRole('planner') || $user->hasRole('super-admin')) {
+                return $user->can('view', $need);
+            }
+
             return $user->can('update', $need);
         }
 
@@ -39,13 +44,27 @@ class NeedAttachmentPolicy
 
     public function update(User $user, NeedAttachment $needAttachment): bool
     {
-        return $user->hasPermissionTo('create need-attachments')
-            && $user->can('update', $needAttachment->need);
+        if (! $user->hasPermissionTo('create need-attachments')) {
+            return false;
+        }
+
+        if ($user->hasRole('planner') || $user->hasRole('super-admin')) {
+            return $user->can('view', $needAttachment->need);
+        }
+
+        return $user->can('update', $needAttachment->need);
     }
 
     public function delete(User $user, NeedAttachment $needAttachment): bool
     {
-        return $user->hasPermissionTo('delete need-attachments')
-            && $user->can('update', $needAttachment->need);
+        if (! $user->hasPermissionTo('delete need-attachments')) {
+            return false;
+        }
+
+        if ($user->hasRole('planner') || $user->hasRole('super-admin')) {
+            return $user->can('view', $needAttachment->need);
+        }
+
+        return $user->can('update', $needAttachment->need);
     }
 }

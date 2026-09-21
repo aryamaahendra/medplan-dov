@@ -37,6 +37,7 @@ export function NeedLockDialog({
   const { data, setData, post, processing, errors, clearErrors } = useForm({
     lock_reason: '',
     unlocked_until: '',
+    inherit_schedule: false,
   });
 
   useEffect(() => {
@@ -44,6 +45,7 @@ export function NeedLockDialog({
       setData({
         lock_reason: '',
         unlocked_until: '',
+        inherit_schedule: false,
       });
       clearErrors();
     }
@@ -85,6 +87,32 @@ export function NeedLockDialog({
         },
       });
     }
+  };
+
+  const handleRevokeOverride = () => {
+    post(
+      NeedLockController.unlock.url(need, {
+        query: {
+          inherit_schedule: 1,
+          lock_reason: 'Mencabut override dan kembali ke jadwal kelompok',
+        },
+      }),
+      {
+        preserveScroll: true,
+        onSuccess: () => {
+          toast.success(
+            'Override kunci berhasil dicabut dan jadwal kelompok dipulihkan.',
+          );
+          onOpenChange(false);
+        },
+        onError: (err) => {
+          const message =
+            Object.values(err).flat()[0] ||
+            'Terjadi kesalahan saat mencabut override.';
+          toast.error(message);
+        },
+      },
+    );
   };
 
   return (
@@ -154,21 +182,37 @@ export function NeedLockDialog({
             )}
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              Batal
-            </Button>
-            <Button
-              type="submit"
-              variant={isLockMode ? 'destructive' : 'default'}
-              disabled={processing}
-            >
-              {isLockMode ? 'Kunci Usulan' : 'Simpan Perubahan'}
-            </Button>
+          <DialogFooter className="gap-2 sm:justify-between sm:gap-0">
+            <div>
+              {!isLockMode &&
+                (need.is_locked !== null || !!need.unlocked_until) && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="text-xs text-muted-foreground hover:text-foreground"
+                    onClick={handleRevokeOverride}
+                    disabled={processing}
+                  >
+                    Cabut Override & Ikuti Jadwal
+                  </Button>
+                )}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                Batal
+              </Button>
+              <Button
+                type="submit"
+                variant={isLockMode ? 'destructive' : 'default'}
+                disabled={processing}
+              >
+                {isLockMode ? 'Kunci Usulan' : 'Simpan Perubahan'}
+              </Button>
+            </div>
           </DialogFooter>
         </form>
       </DialogContent>

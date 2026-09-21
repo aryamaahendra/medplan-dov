@@ -73,14 +73,20 @@ class NeedPolicy
         if (! $this->checkTieredPermission($user, $need, 'update')) {
             return false;
         }
-        if (! $this->canBypassSubmissionWindow($user)) {
-            if ($need->isLocked($user)) {
+        if ($need->isLocked($user)) {
+            $isLockedByGroupOnly = ! $need->isExplicitlyLocked()
+                && $need->approved_by_director_at === null
+                && $this->canBypassSubmissionWindow($user);
+
+            if (! $isLockedByGroupOnly) {
                 $needGroup = $need->needGroup ?? NeedGroup::find($need->need_group_id);
                 if ($needGroup && ! $needGroup->isOpenForSubmission() && ! ($need->unlocked_until !== null && $need->unlocked_until->isFuture()) && $need->is_locked !== false) {
                     return Response::deny('Periode pengajuan usulan kebutuhan untuk kelompok ini sedang ditutup.');
                 }
 
-                return Response::deny('Usulan kebutuhan terkunci dan tidak dapat diubah.');
+                $reason = $need->getEffectiveLockReason($user) ?: 'Usulan kebutuhan terkunci dan tidak dapat diubah.';
+
+                return Response::deny($reason);
             }
         }
 
@@ -96,10 +102,8 @@ class NeedPolicy
             return false;
         }
 
-        if (! $this->canBypassSubmissionWindow($user)) {
-            if ($need->isLocked($user)) {
-                return Response::deny('Usulan kebutuhan terkunci dan tidak dapat dihapus.');
-            }
+        if ($need->isLocked($user)) {
+            return Response::deny('Usulan kebutuhan terkunci dan tidak dapat dihapus.');
         }
 
         return true;
@@ -122,10 +126,8 @@ class NeedPolicy
             return false;
         }
 
-        if (! $this->canBypassSubmissionWindow($user)) {
-            if ($need->isLocked($user)) {
-                return Response::deny('Usulan kebutuhan terkunci dan tidak dapat dipulihkan.');
-            }
+        if ($need->isLocked($user)) {
+            return Response::deny('Usulan kebutuhan terkunci dan tidak dapat dipulihkan.');
         }
 
         return true;
@@ -140,10 +142,8 @@ class NeedPolicy
             return false;
         }
 
-        if (! $this->canBypassSubmissionWindow($user)) {
-            if ($need->isLocked($user)) {
-                return Response::deny('Usulan kebutuhan terkunci dan tidak dapat dihapus permanen.');
-            }
+        if ($need->isLocked($user)) {
+            return Response::deny('Usulan kebutuhan terkunci dan tidak dapat dihapus permanen.');
         }
 
         return true;
@@ -200,7 +200,7 @@ class NeedPolicy
     }
 
     /**
-     * Determine whether the user can bypass the submission window restrictions.
+     * Determine whether the user can bypass the submission window restrictions on creation.
      */
     private function canBypassSubmissionWindow(User $user): bool
     {

@@ -33,8 +33,7 @@ class NeedAttachmentController extends Controller
      */
     public function store(Request $request, Need $need, AddNeedAttachmentAction $action): RedirectResponse
     {
-        $this->authorize('update', $need);
-
+        $this->authorize('create', [NeedAttachment::class, $need]);
         $request->validate([
             'file' => ['required', 'file', 'max:51200', 'mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,zip,rar,mp4,webm,ogg'],
             'display_name' => ['nullable', 'string', 'max:255'],
@@ -88,8 +87,7 @@ class NeedAttachmentController extends Controller
      */
     public function destroy(NeedAttachment $attachment, DeleteNeedAttachmentAction $action): RedirectResponse
     {
-        $this->authorize('update', $attachment->need);
-
+        $this->authorize('delete', $attachment);
         $action->execute($attachment);
 
         return back()->with('success', 'Lampiran berhasil dihapus.');

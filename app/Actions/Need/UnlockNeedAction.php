@@ -13,10 +13,23 @@ class UnlockNeedAction
      */
     public function execute(
         Need $need,
-        string $reason,
+        ?string $reason = null,
         ?User $user = null,
-        DateTimeInterface|string|null $unlockedUntil = null
+        DateTimeInterface|string|null $unlockedUntil = null,
+        bool $inheritGroupSchedule = false
     ): Need {
+        if ($inheritGroupSchedule) {
+            $need->update([
+                'is_locked' => null,
+                'locked_at' => null,
+                'locked_by_user_id' => null,
+                'lock_reason' => $reason,
+                'unlocked_until' => null,
+            ]);
+
+            return $need;
+        }
+
         $need->update([
             'is_locked' => $unlockedUntil !== null ? null : false,
             'locked_at' => null,

@@ -17,13 +17,14 @@ class UnlockNeedRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array{lock_reason: array<int, string>, unlocked_until: array<int, string>}
+     * @return array<string, array<int, string>>
      */
     public function rules(): array
     {
         return [
-            'lock_reason' => ['required', 'string', 'max:500'],
+            'lock_reason' => [$this->boolean('inherit_schedule') ? 'nullable' : 'required', 'string', 'max:500'],
             'unlocked_until' => ['nullable', 'date', 'after:now'],
+            'inherit_schedule' => ['nullable', 'boolean'],
         ];
     }
 }

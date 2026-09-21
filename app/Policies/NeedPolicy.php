@@ -85,6 +85,14 @@ class NeedPolicy
     }
 
     /**
+     * Determine whether the user can perform checklist evaluations on the model.
+     */
+    public function performChecklist(User $user, Need $need): bool
+    {
+        return $user->hasPermissionTo('perform checklist');
+    }
+
+    /**
      * Helper to check tiered permissions.
      */
     private function checkTieredPermission(User $user, Need $need, string $action): bool

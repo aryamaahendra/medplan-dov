@@ -100,6 +100,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'update need tab detail' => 'Mengubah data pada tab Detail KAK',
             'update need tab lampiran' => 'Mengubah data pada tab Lampiran',
             'update need status' => 'Mengubah status usulan kebutuhan',
+            'lock needs' => 'Mengunci usulan kebutuhan',
+            'unlock needs' => 'Membuka kunci usulan kebutuhan',
 
             // Need Configuration
             'view any need-groups' => 'Melihat daftar semua grup usulan',
@@ -180,8 +182,9 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Create roles and assign permissions
 
-        // Super Admin - gets all permissions via Gate::before in a policy or AuthServiceProvider
-        Role::firstOrCreate(['name' => UserRole::SuperAdmin->value, 'guard_name' => 'web']);
+        // Super Admin - gets all permissions via Gate::before as well as direct role sync
+        $superAdminRole = Role::firstOrCreate(['name' => UserRole::SuperAdmin->value, 'guard_name' => 'web']);
+        $superAdminRole->syncPermissions(array_keys($permissions));
 
         // Director
         $directorRole = Role::firstOrCreate(['name' => UserRole::Director->value, 'guard_name' => 'web']);

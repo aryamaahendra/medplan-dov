@@ -17,7 +17,7 @@ class NeedChecklistAnswerController extends Controller
      */
     public function store(Request $request, Need $need, RecalculateNeedChecklistScore $recalculateScore): RedirectResponse
     {
-        $this->authorize('update', $need);
+        $this->authorize('performChecklist', $need);
 
         $validated = $request->validate([
             'answers' => ['required', 'array'],

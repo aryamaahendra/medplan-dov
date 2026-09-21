@@ -6,6 +6,7 @@ use App\Models\OrganizationalUnit;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
@@ -120,4 +121,19 @@ test('super admin can access permission management', function () {
     $response = $this->actingAs($this->superAdmin)->get(route('permissions.index'));
 
     $response->assertStatus(200);
+});
+
+test('lock needs and unlock needs permissions are assigned to planner and super-admin roles', function () {
+    $plannerRole = Role::findByName('planner');
+    $superAdminRole = Role::findByName('super-admin');
+
+    expect($plannerRole->hasPermissionTo('lock needs'))->toBeTrue();
+    expect($plannerRole->hasPermissionTo('unlock needs'))->toBeTrue();
+    expect($superAdminRole->hasPermissionTo('lock needs'))->toBeTrue();
+    expect($superAdminRole->hasPermissionTo('unlock needs'))->toBeTrue();
+});
+
+test('staff does not have lock needs or unlock needs permissions', function () {
+    expect($this->staffA->hasPermissionTo('lock needs'))->toBeFalse();
+    expect($this->staffA->hasPermissionTo('unlock needs'))->toBeFalse();
 });

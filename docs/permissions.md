@@ -75,16 +75,20 @@ This document lists the granular permissions added to the application to replace
 | `create need-attachments` | Mengunggah lampiran baru ke usulan |
 | `delete need-attachments` | Menghapus lampiran dari usulan |
 
+### Need Locking
+| Permission | Description |
+|------------|-------------|
+| `lock needs` | Mengunci usulan kebutuhan |
+| `unlock needs` | Membuka kunci usulan kebutuhan |
+
 ## Obsolete Permissions (Deleted)
 - `manage need-checklists`
 - `manage renstras`
 - `manage kpis`
 - `manage plannings`
 - `manage ssp`
-
-## Role Assignment Summary
 - **Super Admin**: Has all permissions.
 - **Director**: Has all `view` permissions (read-only).
-- **Planner**: Has full CRUD permissions for all strategic planning modules.
+- **Planner**: Has full CRUD permissions for all strategic planning modules, checklist evaluation (`perform checklist`), and need locking (`lock needs`, `unlock needs`).
 - **Unit Head**: Has CRUD permissions for attachments on their unit's needs.
 - **Staff**: Has view and create permissions for attachments on their unit's needs.

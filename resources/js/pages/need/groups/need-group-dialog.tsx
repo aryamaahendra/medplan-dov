@@ -52,11 +52,35 @@ function NeedGroupForm({
 }) {
   const isEditing = !!needGroup;
 
+  // Convert ISO string to datetime-local input format (YYYY-MM-DDTHH:mm)
+  const formatForInput = (dateStr?: string | null) => {
+    if (!dateStr) {
+      return '';
+    }
+
+    const d = new Date(dateStr);
+
+    if (isNaN(d.getTime())) {
+      return dateStr.slice(0, 16);
+    }
+
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const year = d.getFullYear();
+    const month = pad(d.getMonth() + 1);
+    const day = pad(d.getDate());
+    const hours = pad(d.getHours());
+    const minutes = pad(d.getMinutes());
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
   const { data, setData, submit, processing, errors } = useForm({
     name: needGroup?.name ?? '',
     description: needGroup?.description ?? '',
     year: needGroup?.year ?? new Date().getFullYear(),
     is_active: needGroup?.is_active ?? true,
+    submission_start_at: formatForInput(needGroup?.submission_start_at),
+    submission_end_at: formatForInput(needGroup?.submission_end_at),
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -129,6 +153,29 @@ function NeedGroupForm({
             rows={3}
           />
           <InputError message={errors.description} />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="submission_start_at">Mulai Pengajuan</Label>
+            <Input
+              id="submission_start_at"
+              type="datetime-local"
+              value={data.submission_start_at}
+              onChange={(e) => setData('submission_start_at', e.target.value)}
+            />
+            <InputError message={errors.submission_start_at} />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="submission_end_at">Batas Pengajuan</Label>
+            <Input
+              id="submission_end_at"
+              type="datetime-local"
+              value={data.submission_end_at}
+              onChange={(e) => setData('submission_end_at', e.target.value)}
+            />
+            <InputError message={errors.submission_end_at} />
+          </div>
         </div>
 
         <div className="flex items-center space-x-2">

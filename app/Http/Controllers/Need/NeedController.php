@@ -166,7 +166,8 @@ class NeedController extends Controller
 
     public function store(StoreNeedRequest $request, StoreNeedAction $action): RedirectResponse
     {
-        $this->authorize('create', Need::class);
+        $needGroup = NeedGroup::find($request->input('need_group_id'));
+        $this->authorize('create', [Need::class, $needGroup]);
         $need = $action->execute(
             $request->validated(),
             $request->file('attachments'),
@@ -181,9 +182,9 @@ class NeedController extends Controller
 
     public function create(Request $request): Response|RedirectResponse
     {
-        $this->authorize('create', Need::class);
         $groupId = $request->input('need_group_id');
         $currentGroup = $groupId ? NeedGroup::findOrFail($groupId) : null;
+        $this->authorize('create', [Need::class, $currentGroup]);
 
         return Inertia::render('need/needs/create', [
             'currentGroup' => $currentGroup,

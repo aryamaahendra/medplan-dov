@@ -3,8 +3,10 @@
 namespace App\Policies;
 
 use App\Models\Need;
+use App\Models\NeedGroup;
 use App\Models\OrganizationalUnit;
 use App\Models\User;
+use Illuminate\Auth\Access\Response;
 
 class NeedPolicy
 {
@@ -37,19 +39,49 @@ class NeedPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user, ?NeedGroup $needGroup = null): Response|bool
     {
-        return $user->hasPermissionTo('create any needs')
+        $hasPermission = $user->hasPermissionTo('create any needs')
             || $user->hasPermissionTo('create descendant needs')
             || $user->hasPermissionTo('create needs');
+
+        if (! $hasPermission) {
+            return false;
+        }
+
+        if (! $needGroup) {
+            $groupId = request()->input('need_group_id');
+            if ($groupId) {
+                $needGroup = NeedGroup::find($groupId);
+            }
+        }
+
+        if ($needGroup && ! $this->canBypassSubmissionWindow($user)) {
+            if (! $needGroup->isOpenForSubmission()) {
+                return Response::deny('Periode pengajuan usulan kebutuhan untuk kelompok ini sedang ditutup.');
+            }
+        }
+
+        return true;
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Need $need): bool
+    public function update(User $user, Need $need): Response|bool
     {
-        return $this->checkTieredPermission($user, $need, 'update');
+        if (! $this->checkTieredPermission($user, $need, 'update')) {
+            return false;
+        }
+
+        if (! $this->canBypassSubmissionWindow($user)) {
+            $needGroup = $need->needGroup ?? NeedGroup::find($need->need_group_id);
+            if ($needGroup && ! $needGroup->isOpenForSubmission()) {
+                return Response::deny('Periode pengajuan usulan kebutuhan untuk kelompok ini sedang ditutup.');
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -116,5 +148,13 @@ class NeedPolicy
 
         return $user->hasPermissionTo("{$action} needs")
             && $user->organizational_unit_id === $need->organizational_unit_id;
+    }
+
+    /**
+     * Determine whether the user can bypass the submission window restrictions.
+     */
+    private function canBypassSubmissionWindow(User $user): bool
+    {
+        return $user->hasRole('super-admin') || $user->hasRole('planner');
     }
 }

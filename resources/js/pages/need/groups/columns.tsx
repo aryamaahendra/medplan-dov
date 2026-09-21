@@ -14,13 +14,14 @@ export interface NeedGroup {
   description: string | null;
   year: number;
   is_active: boolean;
+  submission_start_at: string | null;
+  submission_end_at: string | null;
   need_count: number;
   total_budget: number | null;
   approved_count: number;
   priority_count: number;
   created_at: string;
 }
-
 export const getColumns = (
   onEdit: (group: NeedGroup) => void,
   onDelete: (group: NeedGroup) => void,

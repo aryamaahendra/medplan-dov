@@ -21,6 +21,8 @@ class NeedResource extends JsonResource
                 'delete' => $request->user()?->can('delete', $this->resource),
                 'approve' => $request->user()?->can('approve', $this->resource),
                 'performChecklist' => $request->user()?->can('performChecklist', $this->resource),
+                'lock' => $request->user()?->can('lock', $this->resource),
+                'unlock' => $request->user()?->can('unlock', $this->resource),
             ],
             'organizational_unit' => $this->whenLoaded('organizationalUnit'),
             'need_type' => $this->whenLoaded('needType'),

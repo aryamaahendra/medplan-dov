@@ -1,0 +1,47 @@
+<?php
+
+namespace App\Http\Controllers\Need;
+
+use App\Actions\Need\LockNeedAction;
+use App\Actions\Need\UnlockNeedAction;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Need\LockNeedRequest;
+use App\Http\Requests\Need\UnlockNeedRequest;
+use App\Models\Need;
+use Illuminate\Http\RedirectResponse;
+
+class NeedLockController extends Controller
+{
+    /**
+     * Lock the given need.
+     */
+    public function lock(LockNeedRequest $request, Need $need, LockNeedAction $action): RedirectResponse
+    {
+        $this->authorize('lock', $need);
+
+        $action->execute(
+            $need,
+            $request->validated('lock_reason'),
+            $request->user()
+        );
+
+        return back()->with('success', 'Usulan kebutuhan berhasil dikunci.');
+    }
+
+    /**
+     * Unlock the given need or grant a temporary extension.
+     */
+    public function unlock(UnlockNeedRequest $request, Need $need, UnlockNeedAction $action): RedirectResponse
+    {
+        $this->authorize('unlock', $need);
+
+        $action->execute(
+            $need,
+            $request->validated('lock_reason'),
+            $request->user(),
+            $request->validated('unlocked_until')
+        );
+
+        return back()->with('success', 'Kunci usulan kebutuhan berhasil dibuka.');
+    }
+}

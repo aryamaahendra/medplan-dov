@@ -38,6 +38,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::controller('NeedController')->group(function () {
                 Route::patch('{need}/director-review', 'updateDirectorReview')->name('director-review');
             });
+            Route::controller('NeedLockController')->group(function () {
+                Route::post('{need}/lock', 'lock')->name('lock');
+                Route::post('{need}/unlock', 'unlock')->name('unlock');
+            });
             Route::get('export', 'NeedExportController')->name('export');
             Route::get('{need}/export-pdf', 'ExportNeedPdfController')->name('export-pdf');
             Route::controller('NeedChecklistAnswerController')->group(function () {

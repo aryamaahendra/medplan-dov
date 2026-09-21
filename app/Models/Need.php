@@ -39,6 +39,7 @@ use Illuminate\Support\Facades\Storage;
     'locked_at',
     'locked_by_user_id',
     'lock_reason',
+    'unlocked_until',
 ])]
 class Need extends Model
 {
@@ -71,6 +72,7 @@ class Need extends Model
             'approved_by_director_at' => 'datetime',
             'is_locked' => 'boolean',
             'locked_at' => 'datetime',
+            'unlocked_until' => 'datetime',
         ];
     }
 
@@ -113,6 +115,14 @@ class Need extends Model
 
         if ($this->is_locked === true) {
             return true;
+        }
+
+        if ($this->unlocked_until !== null && $this->unlocked_until->isFuture()) {
+            return false;
+        }
+
+        if ($this->is_locked === false) {
+            return false;
         }
 
         $needGroup = $this->needGroup ?? NeedGroup::find($this->need_group_id);

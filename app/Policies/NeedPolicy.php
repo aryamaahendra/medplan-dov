@@ -73,14 +73,13 @@ class NeedPolicy
         if (! $this->checkTieredPermission($user, $need, 'update')) {
             return false;
         }
-
         if (! $this->canBypassSubmissionWindow($user)) {
-            $needGroup = $need->needGroup ?? NeedGroup::find($need->need_group_id);
-            if ($needGroup && ! $needGroup->isOpenForSubmission()) {
-                return Response::deny('Periode pengajuan usulan kebutuhan untuk kelompok ini sedang ditutup.');
-            }
-
             if ($need->isLocked($user)) {
+                $needGroup = $need->needGroup ?? NeedGroup::find($need->need_group_id);
+                if ($needGroup && ! $needGroup->isOpenForSubmission() && ! ($need->unlocked_until !== null && $need->unlocked_until->isFuture()) && $need->is_locked !== false) {
+                    return Response::deny('Periode pengajuan usulan kebutuhan untuk kelompok ini sedang ditutup.');
+                }
+
                 return Response::deny('Usulan kebutuhan terkunci dan tidak dapat diubah.');
             }
         }
@@ -156,6 +155,22 @@ class NeedPolicy
     public function performChecklist(User $user, Need $need): bool
     {
         return $user->hasPermissionTo('perform checklist');
+    }
+
+    /**
+     * Determine whether the user can lock the model.
+     */
+    public function lock(User $user, Need $need): bool
+    {
+        return $user->hasPermissionTo('lock needs');
+    }
+
+    /**
+     * Determine whether the user can unlock the model.
+     */
+    public function unlock(User $user, Need $need): bool
+    {
+        return $user->hasPermissionTo('unlock needs');
     }
 
     /**

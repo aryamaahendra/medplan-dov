@@ -4,6 +4,8 @@ import {
   RiEdit2Line,
   RiQuillPenLine,
   RiErrorWarningLine,
+  RiLockLine,
+  RiLockUnlockLine,
 } from '@remixicon/react';
 import { useState } from 'react';
 
@@ -12,6 +14,7 @@ import needRoutes from '@/routes/needs';
 import type { Need } from '@/types';
 
 import { NeedDirectorReviewDialog } from './need-director-review-dialog';
+import { NeedLockDialog } from './need-lock-dialog';
 import { NeedStatusOverview } from './need-status-overview';
 
 interface NeedSidebarProps {
@@ -20,6 +23,8 @@ interface NeedSidebarProps {
 
 export function NeedSidebar({ need }: NeedSidebarProps) {
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
+  const [lockModalMode, setLockModalMode] = useState<'lock' | 'unlock'>('lock');
+  const [isLockDialogOpen, setIsLockDialogOpen] = useState(false);
 
   return (
     <div className="space-y-4">
@@ -44,6 +49,33 @@ export function NeedSidebar({ need }: NeedSidebarProps) {
         />
       </div>
 
+      {need.can?.lock && !need.is_locked && (
+        <Button
+          variant="outline"
+          className="w-full text-destructive hover:bg-destructive/10 hover:text-destructive"
+          onClick={() => {
+            setLockModalMode('lock');
+            setIsLockDialogOpen(true);
+          }}
+        >
+          <RiLockLine className="h-4 w-4" />
+          Kunci Usulan
+        </Button>
+      )}
+      {need.can?.unlock && (need.is_locked || !!need.unlocked_until) && (
+        <Button
+          variant="outline"
+          className="w-full text-primary hover:bg-primary/10 hover:text-primary"
+          onClick={() => {
+            setLockModalMode('unlock');
+            setIsLockDialogOpen(true);
+          }}
+        >
+          <RiLockUnlockLine className="h-4 w-4" />
+          Buka Kunci / Beri Perpanjangan
+        </Button>
+      )}
+
       <Button
         className="relative w-full"
         onClick={() => setIsReviewDialogOpen(true)}
@@ -63,6 +95,13 @@ export function NeedSidebar({ need }: NeedSidebarProps) {
         need={need}
         open={isReviewDialogOpen}
         onOpenChange={setIsReviewDialogOpen}
+      />
+
+      <NeedLockDialog
+        need={need}
+        mode={lockModalMode}
+        open={isLockDialogOpen}
+        onOpenChange={setIsLockDialogOpen}
       />
     </div>
   );

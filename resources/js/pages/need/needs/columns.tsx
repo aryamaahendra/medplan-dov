@@ -6,6 +6,8 @@ import {
   RiQuillPenLine,
   RiDeleteBinLine,
   RiCloseCircleLine,
+  RiLockLine,
+  RiLockUnlockLine,
 } from '@remixicon/react';
 import type { ColumnDef } from '@tanstack/react-table';
 
@@ -25,6 +27,8 @@ export const getColumns = (
   onEdit: (need: Need) => void,
   onDelete: (need: Need) => void,
   onReview: (need: Need) => void,
+  onLock?: (need: Need) => void,
+  onUnlock?: (need: Need) => void,
 ): ColumnDef<Need>[] => [
   getIndexColumn(),
   {
@@ -231,6 +235,28 @@ export const getColumns = (
           icon: RiQuillPenLine,
           onClick: () => onReview(need),
           indicator: !!need.notes,
+        });
+      }
+
+      if (need.can?.lock && !need.is_locked && onLock) {
+        actions.push('separator');
+        actions.push({
+          label: 'Kunci Usulan',
+          icon: RiLockLine,
+          onClick: () => onLock(need),
+        });
+      }
+
+      if (
+        need.can?.unlock &&
+        (need.is_locked || !!need.unlocked_until) &&
+        onUnlock
+      ) {
+        actions.push('separator');
+        actions.push({
+          label: 'Buka Kunci / Beri Perpanjangan',
+          icon: RiLockUnlockLine,
+          onClick: () => onUnlock(need),
         });
       }
 

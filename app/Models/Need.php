@@ -134,6 +134,48 @@ class Need extends Model
     }
 
     /**
+     * Get the descriptive lock reason for this need.
+     */
+    public function getEffectiveLockReason(?User $user = null): ?string
+    {
+        if ($user && $user->hasRole('super-admin')) {
+            return null;
+        }
+
+        if ($this->approved_by_director_at !== null) {
+            return $this->lock_reason ?: 'Usulan telah disetujui oleh Direktur.';
+        }
+
+        if ($this->is_locked === true) {
+            return $this->lock_reason ?: 'Usulan dikunci secara manual oleh perencana.';
+        }
+
+        if ($this->unlocked_until !== null && $this->unlocked_until->isFuture()) {
+            return $this->lock_reason;
+        }
+
+        if ($this->is_locked === false) {
+            return $this->lock_reason;
+        }
+
+        $needGroup = $this->needGroup ?? NeedGroup::find($this->need_group_id);
+        if ($needGroup && ! $needGroup->isOpenForSubmission()) {
+            if ($this->lock_reason) {
+                return $this->lock_reason;
+            }
+
+            $status = $needGroup->getSubmissionWindowStatus();
+            if ($status === 'upcoming') {
+                return 'Periode pengajuan usulan kebutuhan untuk kelompok ini belum dibuka.';
+            }
+
+            return 'Periode pengajuan usulan kebutuhan untuk kelompok ini telah ditutup.';
+        }
+
+        return $this->lock_reason;
+    }
+
+    /**
      * Get the need type for this need.
      */
     public function needType(): BelongsTo

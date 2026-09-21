@@ -58,6 +58,28 @@ class NeedGroup extends Model
     }
 
     /**
+     * Get the submission window status ('upcoming', 'open', 'closed', or 'indefinite').
+     */
+    public function getSubmissionWindowStatus(): string
+    {
+        if ($this->submission_start_at === null && $this->submission_end_at === null) {
+            return 'indefinite';
+        }
+
+        $now = now();
+
+        if ($this->submission_start_at !== null && $now->lt($this->submission_start_at)) {
+            return 'upcoming';
+        }
+
+        if ($this->submission_end_at !== null && $now->gt($this->submission_end_at)) {
+            return 'closed';
+        }
+
+        return 'open';
+    }
+
+    /**
      * Get the needs for this group.
      */
     /**

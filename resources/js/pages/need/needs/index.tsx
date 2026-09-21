@@ -15,6 +15,7 @@ import { getColumns } from './columns';
 
 import { NeedDirectorReviewDialog } from './components/need-director-review-dialog';
 import { NeedGridView } from './components/need-grid-view';
+import { NeedLockDialog } from './components/need-lock-dialog';
 import { NeedsDashboard } from './components/needs-dashboard';
 import { NeedsHeader } from './components/needs-header';
 import { NeedsTableToolbar } from './components/needs-table-toolbar';
@@ -86,8 +87,21 @@ export default function NeedsIndex({
   } = useDataTable({ only: ['needs', 'filters'] });
 
   const stableColumns = useMemo(
-    () => getColumns(actions.onEdit, actions.onDelete, actions.onReview),
-    [actions.onEdit, actions.onDelete, actions.onReview],
+    () =>
+      getColumns(
+        actions.onEdit,
+        actions.onDelete,
+        actions.onReview,
+        actions.onLock,
+        actions.onUnlock,
+      ),
+    [
+      actions.onEdit,
+      actions.onDelete,
+      actions.onReview,
+      actions.onLock,
+      actions.onUnlock,
+    ],
   );
 
   return (
@@ -212,6 +226,13 @@ export default function NeedsIndex({
           )
         );
       })()}
+
+      <NeedLockDialog
+        need={state.lockingNeed}
+        mode={state.lockDialogMode}
+        open={state.isLockDialogOpen}
+        onOpenChange={actions.setIsLockDialogOpen}
+      />
     </>
   );
 }

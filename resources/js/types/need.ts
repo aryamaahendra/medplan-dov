@@ -105,6 +105,9 @@ export interface Need {
   locked_at?: string | null;
   locked_by_user_id?: number | null;
   lock_reason?: string | null;
+  unlocked_until?: string | null;
+  submission_window_status?: 'upcoming' | 'open' | 'closed' | 'indefinite';
+  group_submission_end_at?: string | null;
   planning_activity_versions?: PlanningActivityVersion[];
   planning_activity_indicators?: PlanningActivityIndicator[];
   can?: {
@@ -112,6 +115,8 @@ export interface Need {
     delete: boolean;
     approve: boolean;
     performChecklist?: boolean;
+    lock?: boolean;
+    unlock?: boolean;
   };
 }
 

@@ -66,6 +66,7 @@ export function NeedForm({
   const isRestricted =
     !hasRole('super-admin') && !hasRole('admin') && !hasRole('planner');
 
+  const isLocked = isEditing && need?.is_locked && !need?.can?.update;
   const tabs = [
     {
       value: 'usulan',
@@ -387,158 +388,163 @@ export function NeedForm({
               })}
             </TabsList>
 
-            {hasPermission('update need tab general') && (
-              <TabsContent
-                value="usulan"
-                className="mt-0 focus-visible:outline-none"
-              >
-                <GeneralInfoSection
-                  data={data}
-                  setData={setData}
-                  errors={errors}
-                  organizationalUnits={filteredOrganizationalUnits}
-                  needTypes={needTypes}
-                  handleVolumeChange={handleVolumeChange}
-                  handleUnitPriceChange={handleUnitPriceChange}
-                />
-              </TabsContent>
-            )}
+            <fieldset
+              disabled={isLocked}
+              className="contents disabled:pointer-events-none disabled:opacity-80"
+            >
+              {hasPermission('update need tab general') && (
+                <TabsContent
+                  value="usulan"
+                  className="mt-0 focus-visible:outline-none"
+                >
+                  <GeneralInfoSection
+                    data={data}
+                    setData={setData}
+                    errors={errors}
+                    organizationalUnits={filteredOrganizationalUnits}
+                    needTypes={needTypes}
+                    handleVolumeChange={handleVolumeChange}
+                    handleUnitPriceChange={handleUnitPriceChange}
+                  />
+                </TabsContent>
+              )}
 
-            {hasPermission('update need tab urgency') && (
-              <TabsContent
-                value="urgency"
-                className="mt-0 focus-visible:outline-none"
-              >
-                <PriorityStatusSection
-                  data={data}
-                  setData={setData}
-                  errors={errors}
-                />
-              </TabsContent>
-            )}
+              {hasPermission('update need tab urgency') && (
+                <TabsContent
+                  value="urgency"
+                  className="mt-0 focus-visible:outline-none"
+                >
+                  <PriorityStatusSection
+                    data={data}
+                    setData={setData}
+                    errors={errors}
+                  />
+                </TabsContent>
+              )}
 
-            {hasPermission('update need tab strategic') && (
-              <TabsContent
-                value="renstra"
-                className="mt-0 focus-visible:outline-none"
-              >
-                <RenstraAlignmentSection
-                  data={data}
-                  setData={setData}
-                  errors={errors}
-                  tujuans={tujuans}
-                  year={parseInt(data.year)}
-                />
-              </TabsContent>
-            )}
+              {hasPermission('update need tab strategic') && (
+                <TabsContent
+                  value="renstra"
+                  className="mt-0 focus-visible:outline-none"
+                >
+                  <RenstraAlignmentSection
+                    data={data}
+                    setData={setData}
+                    errors={errors}
+                    tujuans={tujuans}
+                    year={parseInt(data.year)}
+                  />
+                </TabsContent>
+              )}
 
-            {hasPermission('update need tab ikk') && (
-              <TabsContent
-                value="ikk"
-                className="mt-0 focus-visible:outline-none"
-              >
-                <IkkAlignmentSection
-                  data={data}
-                  setData={setData}
-                  errors={errors}
-                  kpiGroups={kpiGroups}
-                  year={parseInt(data.year)}
-                />
-              </TabsContent>
-            )}
+              {hasPermission('update need tab ikk') && (
+                <TabsContent
+                  value="ikk"
+                  className="mt-0 focus-visible:outline-none"
+                >
+                  <IkkAlignmentSection
+                    data={data}
+                    setData={setData}
+                    errors={errors}
+                    kpiGroups={kpiGroups}
+                    year={parseInt(data.year)}
+                  />
+                </TabsContent>
+              )}
 
-            {hasPermission('update need tab rls') && (
-              <TabsContent
-                value="rls"
-                className="mt-0 focus-visible:outline-none"
-              >
-                <RlsAlignmentSection
-                  data={data}
-                  setData={setData}
-                  errors={errors}
-                  strategicServicePlans={strategicServicePlans}
-                />
-              </TabsContent>
-            )}
+              {hasPermission('update need tab rls') && (
+                <TabsContent
+                  value="rls"
+                  className="mt-0 focus-visible:outline-none"
+                >
+                  <RlsAlignmentSection
+                    data={data}
+                    setData={setData}
+                    errors={errors}
+                    strategicServicePlans={strategicServicePlans}
+                  />
+                </TabsContent>
+              )}
 
-            {hasPermission('update need tab planning') && (
-              <TabsContent
-                value="perencanaan"
-                className="mt-0 focus-visible:outline-none"
-              >
-                <PlanningAlignmentSection
-                  data={data}
-                  setData={setData}
-                  errors={errors}
-                  planningActivities={planningActivities}
-                  year={parseInt(data.year)}
-                />
-              </TabsContent>
-            )}
+              {hasPermission('update need tab planning') && (
+                <TabsContent
+                  value="perencanaan"
+                  className="mt-0 focus-visible:outline-none"
+                >
+                  <PlanningAlignmentSection
+                    data={data}
+                    setData={setData}
+                    errors={errors}
+                    planningActivities={planningActivities}
+                    year={parseInt(data.year)}
+                  />
+                </TabsContent>
+              )}
 
-            {hasPermission('update need tab detail') && (
-              <TabsContent
-                value="detail"
-                className="mt-0 focus-visible:outline-none data-hidden:hidden"
-                keepMounted
-              >
-                <NeedDetailSection
-                  initialValues={data.detail}
-                  detailValuesRef={detailValuesRef}
-                  errors={errors}
-                  technicalSpecificationAttachments={
-                    data.technical_specification_attachments
-                  }
-                  technicalSpecificationAttachmentNames={
-                    data.technical_specification_attachment_names
-                  }
-                  setTechnicalSpecificationAttachments={(files) =>
-                    setData('technical_specification_attachments', files)
-                  }
-                  setTechnicalSpecificationAttachmentNames={(names) =>
-                    setData('technical_specification_attachment_names', names)
-                  }
-                  existingTechnicalSpecificationAttachments={
-                    need?.attachments?.filter(
-                      (a) => a.category === 'technical_specifications',
-                    ) ?? []
-                  }
-                  deletedAttachmentIds={data.deleted_attachment_ids}
-                  setDeletedAttachmentIds={(ids) =>
-                    setData('deleted_attachment_ids', ids)
-                  }
-                  fundingSources={fundingSources}
-                  users={users}
-                  kldiOptions={kldiOptions}
-                  satkerOptions={satkerOptions}
-                  totalPrice={data.total_price}
-                />
-              </TabsContent>
-            )}
+              {hasPermission('update need tab detail') && (
+                <TabsContent
+                  value="detail"
+                  className="mt-0 focus-visible:outline-none data-hidden:hidden"
+                  keepMounted
+                >
+                  <NeedDetailSection
+                    initialValues={data.detail}
+                    detailValuesRef={detailValuesRef}
+                    errors={errors}
+                    technicalSpecificationAttachments={
+                      data.technical_specification_attachments
+                    }
+                    technicalSpecificationAttachmentNames={
+                      data.technical_specification_attachment_names
+                    }
+                    setTechnicalSpecificationAttachments={(files) =>
+                      setData('technical_specification_attachments', files)
+                    }
+                    setTechnicalSpecificationAttachmentNames={(names) =>
+                      setData('technical_specification_attachment_names', names)
+                    }
+                    existingTechnicalSpecificationAttachments={
+                      need?.attachments?.filter(
+                        (a) => a.category === 'technical_specifications',
+                      ) ?? []
+                    }
+                    deletedAttachmentIds={data.deleted_attachment_ids}
+                    setDeletedAttachmentIds={(ids) =>
+                      setData('deleted_attachment_ids', ids)
+                    }
+                    fundingSources={fundingSources}
+                    users={users}
+                    kldiOptions={kldiOptions}
+                    satkerOptions={satkerOptions}
+                    totalPrice={data.total_price}
+                  />
+                </TabsContent>
+              )}
 
-            {hasPermission('update need tab lampiran') && (
-              <TabsContent
-                value="lampiran"
-                className="mt-0 focus-visible:outline-none"
-              >
-                <FileSection
-                  files={data.attachments}
-                  fileNames={data.attachment_names}
-                  setFiles={(files) => setData('attachments', files)}
-                  setFileNames={(names) => setData('attachment_names', names)}
-                  existingAttachments={
-                    need?.attachments?.filter(
-                      (a) => a.category === 'general',
-                    ) ?? []
-                  }
-                  deletedAttachmentIds={data.deleted_attachment_ids}
-                  setDeletedAttachmentIds={(ids) =>
-                    setData('deleted_attachment_ids', ids)
-                  }
-                  errors={errors}
-                />
-              </TabsContent>
-            )}
+              {hasPermission('update need tab lampiran') && (
+                <TabsContent
+                  value="lampiran"
+                  className="mt-0 focus-visible:outline-none"
+                >
+                  <FileSection
+                    files={data.attachments}
+                    fileNames={data.attachment_names}
+                    setFiles={(files) => setData('attachments', files)}
+                    setFileNames={(names) => setData('attachment_names', names)}
+                    existingAttachments={
+                      need?.attachments?.filter(
+                        (a) => a.category === 'general',
+                      ) ?? []
+                    }
+                    deletedAttachmentIds={data.deleted_attachment_ids}
+                    setDeletedAttachmentIds={(ids) =>
+                      setData('deleted_attachment_ids', ids)
+                    }
+                    errors={errors}
+                  />
+                </TabsContent>
+              )}
+            </fieldset>
           </Tabs>
         </CardContent>
         <CardFooter className="justify-end gap-2">
@@ -547,11 +553,13 @@ export function NeedForm({
             variant="outline"
             onClick={() => router.visit(needRoutes.index.url())}
           >
-            Batal
+            {isLocked ? 'Kembali' : 'Batal'}
           </Button>
-          <Button type="submit" disabled={processing}>
-            {isEditing ? 'Simpan Perubahan' : 'Tambah Usulan'}
-          </Button>
+          {!isLocked && (
+            <Button type="submit" disabled={processing}>
+              {isEditing ? 'Simpan Perubahan' : 'Tambah Usulan'}
+            </Button>
+          )}
         </CardFooter>
       </form>
     </Card>

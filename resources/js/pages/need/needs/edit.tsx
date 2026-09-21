@@ -3,7 +3,7 @@ import needRoutes from '@/routes/needs';
 import type { Need, PlanningActivityVersion, Tujuan } from '@/types';
 
 import { NeedForm } from './components/need-form';
-
+import { NeedLockBanner } from './components/need-lock-banner';
 interface EditProps {
   need: Need;
   currentGroup: { id: number; name: string; year: number };
@@ -45,6 +45,8 @@ export default function Edit({
             Perbarui detail usulan pada tahun anggaran {currentGroup.year}.
           </p>
         </div>
+
+        <NeedLockBanner need={need} />
 
         <div className="flex-1">
           <NeedForm

@@ -15,8 +15,12 @@ export function useNeedsIndex({ currentGroup }: UseNeedsIndexProps) {
   const [deletingNeed, setDeletingNeed] = useState<Need | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [reviewingNeedId, setReviewingNeedId] = useState<number | null>(null);
+  const [lockingNeed, setLockingNeed] = useState<Need | null>(null);
+  const [lockDialogMode, setLockDialogMode] = useState<'lock' | 'unlock'>(
+    'lock',
+  );
+  const [isLockDialogOpen, setIsLockDialogOpen] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
-
   const [isGroupDialogOpen, setIsGroupDialogOpen] = useState(false);
   const [isDeletingGroup, setIsDeletingGroup] = useState(false);
   const [isDeletingGroupLoading, setIsDeletingGroupLoading] = useState(false);
@@ -39,6 +43,17 @@ export function useNeedsIndex({ currentGroup }: UseNeedsIndexProps) {
     setReviewingNeedId(need.id);
   };
 
+  const onLock = (need: Need) => {
+    setLockingNeed(need);
+    setLockDialogMode('lock');
+    setIsLockDialogOpen(true);
+  };
+
+  const onUnlock = (need: Need) => {
+    setLockingNeed(need);
+    setLockDialogMode('unlock');
+    setIsLockDialogOpen(true);
+  };
   const onExport = () => {
     const params = new URLSearchParams(window.location.search);
 
@@ -87,6 +102,9 @@ export function useNeedsIndex({ currentGroup }: UseNeedsIndexProps) {
       deletingNeed,
       isDeleting,
       reviewingNeedId,
+      lockingNeed,
+      lockDialogMode,
+      isLockDialogOpen,
       showDashboard,
       isGroupDialogOpen,
       isDeletingGroup,
@@ -95,6 +113,8 @@ export function useNeedsIndex({ currentGroup }: UseNeedsIndexProps) {
     actions: {
       setDeletingNeed,
       setReviewingNeedId,
+      setLockingNeed,
+      setIsLockDialogOpen,
       setShowDashboard,
       setIsGroupDialogOpen,
       setIsDeletingGroup,
@@ -102,6 +122,8 @@ export function useNeedsIndex({ currentGroup }: UseNeedsIndexProps) {
       onCreate,
       onDelete,
       onReview,
+      onLock,
+      onUnlock,
       onExport,
       handleConfirmDelete,
       handleConfirmDeleteGroup,

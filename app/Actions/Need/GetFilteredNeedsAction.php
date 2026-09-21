@@ -18,7 +18,7 @@ class GetFilteredNeedsAction
     {
         $query = Need::query()
             ->with([
-                'needGroup:id,name',
+                'needGroup:id,name,is_active,submission_start_at,submission_end_at',
                 'organizationalUnit:id,name,parent_id',
                 'organizationalUnit.parentsRecursive',
                 'needType:id,name',

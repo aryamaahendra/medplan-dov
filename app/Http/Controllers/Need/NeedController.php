@@ -232,10 +232,11 @@ class NeedController extends Controller
 
     public function edit(Need $need): Response
     {
-        $this->authorize('update', $need);
+        $this->authorize('view', $need);
 
         return Inertia::render('need/needs/edit', [
             'need' => NeedResource::make($need->load([
+                'needGroup',
                 'sasarans:id',
                 'indicators:id',
                 'kpiIndicators:id',
@@ -311,6 +312,7 @@ class NeedController extends Controller
 
         return Inertia::render('need/needs/show', [
             'need' => NeedResource::make($need->load([
+                'needGroup',
                 'organizationalUnit:id,name,parent_id',
                 'organizationalUnit.parentsRecursive',
                 'needType:id,name',

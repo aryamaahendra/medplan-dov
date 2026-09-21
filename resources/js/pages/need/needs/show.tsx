@@ -13,6 +13,7 @@ import { NeedAttachmentsTab } from './components/need-attachments-tab';
 import { NeedDetailTab } from './components/need-detail-tab';
 import { NeedGeneralTab } from './components/need-general-tab';
 import { NeedHeader } from './components/need-header';
+import { NeedLockBanner } from './components/need-lock-banner';
 import { NeedSidebar } from './components/need-sidebar';
 import { PlanningAlignmentShow } from './components/planning-alignment-show';
 import { RlsAlignmentShow } from './components/rls-alignment-show';
@@ -102,6 +103,7 @@ export default function NeedShow({
       <div className="flex flex-col gap-4 p-4 md:p-8">
         <NeedHeader need={need} />
 
+        <NeedLockBanner need={need} />
         <div className="grid grid-cols-1 items-start gap-4 pt-8 lg:grid-cols-3">
           {/* Main Content */}
           <div className="lg:col-span-2">

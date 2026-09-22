@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Renstra;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Renstra\StoreTujuanRequest;
 use App\Http\Requests\Renstra\UpdateTujuanRequest;
 use App\Models\Tujuan;
+use Illuminate\Http\RedirectResponse;
 
 class TujuanController extends Controller
 {
@@ -15,17 +18,9 @@ class TujuanController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTujuanRequest $request)
+    public function store(StoreTujuanRequest $request): RedirectResponse
     {
         Tujuan::create($request->validated());
 
@@ -33,17 +28,9 @@ class TujuanController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Tujuan $tujuan)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTujuanRequest $request, Tujuan $tujuan)
+    public function update(UpdateTujuanRequest $request, Tujuan $tujuan): RedirectResponse
     {
         $tujuan->update($request->validated());
 
@@ -53,7 +40,7 @@ class TujuanController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Tujuan $tujuan)
+    public function destroy(Tujuan $tujuan): RedirectResponse
     {
         $tujuan->delete();
 

@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Renstra;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Renstra\StoreIndicatorRequest;
 use App\Http\Requests\Renstra\UpdateIndicatorRequest;
 use App\Models\Indicator;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 
 class IndicatorController extends Controller
@@ -18,7 +21,7 @@ class IndicatorController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreIndicatorRequest $request)
+    public function store(StoreIndicatorRequest $request): RedirectResponse
     {
         DB::transaction(function () use ($request) {
             $indicator = Indicator::create($request->validated());
@@ -31,7 +34,7 @@ class IndicatorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateIndicatorRequest $request, Indicator $indicator)
+    public function update(UpdateIndicatorRequest $request, Indicator $indicator): RedirectResponse
     {
         DB::transaction(function () use ($request, $indicator) {
             $indicator->update($request->validated());
@@ -45,7 +48,7 @@ class IndicatorController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Indicator $indicator)
+    public function destroy(Indicator $indicator): RedirectResponse
     {
         $indicator->delete();
 

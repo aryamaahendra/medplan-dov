@@ -3,9 +3,8 @@ import { RiDownloadLine, RiAddLine, RiRefreshLine } from '@remixicon/react';
 import { Fragment, useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-import PlanningActivityVersionController, {
-  PlanningRecalculateController,
-} from '@/actions/App/Http/Controllers/Planning/PlanningActivityVersionController';
+import PlanningActivityVersionController from '@/actions/App/Http/Controllers/Planning/PlanningActivityVersionController';
+import PlanningRecalculateController from '@/actions/App/Http/Controllers/Planning/PlanningRecalculateController';
 import { DataTable } from '@/components/data-table/data-table';
 import {
   AlertDialog,

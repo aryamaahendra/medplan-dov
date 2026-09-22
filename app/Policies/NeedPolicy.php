@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
 use App\Models\Need;
 use App\Models\NeedGroup;
-use App\Models\OrganizationalUnit;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
@@ -52,7 +53,7 @@ class NeedPolicy
         if (! $needGroup) {
             $groupId = request()->input('need_group_id');
             if ($groupId) {
-                $needGroup = NeedGroup::find($groupId);
+                $needGroup = NeedGroup::query()->find($groupId);
             }
         }
 
@@ -79,7 +80,7 @@ class NeedPolicy
                 && $this->canBypassSubmissionWindow($user);
 
             if (! $isLockedByGroupOnly) {
-                $needGroup = $need->needGroup ?? NeedGroup::find($need->need_group_id);
+                $needGroup = $need->relationLoaded('needGroup') ? $need->needGroup : null;
                 if ($needGroup && ! $needGroup->isOpenForSubmission() && ! ($need->unlocked_until !== null && $need->unlocked_until->isFuture()) && $need->is_locked !== false) {
                     return Response::deny('Periode pengajuan usulan kebutuhan untuk kelompok ini sedang ditutup.');
                 }
@@ -178,6 +179,7 @@ class NeedPolicy
      */
     private function checkTieredPermission(User $user, Need $need, string $action): bool
     {
+        $need->loadMissing(['needGroup', 'organizationalUnit']);
         if ($user->hasPermissionTo("{$action} any needs")) {
             return true;
         }
@@ -188,7 +190,7 @@ class NeedPolicy
             }
 
             if ($need->organizational_unit_id !== null && $user->organizational_unit_id !== null) {
-                $needUnit = $need->organizationalUnit ?? OrganizationalUnit::find($need->organizational_unit_id);
+                $needUnit = $need->relationLoaded('organizationalUnit') ? $need->organizationalUnit : null;
                 if ($needUnit && $needUnit->isDescendantOf($user->organizational_unit_id)) {
                     return true;
                 }

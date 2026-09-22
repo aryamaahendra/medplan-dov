@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Planning;
 
 use App\Actions\Planning\CalculateActivityBudgetAction;
@@ -12,9 +14,11 @@ class PlanningRecalculateController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(PlanningVersion $planningVersion): RedirectResponse
+    public function __invoke(PlanningVersion $planningVersion, CalculateActivityBudgetAction $action): RedirectResponse
     {
-        app(CalculateActivityBudgetAction::class)->recalculateVersion($planningVersion);
+        $this->authorize('update', $planningVersion);
+
+        $action->recalculateVersion($planningVersion);
 
         return redirect()->back()->with('success', 'Penghitungan ulang anggaran telah dijadwalkan.');
     }

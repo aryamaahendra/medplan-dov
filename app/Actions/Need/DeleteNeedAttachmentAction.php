@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Need;
 
 use App\Models\NeedAttachment;
@@ -12,8 +14,10 @@ class DeleteNeedAttachmentAction
      */
     public function execute(NeedAttachment $attachment): void
     {
-        if (Storage::disk('local')->exists($attachment->file_path)) {
-            Storage::disk('local')->delete($attachment->file_path);
+        $disk = (string) config('filesystems.attachments_disk', config('filesystems.default', 'local'));
+
+        if (Storage::disk($disk)->exists($attachment->file_path)) {
+            Storage::disk($disk)->delete($attachment->file_path);
         }
 
         $attachment->delete();

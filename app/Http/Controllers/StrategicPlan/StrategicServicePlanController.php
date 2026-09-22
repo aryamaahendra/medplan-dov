@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\StrategicPlan;
 
 use App\Http\Controllers\Controller;
@@ -7,6 +9,7 @@ use App\Http\Requests\StrategicPlan\StoreStrategicServicePlanRequest;
 use App\Http\Requests\StrategicPlan\UpdateStrategicServicePlanRequest;
 use App\Models\StrategicServicePlan;
 use App\Traits\HasDataTable;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -47,7 +50,7 @@ class StrategicServicePlanController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreStrategicServicePlanRequest $request)
+    public function store(StoreStrategicServicePlanRequest $request): RedirectResponse
     {
         StrategicServicePlan::create($request->validated());
 
@@ -58,7 +61,7 @@ class StrategicServicePlanController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateStrategicServicePlanRequest $request, StrategicServicePlan $strategicServicePlan)
+    public function update(UpdateStrategicServicePlanRequest $request, StrategicServicePlan $strategicServicePlan): RedirectResponse
     {
         $strategicServicePlan->update($request->validated());
 
@@ -69,7 +72,7 @@ class StrategicServicePlanController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(StrategicServicePlan $strategicServicePlan)
+    public function destroy(StrategicServicePlan $strategicServicePlan): RedirectResponse
     {
         $strategicServicePlan->delete();
 

@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Need;
 
 use App\Actions\Need\GetFilteredNeedsAction;
+use App\Actions\Need\GetNeedDashboardStatsAction;
 use App\Actions\Need\StoreNeedAction;
 use App\Actions\Need\UpdateNeedAction;
 use App\Enums\Kldi;
 use App\Enums\SatkerSkpd;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Need\StoreNeedRequest;
+use App\Http\Requests\Need\UpdateDirectorReviewRequest;
 use App\Http\Requests\Need\UpdateNeedRequest;
 use App\Http\Resources\ChecklistQuestionResource;
 use App\Http\Resources\NeedChecklistAnswerResource;
@@ -44,8 +48,11 @@ class NeedController extends Controller
     /** Columns sortable by */
     private const array SORTABLE_COLUMNS = ['title', 'year', 'status', 'total_price', 'created_at'];
 
-    public function index(Request $request, GetFilteredNeedsAction $action): Response|RedirectResponse
-    {
+    public function index(
+        Request $request,
+        GetFilteredNeedsAction $action,
+        GetNeedDashboardStatsAction $statsAction
+    ): Response|RedirectResponse {
         $this->authorize('viewAny', Need::class);
         $groupId = $request->input('need_group_id');
 
@@ -56,7 +63,7 @@ class NeedController extends Controller
             }
         }
 
-        $currentGroup = $groupId ? NeedGroup::find($groupId) : null;
+        $currentGroup = $groupId ? NeedGroup::query()->find($groupId) : null;
 
         $filters = [
             'year' => $request->input('year'),
@@ -85,79 +92,10 @@ class NeedController extends Controller
         return Inertia::render('need/needs/index', [
             'needs' => $needs,
             'currentGroup' => $currentGroup,
-            'stats' => Inertia::defer(function () use ($groupId, $currentGroup) {
-                $prevGroup = $currentGroup
-                    ? NeedGroup::query()
-                        ->where('id', '!=', $groupId)
-                        ->where('year', '<=', $currentGroup->year)
-                        ->orderByDesc('year')
-                        ->orderByDesc('id')
-                        ->first()
-                    : null;
-
-                $prevGroupId = $prevGroup?->id;
-
-                return [
-                    'total_needs' => Need::where('need_group_id', $groupId)->count(),
-                    'total_budget' => Need::where('need_group_id', $groupId)->sum('total_price'),
-                    'priority_needs' => Need::where('need_group_id', $groupId)->where('is_priority', true)->count(),
-                    'avg_completeness' => Need::where('need_group_id', $groupId)->avg('checklist_percentage') ?? 0,
-                    'approved_by_director' => Need::where('need_group_id', $groupId)->whereNotNull('approved_by_director_at')->count(),
-                    'prev_group' => $prevGroup ? ['id' => $prevGroup->id, 'name' => $prevGroup->name] : null,
-                    'prev_total_needs' => $prevGroupId ? Need::where('need_group_id', $prevGroupId)->count() : null,
-                    'prev_total_budget' => $prevGroupId ? Need::where('need_group_id', $prevGroupId)->sum('total_price') : null,
-                    'prev_priority_needs' => $prevGroupId ? Need::where('need_group_id', $prevGroupId)->where('is_priority', true)->count() : null,
-                    'prev_avg_completeness' => $prevGroupId ? (Need::where('need_group_id', $prevGroupId)->avg('checklist_percentage') ?? 0) : null,
-                    'prev_approved_by_director' => $prevGroupId ? Need::where('need_group_id', $prevGroupId)->whereNotNull('approved_by_director_at')->count() : null,
-                ];
-            }, 'dashboard'),
-            'statusDistribution' => Inertia::defer(fn () => Need::where('need_group_id', $groupId)
-                ->selectRaw('status, count(*) as count')
-                ->groupBy('status')
-                ->get()
-                ->pluck('count', 'status')
-                ->toArray(), 'dashboard'),
-            'needsByUnit' => Inertia::defer(function () use ($groupId) {
-                $aggregates = Need::where('need_group_id', $groupId)
-                    ->selectRaw('organizational_unit_id, count(*) as count, sum(total_price) as total_budget, sum(case when is_priority then 1 else 0 end) as priority_count, sum(case when approved_by_director_at is not null then 1 else 0 end) as approved_count')
-                    ->groupBy('organizational_unit_id')
-                    ->orderByDesc('count')
-                    ->get();
-
-                $unitIds = $aggregates->pluck('organizational_unit_id')->filter()->unique();
-                $units = OrganizationalUnit::with('parentsRecursive')->whereIn('id', $unitIds)->get()->keyBy('id');
-
-                return $aggregates->map(function ($item) use ($units) {
-                    $unit = $units->get($item->organizational_unit_id);
-                    $parents = [];
-                    $cursor = $unit?->parentsRecursive;
-                    while ($cursor) {
-                        array_unshift($parents, $cursor->name);
-                        $cursor = $cursor->parentsRecursive;
-                    }
-
-                    return [
-                        'unit_id' => $item->organizational_unit_id,
-                        'name' => $unit?->name ?? 'Unknown',
-                        'parents' => $parents,
-                        'count' => (int) $item->count,
-                        'total_budget' => (float) $item->total_budget,
-                        'priority_count' => (int) $item->priority_count,
-                        'approved_count' => (int) $item->approved_count,
-                    ];
-                })->values()->all();
-            }, 'dashboard'),
-            'needsByType' => Inertia::defer(fn () => Need::with('needType:id,name')
-                ->where('need_group_id', $groupId)
-                ->selectRaw('need_type_id, count(*) as count')
-                ->groupBy('need_type_id')
-                ->orderByDesc('count')
-                ->get()
-                ->map(fn ($item) => [
-                    'name' => $item->needType->name ?? 'Unknown',
-                    'count' => $item->count,
-                ])
-                ->all(), 'dashboard'),
+            'stats' => Inertia::defer(fn () => $statsAction->stats($groupId, $currentGroup), 'dashboard'),
+            'statusDistribution' => Inertia::defer(fn () => $statsAction->statusDistribution($groupId), 'dashboard'),
+            'needsByUnit' => Inertia::defer(fn () => $statsAction->byUnit($groupId), 'dashboard'),
+            'needsByType' => Inertia::defer(fn () => $statsAction->byType($groupId), 'dashboard'),
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name', 'parent_id'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
             'filters' => array_merge($this->dataTableFilters($request), $filters),
@@ -166,7 +104,7 @@ class NeedController extends Controller
 
     public function store(StoreNeedRequest $request, StoreNeedAction $action): RedirectResponse
     {
-        $needGroup = NeedGroup::find($request->input('need_group_id'));
+        $needGroup = NeedGroup::query()->find($request->input('need_group_id'));
         $this->authorize('create', [Need::class, $needGroup]);
         $need = $action->execute(
             $request->validated(),
@@ -355,16 +293,13 @@ class NeedController extends Controller
             ->with('success', 'Usulan kebutuhan berhasil dihapus.');
     }
 
-    public function updateDirectorReview(Request $request, Need $need): RedirectResponse
+    public function updateDirectorReview(UpdateDirectorReviewRequest $request, Need $need): RedirectResponse
     {
         $this->authorize('approve', $need);
 
-        $validated = $request->validate([
-            'notes' => 'nullable|string',
-            'is_approved' => 'required|boolean',
-        ]);
+        $validated = $request->validated();
 
-        $needGroup = $need->needGroup ?? NeedGroup::find($need->need_group_id);
+        $needGroup = $need->loadMissing('needGroup')->needGroup;
         $isGroupOpen = $needGroup ? $needGroup->isOpenForSubmission() : true;
 
         if ($validated['is_approved']) {

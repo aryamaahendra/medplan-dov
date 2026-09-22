@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Renstra;
 
 use App\Http\Controllers\Controller;
@@ -7,6 +9,7 @@ use App\Http\Requests\Renstra\StoreRenstraRequest;
 use App\Http\Requests\Renstra\UpdateRenstraRequest;
 use App\Models\Renstra;
 use App\Traits\HasDataTable;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -47,7 +50,7 @@ class RenstraController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreRenstraRequest $request)
+    public function store(StoreRenstraRequest $request): RedirectResponse
     {
         Renstra::create($request->validated());
 
@@ -58,7 +61,7 @@ class RenstraController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRenstraRequest $request, Renstra $renstra)
+    public function update(UpdateRenstraRequest $request, Renstra $renstra): RedirectResponse
     {
         $renstra->update($request->validated());
 
@@ -69,7 +72,7 @@ class RenstraController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Renstra $renstra)
+    public function destroy(Renstra $renstra): RedirectResponse
     {
         $renstra->delete();
 

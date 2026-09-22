@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Need;
 
 use App\Http\Controllers\Controller;
@@ -7,10 +9,27 @@ use App\Models\Need;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class ExportNeedPdfController extends Controller
 {
-    public function __invoke(Need $need, Request $request)
+    private const string DEFAULT_PAPER_SIZE = 'a4';
+
+    private const int DEFAULT_MARGIN_TOP = 20;
+
+    private const int DEFAULT_MARGIN_BOTTOM = 20;
+
+    private const int DEFAULT_MARGIN_LEFT = 30;
+
+    private const int DEFAULT_MARGIN_RIGHT = 20;
+
+    /**
+     * Indonesia F4: 215mm x 330mm
+     * points = mm * 72 / 25.4
+     */
+    private const array F4_PAPER_DIMENSIONS = [0, 0, 609.45, 935.43];
+
+    public function __invoke(Need $need, Request $request): Response
     {
         $need->load([
             'detail.fundingSources',
@@ -25,11 +44,11 @@ class ExportNeedPdfController extends Controller
             $signer = User::find($request->input('signer_id'));
         }
 
-        $paperSize = $request->input('paper_size', 'a4');
-        $marginTop = $request->input('m_top', 20);
-        $marginBottom = $request->input('m_bottom', 20);
-        $marginLeft = $request->input('m_left', 30);
-        $marginRight = $request->input('m_right', 20);
+        $paperSize = $request->input('paper_size', self::DEFAULT_PAPER_SIZE);
+        $marginTop = $request->input('m_top', self::DEFAULT_MARGIN_TOP);
+        $marginBottom = $request->input('m_bottom', self::DEFAULT_MARGIN_BOTTOM);
+        $marginLeft = $request->input('m_left', self::DEFAULT_MARGIN_LEFT);
+        $marginRight = $request->input('m_right', self::DEFAULT_MARGIN_RIGHT);
 
         $pdf = Pdf::loadView('pdf.need-detail', [
             'need' => $need,
@@ -42,9 +61,7 @@ class ExportNeedPdfController extends Controller
         ]);
 
         if ($paperSize === 'f4') {
-            // Indonesia F4: 215mm x 330mm
-            // points = mm * 72 / 25.4
-            $pdf->setPaper([0, 0, 609.45, 935.43]);
+            $pdf->setPaper(self::F4_PAPER_DIMENSIONS);
         } else {
             $pdf->setPaper($paperSize);
         }

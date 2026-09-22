@@ -1,24 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Database\Factories\StrategicServicePlanFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+#[Fillable([
+    'year',
+    'strategic_program',
+    'service_plan',
+    'target',
+    'policy_direction',
+])]
 class StrategicServicePlan extends Model
 {
     /** @use HasFactory<StrategicServicePlanFactory> */
     use HasFactory, SoftDeletes;
 
-    protected $fillable = [
-        'year',
-        'strategic_program',
-        'service_plan',
-        'target',
-        'policy_direction',
+    protected $casts = [
+        'year' => 'integer',
     ];
 
     /**

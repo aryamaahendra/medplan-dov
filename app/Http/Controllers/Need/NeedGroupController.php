@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Need;
 
 use App\Http\Controllers\Controller;
@@ -7,6 +9,7 @@ use App\Http\Requests\Need\StoreNeedGroupRequest;
 use App\Http\Requests\Need\UpdateNeedGroupRequest;
 use App\Models\NeedGroup;
 use App\Traits\HasDataTable;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -45,7 +48,7 @@ class NeedGroupController extends Controller
         ]);
     }
 
-    public function store(StoreNeedGroupRequest $request)
+    public function store(StoreNeedGroupRequest $request): RedirectResponse
     {
         $this->authorize('create', NeedGroup::class);
         NeedGroup::create($request->validated());
@@ -54,7 +57,7 @@ class NeedGroupController extends Controller
             ->with('success', 'Kelompok usulan berhasil dibuat.');
     }
 
-    public function update(UpdateNeedGroupRequest $request, NeedGroup $needGroup)
+    public function update(UpdateNeedGroupRequest $request, NeedGroup $needGroup): RedirectResponse
     {
         $this->authorize('update', $needGroup);
         $needGroup->update($request->validated());
@@ -63,7 +66,7 @@ class NeedGroupController extends Controller
             ->with('success', 'Kelompok usulan berhasil diperbarui.');
     }
 
-    public function destroy(NeedGroup $needGroup)
+    public function destroy(NeedGroup $needGroup): RedirectResponse
     {
         $this->authorize('delete', $needGroup);
         $needGroup->delete();

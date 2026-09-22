@@ -102,6 +102,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::post('set-current', 'setCurrent')->name('set-current');
             });
 
+        Route::post('planning-versions/{planning_version}/activities/recalculate', 'PlanningRecalculateController')
+            ->name('planning-versions.activities.recalculate');
+
         Route::controller('PlanningActivityVersionController')->group(function () {
             Route::prefix('planning-versions/{planning_version}/activities')
                 ->name('planning-versions.activities.')
@@ -112,10 +115,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     Route::get('create', 'create')->name('create');
                     Route::post('/', 'store')->name('store');
                     Route::get('check-code', 'checkCode')->name('check-code');
-                    Route::post('recalculate', 'PlanningRecalculateController')
-                        ->name('recalculate');
                 });
-
             Route::prefix('planning-versions/activities/{planning_activity_version}')
                 ->name('planning-versions.activities.')
                 ->group(function () {

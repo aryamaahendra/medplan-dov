@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Need;
 
 use App\Models\Need;
@@ -19,7 +21,9 @@ class AddNeedAttachmentAction
         $extension = $data['extension'] ?? $file->getClientOriginalExtension();
         $fileSize = $data['file_size'] ?? $file->getSize();
 
-        $path = $file->store("needs/{$need->id}", 'local');
+        $disk = (string) config('filesystems.attachments_disk', config('filesystems.default', 'local'));
+
+        $path = $file->store("needs/{$need->id}", $disk);
 
         return $need->attachments()->create([
             'display_name' => $displayName,

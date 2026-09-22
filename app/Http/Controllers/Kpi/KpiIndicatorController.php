@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Kpi;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Kpi\StoreKpiIndicatorRequest;
 use App\Http\Requests\Kpi\UpdateKpiIndicatorRequest;
 use App\Models\KpiIndicator;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 
 class KpiIndicatorController extends Controller
@@ -18,7 +21,7 @@ class KpiIndicatorController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreKpiIndicatorRequest $request)
+    public function store(StoreKpiIndicatorRequest $request): RedirectResponse
     {
         DB::transaction(function () use ($request) {
             $indicator = KpiIndicator::create($request->validated());
@@ -36,7 +39,7 @@ class KpiIndicatorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateKpiIndicatorRequest $request, KpiIndicator $indicator)
+    public function update(UpdateKpiIndicatorRequest $request, KpiIndicator $indicator): RedirectResponse
     {
         DB::transaction(function () use ($request, $indicator) {
             $indicator->update($request->validated());
@@ -57,7 +60,7 @@ class KpiIndicatorController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(KpiIndicator $indicator)
+    public function destroy(KpiIndicator $indicator): RedirectResponse
     {
         $indicator->delete();
 

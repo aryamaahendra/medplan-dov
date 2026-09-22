@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Observers;
 
 use App\Jobs\CalculateActivityBudgetJob;
@@ -24,7 +26,7 @@ class PlanningActivityYearObserver
             $activity = $planningActivityYear->yearable;
 
             if ($activity) {
-                CalculateActivityBudgetJob::dispatch($activity, $planningActivityYear->year);
+                CalculateActivityBudgetJob::dispatch($activity, $planningActivityYear->year)->afterCommit();
             }
         }
     }

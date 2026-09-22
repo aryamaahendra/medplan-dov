@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Renstra;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Renstra\StoreSasaranRequest;
 use App\Http\Requests\Renstra\UpdateSasaranRequest;
 use App\Models\Sasaran;
+use Illuminate\Http\RedirectResponse;
 
 class SasaranController extends Controller
 {
@@ -15,17 +18,9 @@ class SasaranController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreSasaranRequest $request)
+    public function store(StoreSasaranRequest $request): RedirectResponse
     {
         Sasaran::create($request->validated());
 
@@ -33,17 +28,9 @@ class SasaranController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Sasaran $sasaran)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateSasaranRequest $request, Sasaran $sasaran)
+    public function update(UpdateSasaranRequest $request, Sasaran $sasaran): RedirectResponse
     {
         $sasaran->update($request->validated());
 
@@ -53,7 +40,7 @@ class SasaranController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Sasaran $sasaran)
+    public function destroy(Sasaran $sasaran): RedirectResponse
     {
         $sasaran->delete();
 

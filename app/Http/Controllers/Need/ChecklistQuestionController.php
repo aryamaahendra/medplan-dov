@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Need;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Need\StoreChecklistQuestionRequest;
+use App\Http\Requests\Need\UpdateChecklistQuestionRequest;
 use App\Models\ChecklistQuestion;
 use App\Traits\HasDataTable;
 use Illuminate\Http\RedirectResponse;

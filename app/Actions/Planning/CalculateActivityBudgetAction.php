@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Planning;
 
 use App\Enums\PlanningActivityType;
@@ -44,7 +46,7 @@ class CalculateActivityBudgetAction
         // 4. Dispatch jobs for each source and year
         foreach ($sources as $source) {
             for ($year = $startYear; $year <= $endYear; $year++) {
-                CalculateActivityBudgetJob::dispatch($source, $year);
+                CalculateActivityBudgetJob::dispatch($source, $year)->afterCommit();
             }
         }
     }

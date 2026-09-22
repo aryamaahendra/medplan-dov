@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Database\Factories\OrganizationalUnitFactory;
@@ -15,6 +17,13 @@ class OrganizationalUnit extends Model
 {
     /** @use HasFactory<OrganizationalUnitFactory> */
     use HasFactory, SoftDeletes;
+
+    protected function casts(): array
+    {
+        return [
+            'parent_id' => 'integer',
+        ];
+    }
 
     /**
      * Get the parent unit.

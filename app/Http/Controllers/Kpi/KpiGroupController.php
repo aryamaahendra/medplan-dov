@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Kpi;
 
 use App\Http\Controllers\Controller;
@@ -7,6 +9,7 @@ use App\Http\Requests\Kpi\StoreKpiGroupRequest;
 use App\Http\Requests\Kpi\UpdateKpiGroupRequest;
 use App\Models\KpiGroup;
 use App\Traits\HasDataTable;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -48,7 +51,7 @@ class KpiGroupController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreKpiGroupRequest $request)
+    public function store(StoreKpiGroupRequest $request): RedirectResponse
     {
         DB::transaction(function () use ($request) {
             if ($request->boolean('is_active')) {
@@ -71,7 +74,7 @@ class KpiGroupController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateKpiGroupRequest $request, KpiGroup $group)
+    public function update(UpdateKpiGroupRequest $request, KpiGroup $group): RedirectResponse
     {
         DB::transaction(function () use ($request, $group) {
             if ($request->boolean('is_active') && ! $group->is_active) {
@@ -87,7 +90,7 @@ class KpiGroupController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(KpiGroup $group)
+    public function destroy(KpiGroup $group): RedirectResponse
     {
         $group->delete();
 
@@ -97,7 +100,7 @@ class KpiGroupController extends Controller
     /**
      * Set the specified group as the single active group.
      */
-    public function activate(KpiGroup $group)
+    public function activate(KpiGroup $group): RedirectResponse
     {
         DB::transaction(function () use ($group) {
             KpiGroup::where('is_active', true)->update(['is_active' => false]);

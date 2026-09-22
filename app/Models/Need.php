@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\Impact;
 use App\Enums\Urgency;
 use Database\Factories\NeedFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -138,7 +141,7 @@ class Need extends Model
             ];
         }
 
-        $needGroup = $this->needGroup ?? NeedGroup::find($this->need_group_id);
+        $needGroup = $this->needGroup;
         if ($needGroup && ! $needGroup->isOpenForSubmission()) {
             if ($this->lock_reason) {
                 return ['is_locked' => true, 'reason' => $this->lock_reason];
@@ -262,7 +265,7 @@ class Need extends Model
     /**
      * Scope a query to only include needs the user is authorized to see in index.
      */
-    public function scopeIndexScope($query, User $user)
+    public function scopeIndexScope(Builder $query, User $user): Builder
     {
         if ($user->hasAnyRole(['super-admin', 'admin', 'planner'])) {
             return $query;
@@ -278,8 +281,9 @@ class Need extends Model
     {
         static::deleting(function (Need $need) {
             if ($need->isForceDeleting()) {
+                $disk = (string) config('filesystems.attachments_disk', config('filesystems.default', 'local'));
                 foreach ($need->attachments as $attachment) {
-                    Storage::disk('local')->delete($attachment->file_path);
+                    Storage::disk($disk)->delete($attachment->file_path);
                 }
             }
         });

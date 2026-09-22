@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Management;
 
 use App\Enums\UserRole;
@@ -7,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Management\StoreRoleRequest;
 use App\Http\Requests\Management\UpdateRoleRequest;
 use App\Traits\HasDataTable;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -64,7 +67,7 @@ class RoleController extends Controller
         ]);
     }
 
-    public function store(StoreRoleRequest $request)
+    public function store(StoreRoleRequest $request): RedirectResponse
     {
         $this->authorize('create', Role::class);
         $role = Role::create(['name' => $request->validated('name')]);
@@ -76,7 +79,7 @@ class RoleController extends Controller
         return redirect()->route('roles.index')->with('success', 'Role created successfully.');
     }
 
-    public function update(UpdateRoleRequest $request, Role $role)
+    public function update(UpdateRoleRequest $request, Role $role): RedirectResponse
     {
         $this->authorize('update', $role);
         if (strtolower($role->name) === UserRole::SuperAdmin->value && strtolower($request->validated('name')) !== UserRole::SuperAdmin->value) {
@@ -92,7 +95,7 @@ class RoleController extends Controller
         return redirect()->route('roles.index')->with('success', 'Role updated successfully.');
     }
 
-    public function destroy(Role $role)
+    public function destroy(Role $role): RedirectResponse
     {
         $this->authorize('delete', $role);
         if (strtolower($role->name) === UserRole::SuperAdmin->value) {

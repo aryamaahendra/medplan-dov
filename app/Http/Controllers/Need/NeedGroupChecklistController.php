@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Need;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Need\ReorderNeedGroupChecklistRequest;
+use App\Http\Requests\Need\StoreNeedGroupChecklistRequest;
+use App\Http\Requests\Need\UpdateNeedGroupChecklistRequest;
 use App\Http\Resources\ChecklistQuestionResource;
 use App\Models\ChecklistQuestion;
 use App\Models\NeedGroup;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -41,16 +46,11 @@ class NeedGroupChecklistController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, NeedGroup $needGroup)
+    public function store(StoreNeedGroupChecklistRequest $request, NeedGroup $needGroup): RedirectResponse
     {
         $this->authorize('update', $needGroup);
 
-        $validated = $request->validate([
-            'checklist_question_id' => 'required|exists:checklist_questions,id',
-            'is_active' => 'sometimes|boolean',
-            'is_required' => 'sometimes|boolean',
-            'order_column' => 'sometimes|integer',
-        ]);
+        $validated = $request->validated();
 
         $needGroup->checklistQuestions()->attach($validated['checklist_question_id'], [
             'is_active' => $validated['is_active'] ?? true,
@@ -65,15 +65,11 @@ class NeedGroupChecklistController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, NeedGroup $needGroup, ChecklistQuestion $checklistQuestion)
+    public function update(UpdateNeedGroupChecklistRequest $request, NeedGroup $needGroup, ChecklistQuestion $checklistQuestion): RedirectResponse
     {
         $this->authorize('update', $needGroup);
 
-        $validated = $request->validate([
-            'is_active' => 'sometimes|boolean',
-            'is_required' => 'sometimes|boolean',
-            'order_column' => 'sometimes|integer',
-        ]);
+        $validated = $request->validated();
 
         $needGroup->checklistQuestions()->updateExistingPivot($checklistQuestion->id, $validated);
 
@@ -84,15 +80,11 @@ class NeedGroupChecklistController extends Controller
     /**
      * Reorder the resources in storage.
      */
-    public function reorder(Request $request, NeedGroup $needGroup)
+    public function reorder(ReorderNeedGroupChecklistRequest $request, NeedGroup $needGroup): RedirectResponse
     {
         $this->authorize('update', $needGroup);
 
-        $validated = $request->validate([
-            'questions' => 'required|array',
-            'questions.*.id' => 'required|exists:checklist_questions,id',
-            'questions.*.order_column' => 'required|integer',
-        ]);
+        $validated = $request->validated();
 
         foreach ($validated['questions'] as $item) {
             $needGroup->checklistQuestions()->updateExistingPivot($item['id'], [
@@ -107,7 +99,7 @@ class NeedGroupChecklistController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(NeedGroup $needGroup, ChecklistQuestion $checklistQuestion)
+    public function destroy(NeedGroup $needGroup, ChecklistQuestion $checklistQuestion): RedirectResponse
     {
         $this->authorize('update', $needGroup);
 

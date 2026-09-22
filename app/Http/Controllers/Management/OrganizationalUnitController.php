@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Management;
 
 use App\Http\Controllers\Controller;
@@ -7,6 +9,7 @@ use App\Http\Requests\Management\StoreOrganizationalUnitRequest;
 use App\Http\Requests\Management\UpdateOrganizationalUnitRequest;
 use App\Models\OrganizationalUnit;
 use App\Traits\HasDataTable;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -43,7 +46,7 @@ class OrganizationalUnitController extends Controller
         ]);
     }
 
-    public function store(StoreOrganizationalUnitRequest $request)
+    public function store(StoreOrganizationalUnitRequest $request): RedirectResponse
     {
         $this->authorize('create', OrganizationalUnit::class);
         OrganizationalUnit::create($request->validated());
@@ -52,7 +55,7 @@ class OrganizationalUnitController extends Controller
             ->with('success', 'Unit organisasi berhasil dibuat.');
     }
 
-    public function update(UpdateOrganizationalUnitRequest $request, OrganizationalUnit $organizationalUnit)
+    public function update(UpdateOrganizationalUnitRequest $request, OrganizationalUnit $organizationalUnit): RedirectResponse
     {
         $this->authorize('update', $organizationalUnit);
         $organizationalUnit->update($request->validated());
@@ -61,7 +64,7 @@ class OrganizationalUnitController extends Controller
             ->with('success', 'Unit organisasi berhasil diperbarui.');
     }
 
-    public function destroy(OrganizationalUnit $organizationalUnit)
+    public function destroy(OrganizationalUnit $organizationalUnit): RedirectResponse
     {
         $this->authorize('delete', $organizationalUnit);
         $organizationalUnit->delete();

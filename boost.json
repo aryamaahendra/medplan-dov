@@ -22,6 +22,8 @@
         "inertia-react-development",
         "tailwindcss-development",
         "laravel-excel",
-        "laravel-permission-development"
+        "laravel-permission-development",
+        "laravel-specialist",
+        "laravel-tdd"
     ]
 }

@@ -1,7 +1,14 @@
 <?php
 
-test('example', function () {
-    $response = $this->get('/');
+use App\Models\PlanningVersion;
+use App\Models\User;
 
-    $response->assertStatus(200);
+test('authenticated user can view activities of a planning version', function () {
+    $user = User::factory()->create();
+    $user->assignRole('super-admin');
+    $version = PlanningVersion::factory()->create();
+
+    $response = $this->actingAs($user)->get(route('planning-versions.activities.index', $version));
+
+    $response->assertOk();
 });

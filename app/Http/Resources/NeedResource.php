@@ -16,8 +16,9 @@ class NeedResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $needGroup = $this->whenLoaded('needGroup');
-        $hasLoadedNeedGroup = $this->relationLoaded('needGroup');
+        $needGroup = $this->resource->relationLoaded('needGroup')
+            ? $this->resource->needGroup
+            : $this->resource->needGroup;
 
         return [
             'id' => $this->resource->id,
@@ -49,12 +50,8 @@ class NeedResource extends JsonResource
             'is_locked' => $this->resource->isLocked($request->user()),
             'lock_reason' => $this->resource->getEffectiveLockReason($request->user()),
             'unlocked_until' => $this->resource->unlocked_until?->toIso8601String(),
-            'submission_window_status' => $hasLoadedNeedGroup
-                ? ($this->resource->needGroup?->getSubmissionWindowStatus() ?? 'indefinite')
-                : 'indefinite',
-            'group_submission_end_at' => $hasLoadedNeedGroup
-                ? $this->resource->needGroup?->submission_end_at?->toIso8601String()
-                : null,
+            'submission_window_status' => $needGroup?->getSubmissionWindowStatus() ?? 'indefinite',
+            'group_submission_end_at' => $needGroup?->submission_end_at?->toIso8601String(),
 
             // Capabilities
             'can' => [
@@ -67,8 +64,8 @@ class NeedResource extends JsonResource
             ],
 
             // Relations via whenLoaded
-            'need_group' => $needGroup,
-            'needGroup' => $needGroup,
+            'need_group' => $this->whenLoaded('needGroup'),
+            'needGroup' => $this->whenLoaded('needGroup'),
             'organizational_unit' => $this->whenLoaded('organizationalUnit'),
             'need_type' => $this->whenLoaded('needType'),
             'sasarans' => $this->whenLoaded('sasarans'),

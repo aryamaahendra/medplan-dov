@@ -11,6 +11,7 @@ describe('KpiGroupController', function () {
 
     beforeEach(function () {
         $this->user = User::factory()->create();
+        $this->user->assignRole('super-admin');
         $this->actingAs($this->user);
     });
 
@@ -77,7 +78,7 @@ describe('KpiGroupController', function () {
         $response = $this->delete(route('kpis.groups.destroy', $group));
 
         $response->assertSessionHasNoErrors();
-        $this->assertDatabaseMissing('kpi_groups', ['id' => $group->id]);
+        $this->assertModelMissing($group);
     });
 
     it('can activate a kpi group via dedicated route', function () {

@@ -18,11 +18,25 @@ test('authenticated users can visit the dashboard and see stats', function () {
 
     $this->actingAs($user);
 
+    // Initial request: verify dashboard renders
     $response = $this->get(route('dashboard'));
     $response->assertOk();
-
     $response->assertInertia(fn (Assert $page) => $page
         ->component('dashboard')
-        ->has('dashboardData')
+    );
+
+    $version = $response->inertiaPage()['version'] ?? '';
+
+    // Partial request for deferred prop: verify dashboardData is loaded
+    $partialResponse = $this->get(route('dashboard'), [
+        'X-Inertia' => 'true',
+        'X-Inertia-Version' => (string) $version,
+        'X-Inertia-Partial-Component' => 'dashboard',
+        'X-Inertia-Partial-Data' => 'dashboardData',
+    ]);
+    $partialResponse->assertOk();
+    $partialResponse->assertJson(fn ($json) => $json
+        ->has('props.dashboardData')
+        ->etc()
     );
 });

@@ -17,7 +17,7 @@ beforeEach(function () {
     $this->user = User::factory()->admin()->create();
 });
 test('can recalculate planning version activity budget', function () {
-    Queue::fake();
+    Queue::fake([CalculateActivityBudgetJob::class]);
 
     $version = PlanningVersion::factory()->create([
         'year_start' => 2026,

@@ -21,7 +21,7 @@ test('email verification screen can be rendered', function () {
 test('email can be verified', function () {
     $user = User::factory()->unverified()->create();
 
-    Event::fake();
+    Event::fake([Verified::class]);
 
     $verificationUrl = URL::temporarySignedRoute(
         'verification.verify',
@@ -39,7 +39,7 @@ test('email can be verified', function () {
 test('email is not verified with invalid hash', function () {
     $user = User::factory()->unverified()->create();
 
-    Event::fake();
+    Event::fake([Verified::class]);
 
     $verificationUrl = URL::temporarySignedRoute(
         'verification.verify',
@@ -56,7 +56,7 @@ test('email is not verified with invalid hash', function () {
 test('email is not verified with invalid user id', function () {
     $user = User::factory()->unverified()->create();
 
-    Event::fake();
+    Event::fake([Verified::class]);
 
     $verificationUrl = URL::temporarySignedRoute(
         'verification.verify',
@@ -73,7 +73,7 @@ test('email is not verified with invalid user id', function () {
 test('verified user is redirected to dashboard from verification prompt', function () {
     $user = User::factory()->create();
 
-    Event::fake();
+    Event::fake([Verified::class]);
 
     $response = $this->actingAs($user)->get(route('verification.notice'));
 
@@ -84,7 +84,7 @@ test('verified user is redirected to dashboard from verification prompt', functi
 test('already verified user visiting verification link is redirected without firing event again', function () {
     $user = User::factory()->create();
 
-    Event::fake();
+    Event::fake([Verified::class]);
 
     $verificationUrl = URL::temporarySignedRoute(
         'verification.verify',

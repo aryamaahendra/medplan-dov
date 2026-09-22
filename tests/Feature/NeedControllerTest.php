@@ -116,7 +116,7 @@ it('provides active kpi groups and strategic plans to create view', function () 
 
     $response = $this->get(route('needs.create', ['need_group_id' => $this->group->id]));
 
-    $response->assertStatus(200)
+    $response->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('need/needs/create')
             ->has('kpiGroups', 1)
@@ -186,7 +186,7 @@ it('can view a need detail page', function () {
 
     $response = $this->get(route('needs.show', $need));
 
-    $response->assertStatus(200)
+    $response->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('need/needs/show')
             ->has('need')

@@ -24,7 +24,7 @@ it('can view need groups index', function () {
 
     $response = $this->get(route('need-groups.index'));
 
-    $response->assertStatus(200)
+    $response->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('need/groups/index')
             ->has('needGroups.data', 1)

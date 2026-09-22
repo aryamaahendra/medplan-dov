@@ -1,7 +1,12 @@
 <?php
 
-test('example', function () {
-    $response = $this->get('/');
+use App\Models\PlanningActivityVersion;
 
-    $response->assertStatus(200);
+test('planning activity version can be created via factory', function () {
+    $activity = PlanningActivityVersion::factory()->create([
+        'name' => 'Program Pengembangan Sistem',
+    ]);
+
+    expect($activity->name)->toBe('Program Pengembangan Sistem');
+    $this->assertModelExists($activity);
 });

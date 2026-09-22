@@ -10,6 +10,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
+beforeEach(function () {
+    $this->user = User::factory()->create();
+    $this->user->assignRole('super-admin');
+    $this->actingAs($this->user);
+});
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function validIndicatorPayload(Tujuan $tujuan, array $overrides = []): array
@@ -45,6 +51,7 @@ function validSasaranIndicatorPayload(Sasaran $sasaran, array $overrides = []): 
 // ─── Auth Guard ───────────────────────────────────────────────────────────────
 
 test('guest cannot create, update, or delete indicators', function () {
+    auth()->logout();
     $indicator = Indicator::factory()->create();
 
     $this->post(route('indicators.store'), ['name' => 'Test Indicator'])
@@ -60,14 +67,12 @@ test('guest cannot create, update, or delete indicators', function () {
 // ─── Store ────────────────────────────────────────────────────────────────────
 
 test('store creates a new indicator and its targets', function () {
-    $user = User::factory()->create();
     $renstra = Renstra::factory()->create(['year_start' => 2025, 'year_end' => 2029]);
     $tujuan = Tujuan::factory()->create(['renstra_id' => $renstra->id]);
 
     $payload = validIndicatorPayload($tujuan);
 
-    $this->actingAs($user)
-        ->from(route('renstras.show', $renstra))
+    $this->from(route('renstras.show', $renstra))
         ->post(route('indicators.store'), $payload)
         ->assertRedirect(route('renstras.show', $renstra))
         ->assertSessionHas('success', 'Indikator berhasil dibuat.');
@@ -95,10 +100,7 @@ test('store creates a new indicator and its targets', function () {
 });
 
 test('store validates required fields', function () {
-    $user = User::factory()->create();
-
-    $this->actingAs($user)
-        ->post(route('indicators.store'), [])
+    $this->post(route('indicators.store'), [])
         ->assertSessionHasErrors([
             'tujuan_id',
             'sasaran_id',
@@ -108,15 +110,13 @@ test('store validates required fields', function () {
 });
 
 test('store creates a new indicator for sasaran', function () {
-    $user = User::factory()->create();
     $renstra = Renstra::factory()->create(['year_start' => 2025, 'year_end' => 2029]);
     $tujuan = Tujuan::factory()->create(['renstra_id' => $renstra->id]);
     $sasaran = Sasaran::factory()->create(['tujuan_id' => $tujuan->id]);
 
     $payload = validSasaranIndicatorPayload($sasaran);
 
-    $this->actingAs($user)
-        ->from(route('renstras.show', $renstra))
+    $this->from(route('renstras.show', $renstra))
         ->post(route('indicators.store'), $payload)
         ->assertRedirect(route('renstras.show', $renstra))
         ->assertSessionHas('success', 'Indikator berhasil dibuat.');
@@ -130,7 +130,6 @@ test('store creates a new indicator for sasaran', function () {
 });
 
 test('store validates target nested fields', function () {
-    $user = User::factory()->create();
     $tujuan = Tujuan::factory()->create();
 
     $payload = validIndicatorPayload($tujuan, [
@@ -139,8 +138,7 @@ test('store validates target nested fields', function () {
         ],
     ]);
 
-    $this->actingAs($user)
-        ->post(route('indicators.store'), $payload)
+    $this->post(route('indicators.store'), $payload)
         ->assertSessionHasErrors([
             'targets.0.year',
             'targets.0.target',
@@ -150,7 +148,6 @@ test('store validates target nested fields', function () {
 // ─── Update ───────────────────────────────────────────────────────────────────
 
 test('update modifies an existing indicator and its targets', function () {
-    $user = User::factory()->create();
     $renstra = Renstra::factory()->create(['year_start' => 2025, 'year_end' => 2029]);
     $tujuan = Tujuan::factory()->create(['renstra_id' => $renstra->id]);
 
@@ -175,8 +172,7 @@ test('update modifies an existing indicator and its targets', function () {
         ],
     ]);
 
-    $this->actingAs($user)
-        ->from(route('renstras.show', $renstra))
+    $this->from(route('renstras.show', $renstra))
         ->put(route('indicators.update', $indicator), $payload)
         ->assertRedirect(route('renstras.show', $renstra))
         ->assertSessionHas('success', 'Indikator berhasil diperbarui.');
@@ -199,11 +195,9 @@ test('update modifies an existing indicator and its targets', function () {
 });
 
 test('update validates required fields', function () {
-    $user = User::factory()->create();
     $indicator = Indicator::factory()->create();
 
-    $this->actingAs($user)
-        ->put(route('indicators.update', $indicator), [])
+    $this->put(route('indicators.update', $indicator), [])
         ->assertSessionHasErrors([
             'tujuan_id',
             'sasaran_id',
@@ -213,7 +207,6 @@ test('update validates required fields', function () {
 });
 
 test('update modifies a sasaran indicator', function () {
-    $user = User::factory()->create();
     $renstra = Renstra::factory()->create(['year_start' => 2025, 'year_end' => 2029]);
     $tujuan = Tujuan::factory()->create(['renstra_id' => $renstra->id]);
     $sasaran = Sasaran::factory()->create(['tujuan_id' => $tujuan->id]);
@@ -228,8 +221,7 @@ test('update modifies a sasaran indicator', function () {
         'name' => 'Indikator Sasaran Baru',
     ]);
 
-    $this->actingAs($user)
-        ->from(route('renstras.show', $renstra))
+    $this->from(route('renstras.show', $renstra))
         ->put(route('indicators.update', $indicator), $payload)
         ->assertRedirect(route('renstras.show', $renstra))
         ->assertSessionHas('success', 'Indikator berhasil diperbarui.');
@@ -240,8 +232,6 @@ test('update modifies a sasaran indicator', function () {
 // ─── Destroy ─────────────────────────────────────────────────────────────────
 
 test('destroy deletes an indicator and cascades its targets', function () {
-    $user = User::factory()->create();
-
     $indicator = Indicator::factory()->create();
     IndicatorTarget::create([
         'indicator_id' => $indicator->id,
@@ -250,17 +240,16 @@ test('destroy deletes an indicator and cascades its targets', function () {
     ]);
 
     // Ensure they exist initially
-    $this->assertDatabaseHas('indicators', ['id' => $indicator->id]);
+    $this->assertModelExists($indicator);
     $this->assertDatabaseHas('indicator_targets', ['indicator_id' => $indicator->id]);
 
-    $this->actingAs($user)
-        ->from(route('renstras.show', $indicator->tujuan_id ? $indicator->tujuan->renstra_id : $indicator->sasaran->tujuan->renstra_id))
+    $this->from(route('renstras.show', $indicator->tujuan_id ? $indicator->tujuan->renstra_id : $indicator->sasaran->tujuan->renstra_id))
         ->delete(route('indicators.destroy', $indicator))
         ->assertRedirect(route('renstras.show', $indicator->tujuan_id ? $indicator->tujuan->renstra_id : $indicator->sasaran->tujuan->renstra_id))
         ->assertSessionHas('success', 'Indikator berhasil dihapus.');
 
     // Assert indicator is missing
-    $this->assertDatabaseMissing('indicators', ['id' => $indicator->id]);
+    $this->assertModelMissing($indicator);
 
     // Assert targets are missing (cascade on delete)
     $this->assertDatabaseMissing('indicator_targets', ['indicator_id' => $indicator->id]);

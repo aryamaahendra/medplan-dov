@@ -8,7 +8,6 @@ use App\Models\NeedGroup;
 use App\Models\NeedType;
 use App\Models\OrganizationalUnit;
 use App\Models\User;
-use Carbon\Carbon;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\PermissionRegistrar;
@@ -61,7 +60,7 @@ describe('NeedGroup isOpenForSubmission helper', function () {
     });
 
     it('returns true when current time is strictly within start and end boundaries', function () {
-        Carbon::setTestNow('2026-06-15 12:00:00');
+        $this->travelTo('2026-06-15 12:00:00');
 
         $group = NeedGroup::factory()->create([
             'is_active' => true,
@@ -71,11 +70,11 @@ describe('NeedGroup isOpenForSubmission helper', function () {
 
         expect($group->isOpenForSubmission())->toBeTrue();
 
-        Carbon::setTestNow();
+        $this->travelBack();
     });
 
     it('returns false before submission start date', function () {
-        Carbon::setTestNow('2026-05-31 23:59:59');
+        $this->travelTo('2026-05-31 23:59:59');
 
         $group = NeedGroup::factory()->create([
             'is_active' => true,
@@ -85,11 +84,11 @@ describe('NeedGroup isOpenForSubmission helper', function () {
 
         expect($group->isOpenForSubmission())->toBeFalse();
 
-        Carbon::setTestNow();
+        $this->travelBack();
     });
 
     it('returns false after submission deadline', function () {
-        Carbon::setTestNow('2026-07-01 00:00:01');
+        $this->travelTo('2026-07-01 00:00:01');
 
         $group = NeedGroup::factory()->create([
             'is_active' => true,
@@ -99,11 +98,11 @@ describe('NeedGroup isOpenForSubmission helper', function () {
 
         expect($group->isOpenForSubmission())->toBeFalse();
 
-        Carbon::setTestNow();
+        $this->travelBack();
     });
 
     it('handles open-ended start or end dates correctly', function () {
-        Carbon::setTestNow('2026-06-15 12:00:00');
+        $this->travelTo('2026-06-15 12:00:00');
 
         $groupOnlyStart = NeedGroup::factory()->create([
             'is_active' => true,
@@ -119,16 +118,16 @@ describe('NeedGroup isOpenForSubmission helper', function () {
         ]);
         expect($groupOnlyEnd->isOpenForSubmission())->toBeTrue();
 
-        Carbon::setTestNow('2026-07-01 00:00:00');
+        $this->travelTo('2026-07-01 00:00:00');
         expect($groupOnlyEnd->isOpenForSubmission())->toBeFalse();
 
-        Carbon::setTestNow();
+        $this->travelBack();
     });
 });
 
 describe('Need submission window authorization', function () {
     it('allows staff to create a need during an open window', function () {
-        Carbon::setTestNow('2026-06-15 12:00:00');
+        $this->travelTo('2026-06-15 12:00:00');
 
         $group = NeedGroup::factory()->create([
             'is_active' => true,
@@ -162,11 +161,11 @@ describe('Need submission window authorization', function () {
             'need_group_id' => $group->id,
         ]);
 
-        Carbon::setTestNow();
+        $this->travelBack();
     });
 
     it('blocks staff from creating a need when submission window is closed (403)', function () {
-        Carbon::setTestNow('2026-07-01 12:00:00');
+        $this->travelTo('2026-07-01 12:00:00');
 
         $group = NeedGroup::factory()->create([
             'is_active' => true,
@@ -194,17 +193,17 @@ describe('Need submission window authorization', function () {
         $response = $this->actingAs($this->staffUser)
             ->post(route('needs.store'), $payload);
 
-        $response->assertStatus(403);
+        $response->assertForbidden();
         $this->assertDatabaseMissing('needs', [
             'title' => 'Closed Window Need',
         ]);
         $response->assertSee('Periode pengajuan usulan kebutuhan untuk kelompok ini sedang ditutup.');
 
-        Carbon::setTestNow();
+        $this->travelBack();
     });
 
     it('blocks staff from creating a need before submission window start date (403)', function () {
-        Carbon::setTestNow('2026-05-31 23:59:59');
+        $this->travelTo('2026-05-31 23:59:59');
 
         $group = NeedGroup::factory()->create([
             'is_active' => true,
@@ -232,13 +231,13 @@ describe('Need submission window authorization', function () {
         $response = $this->actingAs($this->staffUser)
             ->post(route('needs.store'), $payload);
 
-        $response->assertStatus(403);
+        $response->assertForbidden();
         $response->assertSee('Periode pengajuan usulan kebutuhan untuk kelompok ini sedang ditutup.');
         $this->assertDatabaseMissing('needs', [
             'title' => 'Before Start Window Need',
         ]);
 
-        Carbon::setTestNow();
+        $this->travelBack();
     });
 
     it('blocks staff from creating a need when need group is inactive (403)', function () {
@@ -266,7 +265,7 @@ describe('Need submission window authorization', function () {
         $response = $this->actingAs($this->staffUser)
             ->post(route('needs.store'), $payload);
 
-        $response->assertStatus(403);
+        $response->assertForbidden();
         $response->assertSee('Periode pengajuan usulan kebutuhan untuk kelompok ini sedang ditutup.');
         $this->assertDatabaseMissing('needs', [
             'title' => 'Inactive Group Need',
@@ -274,7 +273,7 @@ describe('Need submission window authorization', function () {
     });
 
     it('allows planner and super-admin to bypass closed submission window on create', function () {
-        Carbon::setTestNow('2026-07-01 12:00:00');
+        $this->travelTo('2026-07-01 12:00:00');
 
         $group = NeedGroup::factory()->create([
             'is_active' => true,
@@ -331,11 +330,11 @@ describe('Need submission window authorization', function () {
             'title' => 'Super Admin Bypassed Need',
         ]);
 
-        Carbon::setTestNow();
+        $this->travelBack();
     });
 
     it('allows staff to edit a need during open submission window', function () {
-        Carbon::setTestNow('2026-06-15 12:00:00');
+        $this->travelTo('2026-06-15 12:00:00');
 
         $group = NeedGroup::factory()->create([
             'is_active' => true,
@@ -373,11 +372,11 @@ describe('Need submission window authorization', function () {
         $response->assertRedirect();
         expect($need->refresh()->title)->toBe('Updated Title');
 
-        Carbon::setTestNow();
+        $this->travelBack();
     });
 
     it('blocks staff from editing a need when submission window is closed (403)', function () {
-        Carbon::setTestNow('2026-07-01 12:00:00');
+        $this->travelTo('2026-07-01 12:00:00');
 
         $group = NeedGroup::factory()->create([
             'is_active' => true,
@@ -411,15 +410,15 @@ describe('Need submission window authorization', function () {
 
         $response = $this->actingAs($this->staffUser)
             ->patch(route('needs.update', $need), $updatePayload);
-        $response->assertStatus(403);
+        $response->assertForbidden();
         $response->assertSee('Periode pengajuan usulan kebutuhan untuk kelompok ini sedang ditutup.');
         expect($need->refresh()->title)->toBe('Initial Title');
 
-        Carbon::setTestNow();
+        $this->travelBack();
     });
 
     it('blocks staff from editing a need before submission window start date (403)', function () {
-        Carbon::setTestNow('2026-05-31 23:59:59');
+        $this->travelTo('2026-05-31 23:59:59');
 
         $group = NeedGroup::factory()->create([
             'is_active' => true,
@@ -454,11 +453,11 @@ describe('Need submission window authorization', function () {
         $response = $this->actingAs($this->staffUser)
             ->patch(route('needs.update', $need), $updatePayload);
 
-        $response->assertStatus(403);
+        $response->assertForbidden();
         $response->assertSee('Periode pengajuan usulan kebutuhan untuk kelompok ini sedang ditutup.');
         expect($need->refresh()->title)->toBe('Initial Title');
 
-        Carbon::setTestNow();
+        $this->travelBack();
     });
 
     it('blocks staff from editing a need when need group is inactive (403)', function () {
@@ -493,13 +492,13 @@ describe('Need submission window authorization', function () {
         $response = $this->actingAs($this->staffUser)
             ->patch(route('needs.update', $need), $updatePayload);
 
-        $response->assertStatus(403);
+        $response->assertForbidden();
         $response->assertSee('Periode pengajuan usulan kebutuhan untuk kelompok ini sedang ditutup.');
         expect($need->refresh()->title)->toBe('Initial Title');
     });
 
     it('allows planner and super-admin to edit a need when submission window is closed', function () {
-        Carbon::setTestNow('2026-07-01 12:00:00');
+        $this->travelTo('2026-07-01 12:00:00');
 
         $group = NeedGroup::factory()->create([
             'is_active' => true,
@@ -539,6 +538,6 @@ describe('Need submission window authorization', function () {
         $response->assertRedirect();
         expect($need->refresh()->title)->toBe('Planner Updated');
 
-        Carbon::setTestNow();
+        $this->travelBack();
     });
 });

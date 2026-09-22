@@ -42,7 +42,7 @@ class DashboardController extends Controller
                     ->whereIn('need_group_id', $groupIds)
                     ->select([
                         'need_group_id',
-                        DB::raw('SUM(CASE WHEN is_priority = 1 THEN 1 ELSE 0 END) as priority_needs'),
+                        DB::raw('SUM(CASE WHEN is_priority THEN 1 ELSE 0 END) as priority_needs'),
                         DB::raw('SUM(CASE WHEN approved_by_director_at IS NOT NULL THEN 1 ELSE 0 END) as approved_by_director'),
                     ])
                     ->groupBy('need_group_id')

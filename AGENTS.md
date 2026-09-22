@@ -46,6 +46,10 @@ Project domain skills available. MUST activate relevant skill when working in do
 - Do not change application dependencies without approval.
 - Be concise in explanations.
 
+### Code Quality & Pre-Commit
+
+- Do NOT manually run lint, formatting, or type-check steps as part of the agent task loop: code formatting (Prettier, Pint), linting (ESLint), and full-project type and static analysis checks (TypeScript, PHPStan) are enforced automatically by the pre-commit hook.
+
 ## Laravel Boost Tools
 
 - Laravel Boost: MCP server with project-specific tools.
@@ -108,6 +112,7 @@ Follow Laravel maintainer guidelines closely.
 PHP 8.5 Laravel app. Match installed major version; never assume.
 
 Check versions before using package API:
+
 - PHP: `composer show --direct` or `composer show <vendor/package>`.
 - JS: check `package.json`.
 

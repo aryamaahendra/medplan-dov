@@ -1,12 +1,7 @@
 {
-  "**/*.php": [
-    "bash -c 'for f in \"$@\"; do rel=\"${f#\"$(pwd)/\"}\"; if [ -f vendor/bin/sail ] && docker compose ps --services --filter status=running 2>/dev/null | grep -q laravel.test; then vendor/bin/sail bin pint \"$rel\"; else ./vendor/bin/pint \"$rel\"; fi; done' --"
-  ],
-  "resources/**/*.{js,jsx,ts,tsx}": [
-    "eslint --fix",
-    "prettier --write"
-  ],
-  "resources/**/*.{css,json,md}": [
-    "prettier --write"
-  ]
+    "**/*.{js,jsx,ts,tsx}": ["prettier --write", "eslint --fix"],
+    "**/*.{css,scss,html,json,md,yml,yaml}": ["prettier --write"],
+    "**/*.php": [
+        "bash -c 'args=(); for f in \"$@\"; do args+=(\"${f#\"$PWD/\"}\"); done; if [ -f vendor/bin/sail ] && docker compose ps --services --filter status=running 2>/dev/null | grep -q laravel.test; then vendor/bin/sail bin pint \"${args[@]}\"; else ./vendor/bin/pint \"${args[@]}\"; fi' --"
+    ]
 }

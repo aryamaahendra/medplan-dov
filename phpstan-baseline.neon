@@ -1,0 +1,475 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Method App\\Actions\\Need\\AddNeedAttachmentAction\:\:execute\(\) should return App\\Models\\NeedAttachment but returns Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Actions/Need/AddNeedAttachmentAction.php
+
+		-
+			message: '#^Parameter \#1 \$unit of method App\\Actions\\Need\\GetFilteredNeedsAction\:\:extractUnitIds\(\) expects App\\Models\\OrganizationalUnit, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Actions/Need/GetFilteredNeedsAction.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Need\:\:\$approved_count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Need/GetNeedDashboardStatsAction.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Need\:\:\$count\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Actions/Need/GetNeedDashboardStatsAction.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Need\:\:\$priority_count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Need/GetNeedDashboardStatsAction.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Need\:\:\$total_budget\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Need/GetNeedDashboardStatsAction.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\Need\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 2
+			path: app/Actions/Need/GetNeedDashboardStatsAction.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Actions/Need/GetNeedDashboardStatsAction.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:fundingSources\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/Need/StoreNeedAction.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:fundingSources\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/Need/UpdateNeedAction.php
+
+		-
+			message: '#^Parameter \#1 \$attachment of method App\\Actions\\Need\\DeleteNeedAttachmentAction\:\:execute\(\) expects App\\Models\\NeedAttachment, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Actions/Need/UpdateNeedAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Planning/CalculateActivityBudgetAction.php
+
+		-
+			message: '#^Anonymous function has an unused use \$parentId\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: app/Actions/Planning/CalculateActivityBudgetAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$activityYears\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Planning/ClonePlanningVersionAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Actions/Planning/ClonePlanningVersionAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$indicators\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Planning/ClonePlanningVersionAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$parent_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Actions/Planning/ClonePlanningVersionAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$planning_version_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Planning/ClonePlanningVersionAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Exports/NeedExport.php
+
+		-
+			message: '#^Cannot call method format\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Exports/NeedExport.php
+
+		-
+			message: '#^Cannot call method label\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: app/Exports/NeedExport.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type string\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: app/Exports/NeedExport.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>budget" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Exports/PlanningHierarchyExport.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>target" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Exports/PlanningHierarchyExport.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Need\:\:\$approved_by_director\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Need\:\:\$avg_completeness\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Need\:\:\$priority_needs\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Need\:\:\$total_budget\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Need\:\:\$total_needs\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>approved_by_director" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>avg_completeness" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>priority_needs" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>total_budget" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>total_needs" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\:\:getCollection\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Need/NeedController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:checklistQuestions\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Need/NeedController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:isOpenForSubmission\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Need/NeedController.php
+
+		-
+			message: '#^Cannot call method isFuture\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Need/NeedController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Need/NeedGroupChecklistController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Need/NeedGroupChecklistController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$pivot\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Need/NeedGroupChecklistController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$question\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Need/NeedGroupChecklistController.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Http/Controllers/Need/NeedGroupChecklistController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Planning/PlanningActivityVersionController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Planning/PlanningActivityVersionController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\:\:getCollection\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Planning/PlanningActivityVersionController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\:\:setCollection\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Planning/PlanningActivityVersionController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:indicators\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Planning/PlanningActivityVersionController.php
+
+		-
+			message: '#^PHPDoc tag @return with type array\<string, array\<mixed\>\|Illuminate\\Contracts\\Validation\\ValidationRule\|string\> is incompatible with native type void\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Http/Requests/Need/StoreNeedRequest.php
+
+		-
+			message: '#^Negated boolean expression is always false\.$#'
+			identifier: booleanNot.alwaysFalse
+			count: 1
+			path: app/Http/Requests/Need/UpdateNeedRequest.php
+
+		-
+			message: '#^PHPDoc tag @return with type array\<string, array\<mixed\>\|Illuminate\\Contracts\\Validation\\ValidationRule\|string\> is incompatible with native type void\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Http/Requests/Need/UpdateNeedRequest.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ChecklistQuestionResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ChecklistQuestionResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ChecklistQuestionResource\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ChecklistQuestionResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ChecklistQuestionResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ChecklistQuestionResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ChecklistQuestionResource\:\:\$is_active\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ChecklistQuestionResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ChecklistQuestionResource\:\:\$order_column\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ChecklistQuestionResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ChecklistQuestionResource\:\:\$question\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ChecklistQuestionResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ChecklistQuestionResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ChecklistQuestionResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NeedChecklistAnswerResource\:\:\$answer\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NeedChecklistAnswerResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NeedChecklistAnswerResource\:\:\$checklist_question_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NeedChecklistAnswerResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NeedChecklistAnswerResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NeedChecklistAnswerResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NeedChecklistAnswerResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NeedChecklistAnswerResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NeedChecklistAnswerResource\:\:\$need_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NeedChecklistAnswerResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NeedChecklistAnswerResource\:\:\$notes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NeedChecklistAnswerResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\NeedChecklistAnswerResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/NeedChecklistAnswerResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\NeedResource\:\:relationLoaded\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/NeedResource.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>value" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: app/Http/Resources/NeedResource.php
+
+		-
+			message: '#^Variable \$type might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: app/Imports/PlanningImport.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$file_path\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Need.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getSubmissionWindowStatus\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Models/Need.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:isOpenForSubmission\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Models/Need.php
+
+		-
+			message: '#^Cannot call method isFuture\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/Need.php
+
+		-
+			message: '#^Parameter \#2 \$parent of method App\\Models\\OrganizationalUnit\:\:isDescendantOfUsingLoadedRelations\(\) expects App\\Models\\OrganizationalUnit\|null, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Models/OrganizationalUnit.php
+
+		-
+			message: '#^Parameter \#1 \$need of method App\\Actions\\Need\\RecalculateNeedChecklistScore\:\:execute\(\) expects App\\Models\\Need, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Observers/NeedChecklistAnswerObserver.php
+
+		-
+			message: '#^Parameter \#1 \$activity of job class App\\Jobs\\CalculateActivityBudgetJob constructor expects App\\Models\\PlanningActivityVersion in App\\Jobs\\CalculateActivityBudgetJob\:\:dispatch\(\), Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Observers/PlanningActivityYearObserver.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:isDescendantOf\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Policies/NeedPolicy.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:isOpenForSubmission\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Policies/NeedPolicy.php
+
+		-
+			message: '#^Cannot call method isFuture\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Policies/NeedPolicy.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between int\<0, max\> and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: app/Policies/NeedPolicy.php

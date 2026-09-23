@@ -1,12 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Method App\\Actions\\Need\\AddNeedAttachmentAction\:\:execute\(\) should return App\\Models\\NeedAttachment but returns Illuminate\\Database\\Eloquent\\Model\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Actions/Need/AddNeedAttachmentAction.php
-
-		-
 			message: '#^Parameter \#1 \$unit of method App\\Actions\\Need\\GetFilteredNeedsAction\:\:extractUnitIds\(\) expects App\\Models\\OrganizationalUnit, Illuminate\\Database\\Eloquent\\Model given\.$#'
 			identifier: argument.type
 			count: 2
@@ -47,24 +41,6 @@ parameters:
 			identifier: nullsafe.neverNull
 			count: 1
 			path: app/Actions/Need/GetNeedDashboardStatsAction.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:fundingSources\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Actions/Need/StoreNeedAction.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:fundingSources\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Actions/Need/UpdateNeedAction.php
-
-		-
-			message: '#^Parameter \#1 \$attachment of method App\\Actions\\Need\\DeleteNeedAttachmentAction\:\:execute\(\) expects App\\Models\\NeedAttachment, Illuminate\\Database\\Eloquent\\Model given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Actions/Need/UpdateNeedAction.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$type\.$#'

@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Need;
 
-use App\Actions\Need\AddNeedAttachmentAction;
-use App\Actions\Need\DeleteNeedAttachmentAction;
+use App\Actions\Need\NeedProposalEngine;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Need\StoreNeedAttachmentRequest;
 use App\Models\Need;
@@ -34,11 +33,11 @@ class NeedAttachmentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreNeedAttachmentRequest $request, Need $need, AddNeedAttachmentAction $action): RedirectResponse
+    public function store(StoreNeedAttachmentRequest $request, Need $need, NeedProposalEngine $engine): RedirectResponse
     {
         $this->authorize('create', [NeedAttachment::class, $need]);
 
-        $action->execute($need, [
+        $engine->addAttachment($need, [
             'file' => $request->file('file'),
             'display_name' => $request->input('display_name'),
             'extension' => $request->input('extension'),
@@ -86,10 +85,10 @@ class NeedAttachmentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(NeedAttachment $attachment, DeleteNeedAttachmentAction $action): RedirectResponse
+    public function destroy(NeedAttachment $attachment, NeedProposalEngine $engine): RedirectResponse
     {
         $this->authorize('delete', $attachment);
-        $action->execute($attachment);
+        $engine->deleteAttachment($attachment);
 
         return back()->with('success', 'Lampiran berhasil dihapus.');
     }

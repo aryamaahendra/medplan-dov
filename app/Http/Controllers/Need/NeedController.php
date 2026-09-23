@@ -6,8 +6,8 @@ namespace App\Http\Controllers\Need;
 
 use App\Actions\Need\GetFilteredNeedsAction;
 use App\Actions\Need\GetNeedDashboardStatsAction;
-use App\Actions\Need\StoreNeedAction;
-use App\Actions\Need\UpdateNeedAction;
+use App\Actions\Need\NeedProposalEngine;
+use App\Actions\Need\NeedProposalPayload;
 use App\Enums\Kldi;
 use App\Enums\SatkerSkpd;
 use App\Http\Controllers\Controller;
@@ -102,17 +102,11 @@ class NeedController extends Controller
         ]);
     }
 
-    public function store(StoreNeedRequest $request, StoreNeedAction $action): RedirectResponse
+    public function store(StoreNeedRequest $request, NeedProposalEngine $engine): RedirectResponse
     {
         $needGroup = NeedGroup::query()->find($request->input('need_group_id'));
         $this->authorize('create', [Need::class, $needGroup]);
-        $need = $action->execute(
-            $request->validated(),
-            $request->file('attachments'),
-            $request->input('attachment_names', []),
-            $request->file('technical_specification_attachments'),
-            $request->input('technical_specification_attachment_names', [])
-        );
+        $need = $engine->submit(NeedProposalPayload::fromRequest($request));
 
         return redirect()->route('needs.index', ['need_group_id' => $need->need_group_id])
             ->with('success', 'Usulan kebutuhan berhasil dibuat.');
@@ -228,17 +222,10 @@ class NeedController extends Controller
         ]);
     }
 
-    public function update(UpdateNeedRequest $request, Need $need, UpdateNeedAction $action): RedirectResponse
+    public function update(UpdateNeedRequest $request, Need $need, NeedProposalEngine $engine): RedirectResponse
     {
         $this->authorize('update', $need);
-        $action->execute(
-            $need,
-            $request->validated(),
-            $request->file('attachments'),
-            $request->input('attachment_names', []),
-            $request->file('technical_specification_attachments'),
-            $request->input('technical_specification_attachment_names', [])
-        );
+        $engine->update($need, NeedProposalPayload::fromRequest($request));
 
         return redirect()->route('needs.index', ['need_group_id' => $need->need_group_id])
             ->with('success', 'Usulan kebutuhan berhasil diperbarui.');

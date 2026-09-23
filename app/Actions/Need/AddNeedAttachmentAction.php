@@ -10,27 +10,17 @@ use Illuminate\Http\UploadedFile;
 
 class AddNeedAttachmentAction
 {
+    public function __construct(
+        protected NeedProposalEngine $engine
+    ) {}
+
     /**
      * Execute the action.
+     *
+     * @param  array{file: UploadedFile, display_name?: ?string, extension?: ?string, file_size?: ?int, category?: ?string}  $data
      */
     public function execute(Need $need, array $data): NeedAttachment
     {
-        /** @var UploadedFile $file */
-        $file = $data['file'];
-        $displayName = $data['display_name'] ?? $file->getClientOriginalName();
-        $extension = $data['extension'] ?? $file->getClientOriginalExtension();
-        $fileSize = $data['file_size'] ?? $file->getSize();
-
-        $disk = (string) config('filesystems.attachments_disk', config('filesystems.default', 'local'));
-
-        $path = $file->store("needs/{$need->id}", $disk);
-
-        return $need->attachments()->create([
-            'display_name' => $displayName,
-            'file_path' => $path,
-            'file_size' => $fileSize,
-            'mime_type' => $file->getMimeType(),
-            'extension' => $extension,
-        ]);
+        return $this->engine->addAttachment($need, $data);
     }
 }

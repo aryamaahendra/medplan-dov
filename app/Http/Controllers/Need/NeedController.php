@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Need;
 
 use App\Actions\Need\GetFilteredNeedsAction;
 use App\Actions\Need\GetNeedDashboardStatsAction;
+use App\Actions\Need\NeedLockLifecycle;
 use App\Actions\Need\NeedProposalEngine;
 use App\Actions\Need\NeedProposalPayload;
 use App\Enums\Kldi;
@@ -280,8 +281,11 @@ class NeedController extends Controller
             ->with('success', 'Usulan kebutuhan berhasil dihapus.');
     }
 
-    public function updateDirectorReview(UpdateDirectorReviewRequest $request, Need $need): RedirectResponse
-    {
+    public function updateDirectorReview(
+        UpdateDirectorReviewRequest $request,
+        Need $need,
+        NeedLockLifecycle $lifecycle
+    ): RedirectResponse {
         $this->authorize('approve', $need);
 
         $validated = $request->validated();
@@ -290,29 +294,14 @@ class NeedController extends Controller
         $isGroupOpen = $needGroup ? $needGroup->isOpenForSubmission() : true;
 
         if ($validated['is_approved']) {
-            $need->update([
-                'notes' => $validated['notes'],
-                'approved_by_director_at' => now(),
-                'is_locked' => true,
-                'locked_at' => now(),
-                'locked_by_user_id' => $request->user()?->id,
-            ]);
+            $lifecycle->approveByDirector($need, $validated['notes'], $request->user());
         } else {
-            $attributes = [
-                'notes' => $validated['notes'],
-                'approved_by_director_at' => null,
-            ];
-
-            // Releasing director approval clears the approval lock state.
-            // When group window is open or active extension window exists, clear lock overrides so schedule inheritance resumes.
             $hasActiveExtension = $need->unlocked_until !== null && $need->unlocked_until->isFuture();
-            if ($isGroupOpen || $hasActiveExtension) {
-                $attributes['is_locked'] = null;
-                $attributes['locked_at'] = null;
-                $attributes['locked_by_user_id'] = null;
-                $attributes['lock_reason'] = null;
-            }
-            $need->update($attributes);
+            $lifecycle->rejectDirectorApproval(
+                $need,
+                $validated['notes'],
+                $isGroupOpen || $hasActiveExtension
+            );
         }
 
         return back()->with('success', 'Review direktur berhasil diperbarui.');

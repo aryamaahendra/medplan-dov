@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Need;
 
-use App\Actions\Need\LockNeedAction;
-use App\Actions\Need\UnlockNeedAction;
+use App\Actions\Need\NeedLockLifecycle;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Need\LockNeedRequest;
 use App\Http\Requests\Need\UnlockNeedRequest;
@@ -17,11 +16,11 @@ class NeedLockController extends Controller
     /**
      * Lock the given need.
      */
-    public function lock(LockNeedRequest $request, Need $need, LockNeedAction $action): RedirectResponse
+    public function lock(LockNeedRequest $request, Need $need, NeedLockLifecycle $lifecycle): RedirectResponse
     {
         $this->authorize('lock', $need);
 
-        $action->execute(
+        $lifecycle->lock(
             $need,
             $request->validated('lock_reason'),
             $request->user()
@@ -33,11 +32,11 @@ class NeedLockController extends Controller
     /**
      * Unlock the given need or grant a temporary extension.
      */
-    public function unlock(UnlockNeedRequest $request, Need $need, UnlockNeedAction $action): RedirectResponse
+    public function unlock(UnlockNeedRequest $request, Need $need, NeedLockLifecycle $lifecycle): RedirectResponse
     {
         $this->authorize('unlock', $need);
 
-        $action->execute(
+        $lifecycle->unlock(
             $need,
             $request->validated('lock_reason'),
             $request->user(),

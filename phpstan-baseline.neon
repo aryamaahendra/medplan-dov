@@ -409,12 +409,6 @@ parameters:
 			path: app/Models/OrganizationalUnit.php
 
 		-
-			message: '#^Parameter \#1 \$need of method App\\Actions\\Need\\RecalculateNeedChecklistScore\:\:execute\(\) expects App\\Models\\Need, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/Observers/NeedChecklistAnswerObserver.php
-
-		-
 			message: '#^Parameter \#1 \$activity of job class App\\Jobs\\CalculateActivityBudgetJob constructor expects App\\Models\\PlanningActivityVersion in App\\Jobs\\CalculateActivityBudgetJob\:\:dispatch\(\), Illuminate\\Database\\Eloquent\\Model given\.$#'
 			identifier: argument.type
 			count: 1

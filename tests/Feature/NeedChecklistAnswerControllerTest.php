@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\Need\ChecklistAssessmentEngine;
 use App\Enums\ChecklistAnswer;
 use App\Models\ChecklistQuestion;
 use App\Models\Need;
@@ -104,29 +105,22 @@ it('calculates the checklist percentage correctly', function () {
     expect((float) $this->need->checklist_percentage)->toBe(66.67);
 });
 
-it('recalculates percentage when an answer is deleted', function () {
+it('recalculates percentage when an answer is deleted via ChecklistAssessmentEngine', function () {
     $question1 = ChecklistQuestion::factory()->create();
     $question2 = ChecklistQuestion::factory()->create();
 
-    $answer1 = $this->need->checklistAnswers()->create([
-        'checklist_question_id' => $question1->id,
-        'answer' => ChecklistAnswer::Yes->value,
+    $engine = app(ChecklistAssessmentEngine::class);
+
+    $engine->evaluate($this->need, [
+        ['checklist_question_id' => $question1->id, 'answer' => ChecklistAnswer::Yes->value],
+        ['checklist_question_id' => $question2->id, 'answer' => ChecklistAnswer::No->value],
     ]);
 
-    $this->need->checklistAnswers()->create([
-        'checklist_question_id' => $question2->id,
-        'answer' => ChecklistAnswer::No->value,
-    ]);
-
-    // Recalculate manually once because we created via relationship (does it trigger observer?)
-    // Actually relationship created() should trigger Observer if registered correctly.
-    // But let's verify.
     $this->need->refresh();
-    // 1 Yes, 1 No = 50%
-    // Wait, let's check if the observer works on creation too.
-    // My observer has 'saved' which covers created and updated.
+    expect((float) $this->need->checklist_percentage)->toBe(50.0);
 
-    $answer1->delete();
+    $answer1 = $this->need->checklistAnswers()->where('checklist_question_id', $question1->id)->first();
+    $engine->deleteAnswer($answer1);
 
     $this->need->refresh();
     // Only 1 No left = 0% Yes
@@ -187,4 +181,26 @@ it('forbids users without perform checklist permission from storing checklist an
             ],
         ])
         ->assertForbidden();
+});
+
+it('updates checklist score atomically without firing observer cycles', function () {
+    $engine = app(ChecklistAssessmentEngine::class);
+
+    $questions = ChecklistQuestion::factory()->count(5)->create();
+
+    $answers = [
+        ['checklist_question_id' => $questions[0]->id, 'answer' => ChecklistAnswer::Yes->value],
+        ['checklist_question_id' => $questions[1]->id, 'answer' => ChecklistAnswer::Yes->value],
+        ['checklist_question_id' => $questions[2]->id, 'answer' => ChecklistAnswer::No->value],
+        ['checklist_question_id' => $questions[3]->id, 'answer' => ChecklistAnswer::NotApplicable->value],
+        ['checklist_question_id' => $questions[4]->id, 'answer' => ChecklistAnswer::Yes->value],
+    ];
+
+    $percentage = $engine->evaluate($this->need, $answers);
+
+    // 3 Yes, 1 No = 3 / 4 = 75.0%
+    expect($percentage)->toBe(75.0);
+
+    $this->need->refresh();
+    expect((float) $this->need->checklist_percentage)->toBe(75.0);
 });

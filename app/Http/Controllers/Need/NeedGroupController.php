@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Need;
 
+use App\Actions\Need\RolloverNeedAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Need\StoreNeedGroupRequest;
 use App\Http\Requests\Need\UpdateNeedGroupRequest;
@@ -48,10 +49,18 @@ class NeedGroupController extends Controller
         ]);
     }
 
-    public function store(StoreNeedGroupRequest $request): RedirectResponse
+    public function store(StoreNeedGroupRequest $request, RolloverNeedAction $rolloverAction): RedirectResponse
     {
         $this->authorize('create', NeedGroup::class);
-        NeedGroup::create($request->validated());
+        $validated = $request->validated();
+        $carryOverIds = $validated['carry_over_need_ids'] ?? [];
+        unset($validated['carry_over_need_ids']);
+
+        $needGroup = NeedGroup::create($validated);
+
+        if (! empty($carryOverIds)) {
+            $rolloverAction->executeMany($carryOverIds, $needGroup, $request->user());
+        }
 
         return redirect()->back()
             ->with('success', 'Kelompok usulan berhasil dibuat.');

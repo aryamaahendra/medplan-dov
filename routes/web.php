@@ -21,6 +21,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::namespace('App\Http\Controllers\Need')->group(function () {
         Route::resource('need-types', 'NeedTypeController')->except(['create', 'edit', 'show']);
         Route::resource('need-groups', 'NeedGroupController')->except(['create', 'edit', 'show']);
+        Route::post('need-groups/{need_group}/rollover', 'NeedRolloverController@bulkRollover')->name('need-groups.rollover');
         Route::resource('checklist-questions', 'ChecklistQuestionController')->except(['show']);
 
         Route::controller('NeedGroupChecklistController')
@@ -35,6 +36,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             });
 
         Route::prefix('needs')->name('needs.')->group(function () {
+            Route::controller('NeedRolloverController')->group(function () {
+                Route::get('unapproved-candidates', 'candidates')->name('unapproved-candidates');
+                Route::get('{need}/unapproved-source', 'sourceDetail')->name('unapproved-source');
+            });
             Route::controller('NeedController')->group(function () {
                 Route::patch('{need}/director-review', 'updateDirectorReview')->name('director-review');
             });

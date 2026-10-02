@@ -43,6 +43,8 @@ class OrganizationalUnit extends Model
 
     /**
      * Get the sub-units.
+     *
+     * @return HasMany<OrganizationalUnit, $this>
      */
     public function children(): HasMany
     {
@@ -51,6 +53,8 @@ class OrganizationalUnit extends Model
 
     /**
      * Get all child units recursively.
+     *
+     * @return HasMany<OrganizationalUnit, $this>
      */
     public function descendantsRecursive(): HasMany
     {

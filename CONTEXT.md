@@ -30,6 +30,14 @@ _Avoid_: Checklist result, questionnaire response
 The detailed proposal information accompanying a need, including terms of reference (TOR), background, specifications, cost estimates, and KPA assignment.
 _Avoid_: Need description, proposal body
 
+**Unapproved Need**:
+A Need submitted in a prior Need Group cycle that did not obtain Director approval before the submission window closed, qualifying it for rollover into a subsequent planning cycle.
+_Avoid_: Rejected proposal, failed need
+
+**Rollover Need**:
+A new Need record created in a target Need Group by cloning an unapproved Need from a prior cycle, inheriting its proposal details while resetting approval, lock, and checklist statuses.
+_Avoid_: Reassigned need, duplicate need
+
 **Funding Source**:
 The financial appropriation or revenue source allocated to cover the estimated expenditure of a need.
 _Avoid_: Budget source, payment origin

@@ -20,6 +20,9 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasRoles, Notifiable, TwoFactorAuthenticatable;
 
+    /**
+     * @return BelongsTo<OrganizationalUnit, $this>
+     */
     public function organizationalUnit(): BelongsTo
     {
         return $this->belongsTo(OrganizationalUnit::class);

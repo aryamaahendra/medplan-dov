@@ -1,0 +1,249 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Models\Need;
+use App\Models\NeedDetail;
+use App\Models\NeedGroup;
+use App\Models\NeedType;
+use App\Models\OrganizationalUnit;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    $this->admin = User::factory()->admin()->create();
+    $this->unit1 = OrganizationalUnit::factory()->create(['name' => 'Unit 1']);
+    $this->unit2 = OrganizationalUnit::factory()->create(['name' => 'Unit 2']);
+    $this->needType = NeedType::factory()->create();
+
+    $this->group1 = NeedGroup::factory()->create(['year' => 2025, 'name' => 'Group 2025']);
+    $this->group2 = NeedGroup::factory()->create(['year' => 2026, 'name' => 'Group 2026']);
+});
+
+it('unapproved candidates query excludes approved needs', function () {
+    $this->be($this->admin);
+
+    $unapprovedNeed = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'approved_by_director_at' => null,
+    ]);
+
+    $approvedNeed = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'approved_by_director_at' => now(),
+    ]);
+
+    $response = $this->getJson(route('needs.unapproved-candidates', [
+        'target_need_group_id' => $this->group2->id,
+    ]));
+
+    $response->assertOk();
+    $ids = collect($response->json('data'))->pluck('id')->all();
+    expect($ids)->toContain($unapprovedNeed->id)
+        ->and($ids)->not->toContain($approvedNeed->id);
+});
+
+it('unapproved candidates query excludes needs from the target group itself', function () {
+    $this->be($this->admin);
+
+    $needInGroup2 = Need::factory()->create([
+        'need_group_id' => $this->group2->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'approved_by_director_at' => null,
+    ]);
+
+    $needInGroup1 = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'approved_by_director_at' => null,
+    ]);
+
+    $response = $this->getJson(route('needs.unapproved-candidates', [
+        'target_need_group_id' => $this->group2->id,
+    ]));
+
+    $response->assertOk();
+    $ids = collect($response->json('data'))->pluck('id')->all();
+    expect($ids)->toContain($needInGroup1->id)
+        ->and($ids)->not->toContain($needInGroup2->id);
+});
+
+it('unapproved candidates query excludes needs already rolled over into the target group', function () {
+    $this->be($this->admin);
+
+    $sourceNeed = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'approved_by_director_at' => null,
+    ]);
+
+    // Already rolled over into group2
+    Need::factory()->create([
+        'need_group_id' => $this->group2->id,
+        'source_need_id' => $sourceNeed->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'approved_by_director_at' => null,
+    ]);
+
+    $response = $this->getJson(route('needs.unapproved-candidates', [
+        'target_need_group_id' => $this->group2->id,
+    ]));
+
+    $response->assertOk();
+    $ids = collect($response->json('data'))->pluck('id')->all();
+    expect($ids)->not->toContain($sourceNeed->id);
+});
+
+it('respects organizational unit scoping for regular users', function () {
+    $userUnit1 = User::factory()->create(['organizational_unit_id' => $this->unit1->id]);
+    $userUnit1->givePermissionTo('view needs');
+    $this->be($userUnit1);
+
+    $needUnit1 = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'approved_by_director_at' => null,
+    ]);
+
+    $needUnit2 = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit2->id,
+        'need_type_id' => $this->needType->id,
+        'approved_by_director_at' => null,
+    ]);
+
+    $response = $this->getJson(route('needs.unapproved-candidates', [
+        'target_need_group_id' => $this->group2->id,
+    ]));
+
+    $response->assertOk();
+    $ids = collect($response->json('data'))->pluck('id')->all();
+    expect($ids)->toContain($needUnit1->id)
+        ->and($ids)->not->toContain($needUnit2->id);
+});
+
+it('can fetch source detail of an unapproved need', function () {
+    $this->be($this->admin);
+
+    $need = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'title' => 'Pengadaan Laptop Perencana',
+    ]);
+    NeedDetail::factory()->create([
+        'need_id' => $need->id,
+        'background' => 'Latar belakang pengadaan laptop',
+    ]);
+
+    $response = $this->getJson(route('needs.unapproved-source', $need));
+
+    $response->assertOk()
+        ->assertJsonPath('data.title', 'Pengadaan Laptop Perencana')
+        ->assertJsonPath('data.detail.background', 'Latar belakang pengadaan laptop');
+});
+
+it('can bulk rollover unapproved needs into a need group', function () {
+    $this->be($this->admin);
+
+    $need1 = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'title' => 'Usulan Satu',
+        'volume' => 5,
+        'unit' => 'unit',
+        'unit_price' => 1000000,
+        'total_price' => 5000000,
+        'approved_by_director_at' => null,
+    ]);
+    NeedDetail::factory()->create([
+        'need_id' => $need1->id,
+        'background' => 'Latar belakang satu',
+    ]);
+
+    $need2 = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'title' => 'Usulan Dua',
+        'volume' => 2,
+        'unit' => 'paket',
+        'unit_price' => 2000000,
+        'total_price' => 4000000,
+        'approved_by_director_at' => null,
+    ]);
+
+    $response = $this->post(route('need-groups.rollover', $this->group2), [
+        'need_ids' => [$need1->id, $need2->id],
+    ]);
+
+    $response->assertRedirect();
+
+    $this->assertDatabaseHas('needs', [
+        'need_group_id' => $this->group2->id,
+        'source_need_id' => $need1->id,
+        'title' => 'Usulan Satu',
+        'year' => 2026,
+        'status' => Need::STATUS_DRAFT,
+        'approved_by_director_at' => null,
+    ]);
+
+    $this->assertDatabaseHas('need_details', [
+        'background' => 'Latar belakang satu',
+    ]);
+
+    $this->assertDatabaseHas('needs', [
+        'need_group_id' => $this->group2->id,
+        'source_need_id' => $need2->id,
+        'title' => 'Usulan Dua',
+        'year' => 2026,
+        'status' => Need::STATUS_DRAFT,
+        'approved_by_director_at' => null,
+    ]);
+
+    expect($this->group2->fresh()->need_count)->toBe(2);
+});
+
+it('can rollover unapproved needs during need group creation', function () {
+    $this->be($this->admin);
+
+    $oldNeed = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'title' => 'Usulan Rollover Saat Buat Kelompok',
+        'approved_by_director_at' => null,
+    ]);
+
+    $response = $this->post(route('need-groups.store'), [
+        'name' => 'Kelompok Baru 2027',
+        'year' => 2027,
+        'description' => 'Deskripsi kelompok baru',
+        'is_active' => true,
+        'carry_over_need_ids' => [$oldNeed->id],
+    ]);
+
+    $response->assertRedirect();
+
+    $newGroup = NeedGroup::where('name', 'Kelompok Baru 2027')->firstOrFail();
+
+    $this->assertDatabaseHas('needs', [
+        'need_group_id' => $newGroup->id,
+        'source_need_id' => $oldNeed->id,
+        'title' => 'Usulan Rollover Saat Buat Kelompok',
+        'year' => 2027,
+        'status' => Need::STATUS_DRAFT,
+    ]);
+});

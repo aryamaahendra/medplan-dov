@@ -1,12 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Parameter \#1 \$unit of method App\\Actions\\Need\\GetFilteredNeedsAction\:\:extractUnitIds\(\) expects App\\Models\\OrganizationalUnit, Illuminate\\Database\\Eloquent\\Model given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/Actions/Need/GetFilteredNeedsAction.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Need\:\:\$approved_count\.$#'
 			identifier: property.notFound
 			count: 1
@@ -377,12 +371,6 @@ parameters:
 			identifier: variable.undefined
 			count: 1
 			path: app/Imports/PlanningImport.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$file_path\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Need.php
 
 		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getSubmissionWindowStatus\(\)\.$#'

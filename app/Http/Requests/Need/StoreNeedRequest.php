@@ -35,7 +35,7 @@ class StoreNeedRequest extends FormRequest
 
         $permissionMap = [
             'update need tab general' => [
-                'need_group_id', 'organizational_unit_id', 'need_type_id', 'year',
+                'need_group_id', 'source_need_id', 'organizational_unit_id', 'need_type_id', 'year',
                 'title', 'description', 'current_condition', 'required_condition',
                 'volume', 'unit', 'unit_price', 'total_price',
             ],
@@ -79,6 +79,7 @@ class StoreNeedRequest extends FormRequest
     {
         return [
             'need_group_id' => ['required', 'integer', 'exists:need_groups,id'],
+            'source_need_id' => ['nullable', 'integer', 'exists:needs,id'],
             'organizational_unit_id' => [
                 'required',
                 'integer',

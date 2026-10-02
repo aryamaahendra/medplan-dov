@@ -1,4 +1,6 @@
 import { useForm } from '@inertiajs/react';
+import { RiHistoryLine } from '@remixicon/react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 import NeedGroupController from '@/actions/App/Http/Controllers/Need/NeedGroupController';
@@ -18,6 +20,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 
 import type { NeedGroup } from './columns';
+import { BulkRolloverDialog } from './components/bulk-rollover-dialog';
 
 interface NeedGroupDialogProps {
   open: boolean;
@@ -74,6 +77,8 @@ function NeedGroupForm({
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
 
+  const [rolloverPickerOpen, setRolloverPickerOpen] = useState(false);
+
   const { data, setData, submit, processing, errors } = useForm({
     name: needGroup?.name ?? '',
     description: needGroup?.description ?? '',
@@ -81,6 +86,7 @@ function NeedGroupForm({
     is_active: needGroup?.is_active ?? true,
     submission_start_at: formatForInput(needGroup?.submission_start_at),
     submission_end_at: formatForInput(needGroup?.submission_end_at),
+    carry_over_need_ids: [] as number[],
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -186,7 +192,46 @@ function NeedGroupForm({
           />
           <Label htmlFor="is_active">Aktif</Label>
         </div>
+
+        {!isEditing && (
+          <div className="rounded-md border bg-muted/40 p-3">
+            <div className="flex items-center justify-between gap-2">
+              <div className="space-y-0.5">
+                <Label className="text-xs font-semibold">
+                  Tarik Usulan Lama
+                </Label>
+                <p className="text-[11px] text-muted-foreground">
+                  {data.carry_over_need_ids.length > 0
+                    ? `${data.carry_over_need_ids.length} usulan terpilih akan ditarik ke kelompok ini.`
+                    : 'Pilih usulan belum disetujui untuk disertakan.'}
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-7 gap-1 text-xs"
+                onClick={() => setRolloverPickerOpen(true)}
+              >
+                <RiHistoryLine className="h-3.5 w-3.5" />
+                {data.carry_over_need_ids.length > 0
+                  ? 'Ubah Pilihan'
+                  : 'Pilih Usulan'}
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
+
+      {!isEditing && (
+        <BulkRolloverDialog
+          open={rolloverPickerOpen}
+          onOpenChange={setRolloverPickerOpen}
+          targetYear={data.year}
+          initialSelectedIds={data.carry_over_need_ids}
+          onSelectIds={(ids) => setData('carry_over_need_ids', ids)}
+        />
+      )}
 
       <DialogFooter className="mb-0!">
         <Button type="button" variant="outline" onClick={onClose}>

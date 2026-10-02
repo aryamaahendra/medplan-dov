@@ -20,6 +20,8 @@ class StoreNeedGroupRequest extends FormRequest
             'is_active' => ['boolean'],
             'submission_start_at' => ['nullable', 'date'],
             'submission_end_at' => ['nullable', 'date', 'after_or_equal:submission_start_at'],
+            'carry_over_need_ids' => ['nullable', 'array'],
+            'carry_over_need_ids.*' => ['integer', 'exists:needs,id'],
         ];
     }
 }

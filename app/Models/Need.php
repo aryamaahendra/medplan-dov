@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Storage;
 
 #[Fillable([
     'need_group_id',
+    'source_need_id',
     'organizational_unit_id',
     'need_type_id',
     'year',
@@ -93,6 +94,22 @@ class Need extends Model
     public function needGroup(): BelongsTo
     {
         return $this->belongsTo(NeedGroup::class);
+    }
+
+    /**
+     * Get the source need from which this need was rolled over.
+     */
+    public function sourceNeed(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'source_need_id');
+    }
+
+    /**
+     * Get the needs rolled over from this need.
+     */
+    public function rolloverNeeds(): HasMany
+    {
+        return $this->hasMany(self::class, 'source_need_id');
     }
 
     /**
@@ -240,6 +257,8 @@ class Need extends Model
 
     /**
      * Get the detail/proposal information for this need.
+     *
+     * @return HasOne<NeedDetail, $this>
      */
     public function detail(): HasOne
     {
@@ -256,6 +275,8 @@ class Need extends Model
 
     /**
      * Get the attachments for this need.
+     *
+     * @return HasMany<NeedAttachment, $this>
      */
     public function attachments(): HasMany
     {
@@ -272,6 +293,45 @@ class Need extends Model
         }
 
         return $query->where('organizational_unit_id', $user->organizational_unit_id);
+    }
+
+    /**
+     * Scope a query to unapproved candidate needs eligible for rollover into a target need group.
+     */
+    public function scopeUnapprovedCandidates(Builder $query, ?int $targetGroupId, User $user): Builder
+    {
+        $query->whereNull('approved_by_director_at');
+
+        if ($targetGroupId !== null && $targetGroupId > 0) {
+            $query->where('need_group_id', '!=', $targetGroupId)
+                ->whereDoesntHave('rolloverNeeds', fn (Builder $q) => $q->where('need_group_id', $targetGroupId));
+        }
+
+        if (! $user->hasAnyRole(['super-admin', 'admin', 'planner']) && ! $user->can('view any needs')) {
+            if ($user->can('view descendant needs') && $user->organizational_unit_id) {
+                /** @var OrganizationalUnit|null $unit */
+                $unit = $user->organizationalUnit;
+                if ($unit) {
+                    $unit->loadMissing('descendantsRecursive');
+                    $allowedIds = [$unit->id];
+                    $collectDescendants = function (OrganizationalUnit $u) use (&$collectDescendants, &$allowedIds): void {
+                        /** @var OrganizationalUnit $descendant */
+                        foreach ($u->descendantsRecursive as $descendant) {
+                            $allowedIds[] = $descendant->id;
+                            $collectDescendants($descendant);
+                        }
+                    };
+                    $collectDescendants($unit);
+                    $query->whereIn('organizational_unit_id', array_unique($allowedIds));
+                } else {
+                    $query->where('organizational_unit_id', $user->organizational_unit_id);
+                }
+            } else {
+                $query->where('organizational_unit_id', $user->organizational_unit_id);
+            }
+        }
+
+        return $query;
     }
 
     /**

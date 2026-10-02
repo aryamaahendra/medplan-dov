@@ -1,4 +1,5 @@
 import { router, useForm, usePage } from '@inertiajs/react';
+import { RiCloseLine, RiHistoryLine } from '@remixicon/react';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -25,6 +26,7 @@ import { PlanningAlignmentSection } from './planning-alignment-section';
 import { PriorityStatusSection } from './priority-status-section';
 import { RenstraAlignmentSection } from './renstra-alignment-section';
 import { RlsAlignmentSection } from './rls-alignment-section';
+import { UnapprovedNeedPickerDialog } from './unapproved-need-picker-dialog';
 
 interface NeedFormProps {
   need?: Need | null;
@@ -116,6 +118,7 @@ export function NeedForm({
   const { data, setData, post, processing, errors, transform } = useForm({
     need_group_id:
       need?.need_group_id?.toString() ?? currentGroup?.id?.toString() ?? '',
+    source_need_id: (need as any)?.source_need_id?.toString() ?? '',
     organizational_unit_id:
       need?.organizational_unit_id?.toString() ??
       (isRestricted ? user?.organizational_unit_id?.toString() : '') ??
@@ -177,6 +180,72 @@ export function NeedForm({
   });
 
   const detailValuesRef = useRef(data.detail);
+
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [sourceTitle, setSourceTitle] = useState<string | null>(null);
+
+  const handleSelectSource = (source: any) => {
+    setSourceTitle(source.title);
+    const newDetail = {
+      background: source.detail?.background ?? '',
+      purpose_and_objectives: source.detail?.purpose_and_objectives ?? '',
+      target_objective: source.detail?.target_objective ?? '',
+      kldi: source.detail?.kldi ?? '',
+      satker_skpd: source.detail?.satker_skpd ?? '',
+      kpa_id: source.detail?.kpa_id?.toString() ?? '',
+      funding_source_ids:
+        source.detail?.funding_sources?.map((s: any) => s.id.toString()) ?? [],
+      estimated_cost: source.detail?.estimated_cost ?? '',
+      implementation_period: source.detail?.implementation_period ?? '',
+      expert_or_skilled_personnel:
+        source.detail?.expert_or_skilled_personnel ?? '',
+      technical_specifications: source.detail?.technical_specifications ?? '',
+      training: source.detail?.training ?? '',
+    };
+    detailValuesRef.current = newDetail;
+
+    setData((prev: typeof data) => ({
+      ...prev,
+      source_need_id: source.id?.toString() ?? '',
+      title: source.title ?? '',
+      description: source.description ?? '',
+      current_condition: source.current_condition ?? '',
+      required_condition: source.required_condition ?? '',
+      unit: source.unit ?? '',
+      volume: source.volume?.toString() ?? '',
+      unit_price: source.unit_price?.toString() ?? '',
+      total_price: source.total_price?.toString() ?? '',
+      urgency: source.urgency ?? 'medium',
+      impact: source.impact ?? 'medium',
+      is_priority: source.is_priority ?? false,
+      need_type_id:
+        source.need_type?.id?.toString() ??
+        source.need_type_id?.toString() ??
+        prev.need_type_id,
+      organizational_unit_id:
+        !isRestricted && source.organizational_unit_id
+          ? source.organizational_unit_id.toString()
+          : prev.organizational_unit_id,
+      sasaran_ids: source.sasarans?.map((s: any) => s.id.toString()) ?? [],
+      indicator_ids: source.indicators?.map((i: any) => i.id.toString()) ?? [],
+      kpi_indicator_ids:
+        source.kpi_indicators?.map((i: any) => i.id.toString()) ?? [],
+      strategic_service_plan_ids:
+        source.strategic_service_plans?.map((i: any) => i.id.toString()) ?? [],
+      planning_activity_version_ids:
+        source.planning_activity_versions?.map((i: any) => i.id.toString()) ??
+        [],
+      planning_activity_indicator_ids:
+        source.planning_activity_indicators?.map((i: any) => i.id.toString()) ??
+        [],
+      detail: newDetail,
+    }));
+  };
+
+  const handleResetSource = () => {
+    setSourceTitle(null);
+    setData('source_need_id', '');
+  };
 
   const fieldMapping: Record<string, string[]> = {
     usulan: [
@@ -360,6 +429,50 @@ export function NeedForm({
     <Card className={cn('w-full max-w-3xl overflow-hidden', className)}>
       <form onSubmit={handleSubmit}>
         <CardContent className="">
+          {!isEditing && (
+            <div className="mb-4 flex flex-col gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-xs text-muted-foreground">
+                  Isi formulir secara manual atau salin dari usulan sebelumnya
+                  yang belum disetujui:
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPickerOpen(true)}
+                  className="gap-1.5"
+                >
+                  <RiHistoryLine className="h-4 w-4" />
+                  Pilih dari Usulan Sebelumnya
+                </Button>
+              </div>
+
+              {sourceTitle && (
+                <div className="flex items-center justify-between rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-xs text-primary">
+                  <div className="flex items-center gap-2">
+                    <RiHistoryLine className="h-4 w-4 shrink-0" />
+                    <span>
+                      Memuat draf dari usulan sebelumnya:{' '}
+                      <strong>{sourceTitle}</strong>. Anda dapat mengubah data
+                      sebelum menyimpannya.
+                    </span>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
+                    onClick={handleResetSource}
+                  >
+                    <RiCloseLine className="mr-1 h-3 w-3" />
+                    Batal Salin
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
@@ -562,6 +675,15 @@ export function NeedForm({
           )}
         </CardFooter>
       </form>
+
+      {!isEditing && currentGroup && (
+        <UnapprovedNeedPickerDialog
+          open={pickerOpen}
+          onOpenChange={setPickerOpen}
+          targetGroupId={currentGroup.id}
+          onSelect={handleSelectSource}
+        />
+      )}
     </Card>
   );
 }

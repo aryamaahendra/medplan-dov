@@ -13,6 +13,7 @@ import needGroupRoutes from '@/routes/need-groups';
 
 import { getColumns } from './columns';
 import type { NeedGroup } from './columns';
+import { BulkRolloverDialog } from './components/bulk-rollover-dialog';
 import { NeedGroupDialog } from './need-group-dialog';
 
 interface PaginatedNeedGroups {
@@ -39,6 +40,7 @@ export default function NeedGroupsIndex({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deletingGroup, setDeletingGroup] = useState<NeedGroup | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [rolloverGroup, setRolloverGroup] = useState<NeedGroup | null>(null);
 
   const { onSearch, onSort, onPageChange, onPerPageChange, onReset } =
     useDataTable({ only: ['needGroups', 'filters'] });
@@ -50,6 +52,10 @@ export default function NeedGroupsIndex({
 
   const onDelete = (group: NeedGroup) => {
     setDeletingGroup(group);
+  };
+
+  const onRollover = (group: NeedGroup) => {
+    setRolloverGroup(group);
   };
 
   const onCreate = () => {
@@ -100,7 +106,7 @@ export default function NeedGroupsIndex({
 
         <DataTable
           columns={useMemo(
-            () => getColumns(onEdit, onDelete, hasPermission),
+            () => getColumns(onEdit, onDelete, hasPermission, onRollover),
             [hasPermission],
           )}
           data={needGroups.data}
@@ -119,6 +125,12 @@ export default function NeedGroupsIndex({
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         needGroup={editingGroup}
+      />
+
+      <BulkRolloverDialog
+        open={!!rolloverGroup}
+        onOpenChange={(open) => !open && setRolloverGroup(null)}
+        needGroup={rolloverGroup}
       />
 
       <ConfirmDialog

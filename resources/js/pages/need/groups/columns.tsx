@@ -1,4 +1,9 @@
-import { RiListCheck3, RiEdit2Line, RiDeleteBinLine } from '@remixicon/react';
+import {
+  RiListCheck3,
+  RiEdit2Line,
+  RiDeleteBinLine,
+  RiHistoryLine,
+} from '@remixicon/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { ActionItem } from '@/components/action-dropdown';
 import { ActionDropdown } from '@/components/action-dropdown';
@@ -26,6 +31,7 @@ export const getColumns = (
   onEdit: (group: NeedGroup) => void,
   onDelete: (group: NeedGroup) => void,
   hasPermission: (permission: string) => boolean,
+  onRollover?: (group: NeedGroup) => void,
 ): ColumnDef<NeedGroup>[] => [
   getIndexColumn('#', 'w-1 text-center'),
   {
@@ -115,6 +121,14 @@ export const getColumns = (
           href: groupRoutes.checklists.index.url({ need_group: group.id }),
         },
       ];
+
+      if (onRollover && hasPermission('update need-groups')) {
+        actions.push({
+          label: 'Tarik Usulan Lama',
+          icon: RiHistoryLine,
+          onClick: () => onRollover(group),
+        });
+      }
 
       if (hasPermission('update need-groups')) {
         actions.push({

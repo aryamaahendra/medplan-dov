@@ -4,6 +4,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { getIndexColumn } from '@/components/data-table/data-table-index-column';
+import { formatDate } from '@/lib/formatters';
 
 export interface User {
   id: number;
@@ -66,15 +67,10 @@ export const getColumns = (
   {
     accessorKey: 'created_at',
     header: (props) => <DataTableColumnHeader {...props} title="Joined" />,
-    cell: ({ row }) => {
-      const date = new Date(row.getValue('created_at'));
-
-      return date.toLocaleDateString('en-GB', {
+    cell: ({ row }) =>
+      formatDate(row.getValue('created_at'), {
         day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      });
-    },
+      }),
   },
   {
     id: 'actions',

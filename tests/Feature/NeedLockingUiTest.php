@@ -244,6 +244,33 @@ describe('Inertia response contains lock metadata', function () {
                 ->where('needs.data.0.can.unlock', true)
             );
     });
+    it('supplies objective lock status and unlock permission to super admin on locked need', function () {
+        $need = Need::factory()->create([
+            'need_group_id' => $this->openGroup->id,
+            'organizational_unit_id' => $this->orgUnit->id,
+            'need_type_id' => $this->needType->id,
+            'is_locked' => true,
+            'lock_reason' => 'Manually locked for evaluation',
+        ]);
+        $superAdminUser = User::factory()->create([
+            'organizational_unit_id' => $this->orgUnit->id,
+        ]);
+        $superAdminUser->assignRole(UserRole::SuperAdmin->value);
+
+        $response = $this->actingAs($superAdminUser)
+            ->get(route('needs.index', ['need_group_id' => $this->openGroup->id]));
+
+        $response->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('need/needs/index')
+                ->has('needs.data', 1)
+                ->where('needs.data.0.is_locked', true)
+                ->where('needs.data.0.lock_reason', 'Manually locked for evaluation')
+                ->where('needs.data.0.can.lock', true)
+                ->where('needs.data.0.can.unlock', true)
+                ->where('needs.data.0.can.update', true)
+            );
+    });
 
     it('supplies lock metadata on needs edit view when accessed by authorized user', function () {
         $need = Need::factory()->create([

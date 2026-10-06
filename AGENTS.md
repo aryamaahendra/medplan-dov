@@ -46,6 +46,16 @@ Project domain skills available. MUST activate relevant skill when working in do
 - Do not change application dependencies without approval.
 - Be concise in explanations.
 
+### Timezone & Date/Time Formatting
+
+- Application timezone is strictly enforced to `Asia/Makassar` (WITA, UTC+8) for both backend and frontend.
+- Backend: `APP_TIMEZONE=Asia/Makassar` in `.env` and `config/app.php`.
+- Frontend: Always use date/time utilities from `@/lib/formatters` instead of ad-hoc `toLocaleDateString()` or `new Date().toLocaleString()`:
+    - `formatDate(date, options?)` for date-only displays.
+    - `formatDateTime(date, options?)` for date & time displays.
+    - `formatForDateTimeInput(date)` for `<input type="datetime-local">` form values.
+    - `APP_TIMEZONE` constant (`'Asia/Makassar'`).
+
 ### Code Quality & Pre-Commit
 
 - Do NOT manually run lint, formatting, or type-check steps as part of the agent task loop: code formatting (Prettier, Pint), linting (ESLint), and full-project type and static analysis checks (TypeScript, PHPStan) are enforced automatically by the pre-commit hook.

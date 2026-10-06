@@ -46,9 +46,9 @@ class NeedResource extends JsonResource
             'created_at' => $this->resource->created_at?->toIso8601String(),
             'updated_at' => $this->resource->updated_at?->toIso8601String(),
 
-            // Computed lock & window properties
-            'is_locked' => $this->resource->isLocked($request->user()),
-            'lock_reason' => $this->resource->getEffectiveLockReason($request->user()),
+            // Computed lock & window properties (objective state of the need, not actor-bypassed)
+            'is_locked' => $this->resource->isLocked(),
+            'lock_reason' => $this->resource->getEffectiveLockReason(),
             'unlocked_until' => $this->resource->unlocked_until?->toIso8601String(),
             'submission_window_status' => $needGroup?->getSubmissionWindowStatus() ?? 'indefinite',
             'group_submission_end_at' => $needGroup?->submission_end_at?->toIso8601String(),

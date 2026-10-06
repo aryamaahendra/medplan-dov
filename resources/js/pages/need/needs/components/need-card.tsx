@@ -23,6 +23,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { STATUS_ICONS, STATUS_LABELS, STATUS_VARIANTS } from '@/constants/need';
+import { formatDate } from '@/lib/formatters';
 import { formatIDR } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
@@ -183,14 +184,9 @@ export function NeedCard({ need, onEdit, onDelete, onReview }: NeedCardProps) {
               {need.approved_by_director_at && (
                 <span className="text-xs text-muted-foreground">
                   pada{' '}
-                  {new Date(need.approved_by_director_at).toLocaleDateString(
-                    'id-ID',
-                    {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    },
-                  )}
+                  {formatDate(need.approved_by_director_at, {
+                    month: 'long',
+                  })}
                 </span>
               )}
             </div>

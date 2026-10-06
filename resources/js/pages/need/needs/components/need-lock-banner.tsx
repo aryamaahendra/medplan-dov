@@ -2,6 +2,7 @@ import { RiLockLine, RiTimeLine } from '@remixicon/react';
 import { useEffect, useState } from 'react';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { formatDateTime } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import type { Need } from '@/types';
 
@@ -129,12 +130,12 @@ export function NeedLockBanner({ need, className }: NeedLockBannerProps) {
         {need.group_submission_end_at && (
           <p className="text-xs opacity-80">
             Batas akhir pengajuan kelompok:{' '}
-            {new Date(need.group_submission_end_at).toLocaleString('id-ID')}
+            {formatDateTime(need.group_submission_end_at)}
           </p>
         )}
         {need.locked_at && (
           <p className="text-xs opacity-80">
-            Waktu penguncian: {new Date(need.locked_at).toLocaleString('id-ID')}
+            Waktu penguncian: {formatDateTime(need.locked_at)}
           </p>
         )}
       </AlertDescription>

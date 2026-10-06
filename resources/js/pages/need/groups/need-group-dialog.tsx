@@ -19,6 +19,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 
+import { formatForDateTimeInput } from '@/lib/formatters';
 import type { NeedGroup } from './columns';
 import { BulkRolloverDialog } from './components/bulk-rollover-dialog';
 
@@ -55,28 +56,6 @@ function NeedGroupForm({
 }) {
   const isEditing = !!needGroup;
 
-  // Convert ISO string to datetime-local input format (YYYY-MM-DDTHH:mm)
-  const formatForInput = (dateStr?: string | null) => {
-    if (!dateStr) {
-      return '';
-    }
-
-    const d = new Date(dateStr);
-
-    if (isNaN(d.getTime())) {
-      return dateStr.slice(0, 16);
-    }
-
-    const pad = (n: number) => String(n).padStart(2, '0');
-    const year = d.getFullYear();
-    const month = pad(d.getMonth() + 1);
-    const day = pad(d.getDate());
-    const hours = pad(d.getHours());
-    const minutes = pad(d.getMinutes());
-
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
-  };
-
   const [rolloverPickerOpen, setRolloverPickerOpen] = useState(false);
 
   const { data, setData, submit, processing, errors } = useForm({
@@ -84,8 +63,8 @@ function NeedGroupForm({
     description: needGroup?.description ?? '',
     year: needGroup?.year ?? new Date().getFullYear(),
     is_active: needGroup?.is_active ?? true,
-    submission_start_at: formatForInput(needGroup?.submission_start_at),
-    submission_end_at: formatForInput(needGroup?.submission_end_at),
+    submission_start_at: formatForDateTimeInput(needGroup?.submission_start_at),
+    submission_end_at: formatForDateTimeInput(needGroup?.submission_end_at),
     carry_over_need_ids: [] as number[],
   });
 

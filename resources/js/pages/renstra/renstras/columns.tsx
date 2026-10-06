@@ -5,6 +5,7 @@ import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { getIndexColumn } from '@/components/data-table/data-table-index-column';
 import { Badge } from '@/components/ui/badge';
+import { formatDate } from '@/lib/formatters';
 import renstraRoutes from '@/routes/renstras';
 import type { Renstra } from '@/types';
 
@@ -52,8 +53,7 @@ export const getColumns = (
   {
     accessorKey: 'created_at',
     header: (props) => <DataTableColumnHeader {...props} title="Dibuat Pada" />,
-    cell: ({ row }) =>
-      new Date(row.original.created_at).toLocaleDateString('id-ID'),
+    cell: ({ row }) => formatDate(row.original.created_at),
     meta: { cellClassName: 'font-mono text-xs w-[120px]' },
   },
   {

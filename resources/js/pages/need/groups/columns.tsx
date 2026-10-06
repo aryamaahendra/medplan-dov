@@ -10,7 +10,7 @@ import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { getIndexColumn } from '@/components/data-table/data-table-index-column';
 import { Badge } from '@/components/ui/badge';
-import { formatIDR } from '@/lib/formatters';
+import { formatDateTime, formatIDR } from '@/lib/formatters';
 import groupRoutes from '@/routes/need-groups';
 
 export interface NeedGroup {
@@ -96,6 +96,28 @@ export const getColumns = (
 
       return <div className="font-medium">{formatIDR(amount)}</div>;
     },
+  },
+  {
+    accessorKey: 'submission_start_at',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Mulai Pengajuan" />
+    ),
+    cell: ({ row }) => (
+      <div className="font-mono text-xs whitespace-nowrap">
+        {formatDateTime(row.getValue('submission_start_at'))}
+      </div>
+    ),
+  },
+  {
+    accessorKey: 'submission_end_at',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Batas Pengajuan" />
+    ),
+    cell: ({ row }) => (
+      <div className="font-mono text-xs whitespace-nowrap">
+        {formatDateTime(row.getValue('submission_end_at'))}
+      </div>
+    ),
   },
   {
     accessorKey: 'is_active',

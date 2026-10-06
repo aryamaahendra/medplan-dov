@@ -26,7 +26,7 @@ class NeedGroupController extends Controller
 
     private const array SEARCH_COLUMNS = ['name', 'description'];
 
-    private const array SORTABLE_COLUMNS = ['name', 'year', 'is_active', 'need_count', 'total_budget', 'approved_count', 'priority_count', 'created_at'];
+    private const array SORTABLE_COLUMNS = ['name', 'year', 'is_active', 'need_count', 'total_budget', 'approved_count', 'priority_count', 'submission_start_at', 'submission_end_at', 'created_at'];
 
     public function index(Request $request): Response
     {

@@ -44,7 +44,7 @@ export function UserMenuContent({ user }: Props) {
           }
         >
           <RiSettings3Line className="mr-2" />
-          RiSettings3Line
+          Settings
         </DropdownMenuItem>
       </DropdownMenuGroup>
       <DropdownMenuSeparator />

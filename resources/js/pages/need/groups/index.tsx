@@ -1,19 +1,21 @@
 import { Head, router } from '@inertiajs/react';
-import { RiAddLine } from '@remixicon/react';
-import { useMemo, useState } from 'react';
+import { RiAddLine, RiFolderChartLine } from '@remixicon/react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@/components/confirm-dialog';
-import { DataTable } from '@/components/data-table/data-table';
+import { DataTablePagination } from '@/components/data-table/data-table-pagination';
+import { DataTableToolbar } from '@/components/data-table/data-table-toolbar';
 import { Button } from '@/components/ui/button';
 import { useDataTable } from '@/hooks/use-data-table';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import { usePermission } from '@/hooks/use-permission';
 import needGroupRoutes from '@/routes/need-groups';
 
-import { getColumns } from './columns';
 import type { NeedGroup } from './columns';
 import { BulkRolloverDialog } from './components/bulk-rollover-dialog';
+import { NeedGroupCard } from './components/need-group-card';
+import { NeedGroupsSummaryStats } from './components/need-groups-summary-stats';
 import { NeedGroupDialog } from './need-group-dialog';
 
 interface PaginatedNeedGroups {
@@ -42,8 +44,9 @@ export default function NeedGroupsIndex({
   const [isDeleting, setIsDeleting] = useState(false);
   const [rolloverGroup, setRolloverGroup] = useState<NeedGroup | null>(null);
 
-  const { onSearch, onSort, onPageChange, onPerPageChange, onReset } =
-    useDataTable({ only: ['needGroups', 'filters'] });
+  const { onSearch, onPageChange, onPerPageChange, onReset } = useDataTable({
+    only: ['needGroups', 'filters'],
+  });
 
   const onEdit = (group: NeedGroup) => {
     setEditingGroup(group);
@@ -82,45 +85,111 @@ export default function NeedGroupsIndex({
     );
   };
 
+  const hasItems = needGroups.data.length > 0;
+
   return (
     <>
       <Head title="Kelompok Usulan" />
 
-      <div className="flex flex-col gap-6 p-4">
-        <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-6 p-4 pb-12 sm:p-6 lg:p-8">
+        {/* Page Header */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-foreground">
-              Kelompok Usulan
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Kelola kelompok usulan kebutuhan per tahun anggaran.
+            <div className="flex items-center gap-2">
+              <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                Kelompok Usulan
+              </h1>
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Kelola daftar kelompok usulan kebutuhan tahun anggaran dan siklus
+              pengajuan.
             </p>
           </div>
-          {hasPermission('create need-groups') && (
-            <Button onClick={onCreate}>
-              <RiAddLine />
-              Tambah Kelompok
-            </Button>
-          )}
+
+          <div className="flex items-center gap-3">
+            {hasPermission('create need-groups') && (
+              <Button onClick={onCreate} className="gap-1.5 shadow-xs">
+                <RiAddLine className="size-4" />
+                Tambah Kelompok
+              </Button>
+            )}
+          </div>
         </div>
 
-        <DataTable
-          columns={useMemo(
-            () => getColumns(onEdit, onDelete, hasPermission, onRollover),
-            [hasPermission],
-          )}
+        {/* Aggregated KPI Summary Header */}
+        <NeedGroupsSummaryStats
+          totalCount={needGroups.total}
           data={needGroups.data}
-          meta={needGroups}
-          filters={filters}
-          onSearch={onSearch}
-          onSort={onSort}
-          onPageChange={onPageChange}
-          onPerPageChange={onPerPageChange}
-          onReset={onReset}
-          searchPlaceholder="Cari berdasarkan nama atau deskripsi..."
         />
+
+        {/* Search & Filter Toolbar */}
+        <div className="flex flex-col gap-4">
+          <DataTableToolbar
+            filters={filters}
+            onSearch={onSearch}
+            onReset={onReset}
+            searchPlaceholder="Cari berdasarkan nama kelompok atau deskripsi..."
+          />
+        </div>
+
+        {/* Full-Width Telemetry Pipeline Card List */}
+        {hasItems ? (
+          <div className="flex w-full flex-col gap-4">
+            {needGroups.data.map((group) => (
+              <NeedGroupCard
+                key={group.id}
+                group={group}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                hasPermission={hasPermission}
+                onRollover={onRollover}
+              />
+            ))}
+          </div>
+        ) : (
+          /* Empty State */
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/50 px-6 py-16 text-center">
+            <div className="flex size-14 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+              <RiFolderChartLine className="size-7" />
+            </div>
+            <h3 className="mt-4 font-heading text-lg font-semibold text-foreground">
+              Tidak Ada Kelompok Usulan
+            </h3>
+            <p className="mt-1.5 max-w-sm text-sm text-muted-foreground">
+              {filters.search
+                ? `Tidak ditemukan kelompok usulan yang cocok dengan kata kunci "${filters.search}". Silakan coba kata kunci lain.`
+                : 'Belum ada kelompok usulan yang terdaftar. Tambahkan kelompok usulan pertama untuk memulai.'}
+            </p>
+            <div className="mt-6 flex items-center gap-3">
+              {filters.search ? (
+                <Button variant="outline" size="sm" onClick={onReset}>
+                  Reset Pencarian
+                </Button>
+              ) : (
+                hasPermission('create need-groups') && (
+                  <Button size="sm" onClick={onCreate}>
+                    <RiAddLine className="size-4" />
+                    Tambah Kelompok
+                  </Button>
+                )
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {hasItems && (
+          <div className="pt-2">
+            <DataTablePagination
+              meta={needGroups}
+              onPageChange={onPageChange}
+              onPerPageChange={onPerPageChange}
+            />
+          </div>
+        )}
       </div>
 
+      {/* Modals & Dialogs */}
       <NeedGroupDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}

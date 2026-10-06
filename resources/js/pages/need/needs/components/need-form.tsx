@@ -664,7 +664,16 @@ export function NeedForm({
           <Button
             type="button"
             variant="outline"
-            onClick={() => router.visit(needRoutes.index.url())}
+            onClick={() => {
+              const targetGroupId = need?.need_group_id ?? currentGroup?.id;
+              router.visit(
+                targetGroupId
+                  ? needRoutes.index.url({
+                      query: { need_group_id: targetGroupId },
+                    })
+                  : needRoutes.index.url(),
+              );
+            }}
           >
             {isLocked ? 'Kembali' : 'Batal'}
           </Button>

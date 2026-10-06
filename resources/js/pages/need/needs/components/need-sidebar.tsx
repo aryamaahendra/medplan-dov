@@ -32,7 +32,11 @@ export function NeedSidebar({ need }: NeedSidebarProps) {
         <Button
           variant="outline"
           render={
-            <Link href={needRoutes.index.url()}>
+            <Link
+              href={needRoutes.index.url({
+                query: { need_group_id: need.need_group_id },
+              })}
+            >
               <RiArrowLeftLine />
               Kembali
             </Link>

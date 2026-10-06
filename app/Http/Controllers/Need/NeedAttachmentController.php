@@ -26,7 +26,7 @@ class NeedAttachmentController extends Controller
         $this->authorize('view', $need);
 
         return Inertia::render('need/needs/attachments', [
-            'need' => $need->load('attachments'),
+            'need' => $need->load(['attachments', 'needGroup']),
         ]);
     }
 

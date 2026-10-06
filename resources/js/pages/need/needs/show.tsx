@@ -174,15 +174,24 @@ export default function NeedShow({
   );
 }
 
-NeedShow.layout = {
-  breadcrumbs: [
-    {
-      title: 'Usulan Kebutuhan',
-      href: needRoutes.index.url(),
-    },
-    {
-      title: 'Detail Usulan',
-      href: '#',
-    },
-  ],
+NeedShow.layout = (props: NeedShowProps) => {
+  const group = props.need?.needGroup;
+  const groupId = props.need?.need_group_id ?? group?.id;
+
+  return {
+    breadcrumbs: [
+      {
+        title: group?.name || 'Kelompok Usulan',
+        href: groupId
+          ? needRoutes.index.url({
+              query: { need_group_id: groupId },
+            })
+          : needRoutes.index.url(),
+      },
+      {
+        title: 'Detail Usulan',
+        href: '#',
+      },
+    ],
+  };
 };

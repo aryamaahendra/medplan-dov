@@ -46,20 +46,28 @@ export default function AttachmentsPage({ need }: AttachmentsPageProps) {
   );
 }
 
-AttachmentsPage.layout = {
-  breadcrumbs: [
-    {
-      title: 'Usulan Kebutuhan',
-      href: needRoutes.index.url(),
-    },
-    {
-      title: 'Detail Usulan',
-      href: (props: AttachmentsPageProps) =>
-        needRoutes.show.url({ need: props.need.id }),
-    },
-    {
-      title: 'Manajemen Lampiran',
-      href: '#',
-    },
-  ],
+AttachmentsPage.layout = (props: AttachmentsPageProps) => {
+  const group = props.need?.needGroup;
+  const groupId = props.need?.need_group_id ?? group?.id;
+
+  return {
+    breadcrumbs: [
+      {
+        title: group?.name || 'Kelompok Usulan',
+        href: groupId
+          ? needRoutes.index.url({
+              query: { need_group_id: groupId },
+            })
+          : needRoutes.index.url(),
+      },
+      {
+        title: 'Detail Usulan',
+        href: needRoutes.show.url({ need: props.need.id }),
+      },
+      {
+        title: 'Manajemen Lampiran',
+        href: '#',
+      },
+    ],
+  };
 };

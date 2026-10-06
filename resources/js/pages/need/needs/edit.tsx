@@ -72,11 +72,7 @@ export default function Edit({
 Edit.layout = (props: EditProps) => ({
   breadcrumbs: [
     {
-      title: 'Usulan Kebutuhan',
-      href: '#',
-    },
-    {
-      title: props.currentGroup?.name || 'Kelompok',
+      title: props.currentGroup?.name || 'Kelompok Usulan',
       href: props.currentGroup
         ? needRoutes.index.url({
             query: { need_group_id: props.currentGroup.id },

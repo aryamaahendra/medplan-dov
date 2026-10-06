@@ -98,7 +98,7 @@ export default function NeedGroupsIndex({
           </div>
           {hasPermission('create need-groups') && (
             <Button onClick={onCreate}>
-              <RiAddLine className="mr-2 h-4 w-4" />
+              <RiAddLine />
               Tambah Kelompok
             </Button>
           )}

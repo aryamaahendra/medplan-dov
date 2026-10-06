@@ -97,7 +97,7 @@ export default function ChecklistQuestionsIndex({
           </div>
           {hasPermission('create checklist-questions') && (
             <Button onClick={onCreate}>
-              <RiAddLine className="mr-2 h-4 w-4" />
+              <RiAddLine />
               Tambah Pertanyaan
             </Button>
           )}

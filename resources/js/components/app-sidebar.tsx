@@ -50,7 +50,7 @@ const mainNavItems: NavItem[] = [
 
 const userRole: NavItem[] = [
   {
-    title: 'RiGroupLine',
+    title: 'Pengguna',
     href: users.index.url(),
     icon: RiGroupLine,
   },

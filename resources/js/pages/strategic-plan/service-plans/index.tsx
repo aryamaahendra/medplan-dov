@@ -100,7 +100,7 @@ export default function StrategicServicePlansIndex({
           </div>
           {hasPermission('create ssps') && (
             <Button onClick={onCreate}>
-              <RiAddLine className="mr-2 h-4 w-4" />
+              <RiAddLine />
               Tambah Rencana
             </Button>
           )}

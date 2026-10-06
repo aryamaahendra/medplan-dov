@@ -99,7 +99,7 @@ export default function NeedTypesIndex({
           </div>
           {hasPermission('create need-types') && (
             <Button onClick={onCreate}>
-              <RiAddLine className="mr-2 h-4 w-4" />
+              <RiAddLine />
               Tambah Jenis
             </Button>
           )}

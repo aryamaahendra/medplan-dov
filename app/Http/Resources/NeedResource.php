@@ -52,7 +52,7 @@ class NeedResource extends JsonResource
             'unlocked_until' => $this->resource->unlocked_until?->toIso8601String(),
             'submission_window_status' => $needGroup?->getSubmissionWindowStatus() ?? 'indefinite',
             'group_submission_end_at' => $needGroup?->submission_end_at?->toIso8601String(),
-
+            'stage' => $this->resource->getWorkflowStage(),
             // Capabilities
             'can' => [
                 'update' => $request->user()?->can('update', $this->resource),
@@ -82,6 +82,7 @@ class NeedResource extends JsonResource
             'indicators_count' => $this->whenCounted('indicators'),
             'kpi_indicators_count' => $this->whenCounted('kpiIndicators'),
             'strategic_service_plans_count' => $this->whenCounted('strategicServicePlans'),
+            'attachments_count' => $this->whenCounted('attachments'),
         ];
     }
 }

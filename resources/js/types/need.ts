@@ -62,6 +62,8 @@ export interface NeedDetail {
 
 export type NeedStatus = 'draft' | 'approved' | 'rejected';
 export type NeedPriority = 'high' | 'medium' | 'low';
+export type NeedWorkflowStage =
+  'draft' | 'under_review' | 'approved' | 'rejected';
 
 export interface Need {
   id: number;
@@ -96,6 +98,8 @@ export interface Need {
   indicators_count?: number;
   kpi_indicators_count?: number;
   strategic_service_plans_count?: number;
+  attachments_count?: number;
+  stage?: NeedWorkflowStage;
   detail?: NeedDetail | null;
   checklist_percentage?: number | string;
   attachments?: Attachment[];

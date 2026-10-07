@@ -38,7 +38,7 @@ interface DataTableProps<TData extends RowData, TValue> {
   searchPlaceholder?: string;
   toolbarChildren?: React.ReactNode;
   toolbarPosition?: 'beside-search' | 'between-search-and-table';
-  view?: 'table' | 'grid';
+  view?: 'table' | 'grid' | 'list' | string;
   renderGrid?: (rows: TData[]) => React.ReactNode;
   customThead?: React.ReactNode;
 }

@@ -32,7 +32,7 @@ class GetFilteredNeedsAction
                 'kpiIndicators:id,name,unit',
                 'strategicServicePlans:id,strategic_program,service_plan',
             ])
-            ->withCount(['sasarans', 'indicators', 'kpiIndicators', 'strategicServicePlans'])
+            ->withCount(['sasarans', 'indicators', 'kpiIndicators', 'strategicServicePlans', 'attachments'])
             ->when($filters['year'] ?? null, fn ($q, $v) => $q->whereIn('year', (array) $v))
             ->when($filters['status'] ?? null, fn ($q, $v) => $q->whereIn('status', (array) $v))
             ->when($filters['need_type_id'] ?? null, fn ($q, $v) => $q->whereIn('need_type_id', (array) $v))

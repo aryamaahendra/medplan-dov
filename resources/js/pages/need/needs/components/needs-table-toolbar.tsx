@@ -1,6 +1,7 @@
 import {
   RiCheckDoubleLine,
   RiTimeLine,
+  RiAlignJustify,
   RiLayoutGridLine,
   RiTableLine,
   RiAlertLine,
@@ -28,8 +29,8 @@ interface NeedsTableToolbarProps {
   organizationalUnits: { id: number; name: string; parent_id: number | null }[];
   needTypes: { id: number; name: string }[];
   mergeParams: (params: Record<string, any>) => void;
-  viewMode: 'table' | 'grid' | 'loading';
-  setViewMode: (mode: 'table' | 'grid') => void;
+  viewMode: 'table' | 'grid' | 'list' | 'loading';
+  setViewMode: (mode: 'table' | 'grid' | 'list') => void;
 }
 
 export function NeedsTableToolbar({
@@ -116,7 +117,18 @@ export function NeedsTableToolbar({
           })}
         >
           <RiTableLine />
-          <span className="sr-only">RiTableLine view</span>
+          <span className="sr-only">Table view</span>
+        </Button>
+        <Button
+          variant={'outline'}
+          size={'icon'}
+          onClick={() => setViewMode('list')}
+          className={cn('border-dashed', {
+            'bg-muted': viewMode === 'list',
+          })}
+        >
+          <RiAlignJustify />
+          <span className="sr-only">List card view</span>
         </Button>
         <Button
           variant={'outline'}

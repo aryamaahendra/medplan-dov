@@ -200,6 +200,27 @@ class Need extends Model
     }
 
     /**
+     * Get the workflow stage for this need.
+     * Returns one of: 'approved' | 'rejected' | 'under_review' | 'draft'
+     */
+    public function getWorkflowStage(): string
+    {
+        if ($this->status === self::STATUS_REJECTED) {
+            return 'rejected';
+        }
+
+        if ($this->approved_by_director_at !== null) {
+            return 'approved';
+        }
+
+        if ($this->status === self::STATUS_APPROVED) {
+            return 'under_review';
+        }
+
+        return 'draft';
+    }
+
+    /**
      * Get the need type for this need.
      */
     public function needType(): BelongsTo

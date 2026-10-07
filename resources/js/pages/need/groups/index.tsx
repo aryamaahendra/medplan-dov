@@ -109,7 +109,7 @@ export default function NeedGroupsIndex({
           <div className="flex items-center gap-3">
             {hasPermission('create need-groups') && (
               <Button onClick={onCreate} className="gap-1.5 shadow-xs">
-                <RiAddLine className="size-4" />
+                <RiAddLine />
                 Tambah Kelompok
               </Button>
             )}

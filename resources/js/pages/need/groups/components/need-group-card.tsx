@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { formatCompactIDR, formatIDR } from '@/lib/formatters';
 import groupRoutes from '@/routes/need-groups';
+import needsRoutes from '@/routes/needs';
 import type { NeedGroup } from '../columns';
 import {
   getGroupActions,
@@ -110,20 +111,21 @@ export function NeedGroupCard({
         <div className="flex items-start justify-between gap-4">
           <h2 className="font-heading text-lg font-bold tracking-tight text-foreground sm:text-xl">
             <Link
-              href={groupRoutes.checklists.index.url({ need_group: group.id })}
+              href={needsRoutes.index.url({
+                query: { need_group_id: group.id },
+              })}
               className="transition-colors hover:text-primary hover:underline"
             >
               {group.name}
             </Link>
           </h2>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <Link
               href={groupRoutes.checklists.index.url({ need_group: group.id })}
               className={buttonVariants({
                 variant: 'secondary',
                 size: 'sm',
-                className: 'h-8 gap-1.5 text-xs',
               })}
             >
               <RiListCheck3 className="size-3.5 text-primary" />

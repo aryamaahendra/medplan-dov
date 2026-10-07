@@ -20,7 +20,6 @@ export function useNeedsIndex({ currentGroup }: UseNeedsIndexProps) {
     'lock',
   );
   const [isLockDialogOpen, setIsLockDialogOpen] = useState(false);
-  const [showDashboard, setShowDashboard] = useState(false);
   const [isGroupDialogOpen, setIsGroupDialogOpen] = useState(false);
   const [isDeletingGroup, setIsDeletingGroup] = useState(false);
   const [isDeletingGroupLoading, setIsDeletingGroupLoading] = useState(false);
@@ -105,7 +104,6 @@ export function useNeedsIndex({ currentGroup }: UseNeedsIndexProps) {
       lockingNeed,
       lockDialogMode,
       isLockDialogOpen,
-      showDashboard,
       isGroupDialogOpen,
       isDeletingGroup,
       isDeletingGroupLoading,
@@ -115,7 +113,6 @@ export function useNeedsIndex({ currentGroup }: UseNeedsIndexProps) {
       setReviewingNeedId,
       setLockingNeed,
       setIsLockDialogOpen,
-      setShowDashboard,
       setIsGroupDialogOpen,
       setIsDeletingGroup,
       onEdit,

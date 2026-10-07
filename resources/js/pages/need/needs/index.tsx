@@ -20,7 +20,6 @@ import { NeedGridView } from './components/need-grid-view';
 import { NeedListView } from './components/need-list-view';
 import { NeedLockDialog } from './components/need-lock-dialog';
 import type { AttentionFilterKey } from './components/needs-attention-strip';
-import { NeedsDashboard } from './components/needs-dashboard';
 import { NeedsHeader } from './components/needs-header';
 import { NeedsStageTabs } from './components/needs-stage-tabs';
 import type { StageTabKey } from './components/needs-stage-tabs';
@@ -43,30 +42,6 @@ interface NeedsIndexProps {
     min_checklist_score?: string | string[];
     need_group_id?: string | string[];
   };
-  stats: {
-    total_needs: number;
-    total_budget: number;
-    priority_needs: number;
-    avg_completeness: number;
-    approved_by_director: number;
-    prev_group: { id: number; name: string } | null;
-    prev_total_needs: number | null;
-    prev_total_budget: number | null;
-    prev_priority_needs: number | null;
-    prev_avg_completeness: number | null;
-    prev_approved_by_director: number | null;
-  };
-  statusDistribution: Record<string, number>;
-  needsByUnit: {
-    unit_id: number | null;
-    name: string;
-    parents: string[];
-    count: number;
-    total_budget: number;
-    priority_count: number;
-    approved_count: number;
-  }[];
-  needsByType: { name: string; count: number }[];
 }
 
 export default function NeedsIndex({
@@ -75,10 +50,6 @@ export default function NeedsIndex({
   organizationalUnits,
   needTypes,
   filters,
-  stats,
-  statusDistribution,
-  needsByUnit,
-  needsByType,
 }: NeedsIndexProps) {
   const [viewMode, setViewMode] = useViewMode();
   const [selectedDrawerNeed, setSelectedDrawerNeed] = useState<Need | null>(
@@ -223,22 +194,13 @@ export default function NeedsIndex({
       <div className="flex flex-col gap-6 p-4">
         <NeedsHeader
           currentGroup={currentGroup}
-          showDashboard={state.showDashboard}
-          onToggleDashboard={() => actions.setShowDashboard((v) => !v)}
           onCreate={actions.onCreate}
           onExport={actions.onExport}
           onEditGroup={() => actions.setIsGroupDialogOpen(true)}
           onDeleteGroup={() => actions.setIsDeletingGroup(true)}
         />
 
-        {state.showDashboard ? (
-          <NeedsDashboard
-            stats={stats}
-            statusDistribution={statusDistribution}
-            needsByUnit={needsByUnit}
-            needsByType={needsByType}
-          />
-        ) : viewMode === 'loading' ? (
+        {viewMode === 'loading' ? (
           <div className="overflow-hidden rounded-md border">
             <div className="h-10 border-b bg-muted/20" />
             <div className="divide-y">

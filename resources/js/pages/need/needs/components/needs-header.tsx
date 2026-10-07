@@ -3,9 +3,7 @@ import {
   RiMoreFill,
   RiFileDownloadLine,
   RiEdit2Line,
-  RiPieChartLine,
   RiAddLine,
-  RiTableLine,
   RiDeleteBinLine,
 } from '@remixicon/react';
 
@@ -20,8 +18,6 @@ interface NeedsHeaderProps {
   onExport: () => void;
   onEditGroup: () => void;
   onDeleteGroup: () => void;
-  showDashboard: boolean;
-  onToggleDashboard: () => void;
 }
 
 export function NeedsHeader({
@@ -30,8 +26,6 @@ export function NeedsHeader({
   onExport,
   onEditGroup,
   onDeleteGroup,
-  showDashboard,
-  onToggleDashboard,
 }: NeedsHeaderProps) {
   const { hasPermission, hasAnyPermission } = usePermission();
 
@@ -82,44 +76,26 @@ export function NeedsHeader({
         </p>
       </div>
       <div className="flex gap-1">
-        <Button variant={'outline'} onClick={onToggleDashboard}>
-          {showDashboard ? (
-            <>
-              <RiTableLine />
-              RiTableLine
-            </>
-          ) : (
-            <>
-              <RiPieChartLine />
-              Dashboard
-            </>
-          )}
-        </Button>
-
-        {!showDashboard && (
-          <>
-            {groupActions.length > 0 && (
-              <ActionDropdown
-                trigger={
-                  <Button variant={'outline'} size={'icon'}>
-                    <RiMoreFill />
-                  </Button>
-                }
-                actions={groupActions as any}
-              />
-            )}
-
-            {hasAnyPermission([
-              'create needs',
-              'create descendant needs',
-              'create any needs',
-            ]) && (
-              <Button onClick={onCreate}>
-                <RiAddLine />
-                Tambah Usulan
+        {groupActions.length > 0 && (
+          <ActionDropdown
+            trigger={
+              <Button variant={'outline'} size={'icon'}>
+                <RiMoreFill />
               </Button>
-            )}
-          </>
+            }
+            actions={groupActions as any}
+          />
+        )}
+
+        {hasAnyPermission([
+          'create needs',
+          'create descendant needs',
+          'create any needs',
+        ]) && (
+          <Button onClick={onCreate}>
+            <RiAddLine />
+            Tambah Usulan
+          </Button>
         )}
       </div>
     </div>

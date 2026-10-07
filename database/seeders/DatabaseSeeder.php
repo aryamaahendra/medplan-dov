@@ -45,6 +45,9 @@ class DatabaseSeeder extends Seeder
         // Service Plans
         $this->call(ISeedStrategicServicePlansTableSeeder::class);
 
+        // Needs (Simulated real-world entries: two groups, accepted + rejected)
+        $this->call(SimulatedNeedsSeeder::class);
+
         // Needs (Core)
         // $this->call(ISeedNeedsTableSeeder::class);
 

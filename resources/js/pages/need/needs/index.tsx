@@ -19,7 +19,6 @@ import { NeedDirectorReviewDialog } from './components/need-director-review-dial
 import { NeedGridView } from './components/need-grid-view';
 import { NeedListView } from './components/need-list-view';
 import { NeedLockDialog } from './components/need-lock-dialog';
-import { NeedsAttentionStrip } from './components/needs-attention-strip';
 import type { AttentionFilterKey } from './components/needs-attention-strip';
 import { NeedsDashboard } from './components/needs-dashboard';
 import { NeedsHeader } from './components/needs-header';
@@ -261,18 +260,11 @@ export default function NeedsIndex({
           </div>
         ) : (
           <div className="flex flex-col gap-4">
-            {/* Workflow Stage Tabs (Variant B) */}
+            {/* Workflow Stage Tabs / Stat Cards */}
             <NeedsStageTabs
               currentTab={currentStageTab}
               onTabChange={setCurrentStageTab}
               counts={stageCounts}
-            />
-
-            {/* Needs Attention Quick-Filter Strip */}
-            <NeedsAttentionStrip
-              needs={needs.data}
-              activeFilter={attentionFilter}
-              onFilterChange={setAttentionFilter}
             />
 
             <DataTable
@@ -315,6 +307,9 @@ export default function NeedsIndex({
                   mergeParams={mergeParams}
                   viewMode={viewMode}
                   setViewMode={setViewMode}
+                  needs={needs.data}
+                  activeAttentionFilter={attentionFilter}
+                  onAttentionFilterChange={setAttentionFilter}
                 />
               }
               toolbarPosition="between-search-and-table"

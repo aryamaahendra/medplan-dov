@@ -5,14 +5,25 @@ import {
   RiLayoutGridLine,
   RiTableLine,
   RiAlertLine,
+  RiErrorWarningLine,
+  RiCalendarLine,
+  RiChat1Line,
+  RiStarFill,
+  RiCloseLine,
 } from '@remixicon/react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { DataTableFacetedFilter } from '@/components/data-table/data-table-faceted-filter';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
+import { Switch } from '@/components/ui/switch';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import { cn } from '@/lib/utils';
+import type { Need } from '@/types';
+import type { AttentionFilterKey } from './needs-attention-strip';
+
+export type { AttentionFilterKey };
 
 interface NeedsTableToolbarProps {
   filters: DataTableFilters & {
@@ -31,6 +42,11 @@ interface NeedsTableToolbarProps {
   mergeParams: (params: Record<string, any>) => void;
   viewMode: 'table' | 'grid' | 'list' | 'loading';
   setViewMode: (mode: 'table' | 'grid' | 'list') => void;
+
+  // Quick filter attention strip integration
+  needs: Need[];
+  activeAttentionFilter: AttentionFilterKey | null;
+  onAttentionFilterChange: (filter: AttentionFilterKey | null) => void;
 }
 
 export function NeedsTableToolbar({
@@ -40,7 +56,126 @@ export function NeedsTableToolbar({
   mergeParams,
   viewMode,
   setViewMode,
+  needs,
+  activeAttentionFilter,
+  onAttentionFilterChange,
 }: NeedsTableToolbarProps) {
+  // Count active manual faceted filters
+  const activeManualCount = useMemo(() => {
+    const keys = [
+      'year',
+      'status',
+      'need_type_id',
+      'organizational_unit_id',
+      'urgency',
+      'impact',
+      'is_priority',
+      'is_approved_by_director',
+      'min_checklist_score',
+    ];
+
+    return keys.reduce((acc, key) => {
+      const val = (filters as Record<string, any>)[key];
+
+      if (val !== undefined && val !== null && val !== '') {
+        if (Array.isArray(val) ? val.length > 0 : true) {
+          return acc + 1;
+        }
+      }
+
+      return acc;
+    }, 0);
+  }, [filters]);
+
+  // Advance switch state: true = Advance (faceted filters), false = Simple (quick filter pills)
+  const [isAdvance, setIsAdvance] = useState(() => activeManualCount > 0);
+
+  // Compute attention counts from current page data
+  const now = new Date().getTime();
+  const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
+
+  const lowChecklistCount = useMemo(
+    () => needs.filter((n) => Number(n.checklist_percentage || 0) < 80).length,
+    [needs],
+  );
+
+  const revisionClosingCount = useMemo(
+    () =>
+      needs.filter((n) => {
+        if (!n.unlocked_until) {
+return false;
+}
+
+        const diff = new Date(n.unlocked_until).getTime() - now;
+
+        return diff > 0 && diff <= threeDaysMs;
+      }).length,
+    [needs, now, threeDaysMs],
+  );
+
+  const submissionClosingCount = useMemo(
+    () =>
+      needs.filter((n) => {
+        if (!n.group_submission_end_at) {
+return false;
+}
+
+        const diff = new Date(n.group_submission_end_at).getTime() - now;
+
+        return diff > 0 && diff <= threeDaysMs;
+      }).length,
+    [needs, now, threeDaysMs],
+  );
+
+  const hasNotesCount = useMemo(
+    () => needs.filter((n) => Boolean(n.notes)).length,
+    [needs],
+  );
+
+  const priorityCount = useMemo(
+    () => needs.filter((n) => Boolean(n.is_priority)).length,
+    [needs],
+  );
+
+  const attentionChips: Array<{
+    key: AttentionFilterKey;
+    label: string;
+    count: number;
+    icon: React.ElementType;
+  }> = [
+    {
+      key: 'low_checklist',
+      label: 'Checklist < 80%',
+      count: lowChecklistCount,
+      icon: RiErrorWarningLine,
+    },
+    {
+      key: 'revision_closing',
+      label: 'Revisi Berakhir Segera',
+      count: revisionClosingCount,
+      icon: RiTimeLine,
+    },
+    {
+      key: 'submission_closing',
+      label: 'Periode Segera Ditutup',
+      count: submissionClosingCount,
+      icon: RiCalendarLine,
+    },
+    {
+      key: 'has_notes',
+      label: 'Catatan Direktur',
+      count: hasNotesCount,
+      icon: RiChat1Line,
+    },
+    {
+      key: 'priority_only',
+      label: 'Prioritas Saja',
+      count: priorityCount,
+      icon: RiStarFill,
+    },
+  ];
+
+  // Options for manual faceted filters
   const statusOptions = [
     { label: 'Draft', value: 'draft', icon: RiTimeLine },
     { label: 'Approved', value: 'approved', icon: RiCheckDoubleLine },
@@ -105,104 +240,240 @@ export function NeedsTableToolbar({
     return Array.isArray(value) ? value : [value];
   };
 
+  const handleResetManualFilters = () => {
+    mergeParams({
+      year: undefined,
+      status: undefined,
+      need_type_id: undefined,
+      organizational_unit_id: undefined,
+      urgency: undefined,
+      impact: undefined,
+      is_priority: undefined,
+      is_approved_by_director: undefined,
+      min_checklist_score: undefined,
+      page: 1,
+    });
+  };
+
   return (
-    <>
+    <div className="flex w-full flex-wrap items-center gap-2.5">
+      {/* 1. List view (view mode switcher) */}
       <ButtonGroup>
         <Button
-          variant={'outline'}
-          size={'icon'}
+          variant="outline"
+          size="icon"
           onClick={() => setViewMode('table')}
-          className={cn('border-dashed', {
+          className={cn('size-8 border', {
             'bg-muted': viewMode === 'table',
           })}
         >
-          <RiTableLine />
+          <RiTableLine className="size-4" />
           <span className="sr-only">Table view</span>
         </Button>
         <Button
-          variant={'outline'}
-          size={'icon'}
+          variant="outline"
+          size="icon"
           onClick={() => setViewMode('list')}
-          className={cn('border-dashed', {
+          className={cn('size-8 border', {
             'bg-muted': viewMode === 'list',
           })}
         >
-          <RiAlignJustify />
+          <RiAlignJustify className="size-4" />
           <span className="sr-only">List card view</span>
         </Button>
         <Button
-          variant={'outline'}
-          size={'icon'}
+          variant="outline"
+          size="icon"
           onClick={() => setViewMode('grid')}
-          className={cn('border-dashed', {
+          className={cn('size-8 border', {
             'bg-muted': viewMode === 'grid',
           })}
         >
-          <RiLayoutGridLine />
+          <RiLayoutGridLine className="size-4" />
           <span className="sr-only">Grid view</span>
         </Button>
       </ButtonGroup>
 
-      <DataTableFacetedFilter
-        title="Tahun"
-        options={yearOptions}
-        selectedValues={getFilterArray(filters.year)}
-        onSelect={(values) => mergeParams({ year: values, page: 1 })}
-      />
-      <DataTableFacetedFilter
-        title="Status"
-        options={statusOptions}
-        selectedValues={getFilterArray(filters.status)}
-        onSelect={(values) => mergeParams({ status: values, page: 1 })}
-      />
-      <DataTableFacetedFilter
-        title="Jenis"
-        options={typeOptions}
-        selectedValues={getFilterArray(filters.need_type_id)}
-        onSelect={(values) => mergeParams({ need_type_id: values, page: 1 })}
-      />
-      <DataTableFacetedFilter
-        title="Unit Kerja"
-        options={unitOptions}
-        selectedValues={getFilterArray(filters.organizational_unit_id)}
-        onSelect={(values) =>
-          mergeParams({ organizational_unit_id: values, page: 1 })
-        }
-      />
-      <DataTableFacetedFilter
-        title="Urgensi"
-        options={urgencyOptions}
-        selectedValues={getFilterArray(filters.urgency)}
-        onSelect={(values) => mergeParams({ urgency: values, page: 1 })}
-      />
-      <DataTableFacetedFilter
-        title="Dampak"
-        options={impactOptions}
-        selectedValues={getFilterArray(filters.impact)}
-        onSelect={(values) => mergeParams({ impact: values, page: 1 })}
-      />
-      <DataTableFacetedFilter
-        title="Prioritas"
-        options={priorityOptions}
-        selectedValues={getFilterArray(filters.is_priority)}
-        onSelect={(values) => mergeParams({ is_priority: values, page: 1 })}
-      />
-      <DataTableFacetedFilter
-        title="Review Direktur"
-        options={directorReviewOptions}
-        selectedValues={getFilterArray(filters.is_approved_by_director)}
-        onSelect={(values) =>
-          mergeParams({ is_approved_by_director: values, page: 1 })
-        }
-      />
-      <DataTableFacetedFilter
-        title="Skor Checklist"
-        options={scoreOptions}
-        selectedValues={getFilterArray(filters.min_checklist_score)}
-        onSelect={(values) =>
-          mergeParams({ min_checklist_score: values, page: 1 })
-        }
-      />
-    </>
+      {/* 2. Filter change toggle (Switch: Simple vs Advance) */}
+      <div className="flex h-8 items-center gap-2 rounded-lg border bg-muted/20 px-2.5">
+        <span
+          role="button"
+          tabIndex={0}
+          onClick={() => setIsAdvance(false)}
+          onKeyDown={(e) => e.key === 'Enter' && setIsAdvance(false)}
+          className={cn(
+            'cursor-pointer text-xs transition-colors select-none',
+            !isAdvance
+              ? 'font-semibold text-foreground'
+              : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          Simple
+        </span>
+
+        <Switch
+          id="filter-mode-switch"
+          size="sm"
+          checked={isAdvance}
+          onCheckedChange={setIsAdvance}
+          aria-label="Ganti mode filter antara Simple dan Advance"
+        />
+
+        <span
+          role="button"
+          tabIndex={0}
+          onClick={() => setIsAdvance(true)}
+          onKeyDown={(e) => e.key === 'Enter' && setIsAdvance(true)}
+          className={cn(
+            'cursor-pointer text-xs transition-colors select-none',
+            isAdvance
+              ? 'font-semibold text-foreground'
+              : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          Advance
+        </span>
+
+        {isAdvance && activeManualCount > 0 && (
+          <Badge
+            variant="secondary"
+            className="ml-0.5 rounded-sm px-1 font-mono text-[10px]"
+          >
+            {activeManualCount}
+          </Badge>
+        )}
+      </div>
+
+      {/* 3. Filters (Quick filter pills if Simple; Faceted filters if Advance) */}
+      {!isAdvance ? (
+        <>
+          {/* Quick filter pills (using solid outline buttons, no dashed border) */}
+          {attentionChips.map((chip) => {
+            const Icon = chip.icon;
+            const isActive = activeAttentionFilter === chip.key;
+
+            return (
+              <Button
+                key={chip.key}
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  onAttentionFilterChange(isActive ? null : chip.key)
+                }
+                className={cn(
+                  'h-8 gap-1.5 border px-2.5 text-xs font-normal transition-colors',
+                  isActive
+                    ? 'border-primary bg-primary/10 font-medium text-primary hover:bg-primary/15'
+                    : 'border-border/80 bg-background text-foreground/80 hover:bg-muted/60',
+                )}
+              >
+                <Icon className="size-3.5 shrink-0" />
+                <span>{chip.label}</span>
+                <Badge
+                  variant={isActive ? 'default' : 'secondary'}
+                  className={cn(
+                    'rounded-sm px-1 font-mono text-[10px]',
+                    isActive && 'bg-primary text-primary-foreground',
+                  )}
+                >
+                  {chip.count}
+                </Badge>
+              </Button>
+            );
+          })}
+
+          {activeAttentionFilter && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground"
+              onClick={() => onAttentionFilterChange(null)}
+            >
+              Reset
+              <RiCloseLine className="ml-1 size-3.5" />
+            </Button>
+          )}
+        </>
+      ) : (
+        <>
+          {/* Manual faceted filters */}
+          <DataTableFacetedFilter
+            title="Tahun"
+            options={yearOptions}
+            selectedValues={getFilterArray(filters.year)}
+            onSelect={(values) => mergeParams({ year: values, page: 1 })}
+          />
+          <DataTableFacetedFilter
+            title="Status"
+            options={statusOptions}
+            selectedValues={getFilterArray(filters.status)}
+            onSelect={(values) => mergeParams({ status: values, page: 1 })}
+          />
+          <DataTableFacetedFilter
+            title="Jenis"
+            options={typeOptions}
+            selectedValues={getFilterArray(filters.need_type_id)}
+            onSelect={(values) =>
+              mergeParams({ need_type_id: values, page: 1 })
+            }
+          />
+          <DataTableFacetedFilter
+            title="Unit Kerja"
+            options={unitOptions}
+            selectedValues={getFilterArray(filters.organizational_unit_id)}
+            onSelect={(values) =>
+              mergeParams({ organizational_unit_id: values, page: 1 })
+            }
+          />
+          <DataTableFacetedFilter
+            title="Urgensi"
+            options={urgencyOptions}
+            selectedValues={getFilterArray(filters.urgency)}
+            onSelect={(values) => mergeParams({ urgency: values, page: 1 })}
+          />
+          <DataTableFacetedFilter
+            title="Dampak"
+            options={impactOptions}
+            selectedValues={getFilterArray(filters.impact)}
+            onSelect={(values) => mergeParams({ impact: values, page: 1 })}
+          />
+          <DataTableFacetedFilter
+            title="Prioritas"
+            options={priorityOptions}
+            selectedValues={getFilterArray(filters.is_priority)}
+            onSelect={(values) => mergeParams({ is_priority: values, page: 1 })}
+          />
+          <DataTableFacetedFilter
+            title="Review Direktur"
+            options={directorReviewOptions}
+            selectedValues={getFilterArray(filters.is_approved_by_director)}
+            onSelect={(values) =>
+              mergeParams({ is_approved_by_director: values, page: 1 })
+            }
+          />
+          <DataTableFacetedFilter
+            title="Skor Checklist"
+            options={scoreOptions}
+            selectedValues={getFilterArray(filters.min_checklist_score)}
+            onSelect={(values) =>
+              mergeParams({ min_checklist_score: values, page: 1 })
+            }
+          />
+
+          {activeManualCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground"
+              onClick={handleResetManualFilters}
+            >
+              Reset Filter
+              <RiCloseLine className="ml-1 size-3.5" />
+            </Button>
+          )}
+        </>
+      )}
+    </div>
   );
 }

@@ -9,7 +9,14 @@ import { useState } from 'react';
 import type { ReactNode } from 'react';
 
 import { Button, buttonVariants } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Tooltip,
   TooltipContent,
@@ -53,12 +60,10 @@ export function AnalyticalWidgetFrame({
         className,
       )}
     >
-      <CardHeader className="flex flex-col gap-2 p-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4 sm:p-5">
+      <CardHeader>
         <div className="flex flex-col gap-1">
           <div className="flex flex-wrap items-center gap-2">
-            <CardTitle className="text-sm font-semibold tracking-tight text-foreground">
-              {title}
-            </CardTitle>
+            <CardTitle>{title}</CardTitle>
             {badge}
             {infoTooltip && (
               <Tooltip>
@@ -79,59 +84,62 @@ export function AnalyticalWidgetFrame({
               </Tooltip>
             )}
           </div>
-          {subtitle && (
-            <p className="text-xs leading-relaxed text-muted-foreground">
-              {subtitle}
-            </p>
-          )}
+          {subtitle && <CardDescription>{subtitle}</CardDescription>}
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5 self-start">
-          {headerActions}
+        <CardAction>
+          <div className="flex flex-wrap items-center gap-1.5 self-start">
+            {headerActions}
 
-          {tableView && (
-            <Button
-              type="button"
-              variant={showTable ? 'secondary' : 'outline'}
-              size="sm"
-              onClick={() => setShowTable(!showTable)}
-              className="h-7 cursor-pointer gap-1 px-2.5 text-xs font-normal"
-              aria-label={
-                showTable
-                  ? 'Tampilkan grafik visual'
-                  : 'Tampilkan sebagai tabel'
-              }
-            >
-              {showTable ? (
-                <>
-                  <RiBarChartLine className="size-3.5 text-primary" />
-                  <span>Grafik</span>
-                </>
-              ) : (
-                <>
-                  <RiTableLine className="size-3.5 text-muted-foreground" />
-                  <span>Tabel</span>
-                </>
-              )}
-            </Button>
-          )}
+            {tableView && (
+              <Button
+                type="button"
+                variant={showTable ? 'secondary' : 'outline'}
+                size="sm"
+                onClick={() => setShowTable(!showTable)}
+                aria-label={
+                  showTable
+                    ? 'Tampilkan grafik visual'
+                    : 'Tampilkan sebagai tabel'
+                }
+              >
+                {showTable ? (
+                  <>
+                    <RiBarChartLine
+                      data-icon="inline-start"
+                      className="text-primary"
+                    />
+                    <span>Grafik</span>
+                  </>
+                ) : (
+                  <>
+                    <RiTableLine
+                      data-icon="inline-start"
+                      className="text-muted-foreground"
+                    />
+                    <span>Tabel</span>
+                  </>
+                )}
+              </Button>
+            )}
 
-          {listHref && (
-            <Link
-              href={listHref}
-              className={cn(
-                buttonVariants({ variant: 'ghost', size: 'sm' }),
-                'h-7 gap-1 px-2 text-xs text-primary hover:text-primary/90',
-              )}
-            >
-              <span>{listActionLabel}</span>
-              <RiArrowRightUpLine className="size-3.5" />
-            </Link>
-          )}
-        </div>
+            {listHref && (
+              <Link
+                href={listHref}
+                className={cn(
+                  buttonVariants({ variant: 'ghost', size: 'sm' }),
+                  'text-primary hover:text-primary/90',
+                )}
+              >
+                <span>{listActionLabel}</span>
+                <RiArrowRightUpLine data-icon="inline-end" />
+              </Link>
+            )}
+          </div>
+        </CardAction>
       </CardHeader>
 
-      <CardContent className="flex flex-1 flex-col p-4 pt-0 sm:p-5 sm:pt-0">
+      <CardContent>
         {showTable && tableView ? (
           <div className="w-full overflow-x-auto rounded-lg border border-border/60">
             {tableView}

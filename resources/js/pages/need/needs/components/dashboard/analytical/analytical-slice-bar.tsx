@@ -204,10 +204,7 @@ export function AnalyticalSliceBar({
           </div>
 
           {activeFiltersCount > 0 && (
-            <Badge
-              variant="default"
-              className="h-5 px-1.5 font-mono text-[10px] font-semibold"
-            >
+            <Badge variant="default" className="font-mono font-semibold">
               {activeFiltersCount} aktif
             </Badge>
           )}
@@ -215,9 +212,12 @@ export function AnalyticalSliceBar({
           {compareGroup && (
             <Badge
               variant="outline"
-              className="h-5 gap-1 border-border/80 bg-muted/40 px-2 text-[10px] font-normal"
+              className="border-border/80 bg-muted/40 font-normal"
             >
-              <RiExchangeLine className="size-3 text-muted-foreground" />
+              <RiExchangeLine
+                data-icon="inline-start"
+                className="text-muted-foreground"
+              />
               <span>
                 Basis Perbandingan: {compareGroup.name} ({compareGroup.year})
               </span>
@@ -258,13 +258,10 @@ export function AnalyticalSliceBar({
 
           <Link
             href={listUrl}
-            className={cn(
-              buttonVariants({ size: 'sm' }),
-              'h-8 gap-1.5 px-3 text-xs font-medium shadow-xs',
-            )}
+            className={cn(buttonVariants({ size: 'sm' }), 'shadow-xs')}
           >
             <span>Buka di daftar</span>
-            <RiArrowRightLine className="size-3.5" />
+            <RiArrowRightLine data-icon="inline-end" />
           </Link>
 
           {hasActiveFilters && (
@@ -273,7 +270,7 @@ export function AnalyticalSliceBar({
               variant="ghost"
               size="sm"
               onClick={onResetSlice}
-              className="h-8 px-2 text-xs text-muted-foreground hover:text-destructive"
+              className="text-muted-foreground hover:text-destructive"
             >
               Reset Irisan
             </Button>
@@ -291,12 +288,15 @@ export function AnalyticalSliceBar({
                 variant={slice.unitIds.length > 0 ? 'secondary' : 'outline'}
                 size="sm"
                 className={cn(
-                  'h-8 cursor-pointer gap-1.5 text-xs font-normal',
+                  'cursor-pointer font-normal',
                   slice.unitIds.length > 0 &&
                     'border-primary/40 font-medium text-foreground',
                 )}
               >
-                <RiBuildingLine className="size-3.5 text-muted-foreground" />
+                <RiBuildingLine
+                  data-icon="inline-start"
+                  className="text-muted-foreground"
+                />
                 <span>Unit Kerja</span>
                 {slice.unitIds.length > 0 && (
                   <span className="py-0.2 ml-1 rounded-full bg-primary/20 px-1.5 font-mono text-[10px] font-semibold text-primary">
@@ -389,12 +389,15 @@ export function AnalyticalSliceBar({
                 variant={slice.typeIds.length > 0 ? 'secondary' : 'outline'}
                 size="sm"
                 className={cn(
-                  'h-8 cursor-pointer gap-1.5 text-xs font-normal',
+                  'cursor-pointer font-normal',
                   slice.typeIds.length > 0 &&
                     'border-primary/40 font-medium text-foreground',
                 )}
               >
-                <RiPriceTag3Line className="size-3.5 text-muted-foreground" />
+                <RiPriceTag3Line
+                  data-icon="inline-start"
+                  className="text-muted-foreground"
+                />
                 <span>Kategori</span>
                 {slice.typeIds.length > 0 && (
                   <span className="py-0.2 ml-1 rounded-full bg-primary/20 px-1.5 font-mono text-[10px] font-semibold text-primary">
@@ -467,12 +470,15 @@ export function AnalyticalSliceBar({
                 variant={slice.stages.length > 0 ? 'secondary' : 'outline'}
                 size="sm"
                 className={cn(
-                  'h-8 cursor-pointer gap-1.5 text-xs font-normal',
+                  'cursor-pointer font-normal',
                   slice.stages.length > 0 &&
                     'border-primary/40 font-medium text-foreground',
                 )}
               >
-                <RiTimeLine className="size-3.5 text-muted-foreground" />
+                <RiTimeLine
+                  data-icon="inline-start"
+                  className="text-muted-foreground"
+                />
                 <span>Tahapan</span>
                 {slice.stages.length > 0 && (
                   <span className="py-0.2 ml-1 rounded-full bg-primary/20 px-1.5 font-mono text-[10px] font-semibold text-primary">
@@ -530,12 +536,15 @@ export function AnalyticalSliceBar({
                 variant={slice.priority !== 'all' ? 'secondary' : 'outline'}
                 size="sm"
                 className={cn(
-                  'h-8 cursor-pointer gap-1.5 text-xs font-normal',
+                  'cursor-pointer font-normal',
                   slice.priority !== 'all' &&
                     'border-primary/40 font-medium text-foreground',
                 )}
               >
-                <RiStarLine className="size-3.5 text-muted-foreground" />
+                <RiStarLine
+                  data-icon="inline-start"
+                  className="text-muted-foreground"
+                />
                 <span>
                   {slice.priority === 'priority_only'
                     ? 'Prioritas Tinggi'
@@ -607,7 +616,7 @@ export function AnalyticalSliceBar({
                 }
                 size="sm"
                 className={cn(
-                  'h-8 cursor-pointer gap-1.5 text-xs font-normal',
+                  'cursor-pointer font-normal',
                   (slice.urgencies.length > 0 || slice.impacts.length > 0) &&
                     'border-primary/40 font-medium text-foreground',
                 )}
@@ -680,12 +689,15 @@ export function AnalyticalSliceBar({
                 }
                 size="sm"
                 className={cn(
-                  'h-8 cursor-pointer gap-1.5 text-xs font-normal',
+                  'cursor-pointer font-normal',
                   slice.checklistBand !== 'all' &&
                     'border-primary/40 font-medium text-foreground',
                 )}
               >
-                <RiShieldCheckLine className="size-3.5 text-muted-foreground" />
+                <RiShieldCheckLine
+                  data-icon="inline-start"
+                  className="text-muted-foreground"
+                />
                 <span>
                   {slice.checklistBand === 'ready'
                     ? 'Siap (>= 85%)'
@@ -774,7 +786,7 @@ export function AnalyticalSliceBar({
               <Badge
                 key={`unit-${id}`}
                 variant="secondary"
-                className="gap-1 border-border/80 px-2 py-0.5 text-xs font-normal"
+                className="border-border/80 font-normal"
               >
                 <span>{u?.name ?? `Unit #${id}`}</span>
                 <button
@@ -797,7 +809,7 @@ export function AnalyticalSliceBar({
               <Badge
                 key={`type-${id}`}
                 variant="secondary"
-                className="gap-1 border-border/80 px-2 py-0.5 text-xs font-normal"
+                className="border-border/80 font-normal"
               >
                 <span>{t?.name ?? `Kategori #${id}`}</span>
                 <button
@@ -825,7 +837,7 @@ export function AnalyticalSliceBar({
               <Badge
                 key={`stage-${st}`}
                 variant="secondary"
-                className="gap-1 border-border/80 px-2 py-0.5 text-xs font-normal"
+                className="border-border/80 font-normal"
               >
                 <span>Tahap: {labelMap[st] ?? st}</span>
                 <button
@@ -842,10 +854,7 @@ export function AnalyticalSliceBar({
 
           {/* Priority Chip */}
           {slice.priority !== 'all' && (
-            <Badge
-              variant="secondary"
-              className="gap-1 border-border/80 px-2 py-0.5 text-xs font-normal"
-            >
+            <Badge variant="secondary" className="border-border/80 font-normal">
               <span>
                 {slice.priority === 'priority_only'
                   ? 'Prioritas Tinggi'
@@ -869,7 +878,7 @@ export function AnalyticalSliceBar({
             <Badge
               key={`urgency-${u}`}
               variant="secondary"
-              className="gap-1 border-border/80 px-2 py-0.5 text-xs font-normal"
+              className="border-border/80 font-normal"
             >
               <span>Urgensi: {u}</span>
               <button
@@ -888,7 +897,7 @@ export function AnalyticalSliceBar({
             <Badge
               key={`impact-${imp}`}
               variant="secondary"
-              className="gap-1 border-border/80 px-2 py-0.5 text-xs font-normal"
+              className="border-border/80 font-normal"
             >
               <span>Dampak: {imp}</span>
               <button
@@ -904,10 +913,7 @@ export function AnalyticalSliceBar({
 
           {/* Checklist Band Chip */}
           {slice.checklistBand !== 'all' && (
-            <Badge
-              variant="secondary"
-              className="gap-1 border-border/80 px-2 py-0.5 text-xs font-normal"
-            >
+            <Badge variant="secondary" className="border-border/80 font-normal">
               <span>
                 Checklist:{' '}
                 {slice.checklistBand === 'ready'

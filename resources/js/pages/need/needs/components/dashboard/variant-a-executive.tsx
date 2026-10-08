@@ -18,7 +18,13 @@ import {
 import { useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { usePermission } from '@/hooks/use-permission';
 import {
   formatCompactIDR,
@@ -103,8 +109,8 @@ export function VariantAExecutive({
         label: 'Draft',
         count: stageDistribution.draft?.count ?? 0,
         budget: stageDistribution.draft?.budget ?? 0,
-        color: 'bg-slate-400 dark:bg-slate-500',
-        textClass: 'text-slate-600 dark:text-slate-300',
+        color: 'bg-muted-foreground/60',
+        textClass: 'text-muted-foreground',
       },
     ];
 
@@ -204,14 +210,17 @@ export function VariantAExecutive({
           })}
           className="group block"
         >
-          <Card className="h-full border-border/70 transition-all hover:border-primary/50 hover:shadow-xs">
-            <CardHeader className="flex flex-row items-center justify-between px-4 pt-3.5 pb-1">
+          <Card
+            size="sm"
+            className="h-full border-border/70 transition-all hover:border-primary/50 hover:shadow-xs"
+          >
+            <CardHeader className="flex flex-row items-center justify-between">
               <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                 TOTAL ANGGARAN
               </span>
               <RiMoneyDollarCircleLine className="size-4 text-muted-foreground transition-colors group-hover:text-primary" />
             </CardHeader>
-            <CardContent className="px-4 pt-0 pb-3">
+            <CardContent>
               <div className="font-mono text-xl font-bold tracking-tight text-foreground">
                 {formatCompactIDR(stats.total_budget)}
               </div>
@@ -242,14 +251,17 @@ export function VariantAExecutive({
           })}
           className="group block"
         >
-          <Card className="h-full border-border/70 transition-all hover:border-success/50 hover:shadow-xs">
-            <CardHeader className="flex flex-row items-center justify-between px-4 pt-3.5 pb-1">
+          <Card
+            size="sm"
+            className="h-full border-border/70 transition-all hover:border-success/50 hover:shadow-xs"
+          >
+            <CardHeader className="flex flex-row items-center justify-between">
               <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                 DISETUJUI DIREKTUR
               </span>
               <RiCheckboxCircleLine className="size-4 text-success" />
             </CardHeader>
-            <CardContent className="px-4 pt-0 pb-3">
+            <CardContent>
               <div className="font-mono text-xl font-bold tracking-tight text-success-foreground dark:text-success">
                 {formatCompactIDR(stats.approved_budget)}
               </div>
@@ -280,6 +292,7 @@ export function VariantAExecutive({
           className="group block"
         >
           <Card
+            size="sm"
             className={cn(
               'h-full transition-all hover:shadow-xs',
               canApprove
@@ -287,7 +300,7 @@ export function VariantAExecutive({
                 : 'border-border/70 hover:border-primary/50',
             )}
           >
-            <CardHeader className="flex flex-row items-center justify-between px-4 pt-3.5 pb-1">
+            <CardHeader className="flex flex-row items-center justify-between">
               <span
                 className={cn(
                   'text-[11px] font-semibold tracking-wider uppercase',
@@ -305,7 +318,7 @@ export function VariantAExecutive({
                 )}
               />
             </CardHeader>
-            <CardContent className="px-4 pt-0 pb-3">
+            <CardContent>
               <div
                 className={cn(
                   'font-mono text-xl font-bold tracking-tight',
@@ -341,15 +354,18 @@ export function VariantAExecutive({
           })}
           className="group block"
         >
-          <Card className="h-full border-border/70 transition-all hover:border-primary/50 hover:shadow-xs">
-            <CardHeader className="flex flex-row items-center justify-between px-4 pt-3.5 pb-1">
+          <Card
+            size="sm"
+            className="h-full border-border/70 transition-all hover:border-primary/50 hover:shadow-xs"
+          >
+            <CardHeader className="flex flex-row items-center justify-between">
               <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                 USULAN PRIORITAS
               </span>
-              <RiAlertLine className="size-4 text-orange-600 dark:text-orange-500" />
+              <RiAlertLine className="size-4 text-warning" />
             </CardHeader>
-            <CardContent className="px-4 pt-0 pb-3">
-              <div className="font-mono text-xl font-bold tracking-tight text-orange-700 dark:text-orange-400">
+            <CardContent>
+              <div className="font-mono text-xl font-bold tracking-tight text-warning-foreground dark:text-warning">
                 {formatNumber(stats.priority_needs)} Usulan
               </div>
               <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
@@ -379,14 +395,17 @@ export function VariantAExecutive({
           })}
           className="group block"
         >
-          <Card className="h-full border-border/70 transition-all hover:border-primary/50 hover:shadow-xs">
-            <CardHeader className="flex flex-row items-center justify-between px-4 pt-3.5 pb-1">
+          <Card
+            size="sm"
+            className="h-full border-border/70 transition-all hover:border-primary/50 hover:shadow-xs"
+          >
+            <CardHeader className="flex flex-row items-center justify-between">
               <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                 RATA KELENGKAPAN
               </span>
               <RiFileList3Line className="size-4 text-muted-foreground transition-colors group-hover:text-primary" />
             </CardHeader>
-            <CardContent className="px-4 pt-0 pb-3">
+            <CardContent>
               <div className="font-mono text-xl font-bold tracking-tight text-foreground">
                 {formatPercent(stats.avg_completeness)}
               </div>
@@ -415,15 +434,13 @@ export function VariantAExecutive({
 
       {/* W3 BUDGET PIPELINE BAR */}
       <Card className="border-border/70">
-        <CardHeader className="px-5 pt-4 pb-2">
+        <CardHeader>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <CardTitle className="text-sm font-semibold tracking-tight">
-                Pipeline Anggaran Berdasarkan Tahapan
-              </CardTitle>
-              <p className="mt-0.5 text-xs text-muted-foreground">
+              <CardTitle>Pipeline Anggaran Berdasarkan Tahapan</CardTitle>
+              <CardDescription>
                 Progres pengajuan dari draft hingga persetujuan Direktur
-              </p>
+              </CardDescription>
             </div>
 
             {/* Metric Toggle: Anggaran | Jumlah */}
@@ -455,7 +472,7 @@ export function VariantAExecutive({
             </div>
           </div>
         </CardHeader>
-        <CardContent className="px-5 pt-1 pb-4">
+        <CardContent>
           {/* Stacked Horizontal Bar */}
           <div className="flex h-6 w-full overflow-hidden rounded-md bg-muted/40 p-0.5">
             {pipelineStages.map((stage) => {
@@ -545,15 +562,13 @@ export function VariantAExecutive({
         {/* Left Column (7 cols): Decision Queue (W4) */}
         <Card className="flex flex-col justify-between border-border/70 lg:col-span-7">
           <div>
-            <CardHeader className="flex flex-row items-center justify-between px-5 pt-4 pb-3">
+            <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="text-sm font-semibold tracking-tight">
-                  Antrean Telaah Direktur
-                </CardTitle>
-                <p className="mt-0.5 text-xs text-muted-foreground">
+                <CardTitle>Antrean Telaah Direktur</CardTitle>
+                <CardDescription>
                   {stats.awaiting_director} usulan · Total{' '}
                   {formatCompactIDR(stats.awaiting_director_budget)}
-                </p>
+                </CardDescription>
               </div>
               <Link
                 href={needRoutes.index.url({
@@ -568,7 +583,7 @@ export function VariantAExecutive({
                 <RiArrowRightLine className="size-3.5" />
               </Link>
             </CardHeader>
-            <CardContent className="px-5 pt-0 pb-4">
+            <CardContent>
               {decisionQueue.length === 0 ? (
                 <div className="flex h-56 flex-col items-center justify-center rounded-lg border border-dashed border-border/80 p-4 text-center">
                   <RiShieldCheckLine className="mb-2 size-8 text-success opacity-80" />
@@ -674,15 +689,13 @@ export function VariantAExecutive({
         {/* Right Column (5 cols): 3x3 Priority Matrix (W5) */}
         <Card className="flex flex-col justify-between border-border/70 lg:col-span-5">
           <div>
-            <CardHeader className="px-5 pt-4 pb-2">
-              <CardTitle className="text-sm font-semibold tracking-tight">
-                Matriks Prioritas (Urgensi x Dampak)
-              </CardTitle>
-              <p className="mt-0.5 text-xs text-muted-foreground">
+            <CardHeader>
+              <CardTitle>Matriks Prioritas (Urgensi x Dampak)</CardTitle>
+              <CardDescription>
                 Urgensi (kolom) x Dampak (baris) untuk usulan aktif
-              </p>
+              </CardDescription>
             </CardHeader>
-            <CardContent className="px-5 pt-1 pb-4">
+            <CardContent>
               <div className="grid grid-cols-4 gap-1.5 text-center text-xs">
                 {/* Header Axis */}
                 <div className="p-1 text-[11px] font-semibold text-muted-foreground">
@@ -791,18 +804,16 @@ export function VariantAExecutive({
       <div className="grid gap-6 lg:grid-cols-12">
         {/* Budget by Unit (W6) */}
         <Card className="border-border/70 lg:col-span-7">
-          <CardHeader className="flex flex-row items-center justify-between px-5 pt-4 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between">
             <div className="flex items-center gap-2">
               <RiBuildingLine className="size-4 text-muted-foreground" />
-              <CardTitle className="text-sm font-semibold tracking-tight">
-                Anggaran per Unit Kerja
-              </CardTitle>
+              <CardTitle>Anggaran per Unit Kerja</CardTitle>
             </div>
             <span className="font-mono text-xs text-muted-foreground">
               Top 8 Unit
             </span>
           </CardHeader>
-          <CardContent className="px-5 pt-1 pb-4">
+          <CardContent>
             {topUnits.length === 0 ? (
               <p className="py-6 text-center text-xs text-muted-foreground">
                 Belum ada usulan per unit.
@@ -914,18 +925,16 @@ export function VariantAExecutive({
 
         {/* Budget by Need Type (W7) */}
         <Card className="border-border/70 lg:col-span-5">
-          <CardHeader className="flex flex-row items-center justify-between px-5 pt-4 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between">
             <div className="flex items-center gap-2">
               <RiStackLine className="size-4 text-muted-foreground" />
-              <CardTitle className="text-sm font-semibold tracking-tight">
-                Anggaran per Jenis Kebutuhan
-              </CardTitle>
+              <CardTitle>Anggaran per Jenis Kebutuhan</CardTitle>
             </div>
             <span className="font-mono text-xs text-muted-foreground">
               Top 6 Kategori
             </span>
           </CardHeader>
-          <CardContent className="px-5 pt-1 pb-4">
+          <CardContent>
             {needsByType.length === 0 ? (
               <p className="py-6 text-center text-xs text-muted-foreground">
                 Belum ada kategori kebutuhan.

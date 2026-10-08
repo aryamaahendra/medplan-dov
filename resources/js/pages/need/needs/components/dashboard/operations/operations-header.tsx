@@ -85,9 +85,12 @@ export function OperationsHeader({
 
           <Badge
             variant="outline"
-            className="gap-1 text-xs font-normal text-muted-foreground"
+            className="font-normal text-muted-foreground"
           >
-            <RiShieldCheckLine className="size-3 text-primary" />
+            <RiShieldCheckLine
+              data-icon="inline-start"
+              className="text-primary"
+            />
             <span>Cakupan: {meta?.scope_label ?? 'Seluruh Rumah Sakit'}</span>
           </Badge>
         </div>

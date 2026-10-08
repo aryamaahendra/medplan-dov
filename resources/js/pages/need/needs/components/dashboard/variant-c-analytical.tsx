@@ -9,7 +9,7 @@ import {
 import { useState, useMemo } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usePermission } from '@/hooks/use-permission';
 import type { NeedsDashboardPayload } from '@/types/needs-dashboard';
@@ -251,24 +251,28 @@ export function VariantCAnalytical({
 
       {/* Zero Match Empty State */}
       {slicedMetrics.totalCount === 0 ? (
-        <Card className="flex flex-col items-center justify-center border-dashed border-border p-12 text-center shadow-xs">
-          <RiFilterOffLine className="mb-3 size-10 text-muted-foreground/50" />
-          <h3 className="text-sm font-semibold text-foreground">
-            Tidak Ada Usulan yang Cocok
-          </h3>
-          <p className="mt-1 max-w-sm text-xs text-muted-foreground">
-            Kombinasi irisan filter saat ini tidak menghasilkan data usulan.
-            Silakan sesuaikan atau bersihkan pilihan filter.
-          </p>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleResetSlice}
-            className="mt-4 h-8 px-3 text-xs"
-          >
-            Reset Irisan Filter
-          </Button>
+        <Card className="border-dashed border-border text-center shadow-xs">
+          <CardContent>
+            <div className="flex flex-col items-center justify-center py-10 text-center">
+              <RiFilterOffLine className="mb-3 size-10 text-muted-foreground/50" />
+              <h3 className="text-sm font-semibold text-foreground">
+                Tidak Ada Usulan yang Cocok
+              </h3>
+              <p className="mt-1 max-w-sm text-xs text-muted-foreground">
+                Kombinasi irisan filter saat ini tidak menghasilkan data usulan.
+                Silakan sesuaikan atau bersihkan pilihan filter.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleResetSlice}
+                className="mt-4"
+              >
+                Reset Irisan Filter
+              </Button>
+            </div>
+          </CardContent>
         </Card>
       ) : (
         /* 2. Analytical Workspace Tabs (DC1 in exact order) */

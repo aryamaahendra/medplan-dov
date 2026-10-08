@@ -122,9 +122,10 @@ export function OperationsStageStrip({
             title={`Buka daftar usulan dengan status ${item.title}`}
           >
             <Card
+              size="sm"
               className={`h-full transition-all duration-150 hover:shadow-xs ${item.colorClasses.card}`}
             >
-              <CardHeader className="flex flex-row items-center justify-between px-4 pt-3.5 pb-1">
+              <CardHeader className="flex flex-row items-center justify-between">
                 <span
                   className={`text-[11px] tracking-wide ${item.colorClasses.title}`}
                 >
@@ -135,7 +136,7 @@ export function OperationsStageStrip({
                 />
               </CardHeader>
 
-              <CardContent className="flex flex-col justify-between px-4 pt-0 pb-3">
+              <CardContent className="flex flex-col justify-between">
                 <div>
                   <div
                     className={`font-mono text-2xl font-bold tracking-tight ${item.colorClasses.number}`}
@@ -157,10 +158,10 @@ export function OperationsStageStrip({
                   {item.exceptionsCount > 0 ? (
                     <Badge
                       variant="destructive"
-                      className="h-4 gap-0.5 px-1 font-mono text-[9px]"
+                      className="font-mono"
                       title={`${item.exceptionsCount} usulan memerlukan perhatian pada tahapan ini`}
                     >
-                      <RiAlertLine className="size-2.5" />
+                      <RiAlertLine data-icon="inline-start" />
                       {item.exceptionsCount} macet
                     </Badge>
                   ) : (

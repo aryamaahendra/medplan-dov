@@ -111,13 +111,10 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
                 attention: ['unaligned_needs'],
               },
             })}
-            className={cn(
-              buttonVariants({ size: 'sm' }),
-              'h-8 gap-1.5 px-3 text-xs font-medium',
-            )}
+            className={cn(buttonVariants({ size: 'sm' }), 'self-start')}
           >
             <span>Buka Usulan Belum Selaras</span>
-            <RiArrowRightLine className="size-3.5" />
+            <RiArrowRightLine data-icon="inline-end" />
           </Link>
         </div>
       )}
@@ -172,10 +169,7 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
                     {formatPercent(item.pct)}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Badge
-                      variant={item.pct >= 85 ? 'default' : 'secondary'}
-                      className="text-[10px]"
-                    >
+                    <Badge variant={item.pct >= 85 ? 'default' : 'secondary'}>
                       {item.pct >= 85 ? 'Memenuhi Target' : 'Perlu Peningkatan'}
                     </Badge>
                   </TableCell>
@@ -303,7 +297,7 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
               variant={filterZeroSupportOnly ? 'default' : 'outline'}
               size="sm"
               onClick={() => setFilterZeroSupportOnly(!filterZeroSupportOnly)}
-              className="h-7 px-2.5 text-xs font-normal"
+              className="font-normal"
             >
               Hanya Tanpa Dukungan ({zeroSupportCount})
             </Button>
@@ -336,7 +330,6 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
                       variant={
                         sasaran.needs_count > 0 ? 'default' : 'secondary'
                       }
-                      className="text-[10px]"
                     >
                       {sasaran.needs_count > 0
                         ? 'Didukung'
@@ -371,7 +364,7 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
                 placeholder="Cari sasaran atau tujuan..."
                 value={sasaranSearch}
                 onChange={(e) => setSasaranSearch(e.target.value)}
-                className="h-8 pl-8 text-xs"
+                className="pl-8"
               />
             </div>
 

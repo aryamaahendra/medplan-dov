@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -238,55 +238,67 @@ export function TabAnggaran({
     <div className="flex flex-col gap-6">
       {/* Priority vs Non-Priority Budget Split Strip */}
       <div className="grid gap-3 sm:grid-cols-3">
-        <Card className="border-border/70 p-4 shadow-xs">
-          <div className="flex items-center justify-between">
+        <Card size="sm" className="border-border/70 shadow-xs">
+          <CardHeader className="flex flex-row items-center justify-between">
             <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
               Belanja Prioritas Tinggi
             </span>
-            <RiStarFill className="size-4 text-orange-500" />
-          </div>
-          <div className="mt-1 font-mono text-xl font-bold text-orange-600 dark:text-orange-400">
-            {formatCompactIDR(metrics.priorityBudget)}
-          </div>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            {metrics.totalBudget > 0
-              ? Math.round((metrics.priorityBudget / metrics.totalBudget) * 100)
-              : 0}
-            % dari total estimasi belanja aktif
-          </p>
+            <RiStarFill className="size-4 text-warning" />
+          </CardHeader>
+          <CardContent>
+            <div className="font-mono text-xl font-bold text-warning-foreground dark:text-warning">
+              {formatCompactIDR(metrics.priorityBudget)}
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {metrics.totalBudget > 0
+                ? Math.round(
+                    (metrics.priorityBudget / metrics.totalBudget) * 100,
+                  )
+                : 0}
+              % dari total estimasi belanja aktif
+            </p>
+          </CardContent>
         </Card>
 
-        <Card className="border-border/70 p-4 shadow-xs">
-          <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
-            Belanja Non-Prioritas
-          </span>
-          <div className="mt-1 font-mono text-xl font-bold text-foreground">
-            {formatCompactIDR(
-              Math.max(0, metrics.totalBudget - metrics.priorityBudget),
-            )}
-          </div>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            {metrics.totalBudget > 0
-              ? 100 -
-                Math.round((metrics.priorityBudget / metrics.totalBudget) * 100)
-              : 0}
-            % usulan reguler / operasional
-          </p>
+        <Card size="sm" className="border-border/70 shadow-xs">
+          <CardHeader>
+            <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+              Belanja Non-Prioritas
+            </span>
+          </CardHeader>
+          <CardContent>
+            <div className="font-mono text-xl font-bold text-foreground">
+              {formatCompactIDR(
+                Math.max(0, metrics.totalBudget - metrics.priorityBudget),
+              )}
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {metrics.totalBudget > 0
+                ? 100 -
+                  Math.round(
+                    (metrics.priorityBudget / metrics.totalBudget) * 100,
+                  )
+                : 0}
+              % usulan reguler / operasional
+            </p>
+          </CardContent>
         </Card>
 
-        <Card className="border-border/70 p-4 shadow-xs">
-          <div className="flex items-center justify-between">
+        <Card size="sm" className="border-border/70 shadow-xs">
+          <CardHeader className="flex flex-row items-center justify-between">
             <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
               Anggaran Usulan Ditolak
             </span>
             <RiAlertLine className="size-4 text-destructive" />
-          </div>
-          <div className="mt-1 font-mono text-xl font-bold text-destructive">
-            {formatCompactIDR(metrics.rejectedBudget)}
-          </div>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            {metrics.rejectedCount} usulan tidak masuk pagu aktif
-          </p>
+          </CardHeader>
+          <CardContent>
+            <div className="font-mono text-xl font-bold text-destructive">
+              {formatCompactIDR(metrics.rejectedBudget)}
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {metrics.rejectedCount} usulan tidak masuk pagu aktif
+            </p>
+          </CardContent>
         </Card>
       </div>
 
@@ -812,10 +824,10 @@ export function TabAnggaran({
                     <TableCell className="text-center">
                       {need.is_priority ? (
                         <Badge
-                          variant="secondary"
-                          className="gap-1 border-orange-200 bg-orange-50 text-[10px] text-orange-700 dark:border-orange-800 dark:bg-orange-950/40 dark:text-orange-400"
+                          variant="outline"
+                          className="border-warning/40 text-warning-foreground dark:text-warning"
                         >
-                          <RiStarFill className="size-3" />
+                          <RiStarFill data-icon="inline-start" />
                           <span>Prioritas</span>
                         </Badge>
                       ) : (

@@ -11,7 +11,7 @@ import {
 } from '@remixicon/react';
 import { useMemo, useState } from 'react';
 import { Button, buttonVariants } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -384,83 +384,95 @@ export function TabRingkasan({
       {/* 1. KPI STRIP (Section 6) */}
       <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
         {/* KPI 1: Total Usulan Cocok */}
-        <Card className="border-border/70 p-4 shadow-xs">
-          <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
-            Total Usulan
-          </span>
-          <div className="mt-1 font-mono text-2xl font-bold tracking-tight text-foreground">
-            {formatNumber(metrics.totalCount)}
-          </div>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            Estimasi belanja {formatCompactIDR(metrics.totalBudget)}
-          </p>
+        <Card size="sm" className="border-border/70 shadow-xs">
+          <CardHeader>
+            <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+              Total Usulan
+            </span>
+          </CardHeader>
+          <CardContent>
+            <div className="font-mono text-2xl font-bold tracking-tight text-foreground">
+              {formatNumber(metrics.totalCount)}
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Estimasi belanja {formatCompactIDR(metrics.totalBudget)}
+            </p>
+          </CardContent>
         </Card>
 
         {/* KPI 2: Disetujui Direktur */}
-        <Card className="border-border/70 p-4 shadow-xs">
-          <div className="flex items-center justify-between">
+        <Card size="sm" className="border-border/70 shadow-xs">
+          <CardHeader className="flex flex-row items-center justify-between">
             <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
               Disetujui Direktur
             </span>
             <RiCheckLine className="size-4 text-success" />
-          </div>
-          <div className="mt-1 font-mono text-2xl font-bold tracking-tight text-success-foreground dark:text-success">
-            {formatNumber(metrics.approvedCount)}
-          </div>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            {formatCompactIDR(metrics.approvedBudget)} terkunci
-          </p>
+          </CardHeader>
+          <CardContent>
+            <div className="font-mono text-2xl font-bold tracking-tight text-success-foreground dark:text-success">
+              {formatNumber(metrics.approvedCount)}
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {formatCompactIDR(metrics.approvedBudget)} terkunci
+            </p>
+          </CardContent>
         </Card>
 
         {/* KPI 3: Menunggu Review */}
-        <Card className="border-border/70 p-4 shadow-xs">
-          <div className="flex items-center justify-between">
+        <Card size="sm" className="border-border/70 shadow-xs">
+          <CardHeader className="flex flex-row items-center justify-between">
             <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
               Menunggu Review
             </span>
             <RiTimeLine className="size-4 text-warning" />
-          </div>
-          <div className="mt-1 font-mono text-2xl font-bold tracking-tight text-warning-foreground dark:text-warning">
-            {formatNumber(metrics.reviewCount)}
-          </div>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            {formatCompactIDR(metrics.reviewBudget)} butuh telaah
-          </p>
+          </CardHeader>
+          <CardContent>
+            <div className="font-mono text-2xl font-bold tracking-tight text-warning-foreground dark:text-warning">
+              {formatNumber(metrics.reviewCount)}
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {formatCompactIDR(metrics.reviewBudget)} butuh telaah
+            </p>
+          </CardContent>
         </Card>
 
         {/* KPI 4: Kesiapan Data (Readiness) */}
-        <Card className="border-border/70 p-4 shadow-xs">
-          <div className="flex items-center justify-between">
+        <Card size="sm" className="border-border/70 shadow-xs">
+          <CardHeader className="flex flex-row items-center justify-between">
             <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
               Kesiapan Data
             </span>
             <RiShieldCheckLine className="size-4 text-primary" />
-          </div>
-          <div className="mt-1 font-mono text-2xl font-bold tracking-tight text-foreground">
-            {formatPercent(metrics.avgReadiness)}
-          </div>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            Dinilai {metrics.assessedCount} dari {metrics.totalCount} usulan
-          </p>
+          </CardHeader>
+          <CardContent>
+            <div className="font-mono text-2xl font-bold tracking-tight text-foreground">
+              {formatPercent(metrics.avgReadiness)}
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Dinilai {metrics.assessedCount} dari {metrics.totalCount} usulan
+            </p>
+          </CardContent>
         </Card>
 
         {/* KPI 5: Porsi Prioritas */}
-        <Card className="border-border/70 p-4 shadow-xs">
-          <div className="flex items-center justify-between">
+        <Card size="sm" className="border-border/70 shadow-xs">
+          <CardHeader className="flex flex-row items-center justify-between">
             <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
               Porsi Prioritas
             </span>
-            <RiStarLine className="size-4 text-orange-600 dark:text-orange-400" />
-          </div>
-          <div className="mt-1 font-mono text-2xl font-bold tracking-tight text-orange-600 dark:text-orange-400">
-            {formatNumber(metrics.priorityCount)}
-          </div>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            {metrics.totalCount > 0
-              ? Math.round((metrics.priorityCount / metrics.totalCount) * 100)
-              : 0}
-            % dari total pengajuan
-          </p>
+            <RiStarLine className="size-4 text-warning" />
+          </CardHeader>
+          <CardContent>
+            <div className="font-mono text-2xl font-bold tracking-tight text-warning-foreground dark:text-warning">
+              {formatNumber(metrics.priorityCount)}
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {metrics.totalCount > 0
+                ? Math.round((metrics.priorityCount / metrics.totalCount) * 100)
+                : 0}
+              % dari total pengajuan
+            </p>
+          </CardContent>
         </Card>
       </div>
 

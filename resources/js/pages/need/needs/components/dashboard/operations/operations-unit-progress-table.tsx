@@ -9,7 +9,14 @@ import { useState, useMemo } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   Table,
@@ -67,54 +74,57 @@ export function OperationsUnitProgressTable({
 
   return (
     <Card className="flex flex-col border-border/80">
-      <CardHeader className="flex flex-col gap-3 px-5 pt-4 pb-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <CardTitle className="flex items-center gap-2 text-sm font-semibold tracking-tight">
-            <RiBuildingLine className="size-4 text-muted-foreground" />
-            <span>Progres Pengajuan per Unit Kerja</span>
-          </CardTitle>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            Monitoring sebaran usulan, kesiapan berkas, dan unit tanpa pengajuan
-          </p>
-        </div>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <RiBuildingLine className="size-4 text-muted-foreground" />
+          <span>Progres Pengajuan per Unit Kerja</span>
+        </CardTitle>
+        <CardDescription>
+          Monitoring sebaran usulan, kesiapan berkas, dan unit tanpa pengajuan
+        </CardDescription>
 
         {/* Toolbar: Search & Mode Filter */}
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="relative w-48 sm:w-56">
-            <RiSearchLine className="absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari nama unit..."
-              className="h-7 pl-8 text-xs"
-            />
-          </div>
+        <CardAction>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative w-48 sm:w-56">
+              <RiSearchLine className="absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Cari nama unit..."
+                className="pl-8"
+              />
+            </div>
 
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() =>
-              setFilterMode((m) => (m === 'all' ? 'problems_only' : 'all'))
-            }
-            className={cn(
-              'h-7 text-xs font-normal',
-              filterMode === 'problems_only' &&
-                'border-warning/50 bg-warning/10 text-warning-foreground dark:text-warning',
-            )}
-          >
-            {filterMode === 'problems_only' ? (
-              <span className="flex items-center gap-1">
-                <RiAlertLine className="size-3 text-warning" />
-                Hanya Masalah ({filteredUnits.length})
-              </span>
-            ) : (
-              'Semua Unit'
-            )}
-          </Button>
-        </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() =>
+                setFilterMode((m) => (m === 'all' ? 'problems_only' : 'all'))
+              }
+              className={cn(
+                'font-normal',
+                filterMode === 'problems_only' &&
+                  'border-warning/50 bg-warning/10 text-warning-foreground dark:text-warning',
+              )}
+            >
+              {filterMode === 'problems_only' ? (
+                <span className="flex items-center gap-1">
+                  <RiAlertLine
+                    data-icon="inline-start"
+                    className="text-warning"
+                  />
+                  Hanya Masalah ({filteredUnits.length})
+                </span>
+              ) : (
+                'Semua Unit'
+              )}
+            </Button>
+          </div>
+        </CardAction>
       </CardHeader>
 
-      <CardContent className="px-5 pt-0 pb-4">
+      <CardContent>
         <div className="max-h-[380px] overflow-y-auto rounded-lg border border-border/70">
           <Table>
             <TableHeader className="sticky top-0 z-10 bg-muted/80 backdrop-blur-xs">

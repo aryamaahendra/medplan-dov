@@ -57,25 +57,21 @@ export function GlobalDashboardControls({
       case 'open':
         return {
           label: 'Buka Pengajuan',
-          variant: 'default' as const,
           color: 'bg-success',
         };
       case 'closed':
         return {
           label: 'Tutup',
-          variant: 'destructive' as const,
           color: 'bg-destructive',
         };
       case 'upcoming':
         return {
           label: 'Mendatang',
-          variant: 'outline' as const,
           color: 'bg-warning',
         };
       default:
         return {
           label: 'Terbuka',
-          variant: 'secondary' as const,
           color: 'bg-info',
         };
     }
@@ -133,18 +129,20 @@ export function GlobalDashboardControls({
           <DropdownMenu>
             <DropdownMenuTrigger
               render={
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8 gap-2 font-medium"
-                >
-                  <RiCalendarLine className="size-4 text-muted-foreground" />
+                <Button variant="outline" size="sm" className="font-medium">
+                  <RiCalendarLine
+                    data-icon="inline-start"
+                    className="text-muted-foreground"
+                  />
                   <span>
                     {currentGroup
                       ? `${currentGroup.name} (${currentGroup.year})`
                       : 'Pilih Kelompok'}
                   </span>
-                  <RiArrowDownSLine className="size-3.5 opacity-60" />
+                  <RiArrowDownSLine
+                    data-icon="inline-end"
+                    className="opacity-60"
+                  />
                 </Button>
               }
             />
@@ -187,12 +185,12 @@ export function GlobalDashboardControls({
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    'h-8 gap-1.5 text-xs text-muted-foreground hover:text-foreground',
+                    'text-muted-foreground hover:text-foreground',
                     compareGroupId &&
                       'bg-accent/60 font-medium text-foreground',
                   )}
                 >
-                  <RiExchangeLine className="size-3.5" />
+                  <RiExchangeLine data-icon="inline-start" />
                   <span>
                     {compareGroup
                       ? `vs ${compareGroup.year}`
@@ -240,12 +238,9 @@ export function GlobalDashboardControls({
         {/* Window status badge with countdown */}
         {currentGroup && (
           <div className="flex items-center gap-1.5">
-            <Badge
-              variant={windowStatusMeta.variant}
-              className="h-6 gap-1 px-2 text-[11px]"
-            >
+            <Badge variant="secondary">
               <span
-                className={cn('size-1.5 rounded-full', windowStatusMeta.color)}
+                className={cn('size-2 rounded-full', windowStatusMeta.color)}
               />
               {windowStatusMeta.label}
             </Badge>

@@ -4,7 +4,14 @@ import { useState, useMemo } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -87,9 +94,12 @@ export function TabUnit({ payload, slice, onSliceChange }: TabUnitProps) {
             {isScopedRole && (
               <Badge
                 variant="outline"
-                className="gap-1 border-border/80 bg-muted/40 text-[10px] font-normal"
+                className="border-border/80 bg-muted/40 font-normal"
               >
-                <RiLockLine className="size-3 text-muted-foreground" />
+                <RiLockLine
+                  data-icon="inline-start"
+                  className="text-muted-foreground"
+                />
                 <span>Cakupan Terkunci</span>
               </Badge>
             )}
@@ -134,95 +144,89 @@ export function TabUnit({ payload, slice, onSliceChange }: TabUnitProps) {
       </div>
 
       {/* 2. UNIT HEADER SNAPSHOT */}
-      <Card className="border-border/70 p-5 shadow-xs">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <h3 className="text-base font-bold tracking-tight text-foreground">
-                {currentUnitStat?.name ?? 'Unit Kerja'}
-              </h3>
-              <Badge
-                variant={approvalRate >= 70 ? 'default' : 'secondary'}
-                className="text-[10px]"
-              >
-                Tingkat Persetujuan {approvalRate}%
-              </Badge>
+      <Card size="sm" className="border-border/70 shadow-xs">
+        <CardHeader className="border-b-0 pb-0">
+          <CardTitle className="flex items-center gap-2">
+            <span>{currentUnitStat?.name ?? 'Unit Kerja'}</span>
+            <Badge variant={approvalRate >= 70 ? 'default' : 'secondary'}>
+              Tingkat Persetujuan {approvalRate}%
+            </Badge>
+          </CardTitle>
+          {currentUnitStat?.parents && currentUnitStat.parents.length > 0 && (
+            <CardDescription>
+              Induk Hirarki: {currentUnitStat.parents.join(' > ')}
+            </CardDescription>
+          )}
+          <CardAction>
+            <Link
+              href={needRoutes.index.url({
+                query: {
+                  need_group_id: groupId,
+                  organizational_unit_id: [selectedUnitId.toString()],
+                },
+              })}
+              className={cn(
+                buttonVariants({ size: 'sm' }),
+                'self-start shadow-xs',
+              )}
+            >
+              <span>Buka Daftar Usulan Unit</span>
+              <RiArrowRightLine data-icon="inline-end" />
+            </Link>
+          </CardAction>
+        </CardHeader>
+        <CardContent>
+          {/* KPI Strip per Unit */}
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+                Total Usulan
+              </span>
+              <div className="mt-1 font-mono text-xl font-bold text-foreground">
+                {formatNumber(currentUnitStat?.count ?? 0)}
+              </div>
+              <span className="font-mono text-[11px] text-muted-foreground">
+                {formatCompactIDR(currentUnitStat?.total_budget ?? 0)}
+              </span>
             </div>
 
-            {currentUnitStat?.parents && currentUnitStat.parents.length > 0 && (
-              <p className="text-xs text-muted-foreground">
-                Induk Hirarki: {currentUnitStat.parents.join(' > ')}
-              </p>
-            )}
-          </div>
-
-          <Link
-            href={needRoutes.index.url({
-              query: {
-                need_group_id: groupId,
-                organizational_unit_id: [selectedUnitId.toString()],
-              },
-            })}
-            className={cn(
-              buttonVariants({ size: 'sm' }),
-              'h-8 gap-1.5 self-start px-3 text-xs font-medium shadow-xs',
-            )}
-          >
-            <span>Buka Daftar Usulan Unit</span>
-            <RiArrowRightLine className="size-3.5" />
-          </Link>
-        </div>
-
-        {/* KPI Strip per Unit */}
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
-            <span className="text-[11px] font-semibold text-muted-foreground uppercase">
-              Total Usulan
-            </span>
-            <div className="mt-1 font-mono text-xl font-bold text-foreground">
-              {formatNumber(currentUnitStat?.count ?? 0)}
+            <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+                Disetujui Direktur
+              </span>
+              <div className="mt-1 font-mono text-xl font-bold text-success-foreground dark:text-success">
+                {formatNumber(currentUnitStat?.approved_count ?? 0)}
+              </div>
+              <span className="font-mono text-[11px] text-muted-foreground">
+                {formatCompactIDR(currentUnitStat?.approved_budget ?? 0)}
+              </span>
             </div>
-            <span className="font-mono text-[11px] text-muted-foreground">
-              {formatCompactIDR(currentUnitStat?.total_budget ?? 0)}
-            </span>
-          </div>
 
-          <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
-            <span className="text-[11px] font-semibold text-muted-foreground uppercase">
-              Disetujui Direktur
-            </span>
-            <div className="mt-1 font-mono text-xl font-bold text-success-foreground dark:text-success">
-              {formatNumber(currentUnitStat?.approved_count ?? 0)}
+            <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+                Menunggu Review
+              </span>
+              <div className="mt-1 font-mono text-xl font-bold text-warning-foreground dark:text-warning">
+                {formatNumber(currentUnitStat?.under_review_count ?? 0)}
+              </div>
+              <span className="font-mono text-[11px] text-muted-foreground">
+                {formatCompactIDR(currentUnitStat?.review_budget ?? 0)}
+              </span>
             </div>
-            <span className="font-mono text-[11px] text-muted-foreground">
-              {formatCompactIDR(currentUnitStat?.approved_budget ?? 0)}
-            </span>
-          </div>
 
-          <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
-            <span className="text-[11px] font-semibold text-muted-foreground uppercase">
-              Menunggu Review
-            </span>
-            <div className="mt-1 font-mono text-xl font-bold text-warning-foreground dark:text-warning">
-              {formatNumber(currentUnitStat?.under_review_count ?? 0)}
+            <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+                Draft / Perlu Tindak Lanjut
+              </span>
+              <div className="mt-1 font-mono text-xl font-bold text-foreground">
+                {formatNumber(currentUnitStat?.draft_count ?? 0)}
+              </div>
+              <span className="font-mono text-[11px] text-muted-foreground">
+                {formatCompactIDR(currentUnitStat?.draft_budget ?? 0)}
+              </span>
             </div>
-            <span className="font-mono text-[11px] text-muted-foreground">
-              {formatCompactIDR(currentUnitStat?.review_budget ?? 0)}
-            </span>
           </div>
-
-          <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
-            <span className="text-[11px] font-semibold text-muted-foreground uppercase">
-              Draft / Perlu Tindak Lanjut
-            </span>
-            <div className="mt-1 font-mono text-xl font-bold text-foreground">
-              {formatNumber(currentUnitStat?.draft_count ?? 0)}
-            </div>
-            <span className="font-mono text-[11px] text-muted-foreground">
-              {formatCompactIDR(currentUnitStat?.draft_budget ?? 0)}
-            </span>
-          </div>
-        </div>
+        </CardContent>
       </Card>
 
       {/* 3. CHILD-UNITS BREAKDOWN TABLE (Hierarki Sub-Unit) */}
@@ -284,7 +288,7 @@ export function TabUnit({ payload, slice, onSliceChange }: TabUnitProps) {
                         })}
                         className={cn(
                           buttonVariants({ variant: 'ghost', size: 'sm' }),
-                          'h-6 px-2 text-xs text-primary',
+                          'text-primary',
                         )}
                       >
                         Buka di daftar
@@ -351,7 +355,7 @@ export function TabUnit({ payload, slice, onSliceChange }: TabUnitProps) {
                         })}
                         className={cn(
                           buttonVariants({ variant: 'ghost', size: 'sm' }),
-                          'h-6 px-2 text-xs text-primary',
+                          'text-primary',
                         )}
                       >
                         Lihat Usulan &rarr;

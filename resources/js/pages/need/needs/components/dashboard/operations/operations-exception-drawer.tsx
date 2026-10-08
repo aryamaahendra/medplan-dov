@@ -64,24 +64,24 @@ export function OperationsExceptionDrawer({
               </span>
             )}
             {severity === 'critical' ? (
-              <Badge variant="destructive" className="font-mono text-xs">
+              <Badge variant="destructive" className="font-mono">
                 Kritis
               </Badge>
             ) : severity === 'ready' ? (
               <Badge
                 variant="default"
-                className="bg-success font-mono text-xs text-success-foreground hover:bg-success/90"
+                className="bg-success font-mono text-success-foreground hover:bg-success/90"
               >
                 Siap Verifikasi
               </Badge>
             ) : severity === 'info' ? (
-              <Badge variant="secondary" className="font-mono text-xs">
+              <Badge variant="secondary" className="font-mono">
                 Info
               </Badge>
             ) : (
               <Badge
                 variant="outline"
-                className="border-warning/40 font-mono text-xs text-warning-foreground dark:text-warning"
+                className="border-warning/40 font-mono text-warning-foreground dark:text-warning"
               >
                 Peringatan
               </Badge>

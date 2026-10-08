@@ -107,7 +107,7 @@ export function TabAlur({ payload, metrics }: TabAlurProps) {
               </span>
               <Badge
                 variant="outline"
-                className="h-5 border-info/40 bg-background text-[10px] font-normal text-info-foreground dark:text-info"
+                className="border-info/40 bg-background font-normal text-info-foreground dark:text-info"
               >
                 {isGated ? 'Mode Akumulasi Awal' : 'Data Log Memadai'}
               </Badge>
@@ -272,7 +272,7 @@ export function TabAlur({ payload, metrics }: TabAlurProps) {
               })}
               className={cn(
                 buttonVariants({ variant: 'ghost', size: 'sm' }),
-                'h-6 px-2 text-xs text-destructive hover:bg-destructive/10',
+                'text-destructive hover:bg-destructive/10',
               )}
             >
               Lihat Berkas Ditolak &rarr;

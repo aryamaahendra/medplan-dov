@@ -16,6 +16,12 @@ use Illuminate\Support\Str;
 
 class RolloverNeedAction
 {
+    public function __construct(
+        protected ?NeedStrategicAlignmentEngine $alignmentEngine = null,
+    ) {
+        $this->alignmentEngine ??= app(NeedStrategicAlignmentEngine::class);
+    }
+
     /**
      * Rollover (clone) a single unapproved need into a target need group.
      */
@@ -79,29 +85,7 @@ class RolloverNeedAction
             }
 
             // Sync strategic alignments
-            if ($sourceNeed->sasarans->isNotEmpty()) {
-                $newNeed->sasarans()->sync($sourceNeed->sasarans->pluck('id')->toArray());
-            }
-
-            if ($sourceNeed->indicators->isNotEmpty()) {
-                $newNeed->indicators()->sync($sourceNeed->indicators->pluck('id')->toArray());
-            }
-
-            if ($sourceNeed->kpiIndicators->isNotEmpty()) {
-                $newNeed->kpiIndicators()->sync($sourceNeed->kpiIndicators->pluck('id')->toArray());
-            }
-
-            if ($sourceNeed->strategicServicePlans->isNotEmpty()) {
-                $newNeed->strategicServicePlans()->sync($sourceNeed->strategicServicePlans->pluck('id')->toArray());
-            }
-
-            if ($sourceNeed->planningActivityVersions->isNotEmpty()) {
-                $newNeed->planningActivityVersions()->sync($sourceNeed->planningActivityVersions->pluck('id')->toArray());
-            }
-
-            if ($sourceNeed->planningActivityIndicators->isNotEmpty()) {
-                $newNeed->planningActivityIndicators()->sync($sourceNeed->planningActivityIndicators->pluck('id')->toArray());
-            }
+            $this->alignmentEngine->cloneAlignments($sourceNeed, $newNeed);
 
             // Clone attachments & isolate stored files
             $disk = (string) config('filesystems.attachments_disk', config('filesystems.default', 'local'));

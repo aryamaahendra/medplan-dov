@@ -15,6 +15,12 @@ use Illuminate\Support\Facades\Storage;
 
 class NeedProposalEngine
 {
+    public function __construct(
+        protected ?NeedStrategicAlignmentEngine $alignmentEngine = null,
+    ) {
+        $this->alignmentEngine ??= app(NeedStrategicAlignmentEngine::class);
+    }
+
     /**
      * Submit a new need proposal with its alignments, details, and attachments.
      */
@@ -29,7 +35,7 @@ class NeedProposalEngine
             /** @var Need $need */
             $need = Need::query()->create($attributes);
 
-            $this->syncAlignmentsOnCreate($need, $payload);
+            $this->alignmentEngine->syncForNeed($need, $payload, isPartialUpdate: false);
             $this->saveDetail($need, $payload->detail, $payload->fundingSources);
             $this->storeAttachments($need, $payload);
 
@@ -52,7 +58,7 @@ class NeedProposalEngine
 
             $need->update($attributes);
 
-            $this->syncAlignmentsOnUpdate($need, $payload);
+            $this->alignmentEngine->syncForNeed($need, $payload, isPartialUpdate: true);
 
             if ($payload->detail !== null) {
                 $this->saveDetail($need, $payload->detail, $payload->fundingSources);
@@ -121,44 +127,6 @@ class NeedProposalEngine
         }
 
         $attachment->delete();
-    }
-
-    /**
-     * Synchronize alignment hierarchies when creating a new proposal.
-     */
-    protected function syncAlignmentsOnCreate(Need $need, NeedProposalPayload $payload): void
-    {
-        $need->sasarans()->sync($payload->sasaranIds ?? []);
-        $need->indicators()->sync($payload->indicatorIds ?? []);
-        $need->kpiIndicators()->sync($payload->kpiIndicatorIds ?? []);
-        $need->strategicServicePlans()->sync($payload->strategicServicePlanIds ?? []);
-        $need->planningActivityVersions()->sync($payload->planningActivityVersionIds ?? []);
-        $need->planningActivityIndicators()->sync($payload->planningActivityIndicatorIds ?? []);
-    }
-
-    /**
-     * Synchronize alignment hierarchies conditionally when updating a proposal.
-     */
-    protected function syncAlignmentsOnUpdate(Need $need, NeedProposalPayload $payload): void
-    {
-        if ($payload->sasaranIds !== null) {
-            $need->sasarans()->sync($payload->sasaranIds);
-        }
-        if ($payload->indicatorIds !== null) {
-            $need->indicators()->sync($payload->indicatorIds);
-        }
-        if ($payload->kpiIndicatorIds !== null) {
-            $need->kpiIndicators()->sync($payload->kpiIndicatorIds);
-        }
-        if ($payload->strategicServicePlanIds !== null) {
-            $need->strategicServicePlans()->sync($payload->strategicServicePlanIds);
-        }
-        if ($payload->planningActivityVersionIds !== null) {
-            $need->planningActivityVersions()->sync($payload->planningActivityVersionIds);
-        }
-        if ($payload->planningActivityIndicatorIds !== null) {
-            $need->planningActivityIndicators()->sync($payload->planningActivityIndicatorIds);
-        }
     }
 
     /**

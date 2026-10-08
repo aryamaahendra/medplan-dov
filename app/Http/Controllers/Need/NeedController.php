@@ -9,6 +9,7 @@ use App\Actions\Need\GetNeedDashboardStatsAction;
 use App\Actions\Need\NeedLockLifecycle;
 use App\Actions\Need\NeedProposalEngine;
 use App\Actions\Need\NeedProposalPayload;
+use App\Actions\Need\NeedStrategicAlignmentEngine;
 use App\Enums\Kldi;
 use App\Enums\SatkerSkpd;
 use App\Http\Controllers\Controller;
@@ -19,14 +20,10 @@ use App\Http\Resources\ChecklistQuestionResource;
 use App\Http\Resources\NeedChecklistAnswerResource;
 use App\Http\Resources\NeedResource;
 use App\Models\FundingSource;
-use App\Models\KpiGroup;
 use App\Models\Need;
 use App\Models\NeedGroup;
 use App\Models\NeedType;
 use App\Models\OrganizationalUnit;
-use App\Models\PlanningActivityVersion;
-use App\Models\StrategicServicePlan;
-use App\Models\Tujuan;
 use App\Models\User;
 use App\Traits\HasDataTable;
 use Illuminate\Http\RedirectResponse;
@@ -119,7 +116,7 @@ class NeedController extends Controller
             ->with('success', 'Usulan kebutuhan berhasil dibuat.');
     }
 
-    public function create(Request $request): Response|RedirectResponse
+    public function create(Request $request, NeedStrategicAlignmentEngine $alignmentEngine): Response|RedirectResponse
     {
         $groupId = $request->input('need_group_id');
         $currentGroup = $groupId ? NeedGroup::findOrFail($groupId) : null;
@@ -129,39 +126,7 @@ class NeedController extends Controller
             'currentGroup' => $currentGroup,
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name', 'parent_id'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
-            'tujuans' => Tujuan::query()
-                ->whereHas('renstra', fn ($q) => $q->where('is_active', true))
-                ->select(['id', 'renstra_id', 'name'])
-                ->with([
-                    'renstra:id,year_start,year_end',
-                    'sasarans' => fn ($q) => $q->select(['id', 'tujuan_id', 'name']),
-                    'sasarans.indicators' => fn ($q) => $q->select(['id', 'sasaran_id', 'name']),
-                    'sasarans.indicators.targets' => fn ($q) => $q->select(['id', 'indicator_id', 'year', 'target']),
-                ])
-                ->get(),
-            'kpiGroups' => KpiGroup::query()
-                ->where('is_active', true)
-                ->with([
-                    'indicators' => fn ($q) => $q->select(['id', 'group_id', 'parent_indicator_id', 'name', 'unit', 'is_category']),
-                    'indicators.annualTargets' => fn ($q) => $q->select(['id', 'indicator_id', 'year', 'target_value']),
-                ])
-                ->get(),
-            'strategicServicePlans' => StrategicServicePlan::query()
-                ->select(['id', 'strategic_program', 'service_plan', 'year'])
-                ->get(),
-            'planningActivities' => PlanningActivityVersion::query()
-                ->whereHas('planningVersion', fn ($q) => $q->where('is_current', true))
-                ->whereNull('parent_id')
-                ->with([
-                    'planningVersion:id,year_start,year_end',
-                    'activityYears',
-                    'indicators.activityYears',
-                    'children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
-                    'children.children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
-                    'children.children.children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
-                    'children.children.children.children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
-                ])
-                ->get(),
+            ...$alignmentEngine->loadFormOptions(),
             'fundingSources' => FundingSource::query()->select(['id', 'name'])->orderBy('name')->get(),
             'users' => User::query()->select(['id', 'name', 'nip'])->orderBy('name')->get(),
             'kldiOptions' => collect(Kldi::cases())->map(fn ($case) => ['name' => $case->value, 'value' => $case->value])->values()->all(),
@@ -169,7 +134,7 @@ class NeedController extends Controller
         ]);
     }
 
-    public function edit(Need $need): Response
+    public function edit(Need $need, NeedStrategicAlignmentEngine $alignmentEngine): Response
     {
         $this->authorize('view', $need);
 
@@ -189,39 +154,7 @@ class NeedController extends Controller
             'currentGroup' => $need->needGroup,
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name', 'parent_id'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
-            'tujuans' => Tujuan::query()
-                ->whereHas('renstra', fn ($q) => $q->where('is_active', true))
-                ->select(['id', 'renstra_id', 'name'])
-                ->with([
-                    'renstra:id,year_start,year_end',
-                    'sasarans' => fn ($q) => $q->select(['id', 'tujuan_id', 'name']),
-                    'sasarans.indicators' => fn ($q) => $q->select(['id', 'sasaran_id', 'name']),
-                    'sasarans.indicators.targets' => fn ($q) => $q->select(['id', 'indicator_id', 'year', 'target']),
-                ])
-                ->get(),
-            'kpiGroups' => KpiGroup::query()
-                ->where('is_active', true)
-                ->with([
-                    'indicators' => fn ($q) => $q->select(['id', 'group_id', 'parent_indicator_id', 'name', 'unit', 'is_category']),
-                    'indicators.annualTargets' => fn ($q) => $q->select(['id', 'indicator_id', 'year', 'target_value']),
-                ])
-                ->get(),
-            'strategicServicePlans' => StrategicServicePlan::query()
-                ->select(['id', 'strategic_program', 'service_plan', 'year'])
-                ->get(),
-            'planningActivities' => PlanningActivityVersion::query()
-                ->whereHas('planningVersion', fn ($q) => $q->where('is_current', true))
-                ->whereNull('parent_id')
-                ->with([
-                    'planningVersion:id,year_start,year_end',
-                    'activityYears',
-                    'indicators.activityYears',
-                    'children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
-                    'children.children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
-                    'children.children.children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
-                    'children.children.children.children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
-                ])
-                ->get(),
+            ...$alignmentEngine->loadFormOptions(),
             'fundingSources' => FundingSource::query()->select(['id', 'name'])->orderBy('name')->get(),
             'users' => User::query()->select(['id', 'name', 'nip'])->orderBy('name')->get(),
             'kldiOptions' => collect(Kldi::cases())->map(fn ($case) => ['name' => $case->value, 'value' => $case->value])->values()->all(),

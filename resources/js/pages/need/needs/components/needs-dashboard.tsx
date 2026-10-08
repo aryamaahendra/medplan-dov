@@ -16,10 +16,10 @@ import { VariantCAnalytical } from './dashboard/variant-c-analytical';
 
 interface NeedsDashboardProps {
   dashboardPayload?: NeedsDashboardPayload;
-  stats?: any;
+  stats?: unknown;
   statusDistribution?: Record<string, number>;
-  needsByUnit?: any[];
-  needsByType?: any[];
+  needsByUnit?: unknown[];
+  needsByType?: unknown[];
   onOpenDirectorReview?: (needId: number) => void;
   onOpenLockDialog?: (needId: number, mode: 'lock' | 'unlock') => void;
 }
@@ -132,9 +132,10 @@ export function NeedsDashboard({
                 payload={dashboardPayload}
                 defaultTab={
                   hasRole('unit-head') || hasRole('staff')
-                    ? 'myunit'
-                    : 'overview'
+                    ? 'unit'
+                    : 'ringkasan'
                 }
+                compareGroupId={compareGroupId}
               />
             )}
           </div>

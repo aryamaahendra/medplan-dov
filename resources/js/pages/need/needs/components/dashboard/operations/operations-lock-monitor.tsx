@@ -89,8 +89,8 @@ export function OperationsLockMonitor({
                       timeline.status === 'closed'
                         ? 'h-full rounded-full bg-destructive'
                         : timeline.status === 'upcoming'
-                          ? 'h-full rounded-full bg-amber-500'
-                          : 'h-full rounded-full bg-emerald-600'
+                          ? 'h-full rounded-full bg-warning'
+                          : 'h-full rounded-full bg-success'
                     }
                   />
                 </div>
@@ -101,7 +101,7 @@ export function OperationsLockMonitor({
                 <span className="font-medium text-foreground">
                   {timeline.status === 'open' &&
                     timeline.days_remaining !== null && (
-                      <span className="font-mono text-emerald-800 dark:text-emerald-400">
+                      <span className="font-mono text-success-foreground dark:text-success">
                         Tersisa {timeline.days_remaining} hari
                       </span>
                     )}
@@ -124,12 +124,12 @@ export function OperationsLockMonitor({
 
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               {/* Tier 2: Dispensasi Aktif */}
-              <div className="flex flex-col justify-between rounded-md border border-amber-500/30 bg-amber-500/5 p-2.5 dark:bg-amber-500/10">
-                <div className="flex items-center justify-between text-[11px] text-amber-800 dark:text-amber-300">
+              <div className="flex flex-col justify-between rounded-md border border-warning/30 bg-warning/5 p-2.5 dark:bg-warning/10">
+                <div className="flex items-center justify-between text-[11px] text-warning-foreground dark:text-warning">
                   <span>Dispensasi</span>
-                  <RiLockUnlockLine className="size-3 text-amber-600" />
+                  <RiLockUnlockLine className="size-3 text-warning" />
                 </div>
-                <div className="mt-1 font-mono text-lg font-bold text-amber-800 dark:text-amber-300">
+                <div className="mt-1 font-mono text-lg font-bold text-warning-foreground dark:text-warning">
                   {formatNumber(
                     tiers?.tier_2_extension ?? activeUnlocks.length,
                   )}
@@ -154,12 +154,12 @@ export function OperationsLockMonitor({
               </div>
 
               {/* Tier 4: Disetujui Direktur */}
-              <div className="flex flex-col justify-between rounded-md border border-emerald-500/30 bg-emerald-500/5 p-2.5 dark:bg-emerald-500/10">
-                <div className="flex items-center justify-between text-[11px] text-emerald-800 dark:text-emerald-300">
+              <div className="flex flex-col justify-between rounded-md border border-success/30 bg-success/5 p-2.5 dark:bg-success/10">
+                <div className="flex items-center justify-between text-[11px] text-success-foreground dark:text-success">
                   <span>Persetujuan Direktur</span>
-                  <RiCheckboxCircleLine className="size-3 text-emerald-600" />
+                  <RiCheckboxCircleLine className="size-3 text-success" />
                 </div>
-                <div className="mt-1 font-mono text-lg font-bold text-emerald-800 dark:text-emerald-300">
+                <div className="mt-1 font-mono text-lg font-bold text-success-foreground dark:text-success">
                   {formatNumber(tiers?.tier_4_director ?? 0)}
                 </div>
                 <span className="text-[10px] text-muted-foreground">
@@ -249,7 +249,7 @@ export function OperationsLockMonitor({
                       <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
                         <span className="truncate">{item.unit_name}</span>
                         <span>-</span>
-                        <span className="font-mono font-medium text-amber-700 dark:text-amber-400">
+                        <span className="font-mono font-medium text-warning-foreground dark:text-warning">
                           Batas:{' '}
                           {item.unlocked_until
                             ? new Date(item.unlocked_until).toLocaleDateString(

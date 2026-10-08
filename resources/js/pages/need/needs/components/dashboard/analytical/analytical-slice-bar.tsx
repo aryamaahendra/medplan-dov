@@ -720,7 +720,7 @@ export function AnalyticalSliceBar({
                 className={cn(
                   'cursor-pointer rounded-md p-1.5 text-left hover:bg-accent/50',
                   slice.checklistBand === 'ready' &&
-                    'bg-accent font-medium text-emerald-600 dark:text-emerald-400',
+                    'bg-accent font-medium text-success-foreground dark:text-success',
                 )}
               >
                 Siap Telaah (Skor &gt;= 85%)
@@ -733,7 +733,7 @@ export function AnalyticalSliceBar({
                 className={cn(
                   'cursor-pointer rounded-md p-1.5 text-left hover:bg-accent/50',
                   slice.checklistBand === 'low' &&
-                    'bg-accent font-medium text-amber-600 dark:text-amber-400',
+                    'bg-accent font-medium text-warning-foreground dark:text-warning',
                 )}
               >
                 Di Bawah Target (Skor &lt; 85%)

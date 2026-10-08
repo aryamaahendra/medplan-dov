@@ -191,7 +191,7 @@ export function TabUnit({ payload, slice, onSliceChange }: TabUnitProps) {
             <span className="text-[11px] font-semibold text-muted-foreground uppercase">
               Disetujui Direktur
             </span>
-            <div className="mt-1 font-mono text-xl font-bold text-emerald-600 dark:text-emerald-400">
+            <div className="mt-1 font-mono text-xl font-bold text-success-foreground dark:text-success">
               {formatNumber(currentUnitStat?.approved_count ?? 0)}
             </div>
             <span className="font-mono text-[11px] text-muted-foreground">
@@ -203,7 +203,7 @@ export function TabUnit({ payload, slice, onSliceChange }: TabUnitProps) {
             <span className="text-[11px] font-semibold text-muted-foreground uppercase">
               Menunggu Review
             </span>
-            <div className="mt-1 font-mono text-xl font-bold text-amber-600 dark:text-amber-400">
+            <div className="mt-1 font-mono text-xl font-bold text-warning-foreground dark:text-warning">
               {formatNumber(currentUnitStat?.under_review_count ?? 0)}
             </div>
             <span className="font-mono text-[11px] text-muted-foreground">
@@ -265,10 +265,10 @@ export function TabUnit({ payload, slice, onSliceChange }: TabUnitProps) {
                     <TableCell className="text-right font-mono">
                       {formatCompactIDR(child.total_budget)}
                     </TableCell>
-                    <TableCell className="text-right font-mono text-emerald-600">
+                    <TableCell className="text-right font-mono text-success-foreground dark:text-success">
                       {formatNumber(child.approved_count)}
                     </TableCell>
-                    <TableCell className="text-right font-mono text-amber-600">
+                    <TableCell className="text-right font-mono text-warning-foreground dark:text-warning">
                       {formatNumber(child.under_review_count)}
                     </TableCell>
                     <TableCell className="text-right font-mono font-semibold">
@@ -335,7 +335,7 @@ export function TabUnit({ payload, slice, onSliceChange }: TabUnitProps) {
                     <TableCell className="text-right font-mono">
                       {formatCompactIDR(child.total_budget)}
                     </TableCell>
-                    <TableCell className="text-right font-mono text-emerald-600">
+                    <TableCell className="text-right font-mono text-success-foreground dark:text-success">
                       {formatNumber(child.approved_count)}
                     </TableCell>
                     <TableCell className="text-right font-mono font-semibold">

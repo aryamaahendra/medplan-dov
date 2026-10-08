@@ -99,12 +99,12 @@ export function OperationsUnitProgressTable({
             className={cn(
               'h-7 text-xs font-normal',
               filterMode === 'problems_only' &&
-                'border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-300',
+                'border-warning/50 bg-warning/10 text-warning-foreground dark:text-warning',
             )}
           >
             {filterMode === 'problems_only' ? (
               <span className="flex items-center gap-1">
-                <RiAlertLine className="size-3 text-amber-600" />
+                <RiAlertLine className="size-3 text-warning" />
                 Hanya Masalah ({filteredUnits.length})
               </span>
             ) : (
@@ -163,7 +163,7 @@ export function OperationsUnitProgressTable({
                       className={cn(
                         'text-xs transition-colors',
                         !item.has_submission &&
-                          'bg-amber-500/5 text-muted-foreground dark:bg-amber-500/10',
+                          'bg-warning/5 text-muted-foreground dark:bg-warning/10',
                       )}
                     >
                       {/* Unit name with hierarchy indentation */}
@@ -199,7 +199,7 @@ export function OperationsUnitProgressTable({
                             {!item.has_submission && (
                               <Badge
                                 variant="outline"
-                                className="h-4 border-amber-500/40 px-1 font-mono text-[9px] text-amber-700 dark:text-amber-400"
+                                className="h-4 border-warning/40 px-1 font-mono text-[9px] text-warning-foreground dark:text-warning"
                               >
                                 Belum Mengajukan
                               </Badge>
@@ -232,28 +232,28 @@ export function OperationsUnitProgressTable({
                               {approvedPct > 0 && (
                                 <div
                                   style={{ width: `${approvedPct}%` }}
-                                  className="h-full bg-emerald-600 dark:bg-emerald-500"
+                                  className="h-full bg-success"
                                   title={`Disetujui: ${item.approved_count}`}
                                 />
                               )}
                               {reviewPct > 0 && (
                                 <div
                                   style={{ width: `${reviewPct}%` }}
-                                  className="h-full bg-amber-500"
+                                  className="h-full bg-warning"
                                   title={`Menunggu Review: ${item.under_review_count}`}
                                 />
                               )}
                               {draftPct > 0 && (
                                 <div
                                   style={{ width: `${draftPct}%` }}
-                                  className="h-full bg-blue-500/70"
+                                  className="h-full bg-info/70"
                                   title={`Draf: ${item.draft_count}`}
                                 />
                               )}
                               {rejectedPct > 0 && (
                                 <div
                                   style={{ width: `${rejectedPct}%` }}
-                                  className="h-full bg-rose-500"
+                                  className="h-full bg-destructive"
                                   title={`Ditolak: ${item.rejected_count}`}
                                 />
                               )}
@@ -262,10 +262,10 @@ export function OperationsUnitProgressTable({
                             {/* Counts legend */}
                             <div className="flex justify-between font-mono text-[10px] text-muted-foreground">
                               <span>Draf: {item.draft_count}</span>
-                              <span className="text-amber-700 dark:text-amber-400">
+                              <span className="text-warning-foreground dark:text-warning">
                                 Rev: {item.under_review_count}
                               </span>
-                              <span className="text-emerald-700 dark:text-emerald-400">
+                              <span className="text-success-foreground dark:text-success">
                                 Selesai: {item.approved_count}
                               </span>
                             </div>
@@ -280,8 +280,8 @@ export function OperationsUnitProgressTable({
                             className={cn(
                               'font-semibold',
                               item.readiness >= 85
-                                ? 'text-emerald-700 dark:text-emerald-400'
-                                : 'text-amber-700 dark:text-amber-400',
+                                ? 'text-success-foreground dark:text-success'
+                                : 'text-warning-foreground dark:text-warning',
                             )}
                           >
                             {item.readiness}%

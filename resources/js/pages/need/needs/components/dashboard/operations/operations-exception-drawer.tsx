@@ -70,7 +70,7 @@ export function OperationsExceptionDrawer({
             ) : severity === 'ready' ? (
               <Badge
                 variant="default"
-                className="bg-emerald-600 font-mono text-xs hover:bg-emerald-700"
+                className="bg-success font-mono text-xs text-success-foreground hover:bg-success/90"
               >
                 Siap Verifikasi
               </Badge>
@@ -81,7 +81,7 @@ export function OperationsExceptionDrawer({
             ) : (
               <Badge
                 variant="outline"
-                className="border-amber-500/40 font-mono text-xs text-amber-700 dark:text-amber-400"
+                className="border-warning/40 font-mono text-xs text-warning-foreground dark:text-warning"
               >
                 Peringatan
               </Badge>
@@ -145,17 +145,17 @@ export function OperationsExceptionDrawer({
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-1.5">
                         {item.stage === 'approved' ? (
-                          <span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-800 dark:text-emerald-300">
+                          <span className="inline-flex items-center gap-1 rounded bg-success/10 px-1.5 py-0.5 text-[10px] font-medium text-success-foreground dark:text-success">
                             <RiCheckboxCircleLine className="size-3" />
                             Disetujui
                           </span>
                         ) : item.stage === 'under_review' ? (
-                          <span className="inline-flex items-center gap-1 rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-800 dark:text-amber-300">
+                          <span className="inline-flex items-center gap-1 rounded bg-warning/10 px-1.5 py-0.5 text-[10px] font-medium text-warning-foreground dark:text-warning">
                             <RiTimeLine className="size-3" />
                             Menunggu Review
                           </span>
                         ) : item.stage === 'rejected' ? (
-                          <span className="inline-flex items-center gap-1 rounded bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-medium text-destructive">
+                          <span className="inline-flex items-center gap-1 rounded bg-destructive/10 px-1.5 py-0.5 text-[10px] font-medium text-destructive">
                             Ditolak / Revisi
                           </span>
                         ) : (
@@ -168,7 +168,7 @@ export function OperationsExceptionDrawer({
                         {item.is_priority && (
                           <Badge
                             variant="default"
-                            className="h-4 bg-amber-600 px-1 text-[9px]"
+                            className="h-4 bg-warning px-1 text-[9px] text-warning-foreground"
                           >
                             Prioritas
                           </Badge>
@@ -206,9 +206,9 @@ export function OperationsExceptionDrawer({
                           className={cn(
                             'font-mono',
                             item.checklist_percentage >= 85
-                              ? 'text-emerald-700 dark:text-emerald-400'
+                              ? 'text-success-foreground dark:text-success'
                               : item.checklist_percentage > 0
-                                ? 'text-amber-700 dark:text-amber-400'
+                                ? 'text-warning-foreground dark:text-warning'
                                 : 'text-muted-foreground',
                           )}
                         >
@@ -219,7 +219,7 @@ export function OperationsExceptionDrawer({
                           className={cn(
                             'font-mono',
                             item.idle_days >= 7
-                              ? 'font-semibold text-rose-700 dark:text-rose-400'
+                              ? 'font-semibold text-destructive'
                               : 'text-muted-foreground',
                           )}
                         >
@@ -233,7 +233,7 @@ export function OperationsExceptionDrawer({
                         </p>
                       )}
                       {item.unlocked_until && (
-                        <p className="mt-0.5 text-[11px] font-medium text-amber-700 dark:text-amber-400">
+                        <p className="mt-0.5 text-[11px] font-medium text-warning-foreground dark:text-warning">
                           Dispensasi sampai: {item.unlocked_until}
                         </p>
                       )}

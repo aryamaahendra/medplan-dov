@@ -82,9 +82,9 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
     <div className="flex flex-col gap-6">
       {/* 1. ORPHAN NEEDS ALERT BANNER */}
       {orphanCount > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200/80 bg-amber-50/60 p-4 text-xs text-amber-950 shadow-xs dark:border-amber-900/60 dark:bg-amber-950/20 dark:text-amber-200">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-warning/40 bg-warning/5 p-4 text-xs text-warning-foreground shadow-xs dark:bg-warning/10 dark:text-warning">
           <div className="flex items-start gap-3">
-            <RiAlertLine className="mt-0.5 size-5 shrink-0 text-amber-600 dark:text-amber-400" />
+            <RiAlertLine className="mt-0.5 size-5 shrink-0 text-warning" />
             <div className="flex flex-col gap-0.5">
               <span className="text-sm font-semibold text-foreground">
                 Usulan Belum Selaras dengan Renstra (Orphan Needs)
@@ -218,10 +218,10 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
               <span className="text-[11px] font-semibold text-muted-foreground uppercase">
                 Kelengkapan KAK
               </span>
-              <RiFileTextLine className="size-4 text-emerald-600" />
+              <RiFileTextLine className="size-4 text-success" />
             </div>
             <div className="mt-2">
-              <div className="font-mono text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+              <div className="font-mono text-2xl font-bold text-success-foreground dark:text-success">
                 {formatPercent(dataReadiness.kak_detail_coverage)}
               </div>
               <p className="mt-0.5 text-[11px] text-muted-foreground">
@@ -233,7 +233,7 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
                 style={{
                   width: `${Math.max(dataReadiness.kak_detail_coverage, 3)}%`,
                 }}
-                className="h-full rounded-full bg-emerald-600"
+                className="h-full rounded-full bg-success"
               />
             </div>
           </div>
@@ -244,7 +244,7 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
               <span className="text-[11px] font-semibold text-muted-foreground uppercase">
                 Lampiran Pendukung
               </span>
-              <RiAttachment2 className="size-4 text-blue-600" />
+              <RiAttachment2 className="size-4 text-info" />
             </div>
             <div className="mt-2">
               <div className="font-mono text-2xl font-bold text-foreground">
@@ -259,7 +259,7 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
                 style={{
                   width: `${Math.max(dataReadiness.attachment_coverage, 3)}%`,
                 }}
-                className="h-full rounded-full bg-blue-600"
+                className="h-full rounded-full bg-info"
               />
             </div>
           </div>
@@ -270,7 +270,7 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
               <span className="text-[11px] font-semibold text-muted-foreground uppercase">
                 Rata-rata Checklist
               </span>
-              <RiCheckLine className="size-4 text-amber-600" />
+              <RiCheckLine className="size-4 text-warning" />
             </div>
             <div className="mt-2">
               <div className="font-mono text-2xl font-bold text-foreground">
@@ -285,7 +285,7 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
                 style={{
                   width: `${Math.max(dataReadiness.avg_checklist, 3)}%`,
                 }}
-                className="h-full rounded-full bg-amber-500"
+                className="h-full rounded-full bg-warning"
               />
             </div>
           </div>
@@ -382,7 +382,7 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
               </Badge>
               <Badge
                 variant="secondary"
-                className="font-normal text-rose-600 dark:text-rose-400"
+                className="font-normal text-destructive"
               >
                 {zeroSupportCount} Tanpa Dukungan
               </Badge>
@@ -407,7 +407,7 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
                       'flex flex-col justify-between rounded-lg border p-3.5 text-xs transition-all',
                       hasNeeds
                         ? 'border-border/80 bg-card hover:border-primary/50 hover:shadow-xs'
-                        : 'border-dashed border-rose-300/70 bg-rose-50/20 dark:border-rose-900/60 dark:bg-rose-950/10',
+                        : 'border-dashed border-destructive/40 bg-destructive/5',
                     )}
                   >
                     <div>
@@ -427,15 +427,13 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
                         <span
                           className={cn(
                             'text-xs font-bold',
-                            hasNeeds
-                              ? 'text-primary'
-                              : 'text-rose-600 dark:text-rose-400',
+                            hasNeeds ? 'text-primary' : 'text-destructive',
                           )}
                         >
                           {sasaran.needs_count} usulan
                         </span>
                         {!hasNeeds && (
-                          <span className="size-1.5 rounded-full bg-rose-500" />
+                          <span className="size-1.5 rounded-full bg-destructive" />
                         )}
                       </div>
                     </div>

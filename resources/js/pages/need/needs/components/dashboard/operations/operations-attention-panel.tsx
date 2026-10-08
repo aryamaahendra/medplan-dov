@@ -64,7 +64,7 @@ export function OperationsAttentionPanel({
         <CardHeader className="px-5 pt-4 pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-sm font-semibold tracking-tight">
-              <RiAlertLine className="size-4 text-amber-600 dark:text-amber-400" />
+              <RiAlertLine className="size-4 text-warning" />
               <span>Perlu Perhatian (Exceptions)</span>
             </CardTitle>
 
@@ -86,25 +86,25 @@ export function OperationsAttentionPanel({
         <CardContent className="flex flex-1 flex-col gap-4 px-5 pt-0 pb-4">
           {/* Positive Queue Header Banner: "Siap Diverifikasi" */}
           {readyQueue && (
-            <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/5 p-3 dark:bg-emerald-500/10">
+            <div className="rounded-lg border border-success/40 bg-success/5 p-3 dark:bg-success/10">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-400">
+                  <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-success/20 text-success-foreground dark:text-success">
                     <RiCheckboxCircleLine className="size-4" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-emerald-900 dark:text-emerald-300">
+                      <span className="text-xs font-bold text-success-foreground dark:text-success">
                         Siap Diverifikasi
                       </span>
                       <Badge
                         variant="default"
-                        className="h-4.5 bg-emerald-600 px-1.5 font-mono text-[10px]"
+                        className="h-4.5 bg-success px-1.5 font-mono text-[10px] text-success-foreground"
                       >
                         {formatNumber(readyQueue.count)}
                       </Badge>
                     </div>
-                    <p className="text-[11px] text-emerald-800/80 dark:text-emerald-400/80">
+                    <p className="text-[11px] text-success-foreground/80 dark:text-success/80">
                       Draf dengan checklist &ge; 85% dan kelengkapan dokumen
                       penuh
                       {readyQueue.budget > 0 &&
@@ -117,7 +117,7 @@ export function OperationsAttentionPanel({
                   size="sm"
                   variant="outline"
                   onClick={handleOpenReadyQueue}
-                  className="h-7 border-emerald-500/40 text-xs text-emerald-800 hover:bg-emerald-500/10 dark:text-emerald-300"
+                  className="h-7 border-success/40 text-xs text-success-foreground hover:bg-success/10 dark:text-success"
                 >
                   <span>Lihat Antrean</span>
                   <RiArrowRightLine className="ml-1 size-3" />
@@ -129,7 +129,7 @@ export function OperationsAttentionPanel({
           {/* Exception Lists grouped by severity */}
           {exceptions.length === 0 ? (
             <div className="flex h-36 flex-col items-center justify-center rounded-lg border border-dashed border-border/80 text-center">
-              <RiCheckboxCircleLine className="mb-1.5 size-7 text-emerald-600 opacity-60" />
+              <RiCheckboxCircleLine className="mb-1.5 size-7 text-success opacity-60" />
               <p className="text-xs font-semibold text-foreground">
                 Tidak ada yang tertahan
               </p>
@@ -187,7 +187,7 @@ export function OperationsAttentionPanel({
               {/* 2. Warning Severity Group */}
               {warningItems.length > 0 && (
                 <div>
-                  <div className="mb-2 flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-amber-700 uppercase dark:text-amber-400">
+                  <div className="mb-2 flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-warning-foreground uppercase dark:text-warning">
                     <RiAlertLine className="size-3.5" />
                     <span>Peringatan (Perlu Pemantauan)</span>
                   </div>
@@ -217,7 +217,7 @@ export function OperationsAttentionPanel({
                         <div className="flex shrink-0 items-center gap-2">
                           <Badge
                             variant="outline"
-                            className="border-amber-500/40 font-mono text-xs text-amber-700 dark:text-amber-400"
+                            className="border-warning/40 font-mono text-xs text-warning-foreground dark:text-warning"
                           >
                             {formatNumber(item.count)}
                           </Badge>

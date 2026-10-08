@@ -279,9 +279,9 @@ export function TabAnggaran({
             <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
               Anggaran Usulan Ditolak
             </span>
-            <RiAlertLine className="size-4 text-rose-500" />
+            <RiAlertLine className="size-4 text-destructive" />
           </div>
-          <div className="mt-1 font-mono text-xl font-bold text-rose-600 dark:text-rose-400">
+          <div className="mt-1 font-mono text-xl font-bold text-destructive">
             {formatCompactIDR(metrics.rejectedBudget)}
           </div>
           <p className="mt-1 text-[11px] text-muted-foreground">
@@ -314,10 +314,10 @@ export function TabAnggaran({
                   <TableCell className="text-right font-mono font-semibold">
                     {formatCompactIDR(u.total_budget)}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-emerald-600">
+                  <TableCell className="text-right font-mono text-success-foreground dark:text-success">
                     {formatCompactIDR(u.approved_budget ?? 0)}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-amber-600">
+                  <TableCell className="text-right font-mono text-warning-foreground dark:text-warning">
                     {formatCompactIDR(u.review_budget ?? 0)}
                   </TableCell>
                   <TableCell className="text-right font-mono text-muted-foreground">
@@ -353,15 +353,15 @@ export function TabAnggaran({
           {/* Legend */}
           <div className="flex flex-wrap items-center gap-4 text-xs">
             <div className="flex items-center gap-1.5">
-              <span className="size-2.5 rounded-full bg-emerald-600" />
+              <span className="size-2.5 rounded-full bg-success" />
               <span>Disetujui Direktur</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="size-2.5 rounded-full bg-amber-500" />
+              <span className="size-2.5 rounded-full bg-warning" />
               <span>Menunggu Review</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="size-2.5 rounded-full bg-blue-600" />
+              <span className="size-2.5 rounded-full bg-info" />
               <span>Draft Pengajuan</span>
             </div>
           </div>
@@ -418,21 +418,21 @@ export function TabAnggaran({
                       {appPct > 0 && (
                         <div
                           style={{ width: `${appPct}%` }}
-                          className="h-full bg-emerald-600 transition-opacity hover:opacity-85"
+                          className="h-full bg-success transition-opacity hover:opacity-85"
                           title={`Disetujui: ${formatCompactIDR(appB)}`}
                         />
                       )}
                       {revPct > 0 && (
                         <div
                           style={{ width: `${revPct}%` }}
-                          className="h-full bg-amber-500 transition-opacity hover:opacity-85"
+                          className="h-full bg-warning transition-opacity hover:opacity-85"
                           title={`Review: ${formatCompactIDR(revB)}`}
                         />
                       )}
                       {drfPct > 0 && (
                         <div
                           style={{ width: `${drfPct}%` }}
-                          className="h-full bg-blue-600 transition-opacity hover:opacity-85"
+                          className="h-full bg-info transition-opacity hover:opacity-85"
                           title={`Draft: ${formatCompactIDR(drfB)}`}
                         />
                       )}
@@ -516,7 +516,7 @@ export function TabAnggaran({
                   <div className="h-2 w-full overflow-hidden rounded-full bg-muted/60">
                     <div
                       style={{ width: `${Math.max(t.percentage, 2)}%` }}
-                      className="h-full rounded-full bg-blue-600 transition-all"
+                      className="h-full rounded-full bg-info transition-all"
                     />
                   </div>
                   <span className="w-20 shrink-0 text-right font-mono text-[10px] text-muted-foreground">
@@ -660,7 +660,7 @@ export function TabAnggaran({
                 <div className="h-2 w-full overflow-hidden rounded-full bg-muted/60">
                   <div
                     style={{ width: `${Math.max(bin.pct, 3)}%` }}
-                    className="h-full rounded-full bg-emerald-600 transition-all"
+                    className="h-full rounded-full bg-success transition-all"
                   />
                 </div>
               </div>

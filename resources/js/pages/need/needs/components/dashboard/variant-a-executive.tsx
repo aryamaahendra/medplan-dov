@@ -87,16 +87,16 @@ export function VariantAExecutive({
         label: 'Disetujui',
         count: stageDistribution.approved?.count ?? 0,
         budget: stageDistribution.approved?.budget ?? 0,
-        color: 'bg-emerald-600 dark:bg-emerald-500',
-        textClass: 'text-emerald-700 dark:text-emerald-400',
+        color: 'bg-success',
+        textClass: 'text-success-foreground dark:text-success',
       },
       {
         key: 'under_review',
         label: 'Menunggu Review',
         count: stageDistribution.under_review?.count ?? 0,
         budget: stageDistribution.under_review?.budget ?? 0,
-        color: 'bg-amber-500',
-        textClass: 'text-amber-700 dark:text-amber-400',
+        color: 'bg-warning',
+        textClass: 'text-warning-foreground dark:text-warning',
       },
       {
         key: 'draft',
@@ -242,15 +242,15 @@ export function VariantAExecutive({
           })}
           className="group block"
         >
-          <Card className="h-full border-border/70 transition-all hover:border-emerald-500/50 hover:shadow-xs">
+          <Card className="h-full border-border/70 transition-all hover:border-success/50 hover:shadow-xs">
             <CardHeader className="flex flex-row items-center justify-between px-4 pt-3.5 pb-1">
               <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                 DISETUJUI DIREKTUR
               </span>
-              <RiCheckboxCircleLine className="size-4 text-emerald-600 dark:text-emerald-500" />
+              <RiCheckboxCircleLine className="size-4 text-success" />
             </CardHeader>
             <CardContent className="px-4 pt-0 pb-3">
-              <div className="font-mono text-xl font-bold tracking-tight text-emerald-700 dark:text-emerald-400">
+              <div className="font-mono text-xl font-bold tracking-tight text-success-foreground dark:text-success">
                 {formatCompactIDR(stats.approved_budget)}
               </div>
               <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
@@ -283,7 +283,7 @@ export function VariantAExecutive({
             className={cn(
               'h-full transition-all hover:shadow-xs',
               canApprove
-                ? 'border-amber-500/40 bg-amber-500/10 hover:border-amber-500/70 dark:bg-amber-500/15'
+                ? 'border-warning/40 bg-warning/10 hover:border-warning/70 dark:bg-warning/15'
                 : 'border-border/70 hover:border-primary/50',
             )}
           >
@@ -292,7 +292,7 @@ export function VariantAExecutive({
                 className={cn(
                   'text-[11px] font-semibold tracking-wider uppercase',
                   canApprove
-                    ? 'text-amber-800 dark:text-amber-300'
+                    ? 'text-warning-foreground dark:text-warning'
                     : 'text-muted-foreground',
                 )}
               >
@@ -301,9 +301,7 @@ export function VariantAExecutive({
               <RiTimeLine
                 className={cn(
                   'size-4',
-                  canApprove
-                    ? 'text-amber-600 dark:text-amber-400'
-                    : 'text-muted-foreground',
+                  canApprove ? 'text-warning' : 'text-muted-foreground',
                 )}
               />
             </CardHeader>
@@ -312,7 +310,7 @@ export function VariantAExecutive({
                 className={cn(
                   'font-mono text-xl font-bold tracking-tight',
                   canApprove
-                    ? 'text-amber-800 dark:text-amber-300'
+                    ? 'text-warning-foreground dark:text-warning'
                     : 'text-foreground',
                 )}
               >
@@ -322,7 +320,7 @@ export function VariantAExecutive({
                 className={cn(
                   'mt-1 truncate font-mono text-[11px]',
                   canApprove
-                    ? 'text-amber-700/80 dark:text-amber-400/80'
+                    ? 'text-warning-foreground/80 dark:text-warning/80'
                     : 'text-muted-foreground',
                 )}
               >
@@ -401,8 +399,8 @@ export function VariantAExecutive({
                     className={cn(
                       'flex items-center gap-0.5 font-mono font-medium',
                       readinessDelta >= 0
-                        ? 'text-emerald-600 dark:text-emerald-400'
-                        : 'text-rose-600 dark:text-rose-400',
+                        ? 'text-success-foreground dark:text-success'
+                        : 'text-destructive',
                     )}
                   >
                     {readinessDelta >= 0 ? '+' : ''}
@@ -528,7 +526,7 @@ export function VariantAExecutive({
                   stage: ['rejected'],
                 },
               })}
-              className="inline-flex shrink-0 items-center gap-1.5 rounded border border-rose-500/30 bg-rose-500/5 px-2 py-1 text-xs font-medium text-rose-700 transition-colors hover:bg-rose-500/10 dark:text-rose-400"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded border border-destructive/30 bg-destructive/5 px-2 py-1 text-xs font-medium text-destructive transition-colors hover:bg-destructive/10"
             >
               <span>Ditolak:</span>
               <span className="font-mono font-bold">
@@ -573,7 +571,7 @@ export function VariantAExecutive({
             <CardContent className="px-5 pt-0 pb-4">
               {decisionQueue.length === 0 ? (
                 <div className="flex h-56 flex-col items-center justify-center rounded-lg border border-dashed border-border/80 p-4 text-center">
-                  <RiShieldCheckLine className="mb-2 size-8 text-emerald-600 opacity-80" />
+                  <RiShieldCheckLine className="mb-2 size-8 text-success opacity-80" />
                   <p className="text-sm font-medium text-foreground">
                     Tidak ada antrean telaah
                   </p>
@@ -596,7 +594,7 @@ export function VariantAExecutive({
                               title="Urgensi & Dampak Tinggi"
                               className="inline-flex"
                             >
-                              <RiStarFill className="size-3.5 shrink-0 text-amber-500" />
+                              <RiStarFill className="size-3.5 shrink-0 text-warning" />
                             </span>
                           )}
                           <Link
@@ -637,7 +635,7 @@ export function VariantAExecutive({
                             className={cn(
                               'py-0.2 rounded px-1 font-mono text-[10px]',
                               item.checklist_percentage < 85
-                                ? 'bg-amber-500/15 text-amber-700 dark:text-amber-400'
+                                ? 'bg-warning/15 text-warning-foreground dark:text-warning'
                                 : 'text-muted-foreground',
                             )}
                           >
@@ -735,7 +733,7 @@ export function VariantAExecutive({
                           className={cn(
                             'flex flex-col items-center justify-center rounded-lg border p-2 transition-all hover:scale-[1.02] hover:shadow-xs',
                             isTopPriority
-                              ? 'border-2 border-red-500/70 bg-red-500/10 text-red-900 dark:bg-red-500/20 dark:text-red-200'
+                              ? 'border-2 border-destructive/70 bg-destructive/10 text-destructive dark:bg-destructive/20'
                               : cell.count > 0
                                 ? intensityRatio > 0.5
                                   ? 'border-primary/50 bg-primary/15 text-foreground'
@@ -745,7 +743,7 @@ export function VariantAExecutive({
                         >
                           <div className="flex items-center gap-1">
                             {isTopPriority && (
-                              <RiStarFill className="size-3 text-red-600" />
+                              <RiStarFill className="size-3 text-destructive" />
                             )}
                             <span className="font-mono text-sm leading-none font-bold">
                               {cell.count}
@@ -773,7 +771,7 @@ export function VariantAExecutive({
                       stage: ['draft', 'under_review'],
                     },
                   })}
-                  className="mt-4 flex items-center justify-between rounded-lg border border-amber-500/30 bg-amber-500/10 p-2.5 text-xs text-amber-900 transition-colors hover:bg-amber-500/15 dark:text-amber-200"
+                  className="mt-4 flex items-center justify-between rounded-lg border border-warning/30 bg-warning/10 p-2.5 text-xs text-warning-foreground transition-colors hover:bg-warning/15 dark:text-warning"
                 >
                   <span className="font-medium">
                     Perhatian: {stats.unapproved_priority_count} usulan
@@ -962,7 +960,7 @@ export function VariantAExecutive({
                     <div className="h-2 w-full overflow-hidden rounded-full bg-muted/60">
                       <div
                         style={{ width: `${Math.max(type.percentage, 3)}%` }}
-                        className="h-full rounded-full bg-blue-600/80 transition-all group-hover:bg-blue-600"
+                        className="h-full rounded-full bg-info/80 transition-all group-hover:bg-info"
                       />
                     </div>
                     <div className="flex items-center justify-between font-mono text-[10px] text-muted-foreground">

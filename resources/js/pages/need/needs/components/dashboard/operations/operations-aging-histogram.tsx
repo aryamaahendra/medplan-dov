@@ -167,10 +167,9 @@ export function OperationsAgingHistogram({
                       }}
                       className={cn(
                         'h-full rounded-full transition-all duration-300',
-                        bucket.key === 'fresh' &&
-                          'bg-emerald-600 dark:bg-emerald-500',
-                        bucket.key === 'stale' && 'bg-amber-500',
-                        bucket.key === 'delayed' && 'bg-orange-500',
+                        bucket.key === 'fresh' && 'bg-success',
+                        bucket.key === 'stale' && 'bg-warning',
+                        bucket.key === 'delayed' && 'bg-warning/80',
                         bucket.key === 'stuck' && 'bg-destructive',
                       )}
                     />

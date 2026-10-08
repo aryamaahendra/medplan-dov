@@ -5,7 +5,6 @@ import {
   RiClipboardLine,
   RiDashboardLine,
   RiFileTextLine,
-  RiFilterLine,
   RiStackLine,
   RiGroupLine,
   RiBookMarkedLine,
@@ -14,6 +13,7 @@ import {
   RiListCheck3,
   RiShieldUserLine,
   RiKey2Line,
+  RiLineChartLine,
 } from '@remixicon/react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
@@ -43,19 +43,19 @@ import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
   {
-    title: 'Executive Dashboard',
+    title: 'Kebijakan & Anggaran',
     href: '/dashboard/executive',
     icon: RiBriefcaseLine,
   },
   {
-    title: 'Operations Dashboard',
+    title: 'Pantauan Pengusulan',
     href: '/dashboard/operations',
     icon: RiDashboardLine,
   },
   {
-    title: 'Workspace Dashboard',
+    title: 'Analisis & Renstra',
     href: '/dashboard/workspace',
-    icon: RiFilterLine,
+    icon: RiLineChartLine,
   },
 ];
 
@@ -200,7 +200,7 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        <NavMain items={mainNavItems} title="Main Menu" />
+        <NavMain items={mainNavItems} title="Dashboard" />
         {dynamicNeedNavItems.length > 0 && (
           <NavMain items={dynamicNeedNavItems} title="Usulan Kebutuhan" />
         )}

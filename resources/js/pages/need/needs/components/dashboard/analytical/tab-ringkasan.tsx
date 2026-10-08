@@ -402,9 +402,9 @@ export function TabRingkasan({
             <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
               Disetujui Direktur
             </span>
-            <RiCheckLine className="size-4 text-emerald-600 dark:text-emerald-400" />
+            <RiCheckLine className="size-4 text-success" />
           </div>
-          <div className="mt-1 font-mono text-2xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">
+          <div className="mt-1 font-mono text-2xl font-bold tracking-tight text-success-foreground dark:text-success">
             {formatNumber(metrics.approvedCount)}
           </div>
           <p className="mt-1 text-[11px] text-muted-foreground">
@@ -418,9 +418,9 @@ export function TabRingkasan({
             <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
               Menunggu Review
             </span>
-            <RiTimeLine className="size-4 text-amber-600 dark:text-amber-400" />
+            <RiTimeLine className="size-4 text-warning" />
           </div>
-          <div className="mt-1 font-mono text-2xl font-bold tracking-tight text-amber-600 dark:text-amber-400">
+          <div className="mt-1 font-mono text-2xl font-bold tracking-tight text-warning-foreground dark:text-warning">
             {formatNumber(metrics.reviewCount)}
           </div>
           <p className="mt-1 text-[11px] text-muted-foreground">
@@ -466,9 +466,9 @@ export function TabRingkasan({
 
       {/* Informational Sub-Strip: Ditolak / Butuh Revisi */}
       {metrics.rejectedCount > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-rose-200/60 bg-rose-50/50 p-3 text-xs text-rose-900 dark:border-rose-900/50 dark:bg-rose-950/20 dark:text-rose-300">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
           <div className="flex items-center gap-2">
-            <RiAlertLine className="size-4 shrink-0 text-rose-600 dark:text-rose-400" />
+            <RiAlertLine className="size-4 shrink-0 text-destructive" />
             <span>
               <strong>Ditolak / Butuh Revisi:</strong> Terdata{' '}
               <span className="font-mono font-semibold">
@@ -488,7 +488,7 @@ export function TabRingkasan({
             })}
             className={cn(
               buttonVariants({ variant: 'outline', size: 'sm' }),
-              'h-7 border-rose-300 bg-background text-xs text-rose-700 hover:bg-rose-50 dark:border-rose-800 dark:text-rose-300',
+              'h-7 border-destructive/30 bg-background text-xs text-destructive hover:bg-destructive/10',
             )}
           >
             <span>Lihat Usulan Ditolak</span>
@@ -583,7 +583,7 @@ export function TabRingkasan({
             {stageDistribution.approved.percentage > 0 && (
               <div
                 style={{ width: `${stageDistribution.approved.percentage}%` }}
-                className="group relative cursor-pointer bg-emerald-600 transition-opacity hover:opacity-85"
+                className="group relative cursor-pointer bg-success transition-opacity hover:opacity-85"
                 title={`Disetujui: ${stageDistribution.approved.percentage}%`}
                 onClick={() =>
                   onSliceChange((prev) => ({
@@ -600,7 +600,7 @@ export function TabRingkasan({
                 style={{
                   width: `${stageDistribution.under_review.percentage}%`,
                 }}
-                className="group relative cursor-pointer bg-amber-500 transition-opacity hover:opacity-85"
+                className="group relative cursor-pointer bg-warning transition-opacity hover:opacity-85"
                 title={`Menunggu Review: ${stageDistribution.under_review.percentage}%`}
                 onClick={() =>
                   onSliceChange((prev) => ({
@@ -615,7 +615,7 @@ export function TabRingkasan({
             {stageDistribution.draft.percentage > 0 && (
               <div
                 style={{ width: `${stageDistribution.draft.percentage}%` }}
-                className="group relative cursor-pointer bg-blue-600 transition-opacity hover:opacity-85"
+                className="group relative cursor-pointer bg-info transition-opacity hover:opacity-85"
                 title={`Draft: ${stageDistribution.draft.percentage}%`}
                 onClick={() =>
                   onSliceChange((prev) => ({
@@ -630,7 +630,7 @@ export function TabRingkasan({
             {stageDistribution.rejected.percentage > 0 && (
               <div
                 style={{ width: `${stageDistribution.rejected.percentage}%` }}
-                className="group relative cursor-pointer bg-rose-600 transition-opacity hover:opacity-85"
+                className="group relative cursor-pointer bg-destructive transition-opacity hover:opacity-85"
                 title={`Ditolak: ${stageDistribution.rejected.percentage}%`}
                 onClick={() =>
                   onSliceChange((prev) => ({
@@ -650,7 +650,7 @@ export function TabRingkasan({
               {
                 key: 'approved' as DerivedStage,
                 name: 'Disetujui Direktur',
-                color: 'bg-emerald-600',
+                color: 'bg-success',
                 count: stageDistribution.approved.count,
                 budget: stageDistribution.approved.budget,
                 pct: stageDistribution.approved.percentage,
@@ -658,7 +658,7 @@ export function TabRingkasan({
               {
                 key: 'under_review' as DerivedStage,
                 name: 'Menunggu Review',
-                color: 'bg-amber-500',
+                color: 'bg-warning',
                 count: stageDistribution.under_review.count,
                 budget: stageDistribution.under_review.budget,
                 pct: stageDistribution.under_review.percentage,
@@ -666,7 +666,7 @@ export function TabRingkasan({
               {
                 key: 'draft' as DerivedStage,
                 name: 'Draft Pengajuan',
-                color: 'bg-blue-600',
+                color: 'bg-info',
                 count: stageDistribution.draft.count,
                 budget: stageDistribution.draft.budget,
                 pct: stageDistribution.draft.percentage,
@@ -674,7 +674,7 @@ export function TabRingkasan({
               {
                 key: 'rejected' as DerivedStage,
                 name: 'Ditolak / Revisi',
-                color: 'bg-rose-600',
+                color: 'bg-destructive',
                 count: stageDistribution.rejected.count,
                 budget: stageDistribution.rejected.budget,
                 pct: stageDistribution.rejected.percentage,
@@ -806,8 +806,8 @@ export function TabRingkasan({
                     className={cn(
                       'text-right font-mono',
                       row.deltaFromAvg >= 0
-                        ? 'text-emerald-600 dark:text-emerald-400'
-                        : 'text-rose-600 dark:text-rose-400',
+                        ? 'text-success-foreground dark:text-success'
+                        : 'text-destructive',
                     )}
                   >
                     {row.deltaFromAvg >= 0 ? '+' : ''}
@@ -965,7 +965,7 @@ export function TabRingkasan({
                       className={cn(
                         'w-16 shrink-0 text-right font-mono text-[10px]',
                         row.deltaFromAvg >= 0
-                          ? 'text-emerald-600 dark:text-emerald-400'
+                          ? 'text-success-foreground dark:text-success'
                           : 'text-muted-foreground',
                       )}
                     >

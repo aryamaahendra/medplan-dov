@@ -9,6 +9,7 @@ import {
 } from '@remixicon/react';
 import { useState } from 'react';
 
+import { StatusBadge } from '@/components/status-badge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatCompactIDR, formatNumber } from '@/lib/formatters';
@@ -53,27 +54,13 @@ export function OperationsHeader({
         {/* Left: Window status & Scope Badge */}
         <div className="flex flex-wrap items-center gap-2">
           {windowStatus === 'open' ? (
-            <Badge
-              variant="default"
-              className="bg-emerald-600 font-medium hover:bg-emerald-700"
-            >
-              Buka Pengajuan
-            </Badge>
+            <StatusBadge status="success">Buka Pengajuan</StatusBadge>
           ) : windowStatus === 'closed' ? (
-            <Badge variant="destructive" className="font-medium">
-              Pengajuan Ditutup
-            </Badge>
+            <StatusBadge status="destructive">Pengajuan Ditutup</StatusBadge>
           ) : windowStatus === 'upcoming' ? (
-            <Badge
-              variant="outline"
-              className="border-amber-500/50 font-medium text-amber-700 dark:text-amber-400"
-            >
-              Mendatang
-            </Badge>
+            <StatusBadge status="warning">Mendatang</StatusBadge>
           ) : (
-            <Badge variant="secondary" className="font-medium">
-              Jadwal Fleksibel
-            </Badge>
+            <StatusBadge status="muted">Jadwal Fleksibel</StatusBadge>
           )}
 
           {daysRemaining !== null && daysRemaining !== undefined && (
@@ -83,7 +70,7 @@ export function OperationsHeader({
                 daysRemaining <= 3
                   ? 'font-bold text-destructive'
                   : daysRemaining <= 7
-                    ? 'text-amber-700 dark:text-amber-400'
+                    ? 'text-warning-foreground dark:text-warning'
                     : 'text-muted-foreground',
               )}
             >
@@ -158,9 +145,9 @@ export function OperationsHeader({
           </div>
 
           <div className="flex items-center gap-1.5">
-            <RiLockUnlockLine className="size-3.5 text-amber-600 dark:text-amber-400" />
+            <RiLockUnlockLine className="size-3.5 text-warning" />
             <span>Izin Buka Kunci:</span>
-            <strong className="font-mono font-bold text-amber-700 dark:text-amber-400">
+            <strong className="font-mono font-bold text-warning-foreground dark:text-warning">
               {formatNumber(activeUnlocksCount)}
             </strong>
             <span>usulan</span>

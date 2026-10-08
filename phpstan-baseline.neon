@@ -8,12 +8,6 @@ parameters:
 			path: app/Actions/Planning/CalculateActivityBudgetAction.php
 
 		-
-			message: '#^Anonymous function has an unused use \$parentId\.$#'
-			identifier: closure.unusedUse
-			count: 1
-			path: app/Actions/Planning/CalculateActivityBudgetAction.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$activityYears\.$#'
 			identifier: property.notFound
 			count: 1

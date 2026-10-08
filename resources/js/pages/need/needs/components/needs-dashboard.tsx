@@ -1,85 +1,145 @@
 import { Deferred } from '@inertiajs/react';
+import { useState, useMemo } from 'react';
 
 import { Skeleton } from '@/components/ui/skeleton';
+import { usePermission } from '@/hooks/use-permission';
 import { cn } from '@/lib/utils';
-import { NeedsStats } from './needs-stats';
-import { UnitStatCard } from './unit-stat-card';
+import type {
+  DashboardVariant,
+  NeedsDashboardPayload,
+} from '@/types/needs-dashboard';
+
+import { GlobalDashboardControls } from './dashboard/global-dashboard-controls';
+import { VariantAExecutive } from './dashboard/variant-a-executive';
+import { VariantBOperations } from './dashboard/variant-b-operations';
+import { VariantCAnalytical } from './dashboard/variant-c-analytical';
 
 interface NeedsDashboardProps {
-  stats?: {
-    total_needs: number;
-    total_budget: number;
-    priority_needs: number;
-    avg_completeness: number;
-    approved_by_director: number;
-    prev_group: { id: number; name: string } | null;
-    prev_total_needs: number | null;
-    prev_total_budget: number | null;
-    prev_priority_needs: number | null;
-    prev_avg_completeness: number | null;
-    prev_approved_by_director: number | null;
-  };
-  statusDistribution: Record<string, number>;
-  needsByUnit: {
-    unit_id: number | null;
-    name: string;
-    parents: string[];
-    count: number;
-    total_budget: number;
-    priority_count: number;
-    approved_count: number;
-  }[];
-  needsByType: { name: string; count: number }[];
+  dashboardPayload?: NeedsDashboardPayload;
+  stats?: any;
+  statusDistribution?: Record<string, number>;
+  needsByUnit?: any[];
+  needsByType?: any[];
+  onOpenDirectorReview?: (needId: number) => void;
+  onOpenLockDialog?: (needId: number, mode: 'lock' | 'unlock') => void;
 }
 
-export function NeedsDashboard({ stats, needsByUnit }: NeedsDashboardProps) {
-  return (
-    <div className="flex flex-col gap-6">
-      <Deferred
-        data={['stats', 'statusDistribution', 'needsByUnit', 'needsByType']}
-        fallback={
-          <div className="flex flex-col gap-6">
-            <NeedsStats />
-            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {[...Array(8)].map((_, i) => (
-                <Skeleton key={i} className="h-24 w-full" />
-              ))}
-            </div>
-          </div>
-        }
-      >
-        {({ reloading }) => (
-          <div className={cn('flex flex-col gap-6', reloading && 'opacity-50')}>
-            <NeedsStats stats={stats} />
+export function NeedsDashboard({
+  dashboardPayload,
+  onOpenDirectorReview,
+  onOpenLockDialog,
+}: NeedsDashboardProps) {
+  const { hasRole } = usePermission();
 
-            <div className="">
-              {needsByUnit.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  Belum ada data usulan per unit.
-                </p>
-              ) : (
-                <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                  {needsByUnit.map((unit, i) => (
-                    <UnitStatCard
-                      key={unit.unit_id ?? i}
-                      name={unit.name}
-                      parents={unit.parents}
-                      count={unit.count}
-                      totalBudget={unit.total_budget}
-                      priorityCount={unit.priority_count}
-                      approvedCount={unit.approved_count}
-                      total={
-                        stats?.total_needs ??
-                        needsByUnit.reduce((a, u) => a + u.count, 0)
-                      }
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
+  // Role default variant:
+  // - Director -> Executive
+  // - Planner / SuperAdmin -> Operations
+  // - UnitHead / Staff -> Analytical (with My Unit tab default)
+  const defaultVariant: DashboardVariant = useMemo(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('needs-dashboard-variant');
+
+      if (
+        saved === 'executive' ||
+        saved === 'operations' ||
+        saved === 'analytical'
+      ) {
+        return saved;
+      }
+    }
+
+    if (hasRole('director')) {
+      return 'executive';
+    }
+
+    if (hasRole('planner') || hasRole('super-admin')) {
+      return 'operations';
+    }
+
+    return 'analytical';
+  }, [hasRole]);
+
+  const [currentVariant, setCurrentVariant] =
+    useState<DashboardVariant>(defaultVariant);
+  const [compareGroupId, setCompareGroupId] = useState<number | null>(null);
+
+  const handleVariantChange = (variant: DashboardVariant) => {
+    setCurrentVariant(variant);
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('needs-dashboard-variant', variant);
+    }
+  };
+
+  return (
+    <Deferred
+      data="dashboardPayload"
+      fallback={
+        <div className="flex flex-col gap-6">
+          <div className="h-12 w-full animate-pulse rounded-xl bg-muted/30" />
+          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+            {[...Array(5)].map((_, i) => (
+              <Skeleton key={i} className="h-28 w-full rounded-xl" />
+            ))}
           </div>
-        )}
-      </Deferred>
-    </div>
+          <Skeleton className="h-48 w-full rounded-xl" />
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Skeleton className="h-64 w-full rounded-xl" />
+            <Skeleton className="h-64 w-full rounded-xl" />
+          </div>
+        </div>
+      }
+    >
+      {({ reloading }) => {
+        if (!dashboardPayload) {
+          return null;
+        }
+
+        return (
+          <div
+            className={cn(
+              'flex flex-col gap-6',
+              reloading && 'opacity-60 transition-opacity',
+            )}
+          >
+            {/* Global Controls & Variant Switcher */}
+            <GlobalDashboardControls
+              currentGroup={dashboardPayload.currentGroup}
+              availableGroups={dashboardPayload.availableGroups}
+              variant={currentVariant}
+              onVariantChange={handleVariantChange}
+              compareGroupId={compareGroupId}
+              onCompareGroupChange={setCompareGroupId}
+            />
+
+            {/* Render Variant According to Selection */}
+            {currentVariant === 'executive' && (
+              <VariantAExecutive
+                payload={dashboardPayload}
+                onOpenDirectorReview={onOpenDirectorReview}
+              />
+            )}
+
+            {currentVariant === 'operations' && (
+              <VariantBOperations
+                payload={dashboardPayload}
+                onOpenLockDialog={onOpenLockDialog}
+              />
+            )}
+
+            {currentVariant === 'analytical' && (
+              <VariantCAnalytical
+                payload={dashboardPayload}
+                defaultTab={
+                  hasRole('unit-head') || hasRole('staff')
+                    ? 'myunit'
+                    : 'overview'
+                }
+              />
+            )}
+          </div>
+        );
+      }}
+    </Deferred>
   );
 }

@@ -5,6 +5,8 @@ import {
   RiEdit2Line,
   RiAddLine,
   RiDeleteBinLine,
+  RiDashboardLine,
+  RiTableLine,
 } from '@remixicon/react';
 
 import needGroupChecklistActions from '@/actions/App/Http/Controllers/Need/NeedGroupChecklistController';
@@ -18,14 +20,17 @@ interface NeedsHeaderProps {
   onExport: () => void;
   onEditGroup: () => void;
   onDeleteGroup: () => void;
+  showDashboard?: boolean;
+  onToggleDashboard?: () => void;
 }
-
 export function NeedsHeader({
   currentGroup,
   onCreate,
   onExport,
   onEditGroup,
   onDeleteGroup,
+  showDashboard = false,
+  onToggleDashboard,
 }: NeedsHeaderProps) {
   const { hasPermission, hasAnyPermission } = usePermission();
 
@@ -75,7 +80,28 @@ export function NeedsHeader({
           Tahun Anggaran {currentGroup.year}
         </p>
       </div>
-      <div className="flex gap-1">
+      <div className="flex items-center gap-1.5">
+        {onToggleDashboard && (
+          <Button
+            variant={showDashboard ? 'secondary' : 'outline'}
+            size="sm"
+            onClick={onToggleDashboard}
+            className="h-9 gap-1.5 font-medium"
+          >
+            {showDashboard ? (
+              <>
+                <RiTableLine className="size-4" />
+                <span>Tabel Usulan</span>
+              </>
+            ) : (
+              <>
+                <RiDashboardLine className="size-4 text-primary" />
+                <span>Dashboard</span>
+              </>
+            )}
+          </Button>
+        )}
+
         {groupActions.length > 0 && (
           <ActionDropdown
             trigger={

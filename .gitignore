@@ -32,3 +32,4 @@ frankenphp
 frankenphp-worker.php
 .scratch
 *.tsbuildinfo
+/docs/tmp

@@ -34,6 +34,29 @@ class GetFilteredNeedsAction
             ])
             ->withCount(['sasarans', 'indicators', 'kpiIndicators', 'strategicServicePlans', 'attachments'])
             ->when($filters['year'] ?? null, fn ($q, $v) => $q->whereIn('year', (array) $v))
+            ->when($filters['stage'] ?? null, function ($q, $v) {
+                $stages = array_filter((array) $v);
+                if (empty($stages)) {
+                    return;
+                }
+                $q->where(function ($sub) use ($stages) {
+                    foreach ($stages as $stage) {
+                        if ($stage === 'approved') {
+                            $sub->orWhereNotNull('approved_by_director_at');
+                        } elseif ($stage === 'under_review') {
+                            $sub->orWhere(function ($under) {
+                                $under->where('status', 'approved')->whereNull('approved_by_director_at');
+                            });
+                        } elseif ($stage === 'rejected') {
+                            $sub->orWhere('status', 'rejected');
+                        } elseif ($stage === 'draft') {
+                            $sub->orWhere(function ($draft) {
+                                $draft->where('status', 'draft')->whereNull('approved_by_director_at');
+                            });
+                        }
+                    }
+                });
+            })
             ->when($filters['status'] ?? null, fn ($q, $v) => $q->whereIn('status', (array) $v))
             ->when($filters['need_type_id'] ?? null, fn ($q, $v) => $q->whereIn('need_type_id', (array) $v))
             ->when($filters['organizational_unit_id'] ?? null, fn ($q, $v) => $q->whereIn('organizational_unit_id', (array) $v))

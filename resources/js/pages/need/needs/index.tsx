@@ -20,6 +20,7 @@ import { NeedGridView } from './components/need-grid-view';
 import { NeedListView } from './components/need-list-view';
 import { NeedLockDialog } from './components/need-lock-dialog';
 import type { AttentionFilterKey } from './components/needs-attention-strip';
+import { NeedsDashboard } from './components/needs-dashboard';
 import { NeedsHeader } from './components/needs-header';
 import { NeedsStageTabs } from './components/needs-stage-tabs';
 import type { StageTabKey } from './components/needs-stage-tabs';
@@ -42,6 +43,7 @@ interface NeedsIndexProps {
     min_checklist_score?: string | string[];
     need_group_id?: string | string[];
   };
+  dashboardPayload?: any;
 }
 
 export default function NeedsIndex({
@@ -50,8 +52,10 @@ export default function NeedsIndex({
   organizationalUnits,
   needTypes,
   filters,
+  dashboardPayload,
 }: NeedsIndexProps) {
   const [viewMode, setViewMode] = useViewMode();
+  const [showDashboard, setShowDashboard] = useState(false);
   const [selectedDrawerNeed, setSelectedDrawerNeed] = useState<Need | null>(
     null,
   );
@@ -198,9 +202,35 @@ export default function NeedsIndex({
           onExport={actions.onExport}
           onEditGroup={() => actions.setIsGroupDialogOpen(true)}
           onDeleteGroup={() => actions.setIsDeletingGroup(true)}
+          showDashboard={showDashboard}
+          onToggleDashboard={() => setShowDashboard((v) => !v)}
         />
 
-        {viewMode === 'loading' ? (
+        {showDashboard ? (
+          <NeedsDashboard
+            dashboardPayload={dashboardPayload}
+            onOpenDirectorReview={(needId) => {
+              const target = needs.data.find((n) => n.id === needId);
+
+              if (target) {
+                actions.onReview(target);
+              } else {
+                actions.setReviewingNeedId(needId);
+              }
+            }}
+            onOpenLockDialog={(needId, mode) => {
+              const target = needs.data.find((n) => n.id === needId);
+
+              if (target) {
+                if (mode === 'lock') {
+                  actions.onLock(target);
+                } else {
+                  actions.onUnlock(target);
+                }
+              }
+            }}
+          />
+        ) : viewMode === 'loading' ? (
           <div className="overflow-hidden rounded-md border">
             <div className="h-10 border-b bg-muted/20" />
             <div className="divide-y">

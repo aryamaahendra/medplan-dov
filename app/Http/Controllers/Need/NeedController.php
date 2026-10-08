@@ -47,7 +47,7 @@ class NeedController extends Controller
     private const array SEARCH_COLUMNS = ['title', 'description'];
 
     /** Columns sortable by */
-    private const array SORTABLE_COLUMNS = ['title', 'year', 'status', 'total_price', 'created_at'];
+    private const array SORTABLE_COLUMNS = ['title', 'year', 'status', 'total_price', 'checklist_percentage', 'created_at'];
 
     public function index(
         Request $request,
@@ -76,9 +76,9 @@ class NeedController extends Controller
             'is_priority' => $request->input('is_priority'),
             'is_approved_by_director' => $request->input('is_approved_by_director'),
             'min_checklist_score' => $request->input('min_checklist_score'),
+            'stage' => $request->input('stage'),
             'need_group_id' => $groupId,
         ];
-
         $query = $action->execute($filters, $request->user());
 
         $needs = $this->applyDataTable(
@@ -90,13 +90,17 @@ class NeedController extends Controller
 
         $needs->getCollection()->transform(fn ($need) => NeedResource::make($need)->resolve());
 
+        $compareGroupId = $request->integer('compare_group_id') ?: null;
+        $user = $request->user();
+
         return Inertia::render('need/needs/index', [
             'needs' => $needs,
             'currentGroup' => $currentGroup,
-            'stats' => Inertia::defer(fn () => $statsAction->stats($groupId, $currentGroup), 'dashboard'),
-            'statusDistribution' => Inertia::defer(fn () => $statsAction->statusDistribution($groupId), 'dashboard'),
-            'needsByUnit' => Inertia::defer(fn () => $statsAction->byUnit($groupId), 'dashboard'),
-            'needsByType' => Inertia::defer(fn () => $statsAction->byType($groupId), 'dashboard'),
+            'dashboardPayload' => Inertia::defer(fn () => $statsAction->getDashboardPayload($groupId, $user, $compareGroupId), 'dashboard'),
+            'stats' => Inertia::defer(fn () => $statsAction->stats($groupId, $currentGroup, $user), 'dashboard'),
+            'statusDistribution' => Inertia::defer(fn () => $statsAction->statusDistribution($groupId, $user), 'dashboard'),
+            'needsByUnit' => Inertia::defer(fn () => $statsAction->byUnit($groupId, $user), 'dashboard'),
+            'needsByType' => Inertia::defer(fn () => $statsAction->byType($groupId, $user), 'dashboard'),
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name', 'parent_id'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
             'filters' => array_merge($this->dataTableFilters($request), $filters),

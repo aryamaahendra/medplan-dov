@@ -2,11 +2,17 @@
 
 namespace App\Observers;
 
+use App\Actions\Need\GetNeedDashboardStatsAction;
 use App\Models\Need;
 use App\Models\NeedGroup;
 
 class NeedObserver
 {
+    private function bustDashboardCache(?Need $need = null): void
+    {
+        GetNeedDashboardStatsAction::clearCacheForGroup($need?->need_group_id);
+    }
+
     /**
      * Handle the Need "created" event.
      */
@@ -15,6 +21,7 @@ class NeedObserver
         if ($need->need_group_id) {
             NeedGroup::where('id', $need->need_group_id)->increment('need_count');
         }
+        $this->bustDashboardCache($need);
     }
 
     /**
@@ -30,6 +37,7 @@ class NeedObserver
                 NeedGroup::where('id', $need->need_group_id)->increment('need_count');
             }
         }
+        $this->bustDashboardCache($need);
     }
 
     /**
@@ -44,6 +52,7 @@ class NeedObserver
         if ($need->need_group_id) {
             NeedGroup::where('id', $need->need_group_id)->decrement('need_count');
         }
+        $this->bustDashboardCache($need);
     }
 
     /**
@@ -54,6 +63,7 @@ class NeedObserver
         if ($need->need_group_id) {
             NeedGroup::where('id', $need->need_group_id)->increment('need_count');
         }
+        $this->bustDashboardCache($need);
     }
 
     /**
@@ -69,5 +79,6 @@ class NeedObserver
         if (! $need->trashed() && $need->need_group_id) { // Actually if forceDeleted fires, trashed() might be true or false.
             // Better to handle decrement in 'deleted' universally if we don't 'double-decrement'
         }
+        $this->bustDashboardCache($need);
     }
 }

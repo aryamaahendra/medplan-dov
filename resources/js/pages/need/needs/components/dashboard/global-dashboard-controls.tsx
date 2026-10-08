@@ -32,7 +32,8 @@ interface GlobalDashboardControlsProps {
   currentGroup: DashboardGroupOption | null;
   availableGroups: DashboardGroupOption[];
   variant: DashboardVariant;
-  onVariantChange: (variant: DashboardVariant) => void;
+  onVariantChange?: (variant: DashboardVariant) => void;
+  onGroupSelect?: (group: DashboardGroupOption) => void;
   compareGroupId: number | null;
   onCompareGroupChange: (groupId: number | null) => void;
 }
@@ -42,6 +43,7 @@ export function GlobalDashboardControls({
   availableGroups,
   variant,
   onVariantChange,
+  onGroupSelect,
   compareGroupId,
   onCompareGroupChange,
 }: GlobalDashboardControlsProps) {
@@ -102,6 +104,12 @@ export function GlobalDashboardControls({
 
   const handleGroupSelect = (group: DashboardGroupOption) => {
     if (group.id === currentGroup?.id) {
+      return;
+    }
+
+    if (onGroupSelect) {
+      onGroupSelect(group);
+
       return;
     }
 
@@ -248,7 +256,15 @@ export function GlobalDashboardControls({
       <div className="flex items-center gap-1 rounded-lg border border-border/80 bg-muted/40 p-1">
         <button
           type="button"
-          onClick={() => onVariantChange('executive')}
+          onClick={() => {
+            if (onVariantChange) {
+              onVariantChange('executive');
+            } else {
+              router.visit(
+                `/dashboard/executive?need_group_id=${currentGroup?.id ?? ''}${compareGroupId ? `&compare_group_id=${compareGroupId}` : ''}`,
+              );
+            }
+          }}
           className={cn(
             'flex cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all',
             variant === 'executive'
@@ -262,7 +278,15 @@ export function GlobalDashboardControls({
 
         <button
           type="button"
-          onClick={() => onVariantChange('operations')}
+          onClick={() => {
+            if (onVariantChange) {
+              onVariantChange('operations');
+            } else {
+              router.visit(
+                `/dashboard/operations?need_group_id=${currentGroup?.id ?? ''}${compareGroupId ? `&compare_group_id=${compareGroupId}` : ''}`,
+              );
+            }
+          }}
           className={cn(
             'flex cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all',
             variant === 'operations'
@@ -276,7 +300,15 @@ export function GlobalDashboardControls({
 
         <button
           type="button"
-          onClick={() => onVariantChange('analytical')}
+          onClick={() => {
+            if (onVariantChange) {
+              onVariantChange('analytical');
+            } else {
+              router.visit(
+                `/dashboard/workspace?need_group_id=${currentGroup?.id ?? ''}${compareGroupId ? `&compare_group_id=${compareGroupId}` : ''}`,
+              );
+            }
+          }}
           className={cn(
             'flex cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all',
             variant === 'analytical'

@@ -3,40 +3,75 @@
 use App\Models\Need;
 use App\Models\NeedGroup;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
+use Spatie\Permission\PermissionRegistrar;
 
-test('guests are redirected to the login page', function () {
-    $response = $this->get(route('dashboard'));
-    $response->assertRedirect(route('login'));
+uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    app(PermissionRegistrar::class)->forgetCachedPermissions();
+    $this->seed(RolesAndPermissionsSeeder::class);
 });
 
-test('authenticated users can visit the dashboard and see stats', function () {
+test('guests are redirected to the login page from dashboard routes', function () {
+    $this->get(route('dashboard'))->assertRedirect(route('login'));
+    $this->get(route('dashboard.executive'))->assertRedirect(route('login'));
+    $this->get(route('dashboard.operations'))->assertRedirect(route('login'));
+    $this->get(route('dashboard.workspace'))->assertRedirect(route('login'));
+});
+
+test('authenticated users are redirected from /dashboard to executive dashboard', function () {
     $user = User::factory()->create();
     $user->assignRole('super-admin');
-    $group = NeedGroup::factory()->create(['year' => 2024, 'is_active' => true]);
-    Need::factory()->count(3)->create(['need_group_id' => $group->id, 'total_price' => 1000]);
+
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertRedirect(route('dashboard.executive'));
+});
+
+test('authenticated users can visit executive dashboard and receive deferred payload', function () {
+    $user = User::factory()->create();
+    $user->assignRole('super-admin');
+    $group = NeedGroup::factory()->create(['year' => 2026, 'is_active' => true]);
+    Need::factory()->count(2)->create(['need_group_id' => $group->id, 'total_price' => 1000]);
 
     $this->actingAs($user);
 
-    // Initial request: verify dashboard renders
-    $response = $this->get(route('dashboard'));
+    $response = $this->get(route('dashboard.executive'));
     $response->assertOk();
     $response->assertInertia(fn (Assert $page) => $page
-        ->component('dashboard')
+        ->component('dashboard/executive')
     );
 
     $version = $response->inertiaPage()['version'] ?? '';
 
-    // Partial request for deferred prop: verify dashboardData is loaded
-    $partialResponse = $this->get(route('dashboard'), [
+    $partialResponse = $this->get(route('dashboard.executive'), [
         'X-Inertia' => 'true',
         'X-Inertia-Version' => (string) $version,
-        'X-Inertia-Partial-Component' => 'dashboard',
-        'X-Inertia-Partial-Data' => 'dashboardData',
+        'X-Inertia-Partial-Component' => 'dashboard/executive',
+        'X-Inertia-Partial-Data' => 'dashboardPayload',
     ]);
     $partialResponse->assertOk();
     $partialResponse->assertJson(fn ($json) => $json
-        ->has('props.dashboardData')
+        ->has('props.dashboardPayload')
         ->etc()
     );
+});
+
+test('authenticated users can visit operations and workspace dashboard pages', function () {
+    $user = User::factory()->create();
+    $user->assignRole('super-admin');
+    $group = NeedGroup::factory()->create(['year' => 2026, 'is_active' => true]);
+
+    $this->actingAs($user);
+
+    $this->get(route('dashboard.operations'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->component('dashboard/operations'));
+
+    $this->get(route('dashboard.workspace'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->component('dashboard/workspace'));
 });

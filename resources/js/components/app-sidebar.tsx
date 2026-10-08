@@ -1,9 +1,11 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
+  RiBriefcaseLine,
   RiBuilding2Line,
   RiClipboardLine,
+  RiDashboardLine,
   RiFileTextLine,
-  RiLayoutGridLine,
+  RiFilterLine,
   RiStackLine,
   RiGroupLine,
   RiBookMarkedLine,
@@ -26,7 +28,6 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { usePermission } from '@/hooks/use-permission';
-import { dashboard } from '@/routes';
 import checklistQuestions from '@/routes/checklist-questions';
 import kpis from '@/routes/kpis';
 import needGroups from '@/routes/need-groups';
@@ -42,9 +43,19 @@ import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
   {
-    title: 'Dashboard',
-    href: dashboard(),
-    icon: RiLayoutGridLine,
+    title: 'Executive Dashboard',
+    href: '/dashboard/executive',
+    icon: RiBriefcaseLine,
+  },
+  {
+    title: 'Operations Dashboard',
+    href: '/dashboard/operations',
+    icon: RiDashboardLine,
+  },
+  {
+    title: 'Workspace Dashboard',
+    href: '/dashboard/workspace',
+    icon: RiFilterLine,
   },
 ];
 
@@ -180,7 +191,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
-              render={<Link href={dashboard()} prefetch />}
+              render={<Link href="/dashboard/executive" prefetch />}
             >
               <AppLogo />
             </SidebarMenuButton>

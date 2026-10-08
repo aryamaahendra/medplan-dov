@@ -1,13 +1,18 @@
 <?php
 
-use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/login')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('dashboard', fn () => redirect()->route('dashboard.executive'))->name('dashboard');
 
+    // Dashboards
+    Route::prefix('dashboard')->name('dashboard.')->controller('App\Http\Controllers\Need\NeedDashboardController')->group(function () {
+        Route::get('executive', 'executive')->name('executive');
+        Route::get('operations', 'operations')->name('operations');
+        Route::get('workspace', 'workspace')->name('workspace');
+    });
     // Management
     Route::namespace('App\Http\Controllers\Management')->group(function () {
         Route::resource('users', 'UserController')->except(['create', 'edit', 'show']);

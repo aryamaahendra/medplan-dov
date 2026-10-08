@@ -1,8 +1,10 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
   RiBookOpenLine,
+  RiBriefcaseLine,
+  RiDashboardLine,
+  RiFilterLine,
   RiFolderLine,
-  RiLayoutGridLine,
   RiMenuLine,
   RiSearchLine,
 } from '@remixicon/react';
@@ -38,7 +40,6 @@ import { UserMenuContent } from '@/components/user-menu-content';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
 import { cn, toUrl } from '@/lib/utils';
-import { dashboard } from '@/routes';
 import type { BreadcrumbItem, NavItem } from '@/types';
 
 type Props = {
@@ -47,9 +48,19 @@ type Props = {
 
 const mainNavItems: NavItem[] = [
   {
-    title: 'Dashboard',
-    href: dashboard(),
-    icon: RiLayoutGridLine,
+    title: 'Executive',
+    href: '/dashboard/executive',
+    icon: RiBriefcaseLine,
+  },
+  {
+    title: 'Operations',
+    href: '/dashboard/operations',
+    icon: RiDashboardLine,
+  },
+  {
+    title: 'Workspace',
+    href: '/dashboard/workspace',
+    icon: RiFilterLine,
   },
 ];
 
@@ -137,7 +148,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
           </div>
 
           <Link
-            href={dashboard()}
+            href="/dashboard/executive"
             prefetch
             className="flex items-center space-x-2"
           >

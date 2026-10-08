@@ -44,8 +44,8 @@ export function VariantBOperations({
       />
 
       {/* B3 & B4. Exceptions (Needs Attention) + Unit Submission Progress */}
-      <div className="grid gap-6 lg:grid-cols-12">
-        <div className="lg:col-span-5">
+      <div className="grid items-stretch gap-6 lg:grid-cols-12">
+        <div className="flex flex-col lg:col-span-5">
           <OperationsAttentionPanel
             groupId={groupId}
             operations={operations}
@@ -53,7 +53,7 @@ export function VariantBOperations({
           />
         </div>
 
-        <div className="lg:col-span-7">
+        <div className="flex flex-col lg:col-span-7">
           <OperationsUnitProgressTable
             groupId={groupId}
             allUnitProgress={operations?.unit_progress ?? allUnitProgress}
@@ -62,8 +62,8 @@ export function VariantBOperations({
       </div>
 
       {/* B5 & B6. Lock Monitor & Aging Histogram */}
-      <div className="grid gap-6 lg:grid-cols-12">
-        <div className="lg:col-span-7">
+      <div className="grid items-stretch gap-6 lg:grid-cols-12">
+        <div className="flex flex-col lg:col-span-7">
           <OperationsLockMonitor
             groupId={groupId}
             lockMonitor={operations?.lock_monitor}
@@ -72,7 +72,7 @@ export function VariantBOperations({
           />
         </div>
 
-        <div className="lg:col-span-5">
+        <div className="flex flex-col lg:col-span-5">
           <OperationsAgingHistogram aging={operations?.aging} />
         </div>
       </div>

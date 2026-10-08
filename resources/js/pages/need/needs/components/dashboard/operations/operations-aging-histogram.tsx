@@ -10,7 +10,6 @@ import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -58,9 +57,11 @@ export function OperationsAgingHistogram({
         <CardDescription>
           Berapa lama usulan tidak disentuh atau tidak mengalami perubahan data
         </CardDescription>
+      </CardHeader>
 
-        {/* Stage tab selectors */}
-        <CardAction>
+      <CardContent>
+        <div className="flex flex-col gap-4">
+          {/* Stage tab selectors moved to CardContent */}
           <div className="flex items-center gap-1 rounded-lg border border-border/70 bg-muted/40 p-1">
             <button
               type="button"
@@ -104,11 +105,7 @@ export function OperationsAgingHistogram({
               <span>Ditolak</span>
             </button>
           </div>
-        </CardAction>
-      </CardHeader>
 
-      <CardContent>
-        <div className="flex flex-col gap-4">
           {/* Metric disclaimer banner */}
           <div className="flex items-center gap-2 rounded-md border border-border/70 bg-muted/20 px-3 py-2 text-[11px] text-muted-foreground">
             <RiInformationLine className="size-4 shrink-0 text-primary" />

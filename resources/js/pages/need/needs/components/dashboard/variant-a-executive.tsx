@@ -25,6 +25,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import { usePermission } from '@/hooks/use-permission';
 import {
   formatCompactIDR,
@@ -443,32 +444,38 @@ export function VariantAExecutive({
               </CardDescription>
             </div>
 
-            {/* Metric Toggle: Anggaran | Jumlah */}
-            <div className="flex items-center gap-1 rounded-lg border border-border/80 bg-muted/30 p-0.5 text-xs">
-              <button
-                type="button"
-                onClick={() => setPipelineMetric('budget')}
+            {/* Metric Switch: Anggaran vs Jumlah Item */}
+            <div className="flex items-center gap-2 text-xs">
+              <span
                 className={cn(
-                  'rounded px-2.5 py-1 font-medium transition-colors',
+                  'cursor-pointer font-medium transition-colors select-none',
                   pipelineMetric === 'budget'
-                    ? 'bg-background font-semibold text-foreground shadow-xs'
+                    ? 'font-semibold text-foreground'
                     : 'text-muted-foreground hover:text-foreground',
                 )}
+                onClick={() => setPipelineMetric('budget')}
               >
                 Anggaran
-              </button>
-              <button
-                type="button"
-                onClick={() => setPipelineMetric('count')}
+              </span>
+              <Switch
+                size="sm"
+                checked={pipelineMetric === 'count'}
+                onCheckedChange={(checked) =>
+                  setPipelineMetric(checked ? 'count' : 'budget')
+                }
+                aria-label="Alihkan metrik antara Anggaran dan Jumlah Item"
+              />
+              <span
                 className={cn(
-                  'rounded px-2.5 py-1 font-medium transition-colors',
+                  'cursor-pointer font-medium transition-colors select-none',
                   pipelineMetric === 'count'
-                    ? 'bg-background font-semibold text-foreground shadow-xs'
+                    ? 'font-semibold text-foreground'
                     : 'text-muted-foreground hover:text-foreground',
                 )}
+                onClick={() => setPipelineMetric('count')}
               >
                 Jumlah Item
-              </button>
+              </span>
             </div>
           </div>
         </CardHeader>
@@ -528,8 +535,9 @@ export function VariantAExecutive({
                     {stage.label}
                   </span>
                   <span className="font-mono text-muted-foreground">
-                    {formatCompactIDR(stage.budget)} ({stage.count} item ·{' '}
-                    {stage.pct}%)
+                    {pipelineMetric === 'budget'
+                      ? `${formatCompactIDR(stage.budget)} (${stage.pct}%)`
+                      : `${formatNumber(stage.count)} item (${stage.pct}%)`}
                   </span>
                 </Link>
               ))}
@@ -845,7 +853,7 @@ export function VariantAExecutive({
                       className="group -mx-1.5 flex flex-col gap-1 rounded-md p-1.5 transition-colors hover:bg-accent/40"
                     >
                       <div className="flex items-center justify-between text-xs">
-                        <span className="max-w-[65%] truncate font-medium text-foreground transition-colors group-hover:text-primary">
+                        <span className="max-w-[65%] truncate font-medium text-foreground">
                           {unit.name}
                         </span>
                         <div className="flex items-center gap-2 font-mono">
@@ -954,7 +962,7 @@ export function VariantAExecutive({
                     className="group -mx-1.5 flex flex-col gap-1 rounded-md p-1.5 transition-colors hover:bg-accent/40"
                   >
                     <div className="flex items-center justify-between text-xs">
-                      <span className="max-w-[60%] truncate font-medium text-foreground transition-colors group-hover:text-primary">
+                      <span className="max-w-[60%] truncate font-medium text-foreground">
                         {type.name}
                       </span>
                       <div className="flex items-center gap-2 font-mono">

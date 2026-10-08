@@ -11,13 +11,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import {
   Table,
   TableBody,
@@ -73,7 +73,7 @@ export function OperationsUnitProgressTable({
   }, [allUnitProgress, search, filterMode]);
 
   return (
-    <Card className="flex flex-col border-border/80">
+    <Card className="flex h-full flex-col border-border/80">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <RiBuildingLine className="size-4 text-muted-foreground" />
@@ -82,50 +82,60 @@ export function OperationsUnitProgressTable({
         <CardDescription>
           Monitoring sebaran usulan, kesiapan berkas, dan unit tanpa pengajuan
         </CardDescription>
-
-        {/* Toolbar: Search & Mode Filter */}
-        <CardAction>
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="relative w-48 sm:w-56">
-              <RiSearchLine className="absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Cari nama unit..."
-                className="pl-8"
-              />
-            </div>
-
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() =>
-                setFilterMode((m) => (m === 'all' ? 'problems_only' : 'all'))
-              }
-              className={cn(
-                'font-normal',
-                filterMode === 'problems_only' &&
-                  'border-warning/50 bg-warning/10 text-warning-foreground dark:text-warning',
-              )}
-            >
-              {filterMode === 'problems_only' ? (
-                <span className="flex items-center gap-1">
-                  <RiAlertLine
-                    data-icon="inline-start"
-                    className="text-warning"
-                  />
-                  Hanya Masalah ({filteredUnits.length})
-                </span>
-              ) : (
-                'Semua Unit'
-              )}
-            </Button>
-          </div>
-        </CardAction>
       </CardHeader>
 
-      <CardContent>
-        <div className="max-h-[380px] overflow-y-auto rounded-lg border border-border/70">
+      <CardContent className="flex flex-1 flex-col">
+        {/* Toolbar: Search & Mode Switch moved to Card Body */}
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <div className="relative w-48 sm:w-64">
+            <RiSearchLine className="absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Cari nama unit..."
+              className="pl-8"
+            />
+          </div>
+
+          <div className="flex items-center gap-2 text-xs">
+            <span
+              className={cn(
+                'cursor-pointer font-medium transition-colors select-none',
+                filterMode === 'all'
+                  ? 'font-semibold text-foreground'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+              onClick={() => setFilterMode('all')}
+            >
+              Semua Unit
+            </span>
+            <Switch
+              size="sm"
+              checked={filterMode === 'problems_only'}
+              onCheckedChange={(checked) =>
+                setFilterMode(checked ? 'problems_only' : 'all')
+              }
+              aria-label="Tampilkan hanya unit yang bermasalah"
+            />
+            <span
+              className={cn(
+                'flex cursor-pointer items-center gap-1 font-medium transition-colors select-none',
+                filterMode === 'problems_only'
+                  ? 'font-semibold text-warning-foreground dark:text-warning'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+              onClick={() => setFilterMode('problems_only')}
+            >
+              <RiAlertLine className="size-3 text-warning" />
+              <span>Hanya Masalah</span>
+              {filterMode === 'problems_only' && (
+                <span>({filteredUnits.length})</span>
+              )}
+            </span>
+          </div>
+        </div>
+
+        <div className="max-h-[380px] flex-1 overflow-y-auto rounded-lg border border-border/70">
           <Table>
             <TableHeader className="sticky top-0 z-10 bg-muted/80 backdrop-blur-xs">
               <TableRow className="text-xs">

@@ -57,10 +57,16 @@ export function OperationsAttentionPanel({
     setDrawerOpen(true);
   };
 
-  // Group exceptions by severity
-  const criticalItems = exceptions.filter((e) => e.severity === 'critical');
-  const warningItems = exceptions.filter((e) => e.severity === 'warning');
-  const infoItems = exceptions.filter((e) => e.severity === 'info');
+  // Group exceptions by severity (hide items with zero count)
+  const criticalItems = exceptions.filter(
+    (e) => e.severity === 'critical' && e.count > 0,
+  );
+  const warningItems = exceptions.filter(
+    (e) => e.severity === 'warning' && e.count > 0,
+  );
+  const infoItems = exceptions.filter(
+    (e) => e.severity === 'info' && e.count > 0,
+  );
 
   const totalExceptionsCount = exceptions.reduce((sum, e) => sum + e.count, 0);
 

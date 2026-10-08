@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Need;
 
 use App\Actions\Need\GetFilteredNeedsAction;
-use App\Actions\Need\GetNeedDashboardStatsAction;
 use App\Actions\Need\NeedLockLifecycle;
 use App\Actions\Need\NeedProposalEngine;
 use App\Actions\Need\NeedProposalPayload;
@@ -48,8 +47,7 @@ class NeedController extends Controller
 
     public function index(
         Request $request,
-        GetFilteredNeedsAction $action,
-        GetNeedDashboardStatsAction $statsAction
+        GetFilteredNeedsAction $action
     ): Response|RedirectResponse {
         $this->authorize('viewAny', Need::class);
         $groupId = $request->input('need_group_id');
@@ -89,17 +87,9 @@ class NeedController extends Controller
 
         $needs->getCollection()->transform(fn ($need) => NeedResource::make($need)->resolve());
 
-        $compareGroupId = $request->integer('compare_group_id') ?: null;
-        $user = $request->user();
-
         return Inertia::render('need/needs/index', [
             'needs' => $needs,
             'currentGroup' => $currentGroup,
-            'dashboardPayload' => Inertia::defer(fn () => $statsAction->getDashboardPayload($groupId, $user, $compareGroupId), 'dashboard'),
-            'stats' => Inertia::defer(fn () => $statsAction->stats($groupId, $currentGroup, $user), 'dashboard'),
-            'statusDistribution' => Inertia::defer(fn () => $statsAction->statusDistribution($groupId, $user), 'dashboard'),
-            'needsByUnit' => Inertia::defer(fn () => $statsAction->byUnit($groupId, $user), 'dashboard'),
-            'needsByType' => Inertia::defer(fn () => $statsAction->byType($groupId, $user), 'dashboard'),
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name', 'parent_id'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
             'filters' => array_merge($this->dataTableFilters($request), $filters),

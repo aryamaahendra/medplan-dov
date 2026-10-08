@@ -129,7 +129,7 @@ test('role scope restricts dashboard stats for staff to their own unit', functio
         ->and($staffAPayload['needsByUnit'][0]['unit_id'])->toBe($this->unitA->id);
 });
 
-test('needs index controller supplies deferred dashboardPayload prop', function () {
+test('executive dashboard controller supplies deferred dashboardPayload prop', function () {
     Need::factory()->create([
         'need_group_id' => $this->group->id,
         'organizational_unit_id' => $this->unitA->id,
@@ -137,7 +137,7 @@ test('needs index controller supplies deferred dashboardPayload prop', function 
         'total_price' => 1500,
     ]);
 
-    $response = $this->actingAs($this->superAdmin)->get(route('needs.index', [
+    $response = $this->actingAs($this->superAdmin)->get(route('dashboard.executive', [
         'need_group_id' => $this->group->id,
     ]));
 
@@ -145,12 +145,12 @@ test('needs index controller supplies deferred dashboardPayload prop', function 
     $version = $response->inertiaPage()['version'] ?? '';
 
     // Verify deferred loading of dashboard props
-    $partialResponse = $this->actingAs($this->superAdmin)->get(route('needs.index', [
+    $partialResponse = $this->actingAs($this->superAdmin)->get(route('dashboard.executive', [
         'need_group_id' => $this->group->id,
     ]), [
         'X-Inertia' => 'true',
         'X-Inertia-Version' => (string) $version,
-        'X-Inertia-Partial-Component' => 'need/needs/index',
+        'X-Inertia-Partial-Component' => 'dashboard/executive',
         'X-Inertia-Partial-Data' => 'dashboardPayload',
     ]);
 

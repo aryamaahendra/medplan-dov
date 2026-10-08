@@ -344,7 +344,9 @@ final class GetNeedDashboardStatsAction
                 COUNT(CASE WHEN status = 'approved' AND approved_by_director_at IS NULL THEN 1 END) as under_review_count,
                 COALESCE(SUM(CASE WHEN status = 'approved' AND approved_by_director_at IS NULL THEN total_price ELSE 0 END), 0) as review_budget,
                 COUNT(CASE WHEN {$stageCase} = 'draft' THEN 1 END) as draft_count,
-                COALESCE(SUM(CASE WHEN {$stageCase} = 'draft' THEN total_price ELSE 0 END), 0) as draft_budget
+                COALESCE(SUM(CASE WHEN {$stageCase} = 'draft' THEN total_price ELSE 0 END), 0) as draft_budget,
+                COUNT(CASE WHEN {$stageCase} = 'rejected' THEN 1 END) as rejected_count,
+                COALESCE(SUM(CASE WHEN {$stageCase} = 'rejected' THEN total_price ELSE 0 END), 0) as rejected_budget
             ")
             ->groupBy('organizational_unit_id')
             ->orderByDesc('total_budget')
@@ -379,19 +381,33 @@ final class GetNeedDashboardStatsAction
                 'review_budget' => (float) $item->review_budget,
                 'draft_count' => (int) $item->draft_count,
                 'draft_budget' => (float) $item->draft_budget,
-                'rejected_count' => 0,
+                'rejected_count' => (int) $item->rejected_count,
             ];
         })->values()->all();
-        // 6. Unit Submission Progress (including units with 0 submissions for Operations Center)
-        $allUnitProgress = $allUnits->map(function ($unit) use ($needsByUnit) {
+        // 6. Unit Submission Progress (scoped and with hierarchy)
+        $scopedUnits = $allUnits;
+        if (! $user?->can('view any needs')) {
+            if ($user?->can('view descendant needs') && $user->organizational_unit_id) {
+                $allowedIds = $this->extractUnitIds($user->organizationalUnit);
+                $scopedUnits = $allUnits->whereIn('id', $allowedIds);
+            } elseif ($user?->organizational_unit_id) {
+                $scopedUnits = $allUnits->where('id', $user->organizational_unit_id);
+            }
+        }
+
+        $allUnitProgress = $scopedUnits->map(function ($unit) use ($needsByUnit, $unitBreadcrumbMap) {
             $existing = collect($needsByUnit)->firstWhere('unit_id', $unit->id);
             $count = $existing['count'] ?? 0;
             $approved = $existing['approved_count'] ?? 0;
             $rate = $count > 0 ? round(($approved / $count) * 100, 1) : 0.0;
+            $parents = $unitBreadcrumbMap[$unit->id] ?? [];
 
             return [
                 'unit_id' => $unit->id,
                 'name' => $unit->name,
+                'parent_id' => $unit->parent_id,
+                'depth' => count($parents),
+                'breadcrumb' => ! empty($parents) ? implode(' > ', $parents) : null,
                 'total_needs' => $count,
                 'total_budget' => $existing['total_budget'] ?? 0.0,
                 'draft_count' => $existing['draft_count'] ?? 0,
@@ -400,6 +416,8 @@ final class GetNeedDashboardStatsAction
                 'rejected_count' => $existing['rejected_count'] ?? 0,
                 'completion_rate' => $rate,
                 'has_submission' => $count > 0,
+                'exceptions_count' => 0,
+                'readiness' => 0.0,
             ];
         })->values()->sortByDesc('total_needs')->values()->all();
 
@@ -621,6 +639,14 @@ final class GetNeedDashboardStatsAction
                 ];
             })
             ->all();
+        $operations = $this->buildOperationsPayload(
+            $currentGroup,
+            $baseQuery,
+            $user,
+            $stats,
+            $allUnitProgress,
+            $now
+        );
 
         return [
             'currentGroup' => $currentGroup ? [
@@ -647,6 +673,7 @@ final class GetNeedDashboardStatsAction
             'fundingSources' => $fundingSources,
             'checklistBuckets' => $checklistBuckets,
             'myUnitData' => $myUnitData,
+            'operations' => $operations,
         ];
     }
 
@@ -688,5 +715,495 @@ final class GetNeedDashboardStatsAction
         $payload = $this->getDashboardPayload($groupId, $user);
 
         return $payload['needsByType'] ?? [];
+    }
+
+    /**
+     * Format need item for exception side-drawer drill-down.
+     *
+     * @return array<string, mixed>
+     */
+    private function formatNeedForDrawer(Need $need, CarbonImmutable $now): array
+    {
+        $updatedAt = $need->updated_at ? CarbonImmutable::parse($need->updated_at) : $now;
+        $idleDays = max(0, (int) $updatedAt->diffInDays($now));
+        $stage = $need->getWorkflowStage();
+        $unlockedUntil = $need->unlocked_until ? CarbonImmutable::parse($need->unlocked_until)->setTimezone('Asia/Makassar')->format('d M Y H:i') : null;
+
+        return [
+            'id' => (int) $need->id,
+            'title' => (string) $need->title,
+            'unit_name' => $need->organizationalUnit->name ?? 'Unknown',
+            'organizational_unit_id' => $need->organizational_unit_id,
+            'stage' => $stage,
+            'total_price' => (float) $need->total_price,
+            'checklist_percentage' => (float) $need->checklist_percentage,
+            'idle_days' => $idleDays,
+            'updated_at' => $updatedAt->setTimezone('Asia/Makassar')->format('d M Y H:i'),
+            'is_priority' => (bool) $need->is_priority,
+            'is_locked' => (bool) $need->is_locked,
+            'lock_reason' => $need->lock_reason,
+            'unlocked_until' => $unlockedUntil,
+        ];
+    }
+
+    /**
+     * Build comprehensive Operations Command Center data (Variant B).
+     *
+     * @param  Builder<Need>  $baseQuery
+     * @param  array<string, mixed>  $stats
+     * @param  array<int, array<string, mixed>>  $allUnitProgress
+     * @return array<string, mixed>
+     */
+    private function buildOperationsPayload(
+        ?NeedGroup $currentGroup,
+        Builder $baseQuery,
+        ?User $user,
+        array $stats,
+        array &$allUnitProgress,
+        CarbonImmutable $now
+    ): array {
+        // 1. Meta & Window calculation
+        if (! $user || $user->can('view any needs')) {
+            $scopeLabel = 'Seluruh Rumah Sakit';
+        } elseif ($user->can('view descendant needs') && $user->organizationalUnit) {
+            $scopeLabel = $user->organizationalUnit->name.' & Unit Bawahan';
+        } else {
+            $scopeLabel = $user->organizationalUnit->name ?? 'Unit Pengguna';
+        }
+
+        $subEnd = $currentGroup?->submission_end_at ? CarbonImmutable::parse($currentGroup->submission_end_at) : null;
+        $startAtFormatted = $currentGroup?->submission_start_at ? CarbonImmutable::parse($currentGroup->submission_start_at)->format('d M Y') : null;
+        $endAtFormatted = $currentGroup?->submission_end_at ? CarbonImmutable::parse($currentGroup->submission_end_at)->format('d M Y') : null;
+        $daysRemaining = $subEnd ? (int) ceil($now->diffInDays($subEnd, false)) : null;
+        $windowStatus = $currentGroup?->getSubmissionWindowStatus() ?? 'indefinite';
+
+        // 2. Positive Queue: "Siap Diverifikasi"
+        // (Draft with checklist >= 85% and complete mandatory linkages)
+        $readyQuery = (clone $baseQuery)
+            ->where('status', 'draft')
+            ->whereNull('approved_by_director_at')
+            ->where('checklist_percentage', '>=', 85)
+            ->has('attachments')
+            ->has('sasarans')
+            ->has('indicators')
+            ->has('kpiIndicators')
+            ->has('strategicServicePlans');
+
+        $readyCount = (int) (clone $readyQuery)->count();
+        $readyBudget = (float) (clone $readyQuery)->sum('total_price');
+        $readyNeeds = (clone $readyQuery)
+            ->with(['organizationalUnit:id,name'])
+            ->orderByDesc('total_price')
+            ->limit(10)
+            ->get()
+            ->map(fn (Need $n): array => $this->formatNeedForDrawer($n, $now))
+            ->all();
+
+        // 3. Exception Catalog E1..E9
+        // E1: Window closing soon while draft exists
+        $isE1Active = $currentGroup && $currentGroup->isOpenForSubmission() && $daysRemaining !== null && $daysRemaining <= 7 && $daysRemaining >= 0;
+        $e1Severity = ($daysRemaining !== null && $daysRemaining <= 3) ? 'critical' : 'warning';
+        $e1NeedsQuery = $isE1Active
+            ? (clone $baseQuery)->where('status', 'draft')->whereNull('approved_by_director_at')
+            : null;
+        $e1Count = $e1NeedsQuery ? (int) (clone $e1NeedsQuery)->count() : 0;
+        $e1Budget = $e1NeedsQuery ? (float) (clone $e1NeedsQuery)->sum('total_price') : 0.0;
+        $e1Needs = $e1NeedsQuery
+            ? (clone $e1NeedsQuery)->with('organizationalUnit:id,name')->orderByDesc('total_price')->limit(10)->get()->map(fn (Need $n): array => $this->formatNeedForDrawer($n, $now))->all()
+            : [];
+
+        // E2: Draft idle >= 7 days
+        $sevenDaysAgo = $now->subDays(7);
+        $e2Query = (clone $baseQuery)->where('status', 'draft')->whereNull('approved_by_director_at')->where('updated_at', '<=', $sevenDaysAgo);
+        $e2Count = (int) (clone $e2Query)->count();
+        $e2Budget = (float) (clone $e2Query)->sum('total_price');
+        $e2Needs = (clone $e2Query)->with('organizationalUnit:id,name')->orderBy('updated_at')->limit(10)->get()->map(fn (Need $n): array => $this->formatNeedForDrawer($n, $now))->all();
+
+        // E3: Assessed need with checklist < 85%
+        $e3Query = (clone $baseQuery)->where('checklist_percentage', '>', 0)->where('checklist_percentage', '<', 85)->whereNull('approved_by_director_at');
+        $e3Count = (int) (clone $e3Query)->count();
+        $e3Budget = (float) (clone $e3Query)->sum('total_price');
+        $e3Needs = (clone $e3Query)->with('organizationalUnit:id,name')->orderBy('checklist_percentage')->limit(10)->get()->map(fn (Need $n): array => $this->formatNeedForDrawer($n, $now))->all();
+
+        // E4: Under review with 0% checklist
+        $e4Query = (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where(function ($q) {
+            $q->whereNull('checklist_percentage')->orWhere('checklist_percentage', 0);
+        });
+        $e4Count = (int) (clone $e4Query)->count();
+        $e4Budget = (float) (clone $e4Query)->sum('total_price');
+        $e4Needs = (clone $e4Query)->with('organizationalUnit:id,name')->orderByDesc('total_price')->limit(10)->get()->map(fn (Need $n): array => $this->formatNeedForDrawer($n, $now))->all();
+
+        // E5: Under review idle >= 5 days (Critical at >= 10 days)
+        $fiveDaysAgo = $now->subDays(5);
+        $tenDaysAgo = $now->subDays(10);
+        $e5Query = (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '<=', $fiveDaysAgo);
+        $e5Count = (int) (clone $e5Query)->count();
+        $e5Budget = (float) (clone $e5Query)->sum('total_price');
+        $e5CriticalCount = (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '<=', $tenDaysAgo)->count();
+        $e5Severity = $e5CriticalCount > 0 ? 'critical' : 'warning';
+        $e5Needs = (clone $e5Query)->with('organizationalUnit:id,name')->orderBy('updated_at')->limit(10)->get()->map(fn (Need $n): array => $this->formatNeedForDrawer($n, $now))->all();
+
+        // E6: Under review missing mandatory linkages
+        $e6Query = (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where(function ($q) {
+            $q->doesntHave('attachments')
+                ->orDoesntHave('sasarans')
+                ->orDoesntHave('indicators')
+                ->orDoesntHave('kpiIndicators')
+                ->orDoesntHave('strategicServicePlans');
+        });
+        $e6Count = (int) (clone $e6Query)->count();
+        $e6Budget = (float) (clone $e6Query)->sum('total_price');
+        $e6Needs = (clone $e6Query)->with('organizationalUnit:id,name')->orderByDesc('total_price')->limit(10)->get()->map(fn (Need $n): array => $this->formatNeedForDrawer($n, $now))->all();
+
+        // E7: Rejected idle >= 7 days
+        $e7Query = (clone $baseQuery)->where('status', 'rejected')->where('updated_at', '<=', $sevenDaysAgo);
+        $e7Count = (int) (clone $e7Query)->count();
+        $e7Budget = (float) (clone $e7Query)->sum('total_price');
+        $e7Needs = (clone $e7Query)->with('organizationalUnit:id,name')->orderBy('updated_at')->limit(10)->get()->map(fn (Need $n): array => $this->formatNeedForDrawer($n, $now))->all();
+
+        // E8: Zero submission units
+        $zeroUnits = collect($allUnitProgress)->where('has_submission', false)->values();
+        $e8Count = $zeroUnits->count();
+        $e8Severity = ($daysRemaining !== null && $daysRemaining <= 3) ? 'critical' : 'warning';
+
+        // E9: Lock anomalies (expiring unlock <= 3 days, or locked draft with low checklist)
+        $threeDaysAhead = $now->addDays(3);
+        $e9Query = (clone $baseQuery)->where(function ($q) use ($now, $threeDaysAhead) {
+            $q->where(function ($sub1) use ($now, $threeDaysAhead) {
+                $sub1->whereNotNull('unlocked_until')->where('unlocked_until', '>=', $now)->where('unlocked_until', '<=', $threeDaysAhead);
+            })->orWhere(function ($sub2) {
+                $sub2->where('is_locked', true)->where('status', 'draft')->where('checklist_percentage', '<', 85);
+            });
+        });
+        $e9Count = (int) (clone $e9Query)->count();
+        $e9Budget = (float) (clone $e9Query)->sum('total_price');
+        $e9Needs = (clone $e9Query)->with('organizationalUnit:id,name')->orderBy('unlocked_until')->limit(10)->get()->map(fn (Need $n): array => $this->formatNeedForDrawer($n, $now))->all();
+
+        // Assemble Exception Items
+        $exceptionItems = [
+            [
+                'code' => 'E1',
+                'title' => 'Draf Mendekati Batas Akhir Siklus',
+                'description' => 'Usulan masih berupa draf padahal jadwal pengajuan akan ditutup dalam waktu dekat.',
+                'severity' => $e1Severity,
+                'count' => $e1Count,
+                'budget' => $e1Budget,
+                'stage' => 'draft',
+                'query_filter' => ['status' => ['draft'], 'attention' => ['E1']],
+                'needs' => $e1Needs,
+            ],
+            [
+                'code' => 'E2',
+                'title' => 'Draf Tidak Aktif >= 7 Hari',
+                'description' => 'Draf belum diperbarui oleh unit kerja selama 7 hari atau lebih.',
+                'severity' => 'warning',
+                'count' => $e2Count,
+                'budget' => $e2Budget,
+                'stage' => 'draft',
+                'query_filter' => ['status' => ['draft'], 'attention' => ['E2']],
+                'needs' => $e2Needs,
+            ],
+            [
+                'code' => 'E3',
+                'title' => 'Skor Checklist < 85% (Perlu Kelengkapan)',
+                'description' => 'Usulan telah dinilai tetapi skor instrumen checklist belum mencapai standar kelayakan 85%.',
+                'severity' => 'warning',
+                'count' => $e3Count,
+                'budget' => $e3Budget,
+                'stage' => 'draft',
+                'query_filter' => ['attention' => ['E3']],
+                'needs' => $e3Needs,
+            ],
+            [
+                'code' => 'E4',
+                'title' => 'Menunggu Review Belum Dinilai Checklist',
+                'description' => 'Usulan telah diajukan ke tahap review namun skor checklist masih kosong (0%).',
+                'severity' => 'warning',
+                'count' => $e4Count,
+                'budget' => $e4Budget,
+                'stage' => 'under_review',
+                'query_filter' => ['stage' => ['under_review'], 'attention' => ['E4']],
+                'needs' => $e4Needs,
+            ],
+            [
+                'code' => 'E5',
+                'title' => 'Menunggu Review Tertahan >= 5 Hari',
+                'description' => 'Usulan dalam tahap review belum ditindaklanjuti oleh reviewer atau direktur selama 5 hari atau lebih.',
+                'severity' => $e5Severity,
+                'count' => $e5Count,
+                'budget' => $e5Budget,
+                'stage' => 'under_review',
+                'query_filter' => ['stage' => ['under_review'], 'attention' => ['E5']],
+                'needs' => $e5Needs,
+            ],
+            [
+                'code' => 'E6',
+                'title' => 'Menunggu Review Tanpa Berkas / Keterkaitan Wajib',
+                'description' => 'Usulan review tidak memiliki lampiran berkas atau belum dipetakan ke Sasaran/Indikator/IKK/Renstra.',
+                'severity' => 'critical',
+                'count' => $e6Count,
+                'budget' => $e6Budget,
+                'stage' => 'under_review',
+                'query_filter' => ['stage' => ['under_review'], 'attention' => ['E6']],
+                'needs' => $e6Needs,
+            ],
+            [
+                'code' => 'E7',
+                'title' => 'Ditolak dan Belum Direvisi >= 7 Hari',
+                'description' => 'Usulan ditolak oleh direktur dan belum ada revisi atau tanggapan unit selama 7 hari atau lebih.',
+                'severity' => 'info',
+                'count' => $e7Count,
+                'budget' => $e7Budget,
+                'stage' => 'rejected',
+                'query_filter' => ['status' => ['rejected'], 'attention' => ['E7']],
+                'needs' => $e7Needs,
+            ],
+            [
+                'code' => 'E8',
+                'title' => 'Unit Kerja Belum Mengajukan Usulan',
+                'description' => 'Unit kerja aktif yang belum memiliki satupun usulan terdaftar pada siklus ini.',
+                'severity' => $e8Severity,
+                'count' => $e8Count,
+                'budget' => 0.0,
+                'stage' => 'all',
+                'query_filter' => [],
+                'needs' => [],
+            ],
+            [
+                'code' => 'E9',
+                'title' => 'Izin Buka Kunci Berakhir Segera / Anomali Kunci',
+                'description' => 'Dispensasi izin buka kunci akan kedaluwarsa dalam <= 3 hari atau usulan draf terkunci sebelum lengkap.',
+                'severity' => 'warning',
+                'count' => $e9Count,
+                'budget' => $e9Budget,
+                'stage' => 'all',
+                'query_filter' => ['attention' => ['E9']],
+                'needs' => $e9Needs,
+            ],
+        ];
+
+        // Stage exception totals for stage strip badges
+        $draftExceptionsCount = $e1Count + $e2Count + (int) ((clone $baseQuery)->where('status', 'draft')->where('checklist_percentage', '>', 0)->where('checklist_percentage', '<', 85)->count());
+        $reviewExceptionsCount = $e4Count + $e5Count + $e6Count;
+        $rejectedExceptionsCount = $e7Count;
+
+        // 4. Lock Monitor
+        $activeUnlocksCount = (int) (clone $baseQuery)->whereNotNull('unlocked_until')->where('unlocked_until', '>=', $now)->count();
+        $manualLockedCount = (int) (clone $baseQuery)->where('is_locked', true)->whereNull('approved_by_director_at')->count();
+        $directorLockedCount = (int) (clone $baseQuery)->whereNotNull('approved_by_director_at')->count();
+        $isWindowClosed = $currentGroup && ! $currentGroup->isOpenForSubmission();
+        $windowClosedLockedCount = $isWindowClosed
+            ? (int) (clone $baseQuery)->whereNull('approved_by_director_at')->where('is_locked', '!=', false)->where(function ($q) use ($now) {
+                $q->whereNull('unlocked_until')->orWhere('unlocked_until', '<', $now);
+            })->count()
+            : 0;
+
+        $lockAnomalies = [];
+        if ($e9Count > 0) {
+            $lockAnomalies[] = [
+                'type' => 'expiring_or_locked_draft',
+                'title' => 'Anomali Kunci / Izin Buka Kunci Segera Kedaluwarsa',
+                'description' => 'Terdapat usulan dengan dispensasi buka kunci berakhir <= 3 hari atau draf terkunci.',
+                'count' => $e9Count,
+                'needs' => $e9Needs,
+            ];
+        }
+
+        // 5. Aging Histograms (idle days based on updated_at)
+        $draftAging = [
+            [
+                'key' => 'fresh',
+                'label' => '< 7 Hari',
+                'description' => 'Aktivitas wajar',
+                'count' => (int) (clone $baseQuery)->where('status', 'draft')->whereNull('approved_by_director_at')->where('updated_at', '>', $now->subDays(7))->count(),
+                'budget' => (float) (clone $baseQuery)->where('status', 'draft')->whereNull('approved_by_director_at')->where('updated_at', '>', $now->subDays(7))->sum('total_price'),
+            ],
+            [
+                'key' => 'stale',
+                'label' => '7 - 14 Hari',
+                'description' => 'Perlu perhatian',
+                'count' => (int) (clone $baseQuery)->where('status', 'draft')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(7))->where('updated_at', '>', $now->subDays(14))->count(),
+                'budget' => (float) (clone $baseQuery)->where('status', 'draft')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(7))->where('updated_at', '>', $now->subDays(14))->sum('total_price'),
+            ],
+            [
+                'key' => 'delayed',
+                'label' => '15 - 30 Hari',
+                'description' => 'Tertahan lama',
+                'count' => (int) (clone $baseQuery)->where('status', 'draft')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(14))->where('updated_at', '>', $now->subDays(30))->count(),
+                'budget' => (float) (clone $baseQuery)->where('status', 'draft')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(14))->where('updated_at', '>', $now->subDays(30))->sum('total_price'),
+            ],
+            [
+                'key' => 'stuck',
+                'label' => '> 30 Hari',
+                'description' => 'Macet kritis',
+                'count' => (int) (clone $baseQuery)->where('status', 'draft')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(30))->count(),
+                'budget' => (float) (clone $baseQuery)->where('status', 'draft')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(30))->sum('total_price'),
+            ],
+        ];
+
+        $reviewAging = [
+            [
+                'key' => 'fresh',
+                'label' => '< 5 Hari',
+                'description' => 'Antrean baru',
+                'count' => (int) (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '>', $now->subDays(5))->count(),
+                'budget' => (float) (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '>', $now->subDays(5))->sum('total_price'),
+            ],
+            [
+                'key' => 'stale',
+                'label' => '5 - 10 Hari',
+                'description' => 'Mulai terlambat',
+                'count' => (int) (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(5))->where('updated_at', '>', $now->subDays(10))->count(),
+                'budget' => (float) (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(5))->where('updated_at', '>', $now->subDays(10))->sum('total_price'),
+            ],
+            [
+                'key' => 'delayed',
+                'label' => '10 - 20 Hari',
+                'description' => 'Tertahan verifikasi',
+                'count' => (int) (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(10))->where('updated_at', '>', $now->subDays(20))->count(),
+                'budget' => (float) (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(10))->where('updated_at', '>', $now->subDays(20))->sum('total_price'),
+            ],
+            [
+                'key' => 'stuck',
+                'label' => '> 20 Hari',
+                'description' => 'Macet verifikasi',
+                'count' => (int) (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(20))->count(),
+                'budget' => (float) (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(20))->sum('total_price'),
+            ],
+        ];
+
+        $rejectedAging = [
+            [
+                'key' => 'fresh',
+                'label' => '< 7 Hari',
+                'description' => 'Baru ditolak',
+                'count' => (int) (clone $baseQuery)->where('status', 'rejected')->where('updated_at', '>', $now->subDays(7))->count(),
+                'budget' => (float) (clone $baseQuery)->where('status', 'rejected')->where('updated_at', '>', $now->subDays(7))->sum('total_price'),
+            ],
+            [
+                'key' => 'stale',
+                'label' => '7 - 14 Hari',
+                'description' => 'Belum ada revisi',
+                'count' => (int) (clone $baseQuery)->where('status', 'rejected')->where('updated_at', '<=', $now->subDays(7))->where('updated_at', '>', $now->subDays(14))->count(),
+                'budget' => (float) (clone $baseQuery)->where('status', 'rejected')->where('updated_at', '<=', $now->subDays(7))->where('updated_at', '>', $now->subDays(14))->sum('total_price'),
+            ],
+            [
+                'key' => 'stuck',
+                'label' => '> 14 Hari',
+                'description' => 'Revisi terabaikan',
+                'count' => (int) (clone $baseQuery)->where('status', 'rejected')->where('updated_at', '<=', $now->subDays(14))->count(),
+                'budget' => (float) (clone $baseQuery)->where('status', 'rejected')->where('updated_at', '<=', $now->subDays(14))->sum('total_price'),
+            ],
+        ];
+
+        // 6. Enrich Unit Progress with readiness and exceptions
+        $unitNeedsStats = (clone $baseQuery)
+            ->toBase()
+            ->selectRaw('
+                organizational_unit_id,
+                AVG(CASE WHEN checklist_percentage > 0 THEN checklist_percentage ELSE 0 END) as avg_readiness,
+                COUNT(CASE WHEN (status = \'draft\' AND updated_at <= \''.$sevenDaysAgo->toDateTimeString().'\')
+                    OR (status = \'approved\' AND approved_by_director_at IS NULL AND updated_at <= \''.$fiveDaysAgo->toDateTimeString().'\')
+                    OR (checklist_percentage > 0 AND checklist_percentage < 85) THEN 1 END) as exception_count
+            ')
+            ->groupBy('organizational_unit_id')
+            ->get()
+            ->keyBy('organizational_unit_id');
+
+        foreach ($allUnitProgress as &$unitProg) {
+            $uId = $unitProg['unit_id'];
+            $stat = $unitNeedsStats->get($uId);
+            $unitProg['exceptions_count'] = $stat ? (int) $stat->exception_count : 0;
+            $unitProg['readiness'] = $stat ? round((float) $stat->avg_readiness, 1) : 0.0;
+        }
+        unset($unitProg);
+
+        return [
+            'meta' => [
+                'scope_label' => $scopeLabel,
+                'updated_at' => $now->toIso8601String(),
+                'formatted_time' => $now->format('H:i').' WITA',
+                'window_status' => $windowStatus,
+                'window_start_at' => $startAtFormatted,
+                'window_end_at' => $endAtFormatted,
+                'days_remaining' => $daysRemaining,
+            ],
+            'stage_tiles' => [
+                'draft' => [
+                    'count' => $stats['draft_count'],
+                    'budget' => $stats['draft_budget'],
+                    'holder' => 'Unit Kerja',
+                    'exceptions_count' => $draftExceptionsCount,
+                ],
+                'under_review' => [
+                    'count' => $stats['awaiting_director'],
+                    'budget' => $stats['awaiting_director_budget'],
+                    'holder' => 'Tim Perencana / Direktur',
+                    'exceptions_count' => $reviewExceptionsCount,
+                ],
+                'approved' => [
+                    'count' => $stats['approved_by_director'],
+                    'budget' => $stats['approved_budget'],
+                    'holder' => 'Selesai',
+                    'exceptions_count' => 0,
+                ],
+                'rejected' => [
+                    'count' => $stats['rejected_count'],
+                    'budget' => $stats['rejected_budget'],
+                    'holder' => 'Unit Kerja (Revisi)',
+                    'exceptions_count' => $rejectedExceptionsCount,
+                ],
+            ],
+            'ready_for_verification' => [
+                'count' => $readyCount,
+                'budget' => $readyBudget,
+                'needs' => $readyNeeds,
+            ],
+            'exceptions' => $exceptionItems,
+            'lock_monitor' => [
+                'timeline' => [
+                    'status' => $windowStatus,
+                    'start_at' => $startAtFormatted,
+                    'end_at' => $endAtFormatted,
+                    'days_remaining' => $daysRemaining,
+                    'now_formatted' => $now->format('d M Y H:i').' WITA',
+                ],
+                'tier_counts' => [
+                    'tier_2_extension' => $activeUnlocksCount,
+                    'tier_3_manual' => $manualLockedCount,
+                    'tier_4_director' => $directorLockedCount,
+                    'tier_5_window' => $windowClosedLockedCount,
+                    'total_locked' => $stats['locked_count'],
+                ],
+                'anomalies' => $lockAnomalies,
+                'active_unlocks' => (clone $baseQuery)
+                    ->whereNotNull('unlocked_until')
+                    ->where('unlocked_until', '>=', $now)
+                    ->with(['organizationalUnit:id,name', 'lockedByUser:id,name'])
+                    ->orderBy('unlocked_until')
+                    ->limit(15)
+                    ->get()
+                    ->map(function (Need $need) use ($user): array {
+                        $unlockedUntil = $need->unlocked_until ? CarbonImmutable::parse($need->unlocked_until) : null;
+
+                        return [
+                            'id' => (int) $need->id,
+                            'title' => (string) $need->title,
+                            'unit_name' => $need->organizationalUnit->name ?? 'Unknown',
+                            'unlocked_until' => $unlockedUntil?->toIso8601String(),
+                            'lock_reason' => $need->lock_reason,
+                            'can_lock' => $user?->can('lock', $need) ?? false,
+                            'can_unlock' => $user?->can('unlock', $need) ?? false,
+                        ];
+                    })
+                    ->all(),
+            ],
+            'aging' => [
+                'draft' => $draftAging,
+                'under_review' => $reviewAging,
+                'rejected' => $rejectedAging,
+            ],
+            'unit_progress' => $allUnitProgress,
+        ];
     }
 }

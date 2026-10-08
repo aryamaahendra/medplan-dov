@@ -86,6 +86,9 @@ export interface UnitBudgetStat {
 export interface UnitProgressItem {
   unit_id: number;
   name: string;
+  parent_id?: number | null;
+  depth?: number;
+  breadcrumb?: string | null;
   total_needs: number;
   total_budget: number;
   draft_count: number;
@@ -94,6 +97,8 @@ export interface UnitProgressItem {
   rejected_count: number;
   completion_rate: number;
   has_submission: boolean;
+  exceptions_count?: number;
+  readiness?: number;
 }
 
 export interface NeedTypeStat {
@@ -156,6 +161,107 @@ export interface MyUnitData {
   priority_count: number;
 }
 
+export interface OperationNeedDrawerItem {
+  id: number;
+  title: string;
+  unit_name: string;
+  organizational_unit_id: number;
+  stage: string;
+  total_price: number;
+  checklist_percentage: number;
+  idle_days: number;
+  updated_at: string;
+  is_priority: boolean;
+  is_locked: boolean;
+  lock_reason: string | null;
+  unlocked_until: string | null;
+}
+
+export interface OperationExceptionItem {
+  code: string;
+  title: string;
+  description: string;
+  severity: 'critical' | 'warning' | 'info';
+  count: number;
+  budget: number;
+  stage: string;
+  query_filter?: Record<string, any>;
+  needs: OperationNeedDrawerItem[];
+}
+
+export interface OperationsLockAnomaly {
+  type: string;
+  title: string;
+  description: string;
+  count: number;
+  needs: OperationNeedDrawerItem[];
+}
+
+export interface OperationsLockMonitorData {
+  timeline: {
+    status: 'open' | 'closed' | 'upcoming' | 'indefinite';
+    start_at: string | null;
+    end_at: string | null;
+    days_remaining: number | null;
+    now_formatted: string;
+  };
+  tier_counts: {
+    tier_2_extension: number;
+    tier_3_manual: number;
+    tier_4_director: number;
+    tier_5_window: number;
+    total_locked: number;
+  };
+  anomalies: OperationsLockAnomaly[];
+  active_unlocks: ActiveUnlockItem[];
+}
+
+export interface AgingBucketItem {
+  key: string;
+  label: string;
+  description: string;
+  count: number;
+  budget: number;
+}
+
+export interface OperationsAgingData {
+  draft: AgingBucketItem[];
+  under_review: AgingBucketItem[];
+  rejected: AgingBucketItem[];
+}
+
+export interface OperationsStageTile {
+  count: number;
+  budget: number;
+  holder: string;
+  exceptions_count: number;
+}
+
+export interface OperationsPayload {
+  meta: {
+    scope_label: string;
+    updated_at: string;
+    formatted_time: string;
+    window_status: 'open' | 'closed' | 'upcoming' | 'indefinite';
+    window_start_at: string | null;
+    window_end_at: string | null;
+    days_remaining: number | null;
+  };
+  stage_tiles: Record<
+    'draft' | 'under_review' | 'approved' | 'rejected',
+    OperationsStageTile
+  >;
+  ready_for_verification: {
+    count: number;
+    budget: number;
+    needs: OperationNeedDrawerItem[];
+  };
+  exceptions: OperationExceptionItem[];
+  lock_monitor: OperationsLockMonitorData;
+  aging: OperationsAgingData;
+  unit_progress: UnitProgressItem[];
+}
+
 export interface NeedsDashboardPayload {
   currentGroup: DashboardGroupOption | null;
   availableGroups: DashboardGroupOption[];
@@ -177,4 +283,5 @@ export interface NeedsDashboardPayload {
   fundingSources: FundingSourceStat[];
   checklistBuckets: Record<string, number>;
   myUnitData: MyUnitData | null;
+  operations?: OperationsPayload;
 }

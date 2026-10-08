@@ -139,12 +139,15 @@ export default function NeedsIndex({
       // Attention strip filter
       if (attentionFilter) {
         switch (attentionFilter) {
-          case 'low_checklist':
-            if (Number(need.checklist_percentage || 0) >= 80) {
+          case 'low_checklist': {
+            const pct = Number(need.checklist_percentage || 0);
+
+            if (pct >= 85 || pct === 0) {
               return false;
             }
 
             break;
+          }
           case 'revision_closing': {
             if (!need.unlocked_until) {
               return false;

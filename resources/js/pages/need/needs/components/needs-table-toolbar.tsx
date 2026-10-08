@@ -103,8 +103,8 @@ export function NeedsTableToolbar({
     () =>
       needs.filter((n) => {
         if (!n.unlocked_until) {
-return false;
-}
+          return false;
+        }
 
         const diff = new Date(n.unlocked_until).getTime() - now;
 
@@ -117,8 +117,8 @@ return false;
     () =>
       needs.filter((n) => {
         if (!n.group_submission_end_at) {
-return false;
-}
+          return false;
+        }
 
         const diff = new Date(n.group_submission_end_at).getTime() - now;
 

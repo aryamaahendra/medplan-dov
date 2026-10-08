@@ -165,3 +165,70 @@ test('needs index controller supplies deferred dashboardPayload prop', function 
         ->etc()
     );
 });
+
+test('operations payload supplies full variant B command center data', function () {
+    Need::factory()->create([
+        'need_group_id' => $this->group->id,
+        'organizational_unit_id' => $this->unitA->id,
+        'status' => 'draft',
+        'checklist_percentage' => 90,
+        'total_price' => 5000,
+    ]);
+
+    $action = app(GetNeedDashboardStatsAction::class);
+    $payload = $action->getDashboardPayload($this->group->id, $this->superAdmin);
+
+    expect($payload)->toHaveKey('operations')
+        ->and($payload['operations'])->toHaveKeys([
+            'meta',
+            'stage_tiles',
+            'ready_for_verification',
+            'exceptions',
+            'lock_monitor',
+            'aging',
+            'unit_progress',
+        ])
+        ->and($payload['operations']['meta']['scope_label'])->toBe('Seluruh Rumah Sakit')
+        ->and($payload['operations']['stage_tiles']['draft']['holder'])->toBe('Unit Kerja')
+        ->and($payload['operations']['stage_tiles']['under_review']['holder'])->toBe('Tim Perencana / Direktur')
+        ->and($payload['operations']['stage_tiles']['approved']['holder'])->toBe('Selesai')
+        ->and($payload['operations']['stage_tiles']['rejected']['holder'])->toBe('Unit Kerja (Revisi)');
+});
+
+test('operations exception catalog accurately detects idle needs and attention filter works', function () {
+    // Idle draft (updated 10 days ago) -> E2
+    $staleDraft = Need::factory()->create([
+        'need_group_id' => $this->group->id,
+        'organizational_unit_id' => $this->unitA->id,
+        'status' => 'draft',
+        'updated_at' => now()->subDays(10),
+    ]);
+
+    // Fresh draft -> not E2
+    $freshDraft = Need::factory()->create([
+        'need_group_id' => $this->group->id,
+        'organizational_unit_id' => $this->unitA->id,
+        'status' => 'draft',
+        'updated_at' => now()->subDay(),
+    ]);
+
+    $action = app(GetNeedDashboardStatsAction::class);
+    $payload = $action->getDashboardPayload($this->group->id, $this->superAdmin);
+
+    $e2Item = collect($payload['operations']['exceptions'])->firstWhere('code', 'E2');
+    expect($e2Item)->not->toBeNull()
+        ->and($e2Item['count'])->toBeGreaterThanOrEqual(1);
+
+    // Test click-through attention filter via HTTP request
+    $response = $this->actingAs($this->superAdmin)->get(route('needs.index', [
+        'need_group_id' => $this->group->id,
+        'attention' => ['E2'],
+    ]));
+
+    $response->assertOk();
+    $needsData = $response->inertiaPage()['props']['needs']['data'] ?? [];
+    $filteredIds = collect($needsData)->pluck('id')->all();
+
+    expect($filteredIds)->toContain($staleDraft->id)
+        ->and($filteredIds)->not->toContain($freshDraft->id);
+});

@@ -78,6 +78,8 @@ class NeedController extends Controller
             'min_checklist_score' => $request->input('min_checklist_score'),
             'stage' => $request->input('stage'),
             'need_group_id' => $groupId,
+            'attention' => $request->input('attention'),
+            'include_descendants' => $request->boolean('include_descendants'),
         ];
         $query = $action->execute($filters, $request->user());
 

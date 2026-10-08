@@ -31,9 +31,11 @@ export function NeedsAttentionStrip({
   const now = new Date().getTime();
   const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
 
-  const lowChecklistCount = needs.filter(
-    (n) => Number(n.checklist_percentage || 0) < 80,
-  ).length;
+  const lowChecklistCount = needs.filter((n) => {
+    const pct = Number(n.checklist_percentage || 0);
+
+    return pct > 0 && pct < 85;
+  }).length;
 
   const revisionClosingCount = needs.filter((n) => {
     if (!n.unlocked_until) {
@@ -67,7 +69,7 @@ export function NeedsAttentionStrip({
   }> = [
     {
       key: 'low_checklist',
-      label: 'Checklist < 80%',
+      label: 'Checklist < 85%',
       count: lowChecklistCount,
       icon: RiErrorWarningLine,
       badgeVariant: 'outline',

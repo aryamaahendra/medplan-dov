@@ -14,13 +14,13 @@ import { buttonVariants } from '@/components/ui/button';
 import { formatCompactIDR, formatIDR } from '@/lib/formatters';
 import groupRoutes from '@/routes/need-groups';
 import needsRoutes from '@/routes/needs';
-import type { NeedGroup } from '../columns';
+import type { NeedGroup } from '../types/need-group.types';
 import {
   getGroupActions,
   getMetricsTelemetry,
   getSubmissionStatus,
   getTimelineTelemetry,
-} from './need-group-helpers';
+} from '../utils/need-group-helpers';
 
 interface NeedGroupCardProps {
   group: NeedGroup;

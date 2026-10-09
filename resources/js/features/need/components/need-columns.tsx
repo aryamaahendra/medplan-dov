@@ -34,7 +34,7 @@ import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
 import type { Need } from '@/types';
 
-export const getSmartColumns = (
+export const getNeedColumns = (
   onEdit: (need: Need) => void,
   onDelete: (need: Need) => void,
   onReview: (need: Need) => void,
@@ -358,3 +358,5 @@ export const getSmartColumns = (
     },
   },
 ];
+
+export const getSmartColumns = getNeedColumns;

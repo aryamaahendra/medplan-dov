@@ -8,7 +8,7 @@ import {
 import type { ActionItem } from '@/components/action-dropdown';
 import { formatCompactIDR, formatDateTime } from '@/lib/formatters';
 import groupRoutes from '@/routes/need-groups';
-import type { NeedGroup } from '../columns';
+import type { NeedGroup } from '../types/need-group.types';
 
 export type SubmissionStatusType =
   'open' | 'upcoming' | 'closed' | 'indefinite';

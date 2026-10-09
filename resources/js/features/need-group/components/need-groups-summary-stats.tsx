@@ -6,7 +6,7 @@ import {
 } from '@remixicon/react';
 
 import { formatCompactIDR, formatNumber } from '@/lib/formatters';
-import type { NeedGroup } from '../columns';
+import type { NeedGroup } from '../types/need-group.types';
 
 interface NeedGroupsSummaryStatsProps {
   totalCount: number;

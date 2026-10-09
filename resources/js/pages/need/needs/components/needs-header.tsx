@@ -16,8 +16,8 @@ interface NeedsHeaderProps {
   currentGroup: { id: number; name: string; year: number };
   onCreate: () => void;
   onExport: () => void;
-  onEditGroup: () => void;
-  onDeleteGroup: () => void;
+  onEditGroup?: () => void;
+  onDeleteGroup?: () => void;
 }
 export function NeedsHeader({
   currentGroup,

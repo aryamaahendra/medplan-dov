@@ -20,8 +20,8 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 
 import { formatForDateTimeInput } from '@/lib/formatters';
-import type { NeedGroup } from './columns';
-import { BulkRolloverDialog } from './components/bulk-rollover-dialog';
+import type { NeedGroup } from '../types/need-group.types';
+import { BulkRolloverDialog } from './bulk-rollover-dialog';
 
 interface NeedGroupDialogProps {
   open: boolean;

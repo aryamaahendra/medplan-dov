@@ -1,21 +1,14 @@
 import { RiEdit2Line, RiDeleteBinLine } from '@remixicon/react';
 import type { ColumnDef } from '@tanstack/react-table';
+
 import type { ActionItem } from '@/components/action-dropdown';
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { getIndexColumn } from '@/components/data-table/data-table-index-column';
 import { Badge } from '@/components/ui/badge';
+import type { ChecklistQuestion } from '../types/checklist-question.types';
 
-export interface ChecklistQuestion {
-  id: number;
-  question: string;
-  description: string | null;
-  is_active: boolean;
-  order_column: number;
-  created_at: string;
-}
-
-export const getColumns = (
+export const getChecklistQuestionColumns = (
   onEdit: (question: ChecklistQuestion) => void,
   onDelete: (question: ChecklistQuestion) => void,
   hasPermission: (permission: string) => boolean,

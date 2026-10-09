@@ -16,8 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-
-import type { ChecklistQuestion } from './columns';
+import type { ChecklistQuestion } from '../types/checklist-question.types';
 
 interface ChecklistQuestionDialogProps {
   open: boolean;

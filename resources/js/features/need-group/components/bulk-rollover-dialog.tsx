@@ -32,7 +32,7 @@ import { formatIDR } from '@/lib/formatters';
 import needGroups from '@/routes/need-groups';
 import { unapprovedCandidates } from '@/routes/needs';
 
-import type { NeedGroup } from '../columns';
+import type { NeedGroup } from '../types/need-group.types';
 
 interface CandidateNeed {
   id: number;

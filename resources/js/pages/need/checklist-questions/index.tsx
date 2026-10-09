@@ -1,32 +1,17 @@
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { RiAddLine } from '@remixicon/react';
-import { useMemo, useState } from 'react';
-import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
-import { useDataTable } from '@/hooks/use-data-table';
+import { ChecklistQuestionDialog } from '@/features/checklist-question/components/checklist-question-dialog';
+import { useChecklistQuestionsIndex } from '@/features/checklist-question/hooks/use-checklist-questions-index';
+import type { PaginatedChecklistQuestions } from '@/features/checklist-question/types/checklist-question.types';
 import type { DataTableFilters } from '@/hooks/use-data-table';
-import { usePermission } from '@/hooks/use-permission';
 import checklistQuestionRoutes from '@/routes/checklist-questions';
 
-import { ChecklistQuestionDialog } from './checklist-question-dialog';
-import type { ChecklistQuestion } from './columns';
-import { getColumns } from './columns';
-
-interface PaginatedQuestions {
-  data: ChecklistQuestion[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-  from: number | null;
-  to: number | null;
-}
-
 interface ChecklistQuestionsIndexProps {
-  questions: PaginatedQuestions;
+  questions: PaginatedChecklistQuestions;
   filters: DataTableFilters;
 }
 
@@ -34,51 +19,8 @@ export default function ChecklistQuestionsIndex({
   questions,
   filters,
 }: ChecklistQuestionsIndexProps) {
-  const { hasPermission } = usePermission();
-  const [editingQuestion, setEditingQuestion] =
-    useState<ChecklistQuestion | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [deletingQuestion, setDeletingQuestion] =
-    useState<ChecklistQuestion | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const { onSearch, onSort, onPageChange, onPerPageChange, onReset } =
-    useDataTable({ only: ['questions', 'filters'] });
-
-  const onEdit = (question: ChecklistQuestion) => {
-    setEditingQuestion(question);
-    setIsDialogOpen(true);
-  };
-
-  const onDelete = (question: ChecklistQuestion) => {
-    setDeletingQuestion(question);
-  };
-
-  const onCreate = () => {
-    setEditingQuestion(null);
-    setIsDialogOpen(true);
-  };
-
-  const handleConfirmDelete = () => {
-    if (!deletingQuestion) {
-      return;
-    }
-
-    setIsDeleting(true);
-
-    router.delete(
-      checklistQuestionRoutes.destroy.url({
-        checklist_question: deletingQuestion.id,
-      }),
-      {
-        onSuccess: () => {
-          toast.success('Pertanyaan checklist berhasil dihapus.');
-          setDeletingQuestion(null);
-        },
-        onFinish: () => setIsDeleting(false),
-      },
-    );
-  };
+  const { state, actions, hasPermission, dataTable } =
+    useChecklistQuestionsIndex();
 
   return (
     <>
@@ -96,7 +38,7 @@ export default function ChecklistQuestionsIndex({
             </p>
           </div>
           {hasPermission('create checklist-questions') && (
-            <Button onClick={onCreate}>
+            <Button onClick={actions.onCreate}>
               <RiAddLine data-icon="inline-start" />
               Tambah Pertanyaan
             </Button>
@@ -104,37 +46,35 @@ export default function ChecklistQuestionsIndex({
         </div>
 
         <DataTable
-          columns={useMemo(
-            () => getColumns(onEdit, onDelete, hasPermission),
-            [hasPermission],
-          )}
+          columns={state.columns}
           data={questions.data}
           meta={questions}
           filters={filters}
-          onSearch={onSearch}
-          onSort={onSort}
-          onPageChange={onPageChange}
-          onPerPageChange={onPerPageChange}
-          onReset={onReset}
+          onSearch={dataTable.onSearch}
+          onSort={dataTable.onSort}
+          onPageChange={dataTable.onPageChange}
+          onPerPageChange={dataTable.onPerPageChange}
+          onReset={dataTable.onReset}
           searchPlaceholder="Cari berdasarkan pertanyaan atau deskripsi..."
         />
       </div>
 
       <ChecklistQuestionDialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        question={editingQuestion}
+        key={state.editingQuestion?.id ?? 'new'}
+        open={state.isDialogOpen}
+        onOpenChange={actions.setIsDialogOpen}
+        question={state.editingQuestion}
       />
 
       <ConfirmDialog
-        open={!!deletingQuestion}
-        onOpenChange={(open) => !open && setDeletingQuestion(null)}
-        onConfirm={handleConfirmDelete}
+        open={!!state.deletingQuestion}
+        onOpenChange={(open) => !open && actions.setDeletingQuestion(null)}
+        onConfirm={actions.handleConfirmDelete}
         title="Hapus Pertanyaan Checklist"
-        description={`Apakah Anda yakin ingin menghapus "${deletingQuestion?.question}"? Tindakan ini tidak dapat dibatalkan.`}
+        description={`Apakah Anda yakin ingin menghapus "${state.deletingQuestion?.question}"? Data yang dihapus akan dipindahkan ke tempat sampah (Soft Delete).`}
         confirmText="Hapus"
         variant="destructive"
-        loading={isDeleting}
+        loading={state.isDeleting}
       />
     </>
   );

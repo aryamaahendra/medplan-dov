@@ -13,22 +13,9 @@ import { StatusBadge } from '@/components/status-badge';
 import { Badge } from '@/components/ui/badge';
 import { formatDateTime, formatIDR } from '@/lib/formatters';
 import groupRoutes from '@/routes/need-groups';
+import type { NeedGroup } from '../types/need-group.types';
 
-export interface NeedGroup {
-  id: number;
-  name: string;
-  description: string | null;
-  year: number;
-  is_active: boolean;
-  submission_start_at: string | null;
-  submission_end_at: string | null;
-  need_count: number;
-  total_budget: number | null;
-  approved_count: number;
-  priority_count: number;
-  created_at: string;
-}
-export const getColumns = (
+export const getNeedGroupColumns = (
   onEdit: (group: NeedGroup) => void,
   onDelete: (group: NeedGroup) => void,
   hasPermission: (permission: string) => boolean,

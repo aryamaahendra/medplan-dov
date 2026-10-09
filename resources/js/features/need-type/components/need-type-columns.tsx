@@ -7,18 +7,9 @@ import { DataTableColumnHeader } from '@/components/data-table/data-table-column
 import { getIndexColumn } from '@/components/data-table/data-table-index-column';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/formatters';
+import type { NeedType } from '../types/need-type.types';
 
-export interface NeedType {
-  id: number;
-  name: string;
-  code: string;
-  description: string | null;
-  is_active: boolean;
-  order_column: number;
-  created_at: string;
-}
-
-export const getColumns = (
+export const getNeedTypeColumns = (
   onEdit: (type: NeedType) => void,
   onDelete: (type: NeedType) => void,
   hasPermission: (permission: string) => boolean,

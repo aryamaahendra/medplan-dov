@@ -9,8 +9,13 @@ use App\Models\PlanningActivityVersion;
 use App\Models\PlanningVersion;
 use Illuminate\Support\Facades\DB;
 
-final class ClonePlanningVersionAction
+class ClonePlanningVersionAction
 {
+    public function handle(PlanningVersion $source): PlanningVersion
+    {
+        return $this->execute($source);
+    }
+
     public function execute(PlanningVersion $source): PlanningVersion
     {
         return DB::transaction(function () use ($source): PlanningVersion {

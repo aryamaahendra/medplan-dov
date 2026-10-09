@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Need;
 
+use App\DTOs\Need\NeedProposalPayload;
 use App\Models\FundingSource;
 use App\Models\Need;
 use App\Models\NeedAttachment;

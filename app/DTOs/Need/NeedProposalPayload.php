@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Actions\Need;
+namespace App\DTOs\Need;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 
 final readonly class NeedProposalPayload
@@ -41,22 +40,6 @@ final readonly class NeedProposalPayload
         public array $technicalSpecificationAttachmentNames = [],
         public array $deletedAttachmentIds = [],
     ) {}
-
-    /**
-     * Build proposal payload from an HTTP Request.
-     */
-    public static function fromRequest(Request $request): self
-    {
-        $validated = method_exists($request, 'validated') ? $request->validated() : $request->all();
-
-        return self::fromArray(
-            data: $validated,
-            attachments: $request->file('attachments') ?? [],
-            attachmentNames: (array) $request->input('attachment_names', []),
-            technicalSpecificationAttachments: $request->file('technical_specification_attachments') ?? [],
-            technicalSpecificationAttachmentNames: (array) $request->input('technical_specification_attachment_names', []),
-        );
-    }
 
     /**
      * Build proposal payload from array data and optional uploaded files.

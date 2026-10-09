@@ -1,7 +1,7 @@
 <?php
 
 use App\Actions\Need\NeedProposalEngine;
-use App\Actions\Need\NeedProposalPayload;
+use App\DTOs\Need\NeedProposalPayload;
 use App\Models\Indicator;
 use App\Models\KpiIndicator;
 use App\Models\Need;

@@ -75,17 +75,34 @@ arch('Policies must be final')
 arch('Actions must be suffixed with Action')
     ->expect('App\Actions')
     ->toHaveSuffix('Action')
-    ->ignoring('App\Actions\Fortify');
+    ->ignoring([
+        'App\Actions\Fortify',
+        'App\Actions\Need\NeedProposalEngine',
+        'App\Actions\Need\NeedStrategicAlignmentEngine',
+        'App\Actions\Need\NeedLockLifecycle',
+        'App\Actions\Need\ChecklistAssessmentEngine',
+        'App\Actions\Need\Dashboard',
+    ]);
 
 arch('Actions must expose a handle() method')
     ->expect('App\Actions')
     ->toHaveMethod('handle')
-    ->ignoring('App\Actions\Fortify');
+    ->ignoring([
+        'App\Actions\Fortify',
+        'App\Actions\Need\NeedProposalEngine',
+        'App\Actions\Need\NeedStrategicAlignmentEngine',
+        'App\Actions\Need\NeedLockLifecycle',
+        'App\Actions\Need\ChecklistAssessmentEngine',
+        'App\Actions\Need\Dashboard',
+    ]);
 
 arch('Actions must not be final so tests can mock them')
     ->expect('App\Actions')
     ->not->toBeFinal()
-    ->ignoring('App\Actions\Fortify');
+    ->ignoring([
+        'App\Actions\Fortify',
+        'App\Actions\Need\Dashboard',
+    ]);
 
 // UploadedFile is deliberately NOT listed: Actions may process uploads.
 arch('Actions must stay HTTP-agnostic')

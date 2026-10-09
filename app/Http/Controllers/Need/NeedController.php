@@ -7,8 +7,8 @@ namespace App\Http\Controllers\Need;
 use App\Actions\Need\GetFilteredNeedsAction;
 use App\Actions\Need\NeedLockLifecycle;
 use App\Actions\Need\NeedProposalEngine;
-use App\Actions\Need\NeedProposalPayload;
 use App\Actions\Need\NeedStrategicAlignmentEngine;
+use App\DTOs\Need\NeedProposalPayload;
 use App\Enums\Kldi;
 use App\Enums\SatkerSkpd;
 use App\Http\Controllers\Controller;
@@ -100,7 +100,13 @@ final class NeedController extends Controller
     {
         $needGroup = NeedGroup::query()->find($request->input('need_group_id'));
         $this->authorize('create', [Need::class, $needGroup]);
-        $need = $engine->submit(NeedProposalPayload::fromRequest($request));
+        $need = $engine->submit(NeedProposalPayload::fromArray(
+            data: $request->validated(),
+            attachments: $request->file('attachments') ?? [],
+            attachmentNames: (array) $request->input('attachment_names', []),
+            technicalSpecificationAttachments: $request->file('technical_specification_attachments') ?? [],
+            technicalSpecificationAttachmentNames: (array) $request->input('technical_specification_attachment_names', []),
+        ));
 
         return redirect()->route('needs.index', ['need_group_id' => $need->need_group_id])
             ->with('success', 'Usulan kebutuhan berhasil dibuat.');
@@ -155,7 +161,13 @@ final class NeedController extends Controller
     public function update(UpdateNeedRequest $request, Need $need, NeedProposalEngine $engine): RedirectResponse
     {
         $this->authorize('update', $need);
-        $engine->update($need, NeedProposalPayload::fromRequest($request));
+        $engine->update($need, NeedProposalPayload::fromArray(
+            data: $request->validated(),
+            attachments: $request->file('attachments') ?? [],
+            attachmentNames: (array) $request->input('attachment_names', []),
+            technicalSpecificationAttachments: $request->file('technical_specification_attachments') ?? [],
+            technicalSpecificationAttachmentNames: (array) $request->input('technical_specification_attachment_names', []),
+        ));
 
         return redirect()->route('needs.index', ['need_group_id' => $need->need_group_id])
             ->with('success', 'Usulan kebutuhan berhasil diperbarui.');

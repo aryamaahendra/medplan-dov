@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Actions\Need\NeedProposalPayload;
 use App\Actions\Need\NeedStrategicAlignmentEngine;
+use App\DTOs\Need\NeedProposalPayload;
 use App\Models\Indicator;
 use App\Models\KpiGroup;
 use App\Models\KpiIndicator;

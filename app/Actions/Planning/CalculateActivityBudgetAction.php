@@ -16,6 +16,14 @@ class CalculateActivityBudgetAction
     /**
      * Synchronize all budgets for the given version asynchronously.
      */
+    public function handle(PlanningVersion $version): void
+    {
+        $this->recalculateVersion($version);
+    }
+
+    /**
+     * Synchronize all budgets for the given version asynchronously.
+     */
     public function recalculateVersion(PlanningVersion $version): void
     {
         $vId = $version->id;

@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Cache;
  * High-level coordinator and facade for multi-variant Needs dashboard analytics.
  * Delegates specialized metrics calculation to focused domain calculators.
  */
-final class GetNeedDashboardStatsAction
+class GetNeedDashboardStatsAction
 {
     /**
      * Cache TTL in seconds (60s as per planning spec).
@@ -39,6 +39,11 @@ final class GetNeedDashboardStatsAction
      *
      * @return array<string, mixed>
      */
+    public function handle(int|string|null $groupId, ?User $user = null, ?int $compareGroupId = null): array
+    {
+        return $this->getDashboardPayload($groupId, $user, $compareGroupId);
+    }
+
     public function getDashboardPayload(int|string|null $groupId, ?User $user = null, ?int $compareGroupId = null): array
     {
         if (! $groupId) {

@@ -25,6 +25,11 @@ class RolloverNeedAction
     /**
      * Rollover (clone) a single unapproved need into a target need group.
      */
+    public function handle(Need $sourceNeed, NeedGroup $targetGroup, ?User $actor = null): Need
+    {
+        return $this->execute($sourceNeed, $targetGroup, $actor);
+    }
+
     public function execute(Need $sourceNeed, NeedGroup $targetGroup, ?User $actor = null): Need
     {
         return DB::transaction(function () use ($sourceNeed, $targetGroup) {

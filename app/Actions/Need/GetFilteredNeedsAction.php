@@ -21,6 +21,11 @@ class GetFilteredNeedsAction
      *
      * @param  array<string, mixed>  $filters
      */
+    public function handle(array $filters, User $user): Builder
+    {
+        return $this->execute($filters, $user);
+    }
+
     public function execute(array $filters, User $user): Builder
     {
         $query = Need::query()

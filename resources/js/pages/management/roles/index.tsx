@@ -1,79 +1,17 @@
-import { Head, router, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { RiAddLine } from '@remixicon/react';
-import { useMemo, useState } from 'react';
-import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
 
-import { useDataTable } from '@/hooks/use-data-table';
-import type { DataTableFilters } from '@/hooks/use-data-table';
-import { usePermission } from '@/hooks/use-permission';
+import { useRolesIndex } from '@/features/role/hooks/use-roles-index';
+import type { RolesIndexProps } from '@/features/role/hooks/use-roles-index';
 import rolesRoutes from '@/routes/roles';
-import { getColumns } from './columns';
-import type { Role } from './columns';
 
-interface PaginatedRoles {
-  data: Role[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-  from: number | null;
-  to: number | null;
-}
-
-interface RolesIndexProps {
-  roles: PaginatedRoles;
-  filters: DataTableFilters;
-}
-
-export default function RolesIndex({ roles, filters }: RolesIndexProps) {
-  const { hasPermission } = usePermission();
-  const [deletingRole, setDeletingRole] = useState<Role | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const { onSearch, onSort, onPageChange, onPerPageChange, onReset } =
-    useDataTable({
-      only: ['roles', 'filters'],
-    });
-
-  const onEdit = (role: Role) => {
-    if (role.name.toLowerCase() === 'superadmin') {
-      toast.error('Cannot edit Superadmin role.');
-
-      return;
-    }
-
-    router.visit(rolesRoutes.edit.url({ role: role.id }));
-  };
-
-  const onDelete = (role: Role) => {
-    if (role.name.toLowerCase() === 'superadmin') {
-      toast.error('Cannot delete Superadmin role.');
-
-      return;
-    }
-
-    setDeletingRole(role);
-  };
-
-  const handleConfirmDelete = () => {
-    if (!deletingRole) {
-      return;
-    }
-
-    setIsDeleting(true);
-
-    router.delete(rolesRoutes.destroy.url({ role: deletingRole.id }), {
-      onSuccess: () => {
-        toast.success('Role deleted successfully.');
-        setDeletingRole(null);
-      },
-      onFinish: () => setIsDeleting(false),
-    });
-  };
+export default function RolesIndex(props: RolesIndexProps) {
+  const { state, handlers, table, hasPermission, roles, filters } =
+    useRolesIndex(props);
 
   return (
     <>
@@ -100,31 +38,28 @@ export default function RolesIndex({ roles, filters }: RolesIndexProps) {
         </div>
 
         <DataTable
-          columns={useMemo(
-            () => getColumns(onEdit, onDelete, hasPermission),
-            [hasPermission],
-          )}
+          columns={table.columns}
           data={roles.data}
           meta={roles}
           filters={filters}
-          onSearch={onSearch}
-          onSort={onSort}
-          onPageChange={onPageChange}
-          onPerPageChange={onPerPageChange}
-          onReset={onReset}
+          onSearch={table.onSearch}
+          onSort={table.onSort}
+          onPageChange={table.onPageChange}
+          onPerPageChange={table.onPerPageChange}
+          onReset={table.onReset}
           searchPlaceholder="Search by name..."
         />
       </div>
 
       <ConfirmDialog
-        open={!!deletingRole}
-        onOpenChange={(open) => !open && setDeletingRole(null)}
-        onConfirm={handleConfirmDelete}
+        open={!!state.deletingRole}
+        onOpenChange={(open) => !open && handlers.setDeletingRole(null)}
+        onConfirm={handlers.handleConfirmDelete}
         title="Delete Role"
-        description={`Are you sure you want to delete the ${deletingRole?.name} role? This action cannot be undone.`}
+        description={`Are you sure you want to delete the ${state.deletingRole?.name} role? This action cannot be undone.`}
         confirmText="Delete Role"
         variant="destructive"
-        loading={isDeleting}
+        loading={state.isDeleting}
       />
     </>
   );

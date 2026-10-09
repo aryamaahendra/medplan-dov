@@ -1,8 +1,7 @@
 import { Head } from '@inertiajs/react';
+import type { Permission, Role } from '@/features/role/components/role-columns';
+import { RoleForm } from '@/features/role/components/role-form';
 import rolesRoutes from '@/routes/roles';
-import type { Permission } from '../permissions/columns';
-import type { Role } from './columns';
-import { RoleForm } from './role-form';
 
 interface RoleEditProps {
   role: Role;

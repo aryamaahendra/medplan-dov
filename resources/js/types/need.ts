@@ -133,3 +133,20 @@ export interface PaginatedNeeds {
   from: number | null;
   to: number | null;
 }
+
+export interface StageCounts {
+  all: number;
+  draft: number;
+  under_review: number;
+  approved: number;
+  rejected: number;
+  locked: number;
+}
+
+export interface AttentionCounts {
+  low_checklist: number;
+  revision_closing: number;
+  submission_closing: number;
+  has_notes: number;
+  priority_only: number;
+}

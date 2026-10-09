@@ -7,7 +7,7 @@ import {
 } from '@remixicon/react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { Need } from '@/types';
+import type { AttentionCounts, Need } from '@/types';
 
 export type AttentionFilterKey =
   | 'low_checklist'
@@ -18,16 +18,16 @@ export type AttentionFilterKey =
 
 interface NeedsAttentionStripProps {
   needs: Need[];
+  attentionCounts?: AttentionCounts;
   activeFilter: AttentionFilterKey | null;
   onFilterChange: (filter: AttentionFilterKey | null) => void;
 }
-
 export function NeedsAttentionStrip({
   needs,
+  attentionCounts,
   activeFilter,
   onFilterChange,
 }: NeedsAttentionStripProps) {
-  // Compute attention counts from current page data
   const now = new Date().getTime();
   const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
 
@@ -70,35 +70,35 @@ export function NeedsAttentionStrip({
     {
       key: 'low_checklist',
       label: 'Checklist < 85%',
-      count: lowChecklistCount,
+      count: attentionCounts?.low_checklist ?? lowChecklistCount,
       icon: RiErrorWarningLine,
       badgeVariant: 'outline',
     },
     {
       key: 'revision_closing',
       label: 'Revisi Berakhir Segera',
-      count: revisionClosingCount,
+      count: attentionCounts?.revision_closing ?? revisionClosingCount,
       icon: RiTimeLine,
       badgeVariant: 'outline',
     },
     {
       key: 'submission_closing',
       label: 'Periode Segera Ditutup',
-      count: submissionClosingCount,
+      count: attentionCounts?.submission_closing ?? submissionClosingCount,
       icon: RiCalendarLine,
       badgeVariant: 'outline',
     },
     {
       key: 'has_notes',
       label: 'Catatan Direktur',
-      count: hasNotesCount,
+      count: attentionCounts?.has_notes ?? hasNotesCount,
       icon: RiChat1Line,
       badgeVariant: 'outline',
     },
     {
       key: 'priority_only',
       label: 'Prioritas Saja',
-      count: priorityCount,
+      count: attentionCounts?.priority_only ?? priorityCount,
       icon: RiStarFill,
       badgeVariant: 'destructive',
     },

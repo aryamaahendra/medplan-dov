@@ -6,8 +6,10 @@ namespace App\Actions\Need;
 
 use App\Exceptions\Need\NeedExceptionCatalog;
 use App\Models\Need;
+use App\Models\NeedGroup;
 use App\Models\OrganizationalUnit;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 
 class GetFilteredNeedsAction
@@ -63,6 +65,8 @@ class GetFilteredNeedsAction
                             $sub->orWhere(function ($draft) {
                                 $draft->where('status', 'draft')->whereNull('approved_by_director_at');
                             });
+                        } elseif ($stage === 'locked') {
+                            $sub->orWhere('is_locked', true);
                         }
                     }
                 });
@@ -144,5 +148,78 @@ class GetFilteredNeedsAction
         }
 
         return $ids;
+    }
+
+    /**
+     * Compute aggregate counts for stage tabs and attention chips across all matching needs.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return array{
+     *     stageCounts: array{all: int, draft: int, under_review: int, approved: int, rejected: int, locked: int},
+     *     attentionCounts: array{low_checklist: int, revision_closing: int, submission_closing: int, has_notes: int, priority_only: int}
+     * }
+     */
+    public function getIndexCounts(
+        array $filters,
+        User $user,
+        ?NeedGroup $currentGroup = null,
+        ?string $search = null,
+    ): array {
+        $baseFilters = $filters;
+        unset($baseFilters['stage'], $baseFilters['attention']);
+
+        $query = $this->execute($baseFilters, $user);
+
+        if ($search !== null && $search !== '') {
+            $query->where(function (Builder $q) use ($search): void {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        $now = CarbonImmutable::now('Asia/Makassar');
+        $nowStr = $now->toDateTimeString();
+        $threeDaysAheadStr = $now->addDays(NeedExceptionCatalog::REVISION_CLOSING_DAYS)->toDateTimeString();
+        $minChecklist = NeedExceptionCatalog::MIN_CHECKLIST_PERCENTAGE;
+
+        $isSubmissionClosing = $currentGroup?->submission_end_at !== null
+            && $now->lte($currentGroup->submission_end_at)
+            && $now->addDays(NeedExceptionCatalog::SUBMISSION_CLOSING_DAYS)->gte($currentGroup->submission_end_at);
+
+        /** @var object{all_count?: int|string, draft_count?: int|string, under_review_count?: int|string, approved_count?: int|string, rejected_count?: int|string, locked_count?: int|string, low_checklist_count?: int|string, revision_closing_count?: int|string, has_notes_count?: int|string, priority_count?: int|string}|null $aggregates */
+        $aggregates = (clone $query)
+            ->toBase()
+            ->cloneWithout(['columns', 'orders'])
+            ->selectRaw("
+                COUNT(*) as all_count,
+                COUNT(CASE WHEN status = 'draft' AND approved_by_director_at IS NULL THEN 1 END) as draft_count,
+                COUNT(CASE WHEN status = 'approved' AND approved_by_director_at IS NULL THEN 1 END) as under_review_count,
+                COUNT(CASE WHEN approved_by_director_at IS NOT NULL THEN 1 END) as approved_count,
+                COUNT(CASE WHEN status = 'rejected' THEN 1 END) as rejected_count,
+                COUNT(CASE WHEN is_locked = true THEN 1 END) as locked_count,
+                COUNT(CASE WHEN checklist_percentage > 0 AND checklist_percentage < {$minChecklist} AND approved_by_director_at IS NULL THEN 1 END) as low_checklist_count,
+                COUNT(CASE WHEN (unlocked_until IS NOT NULL AND unlocked_until >= '{$nowStr}' AND unlocked_until <= '{$threeDaysAheadStr}') OR (is_locked = true AND status = 'draft' AND checklist_percentage < {$minChecklist}) THEN 1 END) as revision_closing_count,
+                COUNT(CASE WHEN notes IS NOT NULL AND notes != '' THEN 1 END) as has_notes_count,
+                COUNT(CASE WHEN is_priority = true THEN 1 END) as priority_count
+            ")
+            ->first();
+
+        return [
+            'stageCounts' => [
+                'all' => (int) ($aggregates->all_count ?? 0),
+                'draft' => (int) ($aggregates->draft_count ?? 0),
+                'under_review' => (int) ($aggregates->under_review_count ?? 0),
+                'approved' => (int) ($aggregates->approved_count ?? 0),
+                'rejected' => (int) ($aggregates->rejected_count ?? 0),
+                'locked' => (int) ($aggregates->locked_count ?? 0),
+            ],
+            'attentionCounts' => [
+                'low_checklist' => (int) ($aggregates->low_checklist_count ?? 0),
+                'revision_closing' => (int) ($aggregates->revision_closing_count ?? 0),
+                'submission_closing' => $isSubmissionClosing ? (int) ($aggregates->draft_count ?? 0) : 0,
+                'has_notes' => (int) ($aggregates->has_notes_count ?? 0),
+                'priority_only' => (int) ($aggregates->priority_count ?? 0),
+            ],
+        ];
     }
 }

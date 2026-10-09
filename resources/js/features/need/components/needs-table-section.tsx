@@ -1,24 +1,31 @@
 import { DataTable } from '@/components/data-table/data-table';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { UseDataTableReturn } from '@/hooks/use-data-table';
+import type { NeedsIndexFilters } from '@/pages/need/needs';
 import { NeedGridView } from '@/pages/need/needs/components/need-grid-view';
 import { NeedListView } from '@/pages/need/needs/components/need-list-view';
 import { NeedsStageTabs } from '@/pages/need/needs/components/needs-stage-tabs';
 import { NeedsTableToolbar } from '@/pages/need/needs/components/needs-table-toolbar';
-import type { PaginatedNeeds } from '@/types';
-import type { useNeedsIndex } from '../hooks/use-needs-index';
+import type { AttentionCounts, PaginatedNeeds } from '@/types';
+import type {
+  UseNeedsIndexActions,
+  UseNeedsIndexState,
+} from '../hooks/use-needs-index';
 
 interface NeedsTableSectionProps {
   needs: PaginatedNeeds;
-  filters: any;
+  attentionCounts: AttentionCounts;
+  filters: NeedsIndexFilters;
   organizationalUnits: { id: number; name: string; parent_id: number | null }[];
   needTypes: { id: number; name: string }[];
-  state: ReturnType<typeof useNeedsIndex>['state'];
-  actions: ReturnType<typeof useNeedsIndex>['actions'];
-  dataTable: ReturnType<typeof useNeedsIndex>['dataTable'];
+  state: UseNeedsIndexState;
+  actions: UseNeedsIndexActions;
+  dataTable: UseDataTableReturn;
 }
 
 export function NeedsTableSection({
   needs,
+  attentionCounts,
   filters,
   organizationalUnits,
   needTypes,
@@ -98,7 +105,7 @@ export function NeedsTableSection({
             mergeParams={dataTable.mergeParams}
             viewMode={state.viewMode}
             setViewMode={actions.setViewMode}
-            needs={needs.data}
+            attentionCounts={attentionCounts}
             activeAttentionFilter={state.attentionFilter}
             onAttentionFilterChange={actions.setAttentionFilter}
           />

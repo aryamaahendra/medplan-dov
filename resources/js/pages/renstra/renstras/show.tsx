@@ -8,7 +8,6 @@ import { useRenstraShow } from '@/features/renstra/hooks/use-renstra-show';
 import renstraRoutes from '@/routes/renstras';
 import type { Renstra } from '@/types';
 
-
 interface RenstraShowProps {
   renstra: Renstra;
 }

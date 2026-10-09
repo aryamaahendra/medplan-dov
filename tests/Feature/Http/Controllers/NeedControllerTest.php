@@ -77,6 +77,9 @@ test('index renders the correct component and props', function () {
             ->has('organizationalUnits')
             ->has('needTypes')
             ->has('filters')
+            ->has('stageCounts')
+            ->has('attentionCounts')
+            ->where('stageCounts.all', 3)
         );
 });
 
@@ -466,4 +469,83 @@ test('destroy soft-deletes a need', function () {
         ->assertSessionHas('success', 'Usulan kebutuhan berhasil dihapus.');
 
     $this->assertSoftDeleted($need);
+});
+
+test('index calculates stage and attention counts across all items, not just current page', function () {
+    $user = User::factory()->create();
+    $user->assignRole('super-admin');
+    $group = NeedGroup::factory()->create(['is_active' => true]);
+    $unit = OrganizationalUnit::factory()->create();
+    $needType = NeedType::factory()->create();
+
+    // Create 20 items: 10 draft, 5 approved by director, 5 rejected
+    Need::factory()->count(10)->create([
+        'need_group_id' => $group->id,
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $needType->id,
+        'status' => 'draft',
+        'approved_by_director_at' => null,
+        'is_locked' => false,
+    ]);
+    Need::factory()->count(5)->create([
+        'need_group_id' => $group->id,
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $needType->id,
+        'status' => 'approved',
+        'approved_by_director_at' => now(),
+        'is_locked' => true,
+    ]);
+    Need::factory()->count(5)->create([
+        'need_group_id' => $group->id,
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $needType->id,
+        'status' => 'rejected',
+        'approved_by_director_at' => null,
+        'is_locked' => false,
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('needs.index', ['need_group_id' => $group->id]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('need/needs/index')
+            ->has('needs.data', 15) // default 15 items on page 1
+            ->where('stageCounts.all', 20) // total across ALL pages
+            ->where('stageCounts.draft', 10)
+            ->where('stageCounts.approved', 5)
+            ->where('stageCounts.rejected', 5)
+            ->where('stageCounts.locked', 5)
+        );
+});
+
+test('index can filter by locked stage', function () {
+    $user = User::factory()->create();
+    $user->assignRole('super-admin');
+    $group = NeedGroup::factory()->create(['is_active' => true]);
+    $unit = OrganizationalUnit::factory()->create();
+    $needType = NeedType::factory()->create();
+
+    Need::factory()->create([
+        'need_group_id' => $group->id,
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $needType->id,
+        'is_locked' => true,
+    ]);
+    Need::factory()->create([
+        'need_group_id' => $group->id,
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $needType->id,
+        'is_locked' => false,
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('needs.index', ['need_group_id' => $group->id, 'stage' => 'locked']))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('need/needs/index')
+            ->has('needs.data', 1)
+            ->where('needs.data.0.is_locked', true)
+            ->where('stageCounts.all', 2)
+            ->where('stageCounts.locked', 1)
+        );
 });

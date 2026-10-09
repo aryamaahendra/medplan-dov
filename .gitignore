@@ -33,3 +33,5 @@ frankenphp-worker.php
 .scratch
 *.tsbuildinfo
 /docs/tmp
+/database/*.sqlite
+/database/*.sql

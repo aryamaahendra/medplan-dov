@@ -1,13 +1,20 @@
 import { router } from '@inertiajs/react';
-import { useMemo, useState } from 'react';
+import type { ColumnDef } from '@tanstack/react-table';
+import { useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import needExportActions from '@/actions/App/Http/Controllers/Need/NeedExportController';
+import type { UseDataTableReturn } from '@/hooks/use-data-table';
 import { useDataTable } from '@/hooks/use-data-table';
 import { useViewMode } from '@/hooks/use-view-mode';
-import { getNeedWorkflowStage } from '@/lib/need-workflow';
+import type { NeedsIndexFilters } from '@/pages/need/needs';
 import needRoutes from '@/routes/needs';
-import type { Need, PaginatedNeeds } from '@/types';
+import type {
+  AttentionCounts,
+  Need,
+  PaginatedNeeds,
+  StageCounts,
+} from '@/types';
 import { getNeedColumns } from '../components/need-columns';
 
 export type StageTabKey =
@@ -23,16 +30,60 @@ export type AttentionFilterKey =
 export interface UseNeedsIndexProps {
   needs: PaginatedNeeds;
   currentGroup: { id: number; name: string; year?: number };
+  stageCounts?: StageCounts;
+  attentionCounts?: AttentionCounts;
+  filters?: NeedsIndexFilters;
 }
 
-export function useNeedsIndex({ needs, currentGroup }: UseNeedsIndexProps) {
+export interface UseNeedsIndexState {
+  viewMode: 'table' | 'grid' | 'list' | 'loading';
+  selectedDrawerNeed: Need | null;
+  currentStageTab: StageTabKey;
+  attentionFilter: AttentionFilterKey | null;
+  deletingNeed: Need | null;
+  isDeleting: boolean;
+  reviewingNeedId: number | null;
+  lockingNeed: Need | null;
+  lockDialogMode: 'lock' | 'unlock';
+  isLockDialogOpen: boolean;
+  stageCounts: StageCounts;
+  processedNeeds: Need[];
+  columns: ColumnDef<Need, unknown>[];
+}
+
+export interface UseNeedsIndexActions {
+  setViewMode: (mode: 'table' | 'grid' | 'list') => void;
+  setSelectedDrawerNeed: (need: Need | null) => void;
+  setCurrentStageTab: (stage: StageTabKey) => void;
+  setAttentionFilter: (key: AttentionFilterKey | null) => void;
+  setDeletingNeed: (need: Need | null) => void;
+  setReviewingNeedId: (id: number | null) => void;
+  setIsLockDialogOpen: (open: boolean) => void;
+  onEdit: (need: Need) => void;
+  onCreate: () => void;
+  onDelete: (need: Need) => void;
+  onReview: (need: Need) => void;
+  onLock: (need: Need) => void;
+  onUnlock: (need: Need) => void;
+  onExport: () => void;
+  handleConfirmDelete: () => void;
+}
+
+export interface UseNeedsIndexReturn {
+  state: UseNeedsIndexState;
+  actions: UseNeedsIndexActions;
+  dataTable: UseDataTableReturn;
+}
+export function useNeedsIndex({
+  needs,
+  currentGroup,
+  stageCounts: serverStageCounts,
+  filters,
+}: UseNeedsIndexProps): UseNeedsIndexReturn {
   const [viewMode, setViewMode] = useViewMode();
   const [selectedDrawerNeed, setSelectedDrawerNeed] = useState<Need | null>(
     null,
   );
-  const [currentStageTab, setCurrentStageTab] = useState<StageTabKey>('all');
-  const [attentionFilter, setAttentionFilter] =
-    useState<AttentionFilterKey | null>(null);
 
   const [deletingNeed, setDeletingNeed] = useState<Need | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -43,8 +94,39 @@ export function useNeedsIndex({ needs, currentGroup }: UseNeedsIndexProps) {
   );
   const [isLockDialogOpen, setIsLockDialogOpen] = useState(false);
 
-  const dataTable = useDataTable({ only: ['needs', 'filters'] });
+  const dataTable = useDataTable({
+    only: ['needs', 'filters', 'stageCounts', 'attentionCounts'],
+  });
 
+  const currentStageTab: StageTabKey =
+    ((Array.isArray(filters?.stage)
+      ? filters.stage[0]
+      : filters?.stage) as StageTabKey) || 'all';
+
+  const setCurrentStageTab = useCallback(
+    (stage: StageTabKey) => {
+      dataTable.mergeParams({
+        stage: stage === 'all' ? undefined : stage,
+        page: 1,
+      });
+    },
+    [dataTable],
+  );
+
+  const attentionFilter: AttentionFilterKey | null =
+    ((Array.isArray(filters?.attention)
+      ? filters.attention[0]
+      : filters?.attention) as AttentionFilterKey) || null;
+
+  const setAttentionFilter = useCallback(
+    (key: AttentionFilterKey | null) => {
+      dataTable.mergeParams({
+        attention: key || undefined,
+        page: 1,
+      });
+    },
+    [dataTable],
+  );
   const onEdit = (need: Need) => {
     router.visit(needRoutes.edit.url({ need: need.id }));
   };
@@ -83,7 +165,7 @@ export function useNeedsIndex({ needs, currentGroup }: UseNeedsIndexProps) {
     }
 
     window.location.href = needExportActions.url({
-      query: Object.fromEntries(params) as any,
+      query: Object.fromEntries(params) as unknown as Record<string, string>,
     });
   };
 
@@ -117,102 +199,21 @@ export function useNeedsIndex({ needs, currentGroup }: UseNeedsIndexProps) {
   );
 
   const stageCounts = useMemo(() => {
-    const counts = {
-      all: needs.data.length,
+    if (serverStageCounts) {
+      return serverStageCounts;
+    }
+
+    return {
+      all: needs.total ?? needs.data.length,
       draft: 0,
       under_review: 0,
       approved: 0,
       rejected: 0,
       locked: 0,
     };
+  }, [serverStageCounts, needs.total, needs.data.length]);
 
-    for (const need of needs.data) {
-      const stage = getNeedWorkflowStage(need);
-      counts[stage] = (counts[stage] || 0) + 1;
-
-      if (need.is_locked) {
-        counts.locked += 1;
-      }
-    }
-
-    return counts;
-  }, [needs.data]);
-
-  const processedNeeds = useMemo(() => {
-    const now = new Date().getTime();
-    const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
-
-    return needs.data.filter((need) => {
-      if (currentStageTab !== 'all') {
-        if (currentStageTab === 'locked') {
-          if (!need.is_locked) {
-            return false;
-          }
-        } else {
-          const stage = getNeedWorkflowStage(need);
-
-          if (stage !== currentStageTab) {
-            return false;
-          }
-        }
-      }
-
-      if (attentionFilter) {
-        switch (attentionFilter) {
-          case 'low_checklist': {
-            const pct = Number(need.checklist_percentage || 0);
-
-            if (pct >= 85 || pct === 0) {
-              return false;
-            }
-
-            break;
-          }
-          case 'revision_closing': {
-            if (!need.unlocked_until) {
-              return false;
-            }
-
-            const revDiff = new Date(need.unlocked_until).getTime() - now;
-
-            if (revDiff <= 0 || revDiff > threeDaysMs) {
-              return false;
-            }
-
-            break;
-          }
-          case 'submission_closing': {
-            if (!need.group_submission_end_at) {
-              return false;
-            }
-
-            const subDiff =
-              new Date(need.group_submission_end_at).getTime() - now;
-
-            if (subDiff <= 0 || subDiff > threeDaysMs) {
-              return false;
-            }
-
-            break;
-          }
-          case 'has_notes':
-            if (!need.notes) {
-              return false;
-            }
-
-            break;
-          case 'priority_only':
-            if (!need.is_priority) {
-              return false;
-            }
-
-            break;
-        }
-      }
-
-      return true;
-    });
-  }, [needs.data, currentStageTab, attentionFilter]);
+  const processedNeeds = needs.data;
 
   return {
     state: {

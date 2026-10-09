@@ -20,9 +20,8 @@ import { ButtonGroup } from '@/components/ui/button-group';
 import { Switch } from '@/components/ui/switch';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import { cn } from '@/lib/utils';
-import type { Need } from '@/types';
+import type { AttentionCounts } from '@/types';
 import type { AttentionFilterKey } from './needs-attention-strip';
-
 export type { AttentionFilterKey };
 
 interface NeedsTableToolbarProps {
@@ -39,12 +38,12 @@ interface NeedsTableToolbarProps {
   };
   organizationalUnits: { id: number; name: string; parent_id: number | null }[];
   needTypes: { id: number; name: string }[];
-  mergeParams: (params: Record<string, any>) => void;
+  mergeParams: (params: DataTableFilters) => void;
   viewMode: 'table' | 'grid' | 'list' | 'loading';
   setViewMode: (mode: 'table' | 'grid' | 'list') => void;
 
   // Quick filter attention strip integration
-  needs: Need[];
+  attentionCounts?: AttentionCounts;
   activeAttentionFilter: AttentionFilterKey | null;
   onAttentionFilterChange: (filter: AttentionFilterKey | null) => void;
 }
@@ -56,7 +55,7 @@ export function NeedsTableToolbar({
   mergeParams,
   viewMode,
   setViewMode,
-  needs,
+  attentionCounts,
   activeAttentionFilter,
   onAttentionFilterChange,
 }: NeedsTableToolbarProps) {
@@ -90,53 +89,6 @@ export function NeedsTableToolbar({
   // Advance switch state: true = Advance (faceted filters), false = Simple (quick filter pills)
   const [isAdvance, setIsAdvance] = useState(() => activeManualCount > 0);
 
-  // Compute attention counts from current page data
-  const now = new Date().getTime();
-  const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
-
-  const lowChecklistCount = useMemo(
-    () => needs.filter((n) => Number(n.checklist_percentage || 0) < 80).length,
-    [needs],
-  );
-
-  const revisionClosingCount = useMemo(
-    () =>
-      needs.filter((n) => {
-        if (!n.unlocked_until) {
-          return false;
-        }
-
-        const diff = new Date(n.unlocked_until).getTime() - now;
-
-        return diff > 0 && diff <= threeDaysMs;
-      }).length,
-    [needs, now, threeDaysMs],
-  );
-
-  const submissionClosingCount = useMemo(
-    () =>
-      needs.filter((n) => {
-        if (!n.group_submission_end_at) {
-          return false;
-        }
-
-        const diff = new Date(n.group_submission_end_at).getTime() - now;
-
-        return diff > 0 && diff <= threeDaysMs;
-      }).length,
-    [needs, now, threeDaysMs],
-  );
-
-  const hasNotesCount = useMemo(
-    () => needs.filter((n) => Boolean(n.notes)).length,
-    [needs],
-  );
-
-  const priorityCount = useMemo(
-    () => needs.filter((n) => Boolean(n.is_priority)).length,
-    [needs],
-  );
-
   const attentionChips: Array<{
     key: AttentionFilterKey;
     label: string;
@@ -145,36 +97,35 @@ export function NeedsTableToolbar({
   }> = [
     {
       key: 'low_checklist',
-      label: 'Checklist < 80%',
-      count: lowChecklistCount,
+      label: 'Checklist < 85%',
+      count: attentionCounts?.low_checklist ?? 0,
       icon: RiErrorWarningLine,
     },
     {
       key: 'revision_closing',
       label: 'Revisi Berakhir Segera',
-      count: revisionClosingCount,
+      count: attentionCounts?.revision_closing ?? 0,
       icon: RiTimeLine,
     },
     {
       key: 'submission_closing',
       label: 'Periode Segera Ditutup',
-      count: submissionClosingCount,
+      count: attentionCounts?.submission_closing ?? 0,
       icon: RiCalendarLine,
     },
     {
       key: 'has_notes',
       label: 'Catatan Direktur',
-      count: hasNotesCount,
+      count: attentionCounts?.has_notes ?? 0,
       icon: RiChat1Line,
     },
     {
       key: 'priority_only',
       label: 'Prioritas Saja',
-      count: priorityCount,
+      count: attentionCounts?.priority_only ?? 0,
       icon: RiStarFill,
     },
   ];
-
   // Options for manual faceted filters
   const statusOptions = [
     { label: 'Draft', value: 'draft', icon: RiTimeLine },

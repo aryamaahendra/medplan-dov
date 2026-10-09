@@ -76,6 +76,13 @@ final class NeedController extends Controller
             'attention' => $request->input('attention'),
             'include_descendants' => $request->boolean('include_descendants'),
         ];
+        $counts = $action->getIndexCounts(
+            $filters,
+            $request->user(),
+            $currentGroup,
+            $request->string('search')->trim()->value() ?: null
+        );
+
         $query = $action->execute($filters, $request->user());
 
         $needs = $this->applyDataTable(
@@ -90,6 +97,8 @@ final class NeedController extends Controller
         return Inertia::render('need/needs/index', [
             'needs' => $needs,
             'currentGroup' => $currentGroup,
+            'stageCounts' => $counts['stageCounts'],
+            'attentionCounts' => $counts['attentionCounts'],
             'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name', 'parent_id'])->get(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
             'filters' => array_merge($this->dataTableFilters($request), $filters),

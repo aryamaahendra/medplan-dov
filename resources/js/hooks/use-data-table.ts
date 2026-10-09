@@ -10,7 +10,16 @@ export interface DataTableFilters {
   direction?: 'asc' | 'desc' | '';
   per_page?: number;
   page?: number;
-  [key: string]: string | number | string[] | undefined;
+  [key: string]: string | number | boolean | string[] | undefined;
+}
+
+export interface UseDataTableReturn {
+  onSearch: (value: string) => void;
+  onSort: (column: string, direction?: 'asc' | 'desc') => void;
+  onPageChange: (page: number) => void;
+  onPerPageChange: (perPage: number) => void;
+  onReset: () => void;
+  mergeParams: (newParams: DataTableFilters) => void;
 }
 
 interface UseDataTableOptions {
@@ -39,9 +48,11 @@ export function useDataTable({
    * Performs the Inertia router visit.
    */
   const visit = useCallback(
-    (params: Record<string, string | number | string[] | undefined>) => {
+    (
+      params: Record<string, string | number | boolean | string[] | undefined>,
+    ) => {
       // Clean up empty params
-      const cleaned: Record<string, string | number | string[]> = {};
+      const cleaned: Record<string, string | number | boolean | string[]> = {};
 
       for (const [key, value] of Object.entries(params)) {
         if (
@@ -50,7 +61,7 @@ export function useDataTable({
           value !== '' &&
           !(Array.isArray(value) && value.length === 0)
         ) {
-          cleaned[key] = value as string | number | string[];
+          cleaned[key] = value as string | number | boolean | string[];
         }
       }
 
@@ -86,7 +97,7 @@ export function useDataTable({
 
       const currentParams: Record<
         string,
-        string | number | string[] | undefined
+        string | number | boolean | string[] | undefined
       > = {};
 
       for (const [baseKey, values] of groupedParams) {

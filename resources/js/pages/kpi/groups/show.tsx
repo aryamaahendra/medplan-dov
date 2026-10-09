@@ -1,16 +1,15 @@
 import { Head } from '@inertiajs/react';
 import { RiAddLine } from '@remixicon/react';
-import { useState } from 'react';
 
 import { KpiIndicatorTree } from '@/components/kpis/kpi-indicator-tree';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { KpiGroupInfo } from '@/features/kpi-group/components/kpi-group-info';
+import { KpiIndicatorDialog } from '@/features/kpi-group/components/kpi-indicator-dialog';
+import { useKpiGroupShow } from '@/features/kpi-group/hooks/use-kpi-group-show';
 import { usePermission } from '@/hooks/use-permission';
 import groupRoutes from '@/routes/kpis/groups';
-import type { KpiGroup, KpiIndicator } from '@/types';
-
-import { KpiGroupInfo } from './components/kpi-group-info';
-import { KpiIndicatorDialog } from './components/kpi-indicator-dialog';
+import type { KpiGroup } from '@/types';
 
 interface KpiGroupShowProps {
   group: KpiGroup;
@@ -18,31 +17,7 @@ interface KpiGroupShowProps {
 
 export default function KpiGroupShow({ group }: KpiGroupShowProps) {
   const { hasPermission } = usePermission();
-  const [indicatorDialogOpen, setIndicatorDialogOpen] = useState(false);
-  const [editingIndicator, setEditingIndicator] = useState<KpiIndicator | null>(
-    null,
-  );
-  const [parentIndicator, setParentIndicator] = useState<KpiIndicator | null>(
-    null,
-  );
-
-  const onCreateIndicator = () => {
-    setParentIndicator(null);
-    setEditingIndicator(null);
-    setIndicatorDialogOpen(true);
-  };
-
-  const onCreateChildIndicator = (parent: KpiIndicator) => {
-    setParentIndicator(parent);
-    setEditingIndicator(null);
-    setIndicatorDialogOpen(true);
-  };
-
-  const onEditIndicator = (indicator: KpiIndicator) => {
-    setParentIndicator(null);
-    setEditingIndicator(indicator);
-    setIndicatorDialogOpen(true);
-  };
+  const { state, handlers } = useKpiGroupShow();
 
   const indicators = group.indicators || [];
 
@@ -77,7 +52,7 @@ export default function KpiGroupShow({ group }: KpiGroupShowProps) {
               </p>
             </div>
             {hasPermission('create kpi-indicators') && (
-              <Button onClick={onCreateIndicator}>
+              <Button onClick={handlers.onCreateIndicator}>
                 <RiAddLine data-icon="inline-start" />
                 Tambah Indikator Utama
               </Button>
@@ -90,17 +65,17 @@ export default function KpiGroupShow({ group }: KpiGroupShowProps) {
             yearEnd={group.end_year}
             onEdit={
               hasPermission('update kpi-indicators')
-                ? onEditIndicator
+                ? handlers.onEditIndicator
                 : undefined
             }
             onCreateChild={
               hasPermission('create kpi-indicators')
-                ? onCreateChildIndicator
+                ? handlers.onCreateChildIndicator
                 : undefined
             }
             onCreateFirst={
               hasPermission('create kpi-indicators')
-                ? onCreateIndicator
+                ? handlers.onCreateIndicator
                 : undefined
             }
             emptyMessage="Belum ada indikator atau kategori untuk periode ini."
@@ -109,11 +84,11 @@ export default function KpiGroupShow({ group }: KpiGroupShowProps) {
       </div>
 
       <KpiIndicatorDialog
-        open={indicatorDialogOpen}
-        onOpenChange={setIndicatorDialogOpen}
+        open={state.indicatorDialogOpen}
+        onOpenChange={handlers.setIndicatorDialogOpen}
         group={group}
-        parentIndicator={parentIndicator}
-        indicator={editingIndicator}
+        parentIndicator={state.parentIndicator}
+        indicator={state.editingIndicator}
       />
     </>
   );

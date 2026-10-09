@@ -1,15 +1,11 @@
 import { Deferred, Head, router } from '@inertiajs/react';
-import { useState } from 'react';
 
-import { Skeleton } from '@/components/ui/skeleton';
+import { DashboardSkeleton } from '@/features/dashboard/components/dashboard-skeleton';
+import { GlobalDashboardControls } from '@/features/dashboard/components/global-dashboard-controls';
+import { VariantBOperations } from '@/features/dashboard/components/variant-b-operations';
+import { useOperationsDashboard } from '@/features/dashboard/hooks/use-operations-dashboard';
 import { cn } from '@/lib/utils';
-
-import { GlobalDashboardControls } from '@/pages/need/needs/components/dashboard/global-dashboard-controls';
-import { VariantBOperations } from '@/pages/need/needs/components/dashboard/variant-b-operations';
-import type {
-  NeedsDashboardPayload,
-  DashboardGroupOption,
-} from '@/types/needs-dashboard';
+import type { NeedsDashboardPayload } from '@/types/needs-dashboard';
 
 interface OperationsDashboardProps {
   dashboardPayload?: NeedsDashboardPayload;
@@ -18,48 +14,13 @@ interface OperationsDashboardProps {
 export default function OperationsDashboard({
   dashboardPayload,
 }: OperationsDashboardProps) {
-  const [compareGroupId, setCompareGroupId] = useState<number | null>(null);
-
-  const handleGroupSelect = (group: DashboardGroupOption) => {
-    router.visit(
-      `/dashboard/operations?need_group_id=${group.id}${compareGroupId ? `&compare_group_id=${compareGroupId}` : ''}`,
-      {
-        preserveState: true,
-      },
-    );
-  };
-
-  const handleCompareGroupChange = (groupId: number | null) => {
-    setCompareGroupId(groupId);
-    const currentGroupId = dashboardPayload?.currentGroup?.id;
-    router.visit(
-      `/dashboard/operations?${currentGroupId ? `need_group_id=${currentGroupId}` : ''}${groupId ? `&compare_group_id=${groupId}` : ''}`,
-      { preserveState: true },
-    );
-  };
+  const { state, handlers } = useOperationsDashboard(dashboardPayload);
 
   return (
     <>
       <Head title="Operations Dashboard" />
       <div className="flex flex-col gap-6 p-6">
-        <Deferred
-          data="dashboardPayload"
-          fallback={
-            <div className="flex flex-col gap-6">
-              <div className="h-12 w-full animate-pulse rounded-xl bg-muted/30" />
-              <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-                {[...Array(5)].map((_, i) => (
-                  <Skeleton key={i} className="h-28 w-full rounded-xl" />
-                ))}
-              </div>
-              <Skeleton className="h-48 w-full rounded-xl" />
-              <div className="grid gap-6 lg:grid-cols-2">
-                <Skeleton className="h-64 w-full rounded-xl" />
-                <Skeleton className="h-64 w-full rounded-xl" />
-              </div>
-            </div>
-          }
-        >
+        <Deferred data="dashboardPayload" fallback={<DashboardSkeleton />}>
           {({ reloading }) => {
             if (!dashboardPayload) {
               return (
@@ -82,15 +43,14 @@ export default function OperationsDashboard({
                   currentGroup={dashboardPayload.currentGroup}
                   availableGroups={dashboardPayload.availableGroups}
                   variant="operations"
-                  onGroupSelect={handleGroupSelect}
-                  compareGroupId={compareGroupId}
-                  onCompareGroupChange={handleCompareGroupChange}
+                  onGroupSelect={handlers.handleGroupSelect}
+                  compareGroupId={state.compareGroupId}
+                  onCompareGroupChange={handlers.handleCompareGroupChange}
                 />
 
                 <VariantBOperations
                   payload={dashboardPayload}
                   onOpenLockDialog={(needId) => {
-                    // Navigate to need detail page for lock / unlock
                     router.visit(`/needs/${needId}`);
                   }}
                 />

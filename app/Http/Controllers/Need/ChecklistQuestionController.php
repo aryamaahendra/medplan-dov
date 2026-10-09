@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 
-class ChecklistQuestionController extends Controller
+final class ChecklistQuestionController extends Controller
 {
     use HasDataTable;
 

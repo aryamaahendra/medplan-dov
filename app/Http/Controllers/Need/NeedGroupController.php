@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class NeedGroupController extends Controller
+final class NeedGroupController extends Controller
 {
     use HasDataTable;
 

@@ -9,7 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PlanningVersion;
 use Illuminate\Http\RedirectResponse;
 
-class PlanningRecalculateController extends Controller
+final class PlanningRecalculateController extends Controller
 {
     /**
      * Handle the incoming request.

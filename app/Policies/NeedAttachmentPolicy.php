@@ -6,7 +6,7 @@ use App\Models\Need;
 use App\Models\NeedAttachment;
 use App\Models\User;
 
-class NeedAttachmentPolicy
+final class NeedAttachmentPolicy
 {
     public function before(User $user): ?bool
     {

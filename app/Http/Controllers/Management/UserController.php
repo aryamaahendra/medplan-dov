@@ -17,7 +17,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\Permission\Models\Role;
 
-class UserController extends Controller
+final class UserController extends Controller
 {
     use HasDataTable;
 

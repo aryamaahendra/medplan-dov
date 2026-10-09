@@ -5,7 +5,7 @@ namespace App\Policies;
 use App\Models\Indicator;
 use App\Models\User;
 
-class IndicatorPolicy
+final class IndicatorPolicy
 {
     public function before(User $user): ?bool
     {

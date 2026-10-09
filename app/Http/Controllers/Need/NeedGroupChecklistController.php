@@ -15,7 +15,7 @@ use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class NeedGroupChecklistController extends Controller
+final class NeedGroupChecklistController extends Controller
 {
     /**
      * Display a listing of the resource.

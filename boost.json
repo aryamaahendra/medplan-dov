@@ -1,16 +1,10 @@
 {
-    "agents": [
-        "opencode",
-        "antigravity"
-    ],
+    "agents": ["opencode", "antigravity"],
     "cloud": false,
     "guidelines": true,
     "mcp": true,
     "nightwatch": false,
-    "packages": [
-        "spatie/laravel-permission",
-        "maatwebsite/excel"
-    ],
+    "packages": ["spatie/laravel-permission", "maatwebsite/excel"],
     "sail": true,
     "skills": [
         "infer-conventions",
@@ -24,6 +18,7 @@
         "laravel-excel",
         "laravel-permission-development",
         "laravel-specialist",
-        "laravel-tdd"
+        "laravel-tdd",
+        "project-structure"
     ]
 }

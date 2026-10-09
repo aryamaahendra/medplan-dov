@@ -5,7 +5,7 @@ namespace App\Policies;
 use App\Models\OrganizationalUnit;
 use App\Models\User;
 
-class OrganizationalUnitPolicy
+final class OrganizationalUnitPolicy
 {
     /**
      * Perform pre-authorization checks.

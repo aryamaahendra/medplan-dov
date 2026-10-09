@@ -10,7 +10,7 @@ use App\Http\Requests\Need\StoreNeedChecklistAnswerRequest;
 use App\Models\Need;
 use Illuminate\Http\RedirectResponse;
 
-class NeedChecklistAnswerController extends Controller
+final class NeedChecklistAnswerController extends Controller
 {
     /**
      * Store multiple answers for a need.

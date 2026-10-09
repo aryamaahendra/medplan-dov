@@ -5,7 +5,7 @@ namespace App\Policies;
 use App\Models\StrategicServicePlan;
 use App\Models\User;
 
-class StrategicServicePlanPolicy
+final class StrategicServicePlanPolicy
 {
     public function before(User $user): ?bool
     {

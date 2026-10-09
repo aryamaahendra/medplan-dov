@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class StrategicServicePlanController extends Controller
+final class StrategicServicePlanController extends Controller
 {
     use HasDataTable;
 

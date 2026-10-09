@@ -11,7 +11,7 @@ use App\Http\Requests\Need\UnlockNeedRequest;
 use App\Models\Need;
 use Illuminate\Http\RedirectResponse;
 
-class NeedLockController extends Controller
+final class NeedLockController extends Controller
 {
     /**
      * Lock the given need.

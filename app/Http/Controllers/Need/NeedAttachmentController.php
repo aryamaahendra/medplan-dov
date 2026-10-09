@@ -16,7 +16,7 @@ use Inertia\Response;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class NeedAttachmentController extends Controller
+final class NeedAttachmentController extends Controller
 {
     /**
      * Display a listing of the resource.

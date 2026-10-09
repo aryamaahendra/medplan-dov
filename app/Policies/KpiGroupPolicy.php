@@ -5,7 +5,7 @@ namespace App\Policies;
 use App\Models\KpiGroup;
 use App\Models\User;
 
-class KpiGroupPolicy
+final class KpiGroupPolicy
 {
     public function before(User $user): ?bool
     {

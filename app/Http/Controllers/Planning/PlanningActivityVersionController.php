@@ -27,7 +27,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Throwable;
 
-class PlanningActivityVersionController extends Controller
+final class PlanningActivityVersionController extends Controller
 {
     use HasDataTable;
 

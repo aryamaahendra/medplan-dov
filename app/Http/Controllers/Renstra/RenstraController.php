@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class RenstraController extends Controller
+final class RenstraController extends Controller
 {
     use HasDataTable;
 

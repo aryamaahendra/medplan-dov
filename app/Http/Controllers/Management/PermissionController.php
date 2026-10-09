@@ -9,7 +9,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\Permission\Models\Permission;
 
-class PermissionController extends Controller
+final class PermissionController extends Controller
 {
     use HasDataTable;
 

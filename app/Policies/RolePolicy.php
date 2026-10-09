@@ -5,7 +5,7 @@ namespace App\Policies;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 
-class RolePolicy
+final class RolePolicy
 {
     /**
      * Perform pre-authorization checks.

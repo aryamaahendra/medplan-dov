@@ -10,7 +10,7 @@ use App\Http\Requests\Renstra\UpdateTujuanRequest;
 use App\Models\Tujuan;
 use Illuminate\Http\RedirectResponse;
 
-class TujuanController extends Controller
+final class TujuanController extends Controller
 {
     public function __construct()
     {

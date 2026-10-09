@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-class NeedExportController extends Controller
+final class NeedExportController extends Controller
 {
     /**
      * Handle the export of filtered needs.

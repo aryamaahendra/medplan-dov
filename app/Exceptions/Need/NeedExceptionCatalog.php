@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Actions\Need;
+namespace App\Exceptions\Need;
 
 use App\Models\Need;
 use App\Models\NeedGroup;

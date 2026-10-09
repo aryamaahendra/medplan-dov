@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class PlanningVersionController extends Controller
+final class PlanningVersionController extends Controller
 {
     use HasDataTable;
 

@@ -30,7 +30,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class NeedController extends Controller
+final class NeedController extends Controller
 {
     use HasDataTable;
 
@@ -106,7 +106,7 @@ class NeedController extends Controller
             ->with('success', 'Usulan kebutuhan berhasil dibuat.');
     }
 
-    public function create(Request $request, NeedStrategicAlignmentEngine $alignmentEngine): Response|RedirectResponse
+    public function create(Request $request, NeedStrategicAlignmentEngine $alignmentEngine): Response
     {
         $groupId = $request->input('need_group_id');
         $currentGroup = $groupId ? NeedGroup::findOrFail($groupId) : null;

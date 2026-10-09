@@ -10,7 +10,7 @@ use App\Http\Requests\Renstra\UpdateSasaranRequest;
 use App\Models\Sasaran;
 use Illuminate\Http\RedirectResponse;
 
-class SasaranController extends Controller
+final class SasaranController extends Controller
 {
     public function __construct()
     {

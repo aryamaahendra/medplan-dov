@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class NeedTypeController extends Controller
+final class NeedTypeController extends Controller
 {
     use HasDataTable;
 

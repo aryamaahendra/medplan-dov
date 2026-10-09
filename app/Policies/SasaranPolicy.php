@@ -5,7 +5,7 @@ namespace App\Policies;
 use App\Models\Sasaran;
 use App\Models\User;
 
-class SasaranPolicy
+final class SasaranPolicy
 {
     /**
      * Perform pre-authorization checks.

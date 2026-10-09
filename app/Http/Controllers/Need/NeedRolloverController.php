@@ -14,7 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
-class NeedRolloverController extends Controller
+final class NeedRolloverController extends Controller
 {
     /**
      * Get candidate unapproved needs eligible for rollover into the target need group.

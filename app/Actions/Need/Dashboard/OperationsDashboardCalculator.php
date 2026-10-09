@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Need\Dashboard;
 
-use App\Actions\Need\NeedExceptionCatalog;
+use App\Exceptions\Need\NeedExceptionCatalog;
 use App\Models\Need;
 use App\Models\NeedGroup;
 use App\Models\User;

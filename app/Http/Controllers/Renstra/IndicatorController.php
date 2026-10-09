@@ -11,7 +11,7 @@ use App\Models\Indicator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 
-class IndicatorController extends Controller
+final class IndicatorController extends Controller
 {
     public function __construct()
     {

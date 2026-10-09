@@ -5,7 +5,7 @@ namespace App\Policies;
 use App\Models\KpiAnnualTarget;
 use App\Models\User;
 
-class KpiAnnualTargetPolicy
+final class KpiAnnualTargetPolicy
 {
     public function before(User $user): ?bool
     {

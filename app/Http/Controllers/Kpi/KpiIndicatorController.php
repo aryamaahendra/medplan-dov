@@ -11,7 +11,7 @@ use App\Models\KpiIndicator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 
-class KpiIndicatorController extends Controller
+final class KpiIndicatorController extends Controller
 {
     public function __construct()
     {

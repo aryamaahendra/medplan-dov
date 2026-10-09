@@ -5,7 +5,7 @@ namespace App\Policies;
 use App\Models\PlanningActivityVersion;
 use App\Models\User;
 
-class PlanningActivityVersionPolicy
+final class PlanningActivityVersionPolicy
 {
     public function before(User $user): ?bool
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Need;
 
+use App\Exceptions\Need\NeedExceptionCatalog;
 use App\Models\Need;
 use App\Models\OrganizationalUnit;
 use App\Models\User;

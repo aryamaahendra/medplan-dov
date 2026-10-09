@@ -5,7 +5,7 @@ namespace App\Policies;
 use App\Models\ChecklistQuestion;
 use App\Models\User;
 
-class ChecklistQuestionPolicy
+final class ChecklistQuestionPolicy
 {
     public function before(User $user): ?bool
     {

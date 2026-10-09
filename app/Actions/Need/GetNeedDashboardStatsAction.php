@@ -8,6 +8,7 @@ use App\Actions\Need\Dashboard\AnalyticalWorkspaceCalculator;
 use App\Actions\Need\Dashboard\DashboardScopeResolver;
 use App\Actions\Need\Dashboard\ExecutiveDashboardCalculator;
 use App\Actions\Need\Dashboard\OperationsDashboardCalculator;
+use App\Exceptions\Need\NeedExceptionCatalog;
 use App\Models\Need;
 use App\Models\NeedGroup;
 use App\Models\User;

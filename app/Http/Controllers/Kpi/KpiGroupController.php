@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class KpiGroupController extends Controller
+final class KpiGroupController extends Controller
 {
     use HasDataTable;
 

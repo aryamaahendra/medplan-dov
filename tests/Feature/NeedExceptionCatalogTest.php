@@ -2,8 +2,8 @@
 
 use App\Actions\Need\GetFilteredNeedsAction;
 use App\Actions\Need\GetNeedDashboardStatsAction;
-use App\Actions\Need\NeedExceptionCatalog;
 use App\Enums\UserRole;
+use App\Exceptions\Need\NeedExceptionCatalog;
 use App\Models\Indicator;
 use App\Models\KpiIndicator;
 use App\Models\Need;

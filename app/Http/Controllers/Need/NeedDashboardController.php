@@ -8,12 +8,11 @@ use App\Actions\Need\GetNeedDashboardStatsAction;
 use App\Http\Controllers\Controller;
 use App\Models\Need;
 use App\Models\NeedGroup;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class NeedDashboardController extends Controller
+final class NeedDashboardController extends Controller
 {
     /**
      * Resolve need_group_id, fallback to active or latest group.
@@ -35,7 +34,7 @@ class NeedDashboardController extends Controller
     /**
      * Executive Dashboard page.
      */
-    public function executive(Request $request, GetNeedDashboardStatsAction $statsAction): Response|RedirectResponse
+    public function executive(Request $request, GetNeedDashboardStatsAction $statsAction): Response
     {
         $this->authorize('viewAny', Need::class);
 
@@ -57,7 +56,7 @@ class NeedDashboardController extends Controller
     /**
      * Operations Dashboard page.
      */
-    public function operations(Request $request, GetNeedDashboardStatsAction $statsAction): Response|RedirectResponse
+    public function operations(Request $request, GetNeedDashboardStatsAction $statsAction): Response
     {
         $this->authorize('viewAny', Need::class);
 
@@ -79,7 +78,7 @@ class NeedDashboardController extends Controller
     /**
      * Analytical Workspace Dashboard page.
      */
-    public function workspace(Request $request, GetNeedDashboardStatsAction $statsAction): Response|RedirectResponse
+    public function workspace(Request $request, GetNeedDashboardStatsAction $statsAction): Response
     {
         $this->authorize('viewAny', Need::class);
 

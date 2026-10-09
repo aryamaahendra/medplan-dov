@@ -11,7 +11,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-class ExportNeedPdfController extends Controller
+final class ExportNeedPdfController extends Controller
 {
     private const string DEFAULT_PAPER_SIZE = 'a4';
 

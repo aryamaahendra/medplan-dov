@@ -9,7 +9,7 @@ use App\Models\NeedGroup;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class NeedPolicy
+final class NeedPolicy
 {
     /**
      * Perform pre-authorization checks.

@@ -24,3 +24,11 @@ export interface PaginatedNeedGroups {
   from: number | null;
   to: number | null;
 }
+
+export interface NeedGroupsSummaryStatsData {
+  total_groups: number;
+  active_groups: number;
+  total_needs: number;
+  total_approved: number;
+  total_budget: number;
+}

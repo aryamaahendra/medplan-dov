@@ -8,17 +8,22 @@ import { NeedGroupCardList } from '@/features/need-group/components/need-group-c
 import { NeedGroupIndexDialogs } from '@/features/need-group/components/need-group-index-dialogs';
 import { NeedGroupsSummaryStats } from '@/features/need-group/components/need-groups-summary-stats';
 import { useNeedGroupsIndex } from '@/features/need-group/hooks/use-need-groups-index';
-import type { PaginatedNeedGroups } from '@/features/need-group/types/need-group.types';
+import type {
+  NeedGroupsSummaryStatsData,
+  PaginatedNeedGroups,
+} from '@/features/need-group/types/need-group.types';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import needGroupRoutes from '@/routes/need-groups';
 
 interface NeedGroupsIndexProps {
   needGroups: PaginatedNeedGroups;
+  summaryStats: NeedGroupsSummaryStatsData;
   filters: DataTableFilters;
 }
 
 export default function NeedGroupsIndex({
   needGroups,
+  summaryStats,
   filters,
 }: NeedGroupsIndexProps) {
   const { state, actions, hasPermission, dataTable } = useNeedGroupsIndex();
@@ -52,8 +57,15 @@ export default function NeedGroupsIndex({
         </div>
 
         <NeedGroupsSummaryStats
-          totalCount={needGroups.total}
-          data={needGroups.data}
+          stats={
+            summaryStats ?? {
+              total_groups: needGroups.total,
+              active_groups: 0,
+              total_needs: 0,
+              total_approved: 0,
+              total_budget: 0,
+            }
+          }
         />
 
         <div className="flex flex-col gap-4">

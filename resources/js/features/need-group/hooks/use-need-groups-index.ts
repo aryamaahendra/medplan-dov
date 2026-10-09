@@ -16,7 +16,7 @@ export function useNeedGroupsIndex() {
   const [rolloverGroup, setRolloverGroup] = useState<NeedGroup | null>(null);
 
   const dataTable = useDataTable({
-    only: ['needGroups', 'filters'],
+    only: ['needGroups', 'filters', 'summaryStats'],
   });
 
   const onEdit = (group: NeedGroup) => {

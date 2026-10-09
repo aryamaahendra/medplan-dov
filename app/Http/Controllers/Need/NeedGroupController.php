@@ -8,8 +8,10 @@ use App\Actions\Need\RolloverNeedAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Need\StoreNeedGroupRequest;
 use App\Http\Requests\Need\UpdateNeedGroupRequest;
+use App\Models\Need;
 use App\Models\NeedGroup;
 use App\Traits\HasDataTable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -31,6 +33,45 @@ final class NeedGroupController extends Controller
     public function index(Request $request): Response
     {
         $this->authorize('viewAny', NeedGroup::class);
+        $baseQuery = NeedGroup::query();
+        $search = $request->string('search')->trim()->value();
+        if ($search !== '') {
+            $baseQuery->where(function (Builder $q) use ($search): void {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        /** @var object{total_groups?: int|string, active_groups?: int|string}|null $groupsAggregate */
+        $groupsAggregate = (clone $baseQuery)
+            ->toBase()
+            ->selectRaw('
+                COUNT(*) as total_groups,
+                COUNT(CASE WHEN is_active = true THEN 1 END) as active_groups
+            ')
+            ->first();
+
+        $matchingGroupIds = (clone $baseQuery)->select('id');
+
+        /** @var object{total_needs?: int|string, total_approved?: int|string, total_budget?: int|float|string}|null $needsAggregate */
+        $needsAggregate = Need::query()
+            ->whereIn('need_group_id', $matchingGroupIds)
+            ->toBase()
+            ->selectRaw('
+                COUNT(*) as total_needs,
+                COUNT(CASE WHEN approved_by_director_at IS NOT NULL THEN 1 END) as total_approved,
+                COALESCE(SUM(total_price), 0) as total_budget
+            ')
+            ->first();
+
+        $summaryStats = [
+            'total_groups' => (int) ($groupsAggregate->total_groups ?? 0),
+            'active_groups' => (int) ($groupsAggregate->active_groups ?? 0),
+            'total_needs' => (int) ($needsAggregate->total_needs ?? 0),
+            'total_approved' => (int) ($needsAggregate->total_approved ?? 0),
+            'total_budget' => (float) ($needsAggregate->total_budget ?? 0),
+        ];
+
         $needGroups = $this->applyDataTable(
             NeedGroup::query()
                 ->withSum('needs as total_budget', 'total_price')
@@ -45,6 +86,7 @@ final class NeedGroupController extends Controller
 
         return Inertia::render('need/groups/index', [
             'needGroups' => $needGroups,
+            'summaryStats' => $summaryStats,
             'filters' => $this->dataTableFilters($request),
         ]);
     }

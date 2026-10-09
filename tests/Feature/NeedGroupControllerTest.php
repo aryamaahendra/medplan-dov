@@ -31,6 +31,65 @@ it('can view need groups index', function () {
             ->where('needGroups.data.0.total_budget', '2000.00')
             ->where('needGroups.data.0.approved_count', 2)
             ->where('needGroups.data.0.priority_count', 2)
+            ->where('summaryStats.total_groups', 1)
+            ->where('summaryStats.active_groups', $group->is_active ? 1 : 0)
+            ->where('summaryStats.total_needs', 2)
+            ->where('summaryStats.total_approved', 2)
+            ->where('summaryStats.total_budget', 2000)
+        );
+});
+
+it('computes summary stats across all need groups exceeding page size', function () {
+    $groups = NeedGroup::factory()->count(20)->create(['is_active' => true]);
+    foreach ($groups as $g) {
+        Need::factory()->create([
+            'need_group_id' => $g->id,
+            'total_price' => 500,
+            'approved_by_director_at' => now(),
+        ]);
+    }
+
+    $response = $this->get(route('need-groups.index'));
+
+    $response->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('need/groups/index')
+            ->has('needGroups.data', 15)
+            ->where('needGroups.total', 20)
+            ->where('summaryStats.total_groups', 20)
+            ->where('summaryStats.active_groups', 20)
+            ->where('summaryStats.total_needs', 20)
+            ->where('summaryStats.total_approved', 20)
+            ->where('summaryStats.total_budget', 10000)
+        );
+});
+
+it('filters summary stats when search query is present', function () {
+    $groupA = NeedGroup::factory()->create(['name' => 'Target Group 2026', 'is_active' => true]);
+    Need::factory()->create([
+        'need_group_id' => $groupA->id,
+        'total_price' => 500,
+        'approved_by_director_at' => now(),
+    ]);
+
+    $groupB = NeedGroup::factory()->create(['name' => 'Other Group 2025', 'is_active' => true]);
+    Need::factory()->create([
+        'need_group_id' => $groupB->id,
+        'total_price' => 300,
+        'approved_by_director_at' => null,
+    ]);
+
+    $response = $this->get(route('need-groups.index', ['search' => 'Target Group']));
+
+    $response->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('need/groups/index')
+            ->has('needGroups.data', 1)
+            ->where('summaryStats.total_groups', 1)
+            ->where('summaryStats.active_groups', 1)
+            ->where('summaryStats.total_needs', 1)
+            ->where('summaryStats.total_approved', 1)
+            ->where('summaryStats.total_budget', 500)
         );
 });
 

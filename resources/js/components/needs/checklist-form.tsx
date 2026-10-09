@@ -126,15 +126,17 @@ export function ChecklistForm({
   if (questions.length === 0) {
     return (
       <Card className="border-dashed">
-        <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="mb-4 rounded-full bg-muted p-3">
-            <RiClipboardLine className="h-6 w-6 text-muted-foreground" />
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="mb-4 rounded-full bg-muted p-3">
+              <RiClipboardLine className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <CardTitle>Tidak ada pertanyaan checklist</CardTitle>
+            <CardDescription className="mt-1 max-w-xs">
+              Belum ada pertanyaan checklist yang dikonfigurasi untuk kelompok
+              usulan ini.
+            </CardDescription>
           </div>
-          <CardTitle>Tidak ada pertanyaan checklist</CardTitle>
-          <CardDescription className="max-w-xs pt-1">
-            Belum ada pertanyaan checklist yang dikonfigurasi untuk kelompok
-            usulan ini.
-          </CardDescription>
         </CardContent>
       </Card>
     );
@@ -160,7 +162,7 @@ export function ChecklistForm({
         </p>
       </div>
 
-      <Card className="py-0">
+      <Card>
         <CardContent className="divide-y p-0">
           {questions.map((q, index) => (
             <ChecklistItem

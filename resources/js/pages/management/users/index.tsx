@@ -100,7 +100,7 @@ export default function UsersIndex({
           </div>
           {hasPermission('create users') && (
             <Button onClick={onCreate}>
-              <RiAddLine />
+              <RiAddLine data-icon="inline-start" />
               Tambah User
             </Button>
           )}

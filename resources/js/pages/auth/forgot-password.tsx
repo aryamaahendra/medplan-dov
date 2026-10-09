@@ -15,7 +15,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
       <Head title="Forgot password" />
 
       {status && (
-        <div className="mb-4 text-center text-sm font-medium text-green-600">
+        <div className="mb-4 text-center text-sm font-medium text-success">
           {status}
         </div>
       )}
@@ -45,7 +45,10 @@ export default function ForgotPassword({ status }: { status?: string }) {
                   data-test="email-password-reset-link-button"
                 >
                   {processing && (
-                    <RiLoader4Line className="h-4 w-4 animate-spin" />
+                    <RiLoader4Line
+                      className="animate-spin"
+                      data-icon="inline-start"
+                    />
                   )}
                   Email password reset link
                 </Button>

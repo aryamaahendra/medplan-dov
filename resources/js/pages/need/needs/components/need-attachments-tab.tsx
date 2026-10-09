@@ -50,7 +50,7 @@ export function NeedAttachmentsTab({ need }: NeedAttachmentsTabProps) {
                 )
               }
             >
-              <RiAttachmentLine />
+              <RiAttachmentLine data-icon="inline-start" />
               Kelola Lampiran
             </Button>
           </CardAction>

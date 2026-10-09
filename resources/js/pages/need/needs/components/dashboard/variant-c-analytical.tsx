@@ -281,15 +281,29 @@ export function VariantCAnalytical({
           onValueChange={(val) => setActiveTab(val as AnalyticalTabKey)}
           className="w-full"
         >
-          <TabsList className="w-full justify-start overflow-x-auto border-b border-border/70 bg-transparent p-0">
+          <TabsList className="grid h-auto w-full grid-cols-2 gap-2 border-none bg-transparent p-0 sm:grid-cols-3 lg:grid-cols-5">
             {/* Tab 1: Ringkasan (hidden for staff role per DC4) */}
             {!isStaff && (
               <TabsTrigger
                 value="ringkasan"
-                className="cursor-pointer gap-1.5 border-b-2 border-transparent px-3.5 py-2 text-xs font-medium text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground"
+                className="group flex h-auto cursor-pointer flex-col items-start gap-1 rounded-xl border border-border/70 bg-card p-3 text-left transition-all hover:border-border hover:bg-muted/40 data-[state=active]:border-primary/60 data-[state=active]:bg-primary/5 data-[state=active]:shadow-xs dark:data-[state=active]:bg-primary/10"
               >
-                <RiPieChartLine className="size-3.5" />
-                <span>Ringkasan</span>
+                <div className="flex w-full items-center justify-between">
+                  <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground">
+                    <RiPieChartLine className="size-4" />
+                  </div>
+                  <span className="font-mono text-[10px] font-semibold text-muted-foreground/70 group-data-[state=active]:text-primary">
+                    01
+                  </span>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs font-semibold text-foreground">
+                    Ringkasan
+                  </span>
+                  <span className="line-clamp-1 text-[11px] leading-tight text-muted-foreground">
+                    KPI makro & sebaran utama
+                  </span>
+                </div>
               </TabsTrigger>
             )}
 
@@ -297,10 +311,24 @@ export function VariantCAnalytical({
             {!isStaff && (
               <TabsTrigger
                 value="anggaran"
-                className="cursor-pointer gap-1.5 border-b-2 border-transparent px-3.5 py-2 text-xs font-medium text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground"
+                className="group flex h-auto cursor-pointer flex-col items-start gap-1 rounded-xl border border-border/70 bg-card p-3 text-left transition-all hover:border-border hover:bg-muted/40 data-[state=active]:border-primary/60 data-[state=active]:bg-primary/5 data-[state=active]:shadow-xs dark:data-[state=active]:bg-primary/10"
               >
-                <RiMoneyDollarCircleLine className="size-3.5" />
-                <span>Anggaran</span>
+                <div className="flex w-full items-center justify-between">
+                  <div className="flex size-7 items-center justify-center rounded-lg bg-success/10 text-success transition-colors group-data-[state=active]:bg-success group-data-[state=active]:text-success-foreground">
+                    <RiMoneyDollarCircleLine className="size-4" />
+                  </div>
+                  <span className="font-mono text-[10px] font-semibold text-muted-foreground/70 group-data-[state=active]:text-success">
+                    02
+                  </span>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs font-semibold text-foreground">
+                    Anggaran
+                  </span>
+                  <span className="line-clamp-1 text-[11px] leading-tight text-muted-foreground">
+                    Pagu unit, kategori & pareto
+                  </span>
+                </div>
               </TabsTrigger>
             )}
 
@@ -308,10 +336,24 @@ export function VariantCAnalytical({
             {!isStaff && (
               <TabsTrigger
                 value="keselarasan"
-                className="cursor-pointer gap-1.5 border-b-2 border-transparent px-3.5 py-2 text-xs font-medium text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground"
+                className="group flex h-auto cursor-pointer flex-col items-start gap-1 rounded-xl border border-border/70 bg-card p-3 text-left transition-all hover:border-border hover:bg-muted/40 data-[state=active]:border-primary/60 data-[state=active]:bg-primary/5 data-[state=active]:shadow-xs dark:data-[state=active]:bg-primary/10"
               >
-                <RiTargetLine className="size-3.5" />
-                <span>Keselarasan</span>
+                <div className="flex w-full items-center justify-between">
+                  <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground">
+                    <RiTargetLine className="size-4" />
+                  </div>
+                  <span className="font-mono text-[10px] font-semibold text-muted-foreground/70 group-data-[state=active]:text-primary">
+                    03
+                  </span>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs font-semibold text-foreground">
+                    Keselarasan
+                  </span>
+                  <span className="line-clamp-1 text-[11px] leading-tight text-muted-foreground">
+                    Renstra, IKU & dokumen KAK
+                  </span>
+                </div>
               </TabsTrigger>
             )}
 
@@ -319,20 +361,48 @@ export function VariantCAnalytical({
             {!isStaff && (
               <TabsTrigger
                 value="alur"
-                className="cursor-pointer gap-1.5 border-b-2 border-transparent px-3.5 py-2 text-xs font-medium text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground"
+                className="group flex h-auto cursor-pointer flex-col items-start gap-1 rounded-xl border border-border/70 bg-card p-3 text-left transition-all hover:border-border hover:bg-muted/40 data-[state=active]:border-primary/60 data-[state=active]:bg-primary/5 data-[state=active]:shadow-xs dark:data-[state=active]:bg-primary/10"
               >
-                <RiGitCommitLine className="size-3.5" />
-                <span>Alur</span>
+                <div className="flex w-full items-center justify-between">
+                  <div className="flex size-7 items-center justify-center rounded-lg bg-warning/10 text-warning transition-colors group-data-[state=active]:bg-warning group-data-[state=active]:text-warning-foreground">
+                    <RiGitCommitLine className="size-4" />
+                  </div>
+                  <span className="font-mono text-[10px] font-semibold text-muted-foreground/70 group-data-[state=active]:text-warning">
+                    04
+                  </span>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs font-semibold text-foreground">
+                    Alur
+                  </span>
+                  <span className="line-clamp-1 text-[11px] leading-tight text-muted-foreground">
+                    Corong siklus & aging usulan
+                  </span>
+                </div>
               </TabsTrigger>
             )}
 
             {/* Tab 5: Unit (visible for all, lands here for staff & unit-head) */}
             <TabsTrigger
               value="unit"
-              className="cursor-pointer gap-1.5 border-b-2 border-transparent px-3.5 py-2 text-xs font-medium text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground"
+              className="group flex h-auto cursor-pointer flex-col items-start gap-1 rounded-xl border border-border/70 bg-card p-3 text-left transition-all hover:border-border hover:bg-muted/40 data-[state=active]:border-primary/60 data-[state=active]:bg-primary/5 data-[state=active]:shadow-xs dark:data-[state=active]:bg-primary/10"
             >
-              <RiBuildingLine className="size-3.5" />
-              <span>Unit</span>
+              <div className="flex w-full items-center justify-between">
+                <div className="flex size-7 items-center justify-center rounded-lg bg-info/10 text-info transition-colors group-data-[state=active]:bg-info group-data-[state=active]:text-info-foreground">
+                  <RiBuildingLine className="size-4" />
+                </div>
+                <span className="font-mono text-[10px] font-semibold text-muted-foreground/70 group-data-[state=active]:text-info">
+                  05
+                </span>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-semibold text-foreground">
+                  Unit
+                </span>
+                <span className="line-clamp-1 text-[11px] leading-tight text-muted-foreground">
+                  Fokus unit & hirarki turunan
+                </span>
+              </div>
             </TabsTrigger>
           </TabsList>
 

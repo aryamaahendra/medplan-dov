@@ -141,9 +141,7 @@ export function NeedListCardDetailed({
       <div className="flex flex-wrap items-center justify-between gap-2 border-b bg-muted/20 px-4 py-2.5">
         <div className="flex flex-wrap items-center gap-2 text-xs">
           {need.need_type?.name && (
-            <Badge variant="secondary" className="text-[11px]">
-              {need.need_type.name}
-            </Badge>
+            <Badge variant="secondary">{need.need_type.name}</Badge>
           )}
 
           {unitPath.length > 0 && (
@@ -155,16 +153,13 @@ export function NeedListCardDetailed({
             </span>
           )}
 
-          <Badge
-            variant={stageMeta.variant}
-            className="flex items-center gap-1 text-[11px]"
-          >
-            <StageIcon className="size-3" />
+          <Badge variant={stageMeta.variant}>
+            <StageIcon data-icon="inline-start" />
             {stageMeta.label}
           </Badge>
 
           {need.is_locked && (
-            <span className="inline-flex items-center gap-1 rounded bg-amber-500/10 px-1.5 py-0.5 text-[11px] font-medium text-amber-600 dark:text-amber-400">
+            <span className="inline-flex items-center gap-1 rounded bg-warning/10 px-1.5 py-0.5 text-[11px] font-medium text-warning-foreground dark:text-warning">
               <RiLockLine className="size-3" />
               Terkunci
             </span>
@@ -174,30 +169,19 @@ export function NeedListCardDetailed({
         <div className="flex items-center gap-1.5">
           {/* Primary Action Button */}
           {need.can?.approve ? (
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 px-2.5 text-xs font-medium"
-              onClick={() => onReview(need)}
-            >
-              <RiQuillPenLine className="mr-1 size-3" />
+            <Button size="sm" variant="outline" onClick={() => onReview(need)}>
+              <RiQuillPenLine data-icon="inline-start" />
               Review Direktur
             </Button>
           ) : need.can?.update ? (
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 px-2.5 text-xs font-medium"
-              onClick={() => onEdit(need)}
-            >
-              <RiEdit2Line className="mr-1 size-3" />
+            <Button size="sm" variant="outline" onClick={() => onEdit(need)}>
+              <RiEdit2Line data-icon="inline-start" />
               Edit Usulan
             </Button>
           ) : onSelectDetail ? (
             <Button
               size="sm"
               variant="ghost"
-              className="h-7 px-2.5 text-xs font-medium"
               onClick={() => onSelectDetail(need)}
             >
               Detail
@@ -215,7 +199,7 @@ export function NeedListCardDetailed({
           <div>
             <div className="flex items-start gap-1.5">
               {need.is_priority ? (
-                <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-warning/10 text-warning-foreground dark:text-warning">
                   <RiStarFill className="size-3.5" />
                 </span>
               ) : null}
@@ -289,7 +273,7 @@ export function NeedListCardDetailed({
             {need.notes && (
               <>
                 <span className="text-muted-foreground/40">•</span>
-                <span className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400">
+                <span className="inline-flex items-center gap-1 text-warning-foreground dark:text-warning">
                   <RiChat1Line className="size-3.5" />
                   Ada Catatan Direktur
                 </span>
@@ -336,7 +320,7 @@ export function NeedListCardDetailed({
                   checklistScore >= 85
                     ? 'bg-primary'
                     : checklistScore >= 50
-                      ? 'bg-amber-500'
+                      ? 'bg-warning'
                       : 'bg-primary/40',
                 )}
                 style={{ width: `${checklistScore}%` }}
@@ -349,17 +333,14 @@ export function NeedListCardDetailed({
       {/* Bottom Footer: Priority & Dampak Matrix, Attachments & Time */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-t bg-muted/10 px-4 py-2 text-xs">
         <div className="flex flex-wrap items-center gap-2">
-          <Badge
-            variant="outline"
-            className={cn('text-[11px] font-normal', priority.colorClass)}
-          >
+          <Badge variant="outline" className={priority.colorClass}>
             {priority.label}
           </Badge>
 
           {need.is_priority && (
             <Badge
               variant="outline"
-              className="border-amber-500/40 text-amber-600 dark:text-amber-400"
+              className="border-warning/40 text-warning-foreground dark:text-warning"
             >
               Prioritas Utama
             </Badge>

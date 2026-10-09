@@ -107,7 +107,7 @@ export function ExportPdfDialog({
             (trigger as React.ReactElement)
           ) : (
             <Button variant="outline" size="sm">
-              <RiFileDownloadLine className="mr-1.5 h-4 w-4" />
+              <RiFileDownloadLine data-icon="inline-start" />
               Ekspor PDF
             </Button>
           )
@@ -234,7 +234,7 @@ export function ExportPdfDialog({
             Pratinjau
           </Button>
           <Button onClick={() => handleExport()}>
-            <RiFileDownloadLine className="mr-2 h-4 w-4" />
+            <RiFileDownloadLine data-icon="inline-start" />
             Ekspor
           </Button>
         </DialogFooter>

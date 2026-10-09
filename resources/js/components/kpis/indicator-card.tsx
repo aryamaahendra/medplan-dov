@@ -99,7 +99,7 @@ export function IndicatorCard({
                   variant="outline"
                   onClick={() => onCreateChild(indicator)}
                 >
-                  <RiAddLine /> Tambah Sub
+                  <RiAddLine data-icon="inline-start" /> Tambah Sub
                 </Button>
               )}
               {onEdit && hasPermission('update kpi-indicators') && (
@@ -108,7 +108,7 @@ export function IndicatorCard({
                   variant="ghost"
                   onClick={() => onEdit(indicator)}
                 >
-                  <RiEditLine className="h-4 w-4" />
+                  <RiEditLine />
                 </Button>
               )}
               {onDelete && hasPermission('delete kpi-indicators') && (
@@ -118,7 +118,7 @@ export function IndicatorCard({
                   className="text-destructive"
                   onClick={() => setDeletingIndicator(indicator)}
                 >
-                  <RiDeleteBinLine className="h-4 w-4" />
+                  <RiDeleteBinLine />
                 </Button>
               )}
             </CardAction>
@@ -195,7 +195,7 @@ export function IndicatorCard({
                 variant="ghost"
                 onClick={() => onEdit(indicator)}
               >
-                <RiEditLine className="h-3 w-3" />
+                <RiEditLine />
               </Button>
             )}
             {onDelete && hasPermission('delete kpi-indicators') && (
@@ -205,7 +205,7 @@ export function IndicatorCard({
                 className="text-destructive"
                 onClick={() => setDeletingIndicator(indicator)}
               >
-                <RiDeleteBinLine className="h-3 w-3" />
+                <RiDeleteBinLine />
               </Button>
             )}
           </div>

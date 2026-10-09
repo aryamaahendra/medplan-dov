@@ -62,7 +62,7 @@ export function ActivityImportDialog({
       <DialogTrigger
         render={
           <Button variant="outline">
-            <RiUploadLine className="mr-2 h-4 w-4" />
+            <RiUploadLine data-icon="inline-start" />
             Import
           </Button>
         }

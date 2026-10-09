@@ -8,6 +8,7 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -163,134 +164,139 @@ export function ActivityVersionForm({
                     Pilih induk dan tentukan kode serta nama nomenklatur.
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="grid gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="parent_id">Induk (Parent)</Label>
-                    <Select value={parentId} onValueChange={handleParentChange}>
-                      <SelectTrigger
-                        id="parent_id"
-                        className="w-full max-w-full truncate"
-                      >
-                        <SelectValue placeholder="Pilih induk (opsional)" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Tanpa Induk</SelectItem>
-                        {parents
-                          .filter(
-                            (p) =>
-                              p.id !== activity?.id &&
-                              p.code &&
-                              !/[a-zA-Z]$/.test(p.code),
-                          )
-                          .map((parent) => (
-                            <SelectItem
-                              key={parent.id}
-                              value={parent.id.toString()}
-                            >
-                              {parent.code} - {parent.name}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                    <input
-                      type="hidden"
-                      name="parent_id"
-                      value={parentId === 'none' ? '' : parentId}
-                    />
-                    <InputError message={errors.parent_id} />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="code">Kode</Label>
-                      <Input
-                        id="code"
-                        name="code"
-                        value={code}
-                        onChange={(e) => {
-                          setCode(e.target.value);
-                          setCodeExists(false);
-                        }}
-                        placeholder="Contoh: 1.02.01"
-                        className={codeExists ? 'border-destructive' : ''}
-                      />
-                      {codeExists && (
-                        <p className="text-xs text-destructive">
-                          Kode ini sudah digunakan dalam versi ini.
-                        </p>
-                      )}
-                      <InputError message={errors.code} />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="type">Tipe</Label>
+                <CardContent>
+                  <div className="grid gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="parent_id">Induk (Parent)</Label>
                       <Select
-                        value={type}
-                        onValueChange={(val) => {
-                          if (val) {
-                            setType(val);
-                          }
-                        }}
-                        name="type"
+                        value={parentId}
+                        onValueChange={handleParentChange}
                       >
-                        <SelectTrigger id="type">
-                          <SelectValue placeholder="Pilih Tipe" />
+                        <SelectTrigger
+                          id="parent_id"
+                          className="w-full max-w-full truncate"
+                        >
+                          <SelectValue placeholder="Pilih induk (opsional)" />
                         </SelectTrigger>
                         <SelectContent>
-                          {activityTypes.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>
-                              {opt.label}
-                            </SelectItem>
-                          ))}
+                          <SelectItem value="none">Tanpa Induk</SelectItem>
+                          {parents
+                            .filter(
+                              (p) =>
+                                p.id !== activity?.id &&
+                                p.code &&
+                                !/[a-zA-Z]$/.test(p.code),
+                            )
+                            .map((parent) => (
+                              <SelectItem
+                                key={parent.id}
+                                value={parent.id.toString()}
+                              >
+                                {parent.code} - {parent.name}
+                              </SelectItem>
+                            ))}
                         </SelectContent>
                       </Select>
-                      <input type="hidden" name="type" value={type} />
-                      <InputError message={errors.type} />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="sort_order">Urutan (Sort Order)</Label>
-                      <Input
-                        id="sort_order"
-                        name="sort_order"
-                        type="number"
-                        defaultValue={activity?.sort_order ?? 0}
-                        placeholder="0"
+                      <input
+                        type="hidden"
+                        name="parent_id"
+                        value={parentId === 'none' ? '' : parentId}
                       />
-                      <InputError message={errors.sort_order} />
+                      <InputError message={errors.parent_id} />
                     </div>
-                  </div>
 
-                  <div className="grid gap-2">
-                    <Label htmlFor="name">Nama Nomenklatur</Label>
-                    <Textarea
-                      id="name"
-                      name="name"
-                      defaultValue={activity?.name ?? ''}
-                      className="min-h-[100px]"
-                      required
-                    />
-                    <InputError message={errors.name} />
-                  </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="code">Kode</Label>
+                        <Input
+                          id="code"
+                          name="code"
+                          value={code}
+                          onChange={(e) => {
+                            setCode(e.target.value);
+                            setCodeExists(false);
+                          }}
+                          placeholder="Contoh: 1.02.01"
+                          className={codeExists ? 'border-destructive' : ''}
+                        />
+                        {codeExists && (
+                          <p className="text-xs text-destructive">
+                            Kode ini sudah digunakan dalam versi ini.
+                          </p>
+                        )}
+                        <InputError message={errors.code} />
+                      </div>
 
-                  <div className="grid gap-2">
-                    <Label htmlFor="perangkat_daerah">Perangkat Daerah</Label>
-                    <Input
-                      id="perangkat_daerah"
-                      name="perangkat_daerah"
-                      defaultValue={activity?.perangkat_daerah ?? ''}
-                    />
-                    <InputError message={errors.perangkat_daerah} />
-                  </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="type">Tipe</Label>
+                        <Select
+                          value={type}
+                          onValueChange={(val) => {
+                            if (val) {
+                              setType(val);
+                            }
+                          }}
+                          name="type"
+                        >
+                          <SelectTrigger id="type">
+                            <SelectValue placeholder="Pilih Tipe" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {activityTypes.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <input type="hidden" name="type" value={type} />
+                        <InputError message={errors.type} />
+                      </div>
 
-                  <div className="grid gap-2">
-                    <Label htmlFor="keterangan">Keterangan</Label>
-                    <Textarea
-                      id="keterangan"
-                      name="keterangan"
-                      defaultValue={activity?.keterangan ?? ''}
-                    />
-                    <InputError message={errors.keterangan} />
+                      <div className="space-y-2">
+                        <Label htmlFor="sort_order">Urutan (Sort Order)</Label>
+                        <Input
+                          id="sort_order"
+                          name="sort_order"
+                          type="number"
+                          defaultValue={activity?.sort_order ?? 0}
+                          placeholder="0"
+                        />
+                        <InputError message={errors.sort_order} />
+                      </div>
+                    </div>
+
+                    <div className="grid gap-2">
+                      <Label htmlFor="name">Nama Nomenklatur</Label>
+                      <Textarea
+                        id="name"
+                        name="name"
+                        defaultValue={activity?.name ?? ''}
+                        className="min-h-[100px]"
+                        required
+                      />
+                      <InputError message={errors.name} />
+                    </div>
+
+                    <div className="grid gap-2">
+                      <Label htmlFor="perangkat_daerah">Perangkat Daerah</Label>
+                      <Input
+                        id="perangkat_daerah"
+                        name="perangkat_daerah"
+                        defaultValue={activity?.perangkat_daerah ?? ''}
+                      />
+                      <InputError message={errors.perangkat_daerah} />
+                    </div>
+
+                    <div className="grid gap-2">
+                      <Label htmlFor="keterangan">Keterangan</Label>
+                      <Textarea
+                        id="keterangan"
+                        name="keterangan"
+                        defaultValue={activity?.keterangan ?? ''}
+                      />
+                      <InputError message={errors.keterangan} />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -307,20 +313,20 @@ export function ActivityVersionForm({
 
               <div className="space-y-4">
                 {indicators.map((indicator, index) => (
-                  <Card key={index}>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-semibold">
-                        Indikator {index + 1}
-                      </CardTitle>
+                  <Card key={index} size="sm">
+                    <CardHeader>
+                      <CardTitle>Indikator {index + 1}</CardTitle>
                       {indicators.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="icon-sm"
-                          onClick={() => removeIndicator(index)}
-                        >
-                          <RiDeleteBinLine className="h-4 w-4" />
-                        </Button>
+                        <CardAction>
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon-sm"
+                            onClick={() => removeIndicator(index)}
+                          >
+                            <RiDeleteBinLine />
+                          </Button>
+                        </CardAction>
                       )}
                     </CardHeader>
                     <CardContent>
@@ -380,7 +386,7 @@ export function ActivityVersionForm({
                     onClick={addIndicator}
                     className="w-full border-dashed"
                   >
-                    <RiAddLine className="mr-2 h-4 w-4" />
+                    <RiAddLine data-icon="inline-start" />
                     Tambah Indikator
                   </Button>
                 </div>

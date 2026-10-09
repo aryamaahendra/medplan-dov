@@ -75,9 +75,11 @@ export function OperationsAttentionPanel({
       <Card className="flex h-full flex-col border-border/80">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <RiAlertLine className="size-4 text-warning" />
-              <span>Perlu Perhatian (Exceptions)</span>
+            <CardTitle>
+              <span className="flex items-center gap-2">
+                <RiAlertLine className="size-4 text-warning" />
+                <span>Perlu Perhatian (Exceptions)</span>
+              </span>
             </CardTitle>
 
             <Badge
@@ -110,10 +112,7 @@ export function OperationsAttentionPanel({
                         <span className="text-xs font-bold text-success-foreground dark:text-success">
                           Siap Diverifikasi
                         </span>
-                        <Badge
-                          variant="default"
-                          className="h-4.5 bg-success px-1.5 font-mono text-[10px] text-success-foreground"
-                        >
+                        <Badge className="bg-success font-mono text-success-foreground">
                           {formatNumber(readyQueue.count)}
                         </Badge>
                       </div>
@@ -130,10 +129,10 @@ export function OperationsAttentionPanel({
                     size="sm"
                     variant="outline"
                     onClick={handleOpenReadyQueue}
-                    className="h-7 border-success/40 text-xs text-success-foreground hover:bg-success/10 dark:text-success"
+                    className="border-success/40 text-success-foreground hover:bg-success/10 dark:text-success"
                   >
                     <span>Lihat Antrean</span>
-                    <RiArrowRightLine className="ml-1 size-3" />
+                    <RiArrowRightLine data-icon="inline-end" />
                   </Button>
                 </div>
               </div>

@@ -95,6 +95,7 @@ export function VariantAExecutive({
         count: stageDistribution.approved?.count ?? 0,
         budget: stageDistribution.approved?.budget ?? 0,
         color: 'bg-success',
+        textColor: 'text-success-foreground',
         textClass: 'text-success-foreground dark:text-success',
       },
       {
@@ -103,6 +104,7 @@ export function VariantAExecutive({
         count: stageDistribution.under_review?.count ?? 0,
         budget: stageDistribution.under_review?.budget ?? 0,
         color: 'bg-warning',
+        textColor: 'text-warning-foreground',
         textClass: 'text-warning-foreground dark:text-warning',
       },
       {
@@ -111,6 +113,7 @@ export function VariantAExecutive({
         count: stageDistribution.draft?.count ?? 0,
         budget: stageDistribution.draft?.budget ?? 0,
         color: 'bg-muted-foreground/60',
+        textColor: 'text-background',
         textClass: 'text-muted-foreground',
       },
     ];
@@ -500,8 +503,9 @@ export function VariantAExecutive({
                   aria-label={`${stage.label}: ${formatCompactIDR(stage.budget)}, ${stage.pct} persen, ${stage.count} usulan`}
                   style={{ width: `${Math.max(stage.pct, 3)}%` }}
                   className={cn(
-                    'flex h-full items-center justify-center text-[10px] font-semibold text-white transition-opacity first:rounded-l last:rounded-r hover:opacity-90',
+                    'flex h-full items-center justify-center text-[10px] font-semibold transition-opacity first:rounded-l last:rounded-r hover:opacity-90',
                     stage.color,
+                    stage.textColor,
                   )}
                 >
                   {stage.pct >= 12 && (
@@ -673,7 +677,6 @@ export function VariantAExecutive({
                             size="sm"
                             variant="default"
                             onClick={() => onOpenDirectorReview(item.id)}
-                            className="h-7 text-xs font-medium"
                           >
                             Telaah
                           </Button>

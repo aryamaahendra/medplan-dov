@@ -156,7 +156,7 @@ export default function PlanningVersionsIndex({
                 setDialogOpen(true);
               }}
             >
-              <RiAddLine />
+              <RiAddLine data-icon="inline-start" />
               Buat Versi Baru
             </Button>
           )}

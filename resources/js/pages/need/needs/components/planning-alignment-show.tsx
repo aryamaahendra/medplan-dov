@@ -46,7 +46,7 @@ export function PlanningAlignmentShow({ need }: PlanningAlignmentShowProps) {
       <div className="grid gap-4">
         {Object.entries(groupedVersions).map(([type, versions]) => (
           <Card key={type}>
-            <CardHeader className="py-3">
+            <CardHeader>
               <CardTitle className="text-sm font-medium tracking-wider text-muted-foreground uppercase">
                 {type}
               </CardTitle>

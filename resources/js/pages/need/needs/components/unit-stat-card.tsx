@@ -34,20 +34,20 @@ export function UnitStatCard({
   }).format(totalBudget);
 
   return (
-    <Card size="sm" className="py-0! transition-all hover:shadow-md">
-      <CardHeader className="flex min-h-12 flex-col justify-center gap-0.5 py-2!">
+    <Card size="sm" className="transition-all hover:shadow-md">
+      <CardHeader className="flex min-h-12 flex-col justify-center">
         {parents.length > 0 && (
           <CardDescription className="truncate text-[11px] text-muted-foreground/70">
             {parents.join(' / ')}
           </CardDescription>
         )}
 
-        <CardTitle className="text-xs! leading-tight" title={name}>
+        <CardTitle className="leading-tight" title={name}>
           {name}
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="flex shrink grow flex-col justify-end divide-y px-0! py-2">
+      <CardContent className="flex shrink grow flex-col justify-end divide-y p-0">
         <div className="flex items-center justify-between border-t px-4 py-2 text-base">
           <span className="font-mono text-xl font-bold">{formattedBudget}</span>
         </div>
@@ -62,9 +62,9 @@ export function UnitStatCard({
             </div>
 
             <div className="flex items-center gap-2 font-mono text-xs opacity-70">
-              <div className="text-orange-600">{priorityCount} PRIORITY</div>
+              <div className="text-warning">{priorityCount} PRIORITY</div>
               <div>|</div>
-              <div className="text-green-700">{approvedCount} APPROVED</div>
+              <div className="text-success">{approvedCount} APPROVED</div>
             </div>
           </div>
         </div>
@@ -77,11 +77,11 @@ export function UnitStatCard({
         <div className="grid grid-cols-2 gap-2 text-[10px]">
           <div className="flex items-center justify-between rounded-md bg-muted/30 px-2 py-1">
             <span className="text-muted-foreground">Prioritas</span>
-            <span className="font-medium text-orange-600">{priorityCount}</span>
+            <span className="font-medium text-warning">{priorityCount}</span>
           </div>
           <div className="flex items-center justify-between rounded-md bg-muted/30 px-2 py-1">
             <span className="text-muted-foreground">Disetujui</span>
-            <span className="font-medium text-green-600">{approvedCount}</span>
+            <span className="font-medium text-success">{approvedCount}</span>
           </div>
         </div> */}
 

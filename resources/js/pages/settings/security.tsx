@@ -146,7 +146,7 @@ export default function Security({
                   leave="transition ease-in-out"
                   leaveTo="opacity-0"
                 >
-                  <p className="text-sm text-neutral-600">Saved</p>
+                  <p className="text-sm text-muted-foreground">Saved</p>
                 </Transition>
               </div>
             </>
@@ -200,7 +200,7 @@ export default function Security({
               <div>
                 {hasSetupData ? (
                   <Button onClick={() => setShowSetupModal(true)}>
-                    <RiShieldCheckLine />
+                    <RiShieldCheckLine data-icon="inline-start" />
                     Continue setup
                   </Button>
                 ) : (

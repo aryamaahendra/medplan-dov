@@ -240,10 +240,13 @@ export function UnapprovedNeedPickerDialog({
                         onClick={() => handleSelect(need.id)}
                       >
                         {selectingId === need.id ? (
-                          <RiLoader4Line className="h-4 w-4 animate-spin" />
+                          <RiLoader4Line
+                            data-icon="inline-start"
+                            className="animate-spin"
+                          />
                         ) : (
                           <>
-                            <RiCheckLine className="mr-1 h-4 w-4" />
+                            <RiCheckLine data-icon="inline-start" />
                             Pilih
                           </>
                         )}

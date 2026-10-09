@@ -34,36 +34,35 @@ export function PriorityBadge({
 
   switch (normalizedLevel) {
     case 'high':
-      // Orange (Soft)
+      // Warning
       customClasses =
-        'bg-orange-50 text-orange-700 border-orange-200/50 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20';
+        'border-warning/30 bg-warning/15 text-warning-foreground dark:bg-warning/20 dark:text-warning';
       break;
     case 'medium':
-      // Blue (Soft)
+      // Info
       customClasses =
-        'bg-blue-50 text-blue-700 border-blue-200/50 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20';
+        'border-info/30 bg-info/15 text-info dark:bg-info/20 dark:text-info';
       break;
     case 'low':
-      // Gray (Soft)
-      customClasses =
-        'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
+      // Muted
+      customClasses = 'border-transparent bg-muted text-muted-foreground';
       break;
     case 'urgent':
     case 'extreme':
-      // Red (Soft)
+      // Destructive
       customClasses =
-        'bg-red-50 text-red-700 border-red-200/50 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20';
+        'border-destructive/30 bg-destructive/10 text-destructive dark:bg-destructive/20';
       break;
     case 'normal':
     case 'safe':
-      // Green (Soft)
+      // Success
       customClasses =
-        'bg-green-50 text-green-700 border-green-200/50 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20';
+        'border-success/30 bg-success/15 text-success-foreground dark:bg-success/20 dark:text-success';
       break;
     default:
-      // Generic gray fallback
+      // Generic fallback
       customClasses =
-        'bg-secondary/50 text-secondary-foreground border-transparent';
+        'border-transparent bg-secondary text-secondary-foreground';
   }
 
   const label = PRIORITY_LABELS[level] ?? level ?? fallback;

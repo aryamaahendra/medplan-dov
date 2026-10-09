@@ -89,7 +89,7 @@ export default function PdfViewer({
             disabled={pageNumber <= 1}
             onClick={() => changePage(-1)}
           >
-            <RiArrowLeftSLine className="h-4 w-4" />
+            <RiArrowLeftSLine />
           </Button>
           <p className="min-w-[100px] text-center text-xs font-medium">
             Halaman {pageNumber} dari {numPages || '?'}
@@ -100,7 +100,7 @@ export default function PdfViewer({
             disabled={pageNumber >= (numPages || 0)}
             onClick={() => changePage(1)}
           >
-            <RiArrowRightSLine className="h-4 w-4" />
+            <RiArrowRightSLine />
           </Button>
         </div>
 

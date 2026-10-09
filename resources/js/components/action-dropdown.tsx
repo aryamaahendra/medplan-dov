@@ -12,7 +12,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
 
 export interface ActionItem {
   label: string;
@@ -54,7 +53,7 @@ export function ActionDropdown({
             <Button
               size={'icon-sm'}
               variant={triggerVariant}
-              className={cn('', className)}
+              className={className}
             >
               <span className="sr-only">Open menu</span>
               <RiMoreFill />
@@ -82,7 +81,6 @@ export function ActionDropdown({
           return (
             <DropdownMenuItem
               key={index}
-              className="text-sm/relaxed"
               onClick={onClick}
               variant={variant}
               disabled={disabled}
@@ -90,7 +88,7 @@ export function ActionDropdown({
                 href ? <Link href={href} className="flex-1" /> : undefined
               }
             >
-              {Icon && <Icon className="mr-2 h-4 w-4" />}
+              {Icon && <Icon />}
               <span className="flex-1">{label}</span>
               {indicator && (
                 <span className="ml-auto flex h-3.5 w-3.5 items-center justify-center rounded-full bg-foreground text-background ring-2 ring-foreground">

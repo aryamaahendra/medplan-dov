@@ -81,23 +81,18 @@ export function NeedDetailDrawer({
         {/* Header with Title and Primary Badges */}
         <SheetHeader className="border-b bg-muted/20 p-5">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="outline" className="font-mono text-xs">
+            <Badge variant="outline" className="font-mono">
               {need.year}
             </Badge>
             {need.need_type?.name && (
-              <Badge variant="secondary" className="text-xs">
-                {need.need_type.name}
-              </Badge>
+              <Badge variant="secondary">{need.need_type.name}</Badge>
             )}
-            <Badge
-              variant={stageMeta.variant}
-              className="flex items-center gap-1 text-xs"
-            >
-              <StageIcon className="size-3" />
+            <Badge variant={stageMeta.variant}>
+              <StageIcon data-icon="inline-start" />
               {stageMeta.label}
             </Badge>
             {need.is_locked && (
-              <span className="inline-flex items-center gap-1 rounded bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">
+              <span className="inline-flex items-center gap-1 rounded bg-warning/10 px-2 py-0.5 text-xs font-medium text-warning-foreground dark:text-warning">
                 <RiLockLine className="size-3" />
                 Terkunci
               </span>
@@ -210,7 +205,7 @@ export function NeedDetailDrawer({
                       variant="destructive"
                       className="flex items-center gap-1"
                     >
-                      <RiStarFill className="size-3" />
+                      <RiStarFill data-icon="inline-start" />
                       Usulan Prioritas
                     </Badge>
                   )}
@@ -272,7 +267,7 @@ export function NeedDetailDrawer({
                       checklistScore >= 85
                         ? 'bg-primary'
                         : checklistScore >= 50
-                          ? 'bg-amber-500'
+                          ? 'bg-warning'
                           : 'bg-primary/40',
                     )}
                     style={{ width: `${checklistScore}%` }}
@@ -301,7 +296,7 @@ export function NeedDetailDrawer({
                       });
                     }}
                   >
-                    <RiFileTextLine className="mr-1.5 size-3.5" />
+                    <RiFileTextLine data-icon="inline-start" />
                     Buka Halaman Detail KAK
                   </Button>
                 </div>
@@ -363,7 +358,7 @@ export function NeedDetailDrawer({
                 </div>
 
                 {need.notes ? (
-                  <div className="mt-3 rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-amber-900 dark:text-amber-200">
+                  <div className="mt-3 rounded-lg border border-warning/30 bg-warning/10 p-3 text-warning-foreground dark:text-warning">
                     <span className="font-semibold">
                       Catatan Evaluasi Direktur:
                     </span>
@@ -396,7 +391,7 @@ export function NeedDetailDrawer({
                     </div>
                   )}
                   {need.unlocked_until && (
-                    <div className="flex items-center justify-between text-amber-600 dark:text-amber-400">
+                    <div className="flex items-center justify-between text-warning-foreground dark:text-warning">
                       <span>Perpanjangan Aktif Sampai:</span>
                       <span className="font-mono">
                         {formatDateTime(need.unlocked_until)}
@@ -437,7 +432,7 @@ export function NeedDetailDrawer({
                   onReview(need);
                 }}
               >
-                <RiQuillPenLine className="mr-1 size-3.5" />
+                <RiQuillPenLine data-icon="inline-start" />
                 Review Direktur
               </Button>
             )}
@@ -451,7 +446,7 @@ export function NeedDetailDrawer({
                   onEdit(need);
                 }}
               >
-                <RiEdit2Line className="mr-1 size-3.5" />
+                <RiEdit2Line data-icon="inline-start" />
                 Edit
               </Button>
             )}

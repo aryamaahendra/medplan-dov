@@ -275,17 +275,17 @@ export function GlobalDashboardControls({
             }
           }}
         >
-          <TabsList className="h-8">
-            <TabsTrigger value="executive" className="gap-1.5 text-xs">
-              <RiBriefcaseLine className="size-3.5" />
+          <TabsList>
+            <TabsTrigger value="executive">
+              <RiBriefcaseLine data-icon="inline-start" />
               <span>Kebijakan & Anggaran</span>
             </TabsTrigger>
-            <TabsTrigger value="operations" className="gap-1.5 text-xs">
-              <RiDashboardLine className="size-3.5" />
+            <TabsTrigger value="operations">
+              <RiDashboardLine data-icon="inline-start" />
               <span>Progres & Kepatuhan</span>
             </TabsTrigger>
-            <TabsTrigger value="analytical" className="gap-1.5 text-xs">
-              <RiLineChartLine className="size-3.5" />
+            <TabsTrigger value="analytical">
+              <RiLineChartLine data-icon="inline-start" />
               <span>Analisis & Renstra</span>
             </TabsTrigger>
           </TabsList>

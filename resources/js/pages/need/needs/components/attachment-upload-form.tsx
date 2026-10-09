@@ -122,7 +122,7 @@ export function AttachmentUploadForm({ needId }: AttachmentUploadFormProps) {
             className="w-full"
             disabled={processing || !data.file}
           >
-            <RiUploadLine />
+            <RiUploadLine data-icon="inline-start" />
             Unggah Berkas
           </Button>
         </form>

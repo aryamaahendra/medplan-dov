@@ -12,8 +12,9 @@ import {
 import { useState, useMemo } from 'react';
 
 import { Badge } from '@/components/ui/badge';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import {
   Table,
   TableBody,
@@ -292,15 +293,36 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
         subtitle="Distribusi dukungan usulan kebutuhan terhadap seluruh sasaran strategis, termasuk sasaran dengan 0 usulan pendukung."
         headerActions={
           <div className="flex flex-wrap items-center gap-2">
-            <Button
-              type="button"
-              variant={filterZeroSupportOnly ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setFilterZeroSupportOnly(!filterZeroSupportOnly)}
-              className="font-normal"
-            >
-              Hanya Tanpa Dukungan ({zeroSupportCount})
-            </Button>
+            <div className="flex items-center gap-1.5 rounded-lg border border-border/80 bg-muted/40 px-2 py-1 text-xs">
+              <span
+                onClick={() => setFilterZeroSupportOnly(false)}
+                className={cn(
+                  'cursor-pointer font-medium transition-colors select-none',
+                  !filterZeroSupportOnly
+                    ? 'font-semibold text-foreground'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                Semua Sasaran
+              </span>
+              <Switch
+                size="sm"
+                checked={filterZeroSupportOnly}
+                onCheckedChange={setFilterZeroSupportOnly}
+                aria-label="Filter sasaran tanpa dukungan"
+              />
+              <span
+                onClick={() => setFilterZeroSupportOnly(true)}
+                className={cn(
+                  'cursor-pointer font-medium transition-colors select-none',
+                  filterZeroSupportOnly
+                    ? 'font-semibold text-foreground'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                Hanya Tanpa Dukungan ({zeroSupportCount})
+              </span>
+            </div>
           </div>
         }
         tableView={
@@ -370,13 +392,8 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
 
             <div className="flex items-center gap-2 font-mono text-xs">
               <span className="text-muted-foreground">Katalog:</span>
-              <Badge variant="outline" className="font-normal">
-                {supportedCount} Didukung
-              </Badge>
-              <Badge
-                variant="secondary"
-                className="font-normal text-destructive"
-              >
+              <Badge variant="outline">{supportedCount} Didukung</Badge>
+              <Badge variant="secondary" className="text-destructive">
                 {zeroSupportCount} Tanpa Dukungan
               </Badge>
             </div>

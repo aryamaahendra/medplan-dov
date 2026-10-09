@@ -62,7 +62,7 @@ export function NeedSidebar({ need }: NeedSidebarProps) {
             setIsLockDialogOpen(true);
           }}
         >
-          <RiLockLine className="h-4 w-4" />
+          <RiLockLine data-icon="inline-start" />
           Kunci Usulan
         </Button>
       )}
@@ -75,7 +75,7 @@ export function NeedSidebar({ need }: NeedSidebarProps) {
             setIsLockDialogOpen(true);
           }}
         >
-          <RiLockUnlockLine className="h-4 w-4" />
+          <RiLockUnlockLine data-icon="inline-start" />
           Buka Kunci / Beri Perpanjangan
         </Button>
       )}
@@ -84,7 +84,7 @@ export function NeedSidebar({ need }: NeedSidebarProps) {
         className="relative w-full"
         onClick={() => setIsReviewDialogOpen(true)}
       >
-        <RiQuillPenLine />
+        <RiQuillPenLine data-icon="inline-start" />
         Review Direktur
         {need.notes && (
           <span className="absolute -top-1.5 -left-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-background">

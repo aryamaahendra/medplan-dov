@@ -117,10 +117,10 @@ export function FilePreviewDialog({
             <Button
               variant="default"
               size="lg"
-              className="rounded-full shadow-2xl transition-transform hover:scale-105"
+              className="shadow-2xl transition-transform hover:scale-105"
               render={
                 <a href={downloadUrl} download={fileName}>
-                  <RiDownloadLine />
+                  <RiDownloadLine data-icon="inline-start" />
                   Download File
                 </a>
               }

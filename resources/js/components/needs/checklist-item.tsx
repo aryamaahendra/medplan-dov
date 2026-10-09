@@ -32,7 +32,7 @@ export function ChecklistItem({
     <div className="flex flex-col gap-4 p-4 transition-colors hover:bg-muted/5">
       <div className="flex items-start gap-6">
         <Badge variant="outline" className="mt-0.5">
-          <RiHashtag />
+          <RiHashtag data-icon="inline-start" />
           {index + 1}
         </Badge>
 

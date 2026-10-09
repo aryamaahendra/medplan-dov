@@ -143,8 +143,8 @@ export function NeedsAttentionStrip({
       {activeFilter && (
         <Button
           variant="ghost"
-          size="sm"
-          className="h-6 px-2 text-[11px] text-muted-foreground hover:text-foreground"
+          size="xs"
+          className="text-muted-foreground hover:text-foreground"
           onClick={() => onFilterChange(null)}
         >
           Reset Filter Cepat

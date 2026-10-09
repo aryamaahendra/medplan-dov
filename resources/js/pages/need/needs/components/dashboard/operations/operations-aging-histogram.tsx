@@ -50,9 +50,11 @@ export function OperationsAgingHistogram({
   return (
     <Card className="flex flex-col border-border/80">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <RiTimeLine className="size-4 text-primary" />
-          <span>Distribusi Ketidakaktifan Usulan (Aging Histogram)</span>
+        <CardTitle>
+          <span className="flex items-center gap-2">
+            <RiTimeLine className="size-4 text-primary" />
+            <span>Distribusi Ketidakaktifan Usulan (Aging Histogram)</span>
+          </span>
         </CardTitle>
         <CardDescription>
           Berapa lama usulan tidak disentuh atau tidak mengalami perubahan data
@@ -159,7 +161,7 @@ export function OperationsAgingHistogram({
                                 ? 'outline'
                                 : 'secondary'
                           }
-                          className="font-mono text-xs"
+                          className="font-mono"
                         >
                           {formatNumber(bucket.count)} usulan ({sharePct}%)
                         </Badge>

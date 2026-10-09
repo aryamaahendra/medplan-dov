@@ -64,10 +64,10 @@ export function DataTableToolbar({
             variant="ghost"
             size="sm"
             onClick={onReset}
-            className="h-8 px-2 lg:px-3"
+            className="px-2 lg:px-3"
           >
             Reset
-            <RiCloseLine className="ml-1 size-4" />
+            <RiCloseLine data-icon="inline-end" />
           </Button>
         )}
 

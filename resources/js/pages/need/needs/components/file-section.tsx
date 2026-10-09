@@ -111,7 +111,7 @@ export function FileSection({
           size="sm"
           onClick={() => fileInputRef.current?.click()}
         >
-          <RiAttachmentLine className="mr-2 h-4 w-4" />
+          <RiAttachmentLine data-icon="inline-start" />
           Pilih File
         </Button>
         <input
@@ -215,10 +215,10 @@ export function FileSection({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-destructive"
+                className="text-destructive"
                 onClick={() => removeNewFile(index)}
               >
-                <RiDeleteBinLine className="h-4 w-4" />
+                <RiDeleteBinLine />
               </Button>
             </div>
           ))}

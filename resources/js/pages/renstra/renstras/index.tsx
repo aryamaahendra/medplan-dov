@@ -90,7 +90,7 @@ export default function RenstrasIndex({
           </div>
           {hasPermission('create renstras') && (
             <Button onClick={onCreate}>
-              <RiAddLine className="h-4 w-4" />
+              <RiAddLine data-icon="inline-start" />
               Tambah Renstra
             </Button>
           )}

@@ -101,14 +101,14 @@ export function FundingSection({
               <span className="truncate">
                 {selectedSourcesLabel || 'Pilih sumber dana...'}
               </span>
-              <RiArrowDownSLine className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              <RiArrowDownSLine data-icon="inline-end" className="opacity-50" />
             </PopoverTrigger>
             <PopoverContent className="w-(--anchor-width) p-0" align="start">
               <div className="flex items-center border-b px-3">
                 <RiSearchLine className="mr-2 h-4 w-4 shrink-0 opacity-50" />
                 <Input
                   placeholder="Cari atau tambah sumber dana..."
-                  className="h-10 border-none bg-transparent outline-none focus-visible:ring-0"
+                  className="border-none bg-transparent shadow-none focus-visible:ring-0"
                   value={sourceSearch}
                   onChange={(e) => setSourceSearch(e.target.value)}
                 />

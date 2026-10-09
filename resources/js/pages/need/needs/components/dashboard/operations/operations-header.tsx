@@ -83,10 +83,7 @@ export function OperationsHeader({
 
           <span className="text-muted-foreground">-</span>
 
-          <Badge
-            variant="outline"
-            className="font-normal text-muted-foreground"
-          >
+          <Badge variant="outline" className="text-muted-foreground">
             <RiShieldCheckLine
               data-icon="inline-start"
               className="text-primary"
@@ -101,18 +98,15 @@ export function OperationsHeader({
             Diperbarui: {meta?.formatted_time ?? 'Hari ini'}
           </span>
           <Button
-            size="sm"
+            size="icon-sm"
             variant="ghost"
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground"
             title="Muat ulang data operasional"
           >
             <RiRefreshLine
-              className={cn(
-                'size-3.5',
-                isRefreshing && 'animate-spin text-primary',
-              )}
+              className={cn(isRefreshing && 'animate-spin text-primary')}
             />
           </Button>
         </div>

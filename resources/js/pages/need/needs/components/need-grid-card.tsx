@@ -103,8 +103,8 @@ export function NeedGridCard({
   }
 
   return (
-    <Card className="flex flex-col overflow-hidden py-0">
-      <CardContent className="flex flex-1 flex-col gap-0 p-0">
+    <Card className="flex flex-col overflow-hidden">
+      <CardContent className="flex flex-1 flex-col p-0">
         <div className="">
           {/* Identity row */}
           <div className="flex items-start gap-2 p-3 pb-2">
@@ -161,22 +161,18 @@ export function NeedGridCard({
 
           {/* Status + Director */}
           <div className="flex flex-wrap items-center gap-1.5 border-t px-3 py-2">
-            <Badge
-              variant={STATUS_VARIANTS[need.status]}
-              className="flex items-center gap-1"
-            >
-              {StatusIcon && <StatusIcon className="h-3 w-3" />}
+            <Badge variant={STATUS_VARIANTS[need.status]}>
+              {StatusIcon && <StatusIcon data-icon="inline-start" />}
               {STATUS_LABELS[need.status]}
             </Badge>
 
             <Badge
               variant={need.approved_by_director_at ? 'default' : 'secondary'}
-              className="flex items-center gap-1"
             >
               {need.approved_by_director_at ? (
-                <RiCheckboxCircleLine className="h-3 w-3" />
+                <RiCheckboxCircleLine data-icon="inline-start" />
               ) : (
-                <RiCloseCircleLine className="h-3 w-3" />
+                <RiCloseCircleLine data-icon="inline-start" />
               )}
               {need.approved_by_director_at ? 'Disetujui' : 'Belum Review'}
             </Badge>
@@ -195,7 +191,7 @@ export function NeedGridCard({
                 percentage >= 85
                   ? 'text-primary'
                   : percentage >= 50
-                    ? 'text-amber-500'
+                    ? 'text-warning'
                     : 'text-muted-foreground',
               )}
             >
@@ -211,7 +207,7 @@ export function NeedGridCard({
                   : percentage >= 85
                     ? 'bg-primary/80'
                     : percentage > 50
-                      ? 'bg-amber-400'
+                      ? 'bg-warning'
                       : 'bg-primary/30',
               )}
               style={{ width: `${percentage}%` }}

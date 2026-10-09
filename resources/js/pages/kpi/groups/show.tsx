@@ -78,7 +78,7 @@ export default function KpiGroupShow({ group }: KpiGroupShowProps) {
             </div>
             {hasPermission('create kpi-indicators') && (
               <Button onClick={onCreateIndicator}>
-                <RiAddLine />
+                <RiAddLine data-icon="inline-start" />
                 Tambah Indikator Utama
               </Button>
             )}

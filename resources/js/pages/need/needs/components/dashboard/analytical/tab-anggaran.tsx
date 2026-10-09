@@ -340,7 +340,8 @@ export function TabAnggaran({
                       <Button
                         type="button"
                         variant="ghost"
-                        size="sm"
+                        size="xs"
+                        className="text-primary"
                         onClick={() => {
                           if (u.unit_id !== null) {
                             onSliceChange((prev) => ({
@@ -349,7 +350,6 @@ export function TabAnggaran({
                             }));
                           }
                         }}
-                        className="h-6 px-2 text-xs text-primary"
                       >
                         Pilih Irisan
                       </Button>

@@ -189,18 +189,16 @@ export function IndicatorTable({
                     <TableCell className="text-center">
                       <DropdownMenu>
                         <DropdownMenuTrigger
-                          render={
-                            <Button variant="ghost" className="h-8 w-8 p-0" />
-                          }
+                          render={<Button variant="ghost" size="icon" />}
                         >
-                          <RiMoreFill className="h-4 w-4" />
+                          <RiMoreFill />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                           {onEdit && hasPermission('update kpi-indicators') && (
                             <DropdownMenuItem onClick={() => onEdit(indicator)}>
-                              <RiEditLine className="mr-2 h-4 w-4" />
-                              RiEditLine
+                              <RiEditLine />
+                              Edit
                             </DropdownMenuItem>
                           )}
                           {(onEdit || onDelete) && <DropdownMenuSeparator />}
@@ -209,7 +207,7 @@ export function IndicatorTable({
                               className="text-destructive"
                               onClick={() => setDeletingIndicator(indicator)}
                             >
-                              <RiDeleteBinLine className="mr-2 h-4 w-4" />
+                              <RiDeleteBinLine />
                               Hapus
                             </DropdownMenuItem>
                           )}

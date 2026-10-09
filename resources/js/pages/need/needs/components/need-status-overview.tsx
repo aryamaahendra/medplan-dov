@@ -42,7 +42,7 @@ export function NeedStatusOverview({ need }: NeedStatusOverviewProps) {
               variant={STATUS_VARIANTS[need.status]}
               className="flex items-center gap-1"
             >
-              {StatusIcon && <StatusIcon className="h-3.5 w-3.5" />}
+              {StatusIcon && <StatusIcon data-icon="inline-start" />}
               {STATUS_LABELS[need.status]}
             </Badge>
           </div>
@@ -53,9 +53,9 @@ export function NeedStatusOverview({ need }: NeedStatusOverviewProps) {
               className="flex items-center gap-1.5"
             >
               {need.approved_by_director_at ? (
-                <RiCheckboxCircleLine className="h-3.5 w-3.5" />
+                <RiCheckboxCircleLine data-icon="inline-start" />
               ) : (
-                <RiCloseCircleLine className="h-3.5 w-3.5" />
+                <RiCloseCircleLine data-icon="inline-start" />
               )}
               {need.approved_by_director_at ? 'Disetujui' : 'Belum'}
             </Badge>

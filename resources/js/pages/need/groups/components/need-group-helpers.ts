@@ -25,9 +25,8 @@ export function getSubmissionStatus(group: NeedGroup): SubmissionStatusInfo {
     return {
       status: 'indefinite',
       label: 'Tanpa Batas Waktu',
-      badgeClass:
-        'border-zinc-500/20 bg-zinc-500/10 text-zinc-600 dark:text-zinc-400',
-      dotClass: 'bg-zinc-400',
+      badgeClass: 'border-transparent bg-muted text-muted-foreground',
+      dotClass: 'bg-muted-foreground',
     };
   }
 
@@ -38,8 +37,8 @@ export function getSubmissionStatus(group: NeedGroup): SubmissionStatusInfo {
       status: 'upcoming',
       label: 'Akan Datang',
       badgeClass:
-        'border-sky-500/20 bg-sky-500/10 text-sky-600 dark:text-sky-400',
-      dotClass: 'bg-sky-500',
+        'border-info/30 bg-info/15 text-info dark:bg-info/20 dark:text-info',
+      dotClass: 'bg-info',
     };
   }
 
@@ -57,8 +56,8 @@ export function getSubmissionStatus(group: NeedGroup): SubmissionStatusInfo {
     status: 'open',
     label: 'Pengajuan Dibuka',
     badgeClass:
-      'border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-    dotClass: 'bg-emerald-500 animate-pulse',
+      'border-success/30 bg-success/15 text-success-foreground dark:bg-success/20 dark:text-success',
+    dotClass: 'bg-success animate-pulse',
   };
 }
 

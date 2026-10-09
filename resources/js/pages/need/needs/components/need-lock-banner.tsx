@@ -74,17 +74,16 @@ export function NeedLockBanner({ need, className }: NeedLockBannerProps) {
   if (!isLocked && unlockedUntil) {
     return (
       <Alert
-        variant="default"
         className={cn(
-          'border-amber-500/50 bg-amber-500/10 text-amber-900 dark:border-amber-500/30 dark:bg-amber-950/40 dark:text-amber-200',
+          'border-warning/40 bg-warning/10 text-warning-foreground dark:border-warning/30 dark:bg-warning/20',
           className,
         )}
       >
-        <RiTimeLine className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-        <AlertTitle className="font-semibold text-amber-800 dark:text-amber-300">
+        <RiTimeLine className="text-warning" />
+        <AlertTitle className="font-semibold text-warning-foreground">
           Perpanjangan Waktu Aktif
         </AlertTitle>
-        <AlertDescription className="space-y-1 text-sm text-amber-700 dark:text-amber-300/90">
+        <AlertDescription className="space-y-1 text-sm text-warning-foreground/90">
           <p>
             Usulan ini sedang dalam masa perpanjangan pengajuan. Anda dapat
             melakukan perubahan sebelum batas waktu berakhir.
@@ -96,7 +95,7 @@ export function NeedLockBanner({ need, className }: NeedLockBannerProps) {
             </p>
           )}
           {need.lock_reason && (
-            <p className="text-xs text-amber-600/90 italic dark:text-amber-400/80">
+            <p className="text-xs text-warning-foreground/80 italic">
               Alasan: {need.lock_reason}
             </p>
           )}
@@ -111,14 +110,8 @@ export function NeedLockBanner({ need, className }: NeedLockBannerProps) {
   }
 
   return (
-    <Alert
-      variant="destructive"
-      className={cn(
-        'border-destructive/50 bg-destructive/10 text-destructive dark:border-destructive/30 dark:bg-destructive/15',
-        className,
-      )}
-    >
-      <RiLockLine className="h-4 w-4" />
+    <Alert variant="destructive" className={className}>
+      <RiLockLine />
       <AlertTitle className="font-semibold">
         Usulan Kebutuhan Terkunci
       </AlertTitle>

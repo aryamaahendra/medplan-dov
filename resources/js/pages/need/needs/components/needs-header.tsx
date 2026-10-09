@@ -92,7 +92,7 @@ export function NeedsHeader({
           'create any needs',
         ]) && (
           <Button onClick={onCreate}>
-            <RiAddLine />
+            <RiAddLine data-icon="inline-start" />
             Tambah Usulan
           </Button>
         )}

@@ -50,10 +50,10 @@ export function NeedGroupsSummaryStats({
           <span className="text-xs font-medium tracking-wider uppercase">
             Kelompok Aktif
           </span>
-          <RiCheckboxCircleLine className="size-4 text-emerald-500" />
+          <RiCheckboxCircleLine className="size-4 text-success" />
         </div>
         <div className="mt-2 flex items-baseline gap-2">
-          <span className="font-heading text-2xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">
+          <span className="font-heading text-2xl font-bold tracking-tight text-success-foreground dark:text-success">
             {formatNumber(activeCount)}
           </span>
           <span className="text-xs text-muted-foreground">
@@ -67,13 +67,13 @@ export function NeedGroupsSummaryStats({
           <span className="text-xs font-medium tracking-wider uppercase">
             Usulan Terkumpul
           </span>
-          <RiFileList3Line className="size-4 text-sky-500" />
+          <RiFileList3Line className="size-4 text-info" />
         </div>
         <div className="mt-2 flex items-baseline gap-2">
           <span className="font-heading text-2xl font-bold tracking-tight text-foreground">
             {formatNumber(totalNeeds)}
           </span>
-          <span className="text-xs text-emerald-600 dark:text-emerald-400">
+          <span className="text-xs text-success-foreground dark:text-success">
             ({formatNumber(totalApproved)} Disetujui)
           </span>
         </div>
@@ -84,7 +84,7 @@ export function NeedGroupsSummaryStats({
           <span className="text-xs font-medium tracking-wider uppercase">
             Akumulasi Anggaran
           </span>
-          <RiCoinsLine className="size-4 text-amber-500" />
+          <RiCoinsLine className="size-4 text-warning" />
         </div>
         <div className="mt-2 flex items-baseline gap-2">
           <span className="font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl">

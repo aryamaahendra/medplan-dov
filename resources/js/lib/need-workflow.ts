@@ -27,7 +27,7 @@ export const WORKFLOW_STAGES: Record<NeedWorkflowStage, WorkflowStageMeta> = {
     variant: 'outline',
     icon: RiTimeLine,
     colorClass:
-      'bg-amber-500/10 text-amber-700 border-amber-500/20 dark:text-amber-400',
+      'border-warning/20 bg-warning/15 text-warning-foreground dark:text-warning',
   },
   approved: {
     label: 'Disetujui',
@@ -78,10 +78,10 @@ export function getCombinedPriority(need: Need): {
   const label = `Urgensi ${urgencyNorm === 'high' ? 'Tinggi' : urgencyNorm === 'medium' ? 'Sedang' : 'Rendah'} · Dampak ${impactNorm === 'high' ? 'Tinggi' : impactNorm === 'medium' ? 'Sedang' : 'Rendah'}`;
 
   const colorClass = isHigh
-    ? 'bg-orange-50 text-orange-700 border-orange-200/60 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20'
+    ? 'border-warning/30 bg-warning/15 text-warning-foreground dark:bg-warning/20 dark:text-warning'
     : isMedium
-      ? 'bg-blue-50 text-blue-700 border-blue-200/60 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20'
-      : 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
+      ? 'border-info/30 bg-info/15 text-info dark:bg-info/20 dark:text-info'
+      : 'border-transparent bg-muted text-muted-foreground';
 
   return { label, level, colorClass };
 }

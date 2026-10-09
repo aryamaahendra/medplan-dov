@@ -137,10 +137,8 @@ export default function PlanningActivityVersionsIndex({
                 }}
               >
                 <RiRefreshLine
-                  className={cn(
-                    'mr-2 h-4 w-4',
-                    isRecalculating && 'animate-spin',
-                  )}
+                  className={cn(isRecalculating && 'animate-spin')}
+                  data-icon="inline-start"
                 />
                 {isRecalculating ? 'Recalculating...' : 'Recalculate'}
               </Button>

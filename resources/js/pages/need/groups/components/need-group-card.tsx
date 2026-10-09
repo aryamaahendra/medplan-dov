@@ -148,7 +148,7 @@ export function NeedGroupCard({
         <div className="flex flex-col justify-between gap-2">
           <div className="flex items-center justify-between font-mono text-xs">
             <span className="flex items-center gap-1.5 font-medium text-muted-foreground">
-              <RiTimeLine className="size-3.5 text-sky-500" />
+              <RiTimeLine className="size-3.5 text-info" />
               PROGRES WAKTU
             </span>
             <span className="font-semibold text-foreground">
@@ -160,7 +160,7 @@ export function NeedGroupCard({
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 timeline.status === 'open'
-                  ? 'bg-sky-500'
+                  ? 'bg-info'
                   : timeline.status === 'closed'
                     ? 'bg-muted-foreground/60'
                     : 'bg-primary'
@@ -180,10 +180,10 @@ export function NeedGroupCard({
         <div className="flex flex-col justify-between gap-2">
           <div className="flex items-center justify-between font-mono text-xs">
             <span className="flex items-center gap-1.5 font-medium text-muted-foreground">
-              <RiPulseLine className="size-3.5 text-emerald-500" />
+              <RiPulseLine className="size-3.5 text-success" />
               RASIO PERSETUJUAN
             </span>
-            <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+            <span className="font-semibold text-success">
               {metrics.approvalRate}% VALID ({metrics.approvedCount}/
               {metrics.needCount})
             </span>
@@ -191,22 +191,22 @@ export function NeedGroupCard({
 
           <div className="flex h-2 w-full overflow-hidden rounded-full bg-border">
             <div
-              className="bg-emerald-500 transition-all duration-500"
+              className="bg-success transition-all duration-500"
               style={{ width: `${metrics.approvalRate}%` }}
               title={`Disetujui: ${metrics.approvedCount}`}
             />
             <div
-              className="bg-amber-500 transition-all duration-500"
+              className="bg-warning transition-all duration-500"
               style={{ width: `${metrics.priorityRate}%` }}
               title={`Prioritas: ${metrics.priorityCount}`}
             />
           </div>
 
           <div className="flex items-center justify-between font-mono text-[11px]">
-            <span className="text-emerald-600 dark:text-emerald-400">
+            <span className="text-success">
               {metrics.approvedCount} Disetujui
             </span>
-            <span className="text-amber-600 dark:text-amber-400">
+            <span className="text-warning">
               {metrics.priorityCount} Prioritas
             </span>
             <span className="text-muted-foreground">
@@ -251,9 +251,9 @@ export function NeedGroupCard({
         <div className="rounded-xl border border-border/70 bg-muted/30 p-3">
           <div className="flex items-center justify-between font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
             <span>Urgensi</span>
-            <RiFireLine className="size-3 text-amber-500" />
+            <RiFireLine className="size-3 text-warning" />
           </div>
-          <div className="mt-1 font-heading text-lg font-bold text-amber-600 dark:text-amber-400">
+          <div className="mt-1 font-heading text-lg font-bold text-warning">
             {metrics.priorityRate}%
           </div>
           <div className="text-[11px] text-muted-foreground">
@@ -265,9 +265,9 @@ export function NeedGroupCard({
         <div className="rounded-xl border border-border/70 bg-muted/30 p-3">
           <div className="flex items-center justify-between font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
             <span>Validasi</span>
-            <RiShieldCheckLine className="size-3 text-emerald-500" />
+            <RiShieldCheckLine className="size-3 text-success" />
           </div>
-          <div className="mt-1 font-heading text-lg font-bold text-emerald-600 dark:text-emerald-400">
+          <div className="mt-1 font-heading text-lg font-bold text-success">
             {metrics.approvalRate}%
           </div>
           <div className="text-[11px] text-muted-foreground">

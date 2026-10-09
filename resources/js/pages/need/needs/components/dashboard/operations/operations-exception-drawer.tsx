@@ -109,12 +109,11 @@ export function OperationsExceptionDrawer({
               <Button
                 size="sm"
                 variant="outline"
-                className="h-8 gap-1.5 text-xs font-medium"
                 nativeButton={false}
                 render={
                   <Link href={filterUrl} onClick={() => onOpenChange(false)}>
                     <span>Buka Semua di Daftar Usulan</span>
-                    <RiExternalLinkLine className="size-3.5" />
+                    <RiExternalLinkLine data-icon="inline-end" />
                   </Link>
                 }
               />
@@ -166,10 +165,7 @@ export function OperationsExceptionDrawer({
                         )}
 
                         {item.is_priority && (
-                          <Badge
-                            variant="default"
-                            className="h-4 bg-warning px-1 text-[9px] text-warning-foreground"
-                          >
+                          <Badge className="bg-warning text-warning-foreground">
                             Prioritas
                           </Badge>
                         )}
@@ -242,20 +238,18 @@ export function OperationsExceptionDrawer({
                     <div className="flex shrink-0 items-center gap-1.5 pt-1">
                       {onOpenLockDialog && item.is_locked && (
                         <Button
-                          size="sm"
+                          size="xs"
                           variant="ghost"
                           onClick={() => onOpenLockDialog(item.id, 'unlock')}
-                          className="h-7 px-2 text-[11px]"
                         >
                           Buka Kunci
                         </Button>
                       )}
                       {onOpenLockDialog && !item.is_locked && (
                         <Button
-                          size="sm"
+                          size="xs"
                           variant="ghost"
                           onClick={() => onOpenLockDialog(item.id, 'lock')}
-                          className="h-7 px-2 text-[11px]"
                         >
                           Kunci
                         </Button>

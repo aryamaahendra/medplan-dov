@@ -60,9 +60,11 @@ export default function TwoFactorRecoveryCodes({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex gap-3">
-          <RiLockLine className="size-4" aria-hidden="true" />
-          2FA recovery codes
+        <CardTitle>
+          <span className="flex items-center gap-3">
+            <RiLockLine className="size-4" aria-hidden="true" />
+            2FA recovery codes
+          </span>
         </CardTitle>
         <CardDescription>
           Recovery codes let you regain access if you lose your 2FA device.
@@ -77,7 +79,10 @@ export default function TwoFactorRecoveryCodes({
             aria-expanded={codesAreVisible}
             aria-controls="recovery-codes-section"
           >
-            <RecoveryCodeIconComponent className="size-4" aria-hidden="true" />
+            <RecoveryCodeIconComponent
+              data-icon="inline-start"
+              aria-hidden="true"
+            />
             {codesAreVisible ? 'Hide' : 'View'} recovery codes
           </Button>
 

@@ -106,7 +106,7 @@ export function DataTable<TData extends RowData, TValue>({
 
       {view === 'table' ? (
         <div className="rounded-md border">
-          <Table className="text-sm">
+          <Table>
             {customThead ? (
               customThead
             ) : (

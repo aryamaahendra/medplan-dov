@@ -37,7 +37,7 @@ export const getColumns = (
     accessorKey: 'email',
     header: (props) => <DataTableColumnHeader {...props} title="Email" />,
     meta: {
-      cellClassName: 'text-blue-500 font-medium',
+      cellClassName: 'text-primary font-medium',
     },
   },
   {

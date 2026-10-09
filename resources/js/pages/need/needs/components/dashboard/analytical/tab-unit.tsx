@@ -92,10 +92,7 @@ export function TabUnit({ payload, slice, onSliceChange }: TabUnitProps) {
               Unit Kerja Aktif
             </span>
             {isScopedRole && (
-              <Badge
-                variant="outline"
-                className="border-border/80 bg-muted/40 font-normal"
-              >
+              <Badge variant="outline" className="border-border/80 bg-muted/40">
                 <RiLockLine
                   data-icon="inline-start"
                   className="text-muted-foreground"
@@ -145,12 +142,14 @@ export function TabUnit({ payload, slice, onSliceChange }: TabUnitProps) {
 
       {/* 2. UNIT HEADER SNAPSHOT */}
       <Card size="sm" className="border-border/70 shadow-xs">
-        <CardHeader className="border-b-0 pb-0">
-          <CardTitle className="flex items-center gap-2">
-            <span>{currentUnitStat?.name ?? 'Unit Kerja'}</span>
-            <Badge variant={approvalRate >= 70 ? 'default' : 'secondary'}>
-              Tingkat Persetujuan {approvalRate}%
-            </Badge>
+        <CardHeader>
+          <CardTitle>
+            <span className="flex items-center gap-2">
+              <span>{currentUnitStat?.name ?? 'Unit Kerja'}</span>
+              <Badge variant={approvalRate >= 70 ? 'default' : 'secondary'}>
+                Tingkat Persetujuan {approvalRate}%
+              </Badge>
+            </span>
           </CardTitle>
           {currentUnitStat?.parents && currentUnitStat.parents.length > 0 && (
             <CardDescription>

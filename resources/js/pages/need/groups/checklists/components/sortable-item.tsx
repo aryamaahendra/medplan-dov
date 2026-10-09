@@ -100,7 +100,7 @@ export function SortableItem({
             className="text-muted-foreground hover:text-destructive"
             onClick={() => onRemove(question.id)}
           >
-            <RiDeleteBinLine className="h-4 w-4" />
+            <RiDeleteBinLine />
           </Button>
         </div>
       </div>

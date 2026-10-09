@@ -75,9 +75,11 @@ export function OperationsUnitProgressTable({
   return (
     <Card className="flex h-full flex-col border-border/80">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <RiBuildingLine className="size-4 text-muted-foreground" />
-          <span>Progres Pengajuan per Unit Kerja</span>
+        <CardTitle>
+          <span className="flex items-center gap-2">
+            <RiBuildingLine className="size-4 text-muted-foreground" />
+            <span>Progres Pengajuan per Unit Kerja</span>
+          </span>
         </CardTitle>
         <CardDescription>
           Monitoring sebaran usulan, kesiapan berkas, dan unit tanpa pengajuan
@@ -219,7 +221,7 @@ export function OperationsUnitProgressTable({
                             {!item.has_submission && (
                               <Badge
                                 variant="outline"
-                                className="h-4 border-warning/40 px-1 font-mono text-[9px] text-warning-foreground dark:text-warning"
+                                className="border-warning/40 font-mono text-warning-foreground dark:text-warning"
                               >
                                 Belum Mengajukan
                               </Badge>
@@ -319,9 +321,9 @@ export function OperationsUnitProgressTable({
                       {/* Link action */}
                       <TableCell className="text-center">
                         <Button
-                          size="sm"
+                          size="icon-xs"
                           variant="ghost"
-                          className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+                          className="text-muted-foreground hover:text-foreground"
                           nativeButton={false}
                           render={
                             <Link

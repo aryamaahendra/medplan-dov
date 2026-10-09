@@ -134,7 +134,7 @@ export function PriorityStatusSection({
           className={cn(
             'overflow-hidden rounded-lg border transition-all duration-200',
             data.is_priority
-              ? 'border-red-500/30! bg-red-500/10! dark:border-red-500/20! dark:bg-red-500/5!'
+              ? 'border-destructive/30! bg-destructive/10! dark:border-destructive/20! dark:bg-destructive/10!'
               : 'border-muted! bg-muted/30! dark:bg-muted/10!',
           )}
         >
@@ -145,14 +145,14 @@ export function PriorityStatusSection({
                   className={cn(
                     'h-2 w-2 rounded-full',
                     data.is_priority
-                      ? 'animate-pulse bg-red-500'
+                      ? 'animate-pulse bg-destructive'
                       : 'bg-muted-foreground/30',
                   )}
                 />
                 <span
                   className={cn(
                     'text-base font-semibold',
-                    data.is_priority ? 'text-red-700 dark:text-red-400' : '',
+                    data.is_priority ? 'text-destructive' : '',
                   )}
                 >
                   {data.is_priority

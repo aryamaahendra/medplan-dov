@@ -50,7 +50,7 @@ export function TechSpecExtra({
           size="sm"
           onClick={() => fileInputRef.current?.click()}
         >
-          <RiUploadCloudLine className="h-4 w-4" />
+          <RiUploadCloudLine data-icon="inline-start" />
           Unggah Dokumen
         </Button>
         <input

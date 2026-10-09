@@ -12,6 +12,7 @@ import {
 import { useMemo, useState } from 'react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import {
   Table,
   TableBody,
@@ -751,31 +752,37 @@ export function TabRingkasan({
         headerActions={
           <div className="flex flex-wrap items-center gap-2">
             {/* Metric Switcher */}
-            <div className="flex items-center rounded-lg border border-border/80 bg-muted/40 p-0.5">
-              <button
-                type="button"
+            <div className="flex items-center gap-1.5 rounded-lg border border-border/80 bg-muted/40 px-2 py-1 text-xs">
+              <span
                 onClick={() => setSelectedMetric('budget')}
                 className={cn(
-                  'cursor-pointer rounded-md px-2.5 py-1 text-xs font-medium transition-all',
+                  'cursor-pointer font-medium transition-colors select-none',
                   selectedMetric === 'budget'
-                    ? 'bg-background text-foreground shadow-xs'
+                    ? 'font-semibold text-foreground'
                     : 'text-muted-foreground hover:text-foreground',
                 )}
               >
                 Total Anggaran
-              </button>
-              <button
-                type="button"
+              </span>
+              <Switch
+                size="sm"
+                checked={selectedMetric === 'count'}
+                onCheckedChange={(checked) =>
+                  setSelectedMetric(checked ? 'count' : 'budget')
+                }
+                aria-label="Alihkan antara Total Anggaran dan Banyak Usulan"
+              />
+              <span
                 onClick={() => setSelectedMetric('count')}
                 className={cn(
-                  'cursor-pointer rounded-md px-2.5 py-1 text-xs font-medium transition-all',
+                  'cursor-pointer font-medium transition-colors select-none',
                   selectedMetric === 'count'
-                    ? 'bg-background text-foreground shadow-xs'
+                    ? 'font-semibold text-foreground'
                     : 'text-muted-foreground hover:text-foreground',
                 )}
               >
                 Banyak Usulan
-              </button>
+              </span>
             </div>
           </div>
         }
@@ -829,9 +836,9 @@ export function TabRingkasan({
                     <Button
                       type="button"
                       variant="ghost"
-                      size="sm"
+                      size="xs"
                       onClick={() => handleCrossFilter(row)}
-                      className="h-6 px-2 text-xs text-primary"
+                      className="text-primary"
                     >
                       Pilih Irisan
                     </Button>
@@ -910,7 +917,7 @@ export function TabRingkasan({
                   onClick={() => setSelectedDimension(dim.id)}
                   title={dim.disabled ? dim.disabledReason : undefined}
                   className={cn(
-                    'h-7 cursor-pointer gap-1 px-2.5 text-xs font-normal',
+                    'cursor-pointer gap-1 px-2.5 font-normal',
                     isActive && 'font-medium shadow-xs',
                     dim.disabled && 'cursor-not-allowed opacity-40',
                   )}

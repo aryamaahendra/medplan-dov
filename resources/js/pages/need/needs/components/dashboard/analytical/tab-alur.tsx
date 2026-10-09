@@ -107,7 +107,7 @@ export function TabAlur({ payload, metrics }: TabAlurProps) {
               </span>
               <Badge
                 variant="outline"
-                className="border-info/40 bg-background font-normal text-info-foreground dark:text-info"
+                className="border-info/40 bg-background text-info-foreground dark:text-info"
               >
                 {isGated ? 'Mode Akumulasi Awal' : 'Data Log Memadai'}
               </Badge>

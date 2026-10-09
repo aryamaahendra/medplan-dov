@@ -103,7 +103,7 @@ export default function OrganizationalUnitsIndex({
           </div>
           {hasPermission('create organizational-units') && (
             <Button onClick={onCreate}>
-              <RiAddLine />
+              <RiAddLine data-icon="inline-start" />
               Tambah Unit
             </Button>
           )}

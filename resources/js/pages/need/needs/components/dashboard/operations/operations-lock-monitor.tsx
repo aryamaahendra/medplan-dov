@@ -50,9 +50,11 @@ export function OperationsLockMonitor({
       <Card className="flex flex-col border-border/80">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <RiLockLine className="size-4 text-primary" />
-              <span>Monitor Kunci & Dispensasi Siklus (Lock Monitor)</span>
+            <CardTitle>
+              <span className="flex items-center gap-2">
+                <RiLockLine className="size-4 text-primary" />
+                <span>Monitor Kunci & Dispensasi Siklus (Lock Monitor)</span>
+              </span>
             </CardTitle>
 
             <Badge variant="outline" className="font-mono">

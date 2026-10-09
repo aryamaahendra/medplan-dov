@@ -76,9 +76,7 @@ export const getSmartColumns = (
 
           <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
             {need.need_type?.name && (
-              <Badge variant="secondary" className="h-4.5 px-1.5 text-[10px]">
-                {need.need_type.name}
-              </Badge>
+              <Badge variant="secondary">{need.need_type.name}</Badge>
             )}
 
             {path.length > 0 && (
@@ -144,7 +142,7 @@ export const getSmartColumns = (
               <Tooltip>
                 <TooltipTrigger
                   render={
-                    <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                    <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-warning/10 text-warning-foreground dark:text-warning">
                       <RiStarFill className="size-3.5" />
                     </span>
                   }
@@ -154,10 +152,7 @@ export const getSmartColumns = (
             </TooltipProvider>
           ) : null}
 
-          <Badge
-            variant="outline"
-            className={cn('text-[11px] font-normal', priority.colorClass)}
-          >
+          <Badge variant="outline" className={priority.colorClass}>
             {priority.label}
           </Badge>
         </div>
@@ -177,11 +172,8 @@ export const getSmartColumns = (
 
       return (
         <div className="flex flex-col items-start gap-1">
-          <Badge
-            variant={stageMeta.variant}
-            className="flex items-center gap-1 text-[11px]"
-          >
-            <StageIcon className="size-3" />
+          <Badge variant={stageMeta.variant}>
+            <StageIcon data-icon="inline-start" />
             {stageMeta.label}
           </Badge>
 
@@ -190,7 +182,7 @@ export const getSmartColumns = (
               <Tooltip>
                 <TooltipTrigger
                   render={
-                    <span className="inline-flex cursor-help items-center gap-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                    <span className="inline-flex cursor-help items-center gap-0.5 text-[10px] font-medium text-warning-foreground dark:text-warning">
                       <RiLockLine className="size-2.5" />
                       Terkunci
                     </span>
@@ -208,7 +200,7 @@ export const getSmartColumns = (
           )}
 
           {need.unlocked_until && (
-            <span className="text-[10px] text-amber-600 dark:text-amber-400">
+            <span className="text-[10px] text-warning-foreground dark:text-warning">
               Perpanjangan aktif
             </span>
           )}
@@ -244,7 +236,7 @@ export const getSmartColumns = (
                 percentage >= 85
                   ? 'bg-primary'
                   : percentage >= 50
-                    ? 'bg-amber-500'
+                    ? 'bg-warning'
                     : 'bg-primary/40',
               )}
               style={{ width: `${percentage}%` }}
@@ -341,30 +333,19 @@ export const getSmartColumns = (
         <div className="flex items-center justify-end gap-1.5">
           {/* Primary Action Button based on workflow stage */}
           {need.can?.approve ? (
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 px-2 text-xs"
-              onClick={() => onReview(need)}
-            >
-              <RiQuillPenLine className="mr-1 size-3" />
+            <Button size="sm" variant="outline" onClick={() => onReview(need)}>
+              <RiQuillPenLine data-icon="inline-start" />
               Review
             </Button>
           ) : need.can?.update ? (
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 px-2 text-xs"
-              onClick={() => onEdit(need)}
-            >
-              <RiEdit2Line className="mr-1 size-3" />
+            <Button size="sm" variant="outline" onClick={() => onEdit(need)}>
+              <RiEdit2Line data-icon="inline-start" />
               Edit
             </Button>
           ) : (
             <Button
               size="sm"
               variant="ghost"
-              className="h-7 px-2 text-xs"
               onClick={() => onSelectDetail(need)}
             >
               Detail

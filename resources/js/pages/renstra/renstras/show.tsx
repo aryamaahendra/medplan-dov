@@ -188,7 +188,7 @@ export default function RenstraShow({ renstra }: RenstraShowProps) {
                 <Separator orientation="vertical" className="h-4" />
               </div>
               <Button onClick={onCreateTujuan}>
-                <RiAddLine />
+                <RiAddLine data-icon="inline-start" />
                 Tambah Tujuan
               </Button>
             </div>

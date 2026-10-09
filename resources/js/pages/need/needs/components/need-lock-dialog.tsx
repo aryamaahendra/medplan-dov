@@ -188,8 +188,9 @@ export function NeedLockDialog({
                 (need.is_locked !== null || !!need.unlocked_until) && (
                   <Button
                     type="button"
+                    size="sm"
                     variant="ghost"
-                    className="text-xs text-muted-foreground hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground"
                     onClick={handleRevokeOverride}
                     disabled={processing}
                   >

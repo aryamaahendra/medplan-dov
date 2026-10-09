@@ -15,6 +15,7 @@ import {
   formatNumber,
   formatPercent,
 } from '@/lib/formatters';
+import { cn } from '@/lib/utils';
 
 interface NeedsStatsProps {
   stats?: {
@@ -56,11 +57,10 @@ function DeltaBadge({
 
   return (
     <span
-      className={`inline-flex items-center gap-0.5 text-xs font-medium ${
-        isPositive
-          ? 'text-emerald-600 dark:text-emerald-400'
-          : 'text-rose-600 dark:text-rose-400'
-      }`}
+      className={cn(
+        'inline-flex items-center gap-0.5 text-xs font-medium',
+        isPositive ? 'text-success' : 'text-destructive',
+      )}
     >
       <Icon className="size-3" />
       {delta > 0 ? '+' : ''}
@@ -102,7 +102,7 @@ export function NeedsStats({ stats }: NeedsStatsProps) {
             'no prev data'
           )
         }
-        iconClassName="text-blue-500"
+        iconClassName="text-primary"
       />
       <StatsCard
         title="Total Estimasi Anggaran"
@@ -124,7 +124,7 @@ export function NeedsStats({ stats }: NeedsStatsProps) {
             'no prev data'
           )
         }
-        iconClassName="text-emerald-500"
+        iconClassName="text-success"
       />
       <StatsCard
         title="Usulan Prioritas"
@@ -146,7 +146,7 @@ export function NeedsStats({ stats }: NeedsStatsProps) {
             'no prev data'
           )
         }
-        iconClassName="text-amber-500"
+        iconClassName="text-warning"
       />
       <StatsCard
         title="Rata-rata Kelengkapan"
@@ -172,7 +172,7 @@ export function NeedsStats({ stats }: NeedsStatsProps) {
             'no prev data'
           )
         }
-        iconClassName="text-blue-500"
+        iconClassName="text-primary"
       />
       <StatsCard
         title="Disetujui Direktur"
@@ -194,7 +194,7 @@ export function NeedsStats({ stats }: NeedsStatsProps) {
             'no prev data'
           )
         }
-        iconClassName="text-violet-500"
+        iconClassName="text-info"
       />
     </div>
   );

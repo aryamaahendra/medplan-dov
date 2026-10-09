@@ -46,7 +46,7 @@ export function SasaranCard({
               variant="outline"
               onClick={() => onCreateIndicator(sasaran)}
             >
-              <RiAddLine />
+              <RiAddLine data-icon="inline-start" />
               Indikator
             </Button>
           )}

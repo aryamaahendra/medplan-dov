@@ -105,7 +105,7 @@ export default function KpiGroupsIndex({
           </div>
           {hasPermission('create kpi-groups') && (
             <Button onClick={onCreate}>
-              <RiAddLine className="h-4 w-4" />
+              <RiAddLine data-icon="inline-start" />
               Tambah Periode
             </Button>
           )}

@@ -188,7 +188,7 @@ function UserFormContent({
                   id={`role-${role.id}`}
                   checked={data.roles.includes(role.id)}
                   onChange={() => handleRoleToggle(role.id)}
-                  className="rounded border-gray-300 text-primary shadow-sm focus:ring-primary"
+                  className="rounded border-input text-primary shadow-xs focus:ring-ring"
                 />
                 <Label
                   htmlFor={`role-${role.id}`}

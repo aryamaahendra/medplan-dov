@@ -41,25 +41,19 @@ export function DataTableFacetedFilter({
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <Button variant="outline" size="sm" className="h-8 border-dashed" />
+          <Button variant="outline" size="sm" className="border-dashed" />
         }
       >
-        <RiAddCircleLine className="mr-1" />
+        <RiAddCircleLine data-icon="inline-start" />
         {title}
         {selectedValues?.length > 0 && (
           <>
-            <Badge
-              variant="secondary"
-              className="rounded-sm px-1 font-normal lg:hidden"
-            >
+            <Badge variant="secondary" className="px-1 lg:hidden">
               {selectedValues.length}
             </Badge>
             <div className="hidden space-x-1 lg:flex">
               {selectedValues.length > 2 ? (
-                <Badge
-                  variant="secondary"
-                  className="rounded-sm px-1 font-normal"
-                >
+                <Badge variant="secondary" className="px-1">
                   {selectedValues.length} selected
                 </Badge>
               ) : (
@@ -69,7 +63,7 @@ export function DataTableFacetedFilter({
                     <Badge
                       variant="secondary"
                       key={option.value}
-                      className="rounded-sm px-1 font-normal"
+                      className="px-1"
                     >
                       {option.label}
                     </Badge>

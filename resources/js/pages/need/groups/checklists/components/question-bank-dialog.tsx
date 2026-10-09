@@ -87,14 +87,14 @@ export function QuestionBankDialog({
                   <Button
                     size="sm"
                     variant={isAssigned ? 'ghost' : 'outline'}
-                    className="ml-4 h-8 shrink-0"
+                    className="ml-4 shrink-0"
                     disabled={isAssigned || !q.is_active}
                     onClick={() => onAdd(q)}
                   >
                     {isAssigned ? (
-                      <RiCheckboxCircleLine className="h-4 w-4 text-green-600" />
+                      <RiCheckboxCircleLine className="text-success" />
                     ) : !q.is_active ? (
-                      <RiCloseCircleLine className="h-4 w-4 text-destructive" />
+                      <RiCloseCircleLine className="text-destructive" />
                     ) : (
                       'Pilih'
                     )}

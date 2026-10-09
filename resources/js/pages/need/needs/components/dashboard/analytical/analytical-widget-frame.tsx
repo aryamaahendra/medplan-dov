@@ -1,14 +1,14 @@
 import { Link } from '@inertiajs/react';
 import {
   RiTableLine,
-  RiBarChartLine,
+  RiPieChartLine,
   RiArrowRightUpLine,
   RiInformationLine,
 } from '@remixicon/react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 
-import { Button, buttonVariants } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import {
   Card,
   CardAction,
@@ -17,6 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import {
   Tooltip,
   TooltipContent,
@@ -92,35 +93,44 @@ export function AnalyticalWidgetFrame({
             {headerActions}
 
             {tableView && (
-              <Button
-                type="button"
-                variant={showTable ? 'secondary' : 'outline'}
-                size="sm"
-                onClick={() => setShowTable(!showTable)}
-                aria-label={
-                  showTable
-                    ? 'Tampilkan grafik visual'
-                    : 'Tampilkan sebagai tabel'
-                }
-              >
-                {showTable ? (
-                  <>
-                    <RiBarChartLine
-                      data-icon="inline-start"
-                      className="text-primary"
-                    />
-                    <span>Grafik</span>
-                  </>
-                ) : (
-                  <>
-                    <RiTableLine
-                      data-icon="inline-start"
-                      className="text-muted-foreground"
-                    />
-                    <span>Tabel</span>
-                  </>
-                )}
-              </Button>
+              <div className="flex items-center gap-1.5 rounded-lg border border-border/80 bg-muted/30 px-2 py-1 text-xs">
+                <span
+                  onClick={() => setShowTable(false)}
+                  title="Tampilkan grafik visual"
+                  aria-label="Tampilkan grafik visual"
+                  className={cn(
+                    'flex cursor-pointer items-center transition-colors select-none',
+                    !showTable
+                      ? 'text-primary'
+                      : 'text-muted-foreground hover:text-foreground',
+                  )}
+                >
+                  <RiPieChartLine className="size-4" />
+                </span>
+                <Switch
+                  size="sm"
+                  checked={showTable}
+                  onCheckedChange={setShowTable}
+                  aria-label={
+                    showTable
+                      ? 'Tampilkan grafik visual'
+                      : 'Tampilkan sebagai tabel'
+                  }
+                />
+                <span
+                  onClick={() => setShowTable(true)}
+                  title="Tampilkan sebagai tabel"
+                  aria-label="Tampilkan sebagai tabel"
+                  className={cn(
+                    'flex cursor-pointer items-center transition-colors select-none',
+                    showTable
+                      ? 'text-primary'
+                      : 'text-muted-foreground hover:text-foreground',
+                  )}
+                >
+                  <RiTableLine className="size-4" />
+                </span>
+              </div>
             )}
 
             {listHref && (

@@ -188,11 +188,10 @@ function NeedGroupForm({
               <Button
                 type="button"
                 variant="outline"
-                size="sm"
-                className="h-7 gap-1 text-xs"
+                size="xs"
                 onClick={() => setRolloverPickerOpen(true)}
               >
-                <RiHistoryLine className="h-3.5 w-3.5" />
+                <RiHistoryLine data-icon="inline-start" />
                 {data.carry_over_need_ids.length > 0
                   ? 'Ubah Pilihan'
                   : 'Pilih Usulan'}

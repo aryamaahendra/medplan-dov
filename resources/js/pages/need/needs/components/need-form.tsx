@@ -443,7 +443,7 @@ export function NeedForm({
                   onClick={() => setPickerOpen(true)}
                   className="gap-1.5"
                 >
-                  <RiHistoryLine className="h-4 w-4" />
+                  <RiHistoryLine data-icon="inline-start" />
                   Pilih dari Usulan Sebelumnya
                 </Button>
               </div>
@@ -461,11 +461,11 @@ export function NeedForm({
                   <Button
                     type="button"
                     variant="ghost"
-                    size="sm"
-                    className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
+                    size="xs"
+                    className="text-muted-foreground hover:text-foreground"
                     onClick={handleResetSource}
                   >
-                    <RiCloseLine className="mr-1 h-3 w-3" />
+                    <RiCloseLine data-icon="inline-start" />
                     Batal Salin
                   </Button>
                 </div>

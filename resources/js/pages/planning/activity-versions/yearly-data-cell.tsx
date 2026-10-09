@@ -257,7 +257,7 @@ export function YearlyDataCell({
         }}
         onBlur={handleUpdate}
         onKeyDown={handleKeyDown}
-        className={cn('h-8 w-full', {
+        className={cn({
           'min-w-20!': field !== 'budget',
           'min-w-40!': field === 'budget',
         })}
@@ -333,10 +333,10 @@ export function YearlyDataCell({
           className={cn(
             'mt-1 flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-[10px] font-bold',
             {
-              'bg-red-500/10 text-red-500':
+              'bg-destructive/10 text-destructive':
                 hasBudget &&
                 Number(yearlyData.total_budget) > Number(yearlyData.budget),
-              'bg-emerald-500/10 text-emerald-500':
+              'bg-success/15 text-success-foreground dark:text-success':
                 hasBudget &&
                 Number(yearlyData.total_budget) < Number(yearlyData.budget),
               'bg-primary/10 text-primary':

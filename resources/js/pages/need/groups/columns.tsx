@@ -9,6 +9,7 @@ import type { ActionItem } from '@/components/action-dropdown';
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { getIndexColumn } from '@/components/data-table/data-table-index-column';
+import { StatusBadge } from '@/components/status-badge';
 import { Badge } from '@/components/ui/badge';
 import { formatDateTime, formatIDR } from '@/lib/formatters';
 import groupRoutes from '@/routes/need-groups';
@@ -64,12 +65,9 @@ export const getColumns = (
       <DataTableColumnHeader column={column} title="Disetujui" />
     ),
     cell: ({ row }) => (
-      <Badge
-        variant="outline"
-        className="border-emerald-500/20 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20"
-      >
+      <StatusBadge status="success">
         {row.getValue('approved_count')} Item
-      </Badge>
+      </StatusBadge>
     ),
   },
   {
@@ -78,12 +76,9 @@ export const getColumns = (
       <DataTableColumnHeader column={column} title="Prioritas" />
     ),
     cell: ({ row }) => (
-      <Badge
-        variant="outline"
-        className="border-amber-600/20 bg-amber-600/5 text-amber-600"
-      >
+      <StatusBadge status="warning">
         {row.getValue('priority_count')} Item
-      </Badge>
+      </StatusBadge>
     ),
   },
   {

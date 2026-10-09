@@ -62,10 +62,9 @@ export const LABELED_PRIORITY_LABELS: Record<string, string> = {
 };
 
 export const LABELED_PRIORITY_CLASSES: Record<string, string> = {
-  high: 'bg-orange-50 text-orange-700 border-orange-200/50 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20',
-  medium:
-    'bg-blue-50 text-blue-700 border-blue-200/50 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
-  low: 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
+  high: 'border-warning/30 bg-warning/15 text-warning-foreground dark:bg-warning/20 dark:text-warning',
+  medium: 'border-info/30 bg-info/15 text-info dark:bg-info/20 dark:text-info',
+  low: 'border-transparent bg-muted text-muted-foreground',
 };
 
 export const PRIORITY_LEVELS = [

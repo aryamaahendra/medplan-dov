@@ -263,33 +263,33 @@ export function NeedsTableToolbar({
           variant="outline"
           size="icon"
           onClick={() => setViewMode('table')}
-          className={cn('size-8 border', {
+          className={cn('border', {
             'bg-muted': viewMode === 'table',
           })}
         >
-          <RiTableLine className="size-4" />
+          <RiTableLine />
           <span className="sr-only">Table view</span>
         </Button>
         <Button
           variant="outline"
           size="icon"
           onClick={() => setViewMode('list')}
-          className={cn('size-8 border', {
+          className={cn('border', {
             'bg-muted': viewMode === 'list',
           })}
         >
-          <RiAlignJustify className="size-4" />
+          <RiAlignJustify />
           <span className="sr-only">List card view</span>
         </Button>
         <Button
           variant="outline"
           size="icon"
           onClick={() => setViewMode('grid')}
-          className={cn('size-8 border', {
+          className={cn('border', {
             'bg-muted': viewMode === 'grid',
           })}
         >
-          <RiLayoutGridLine className="size-4" />
+          <RiLayoutGridLine />
           <span className="sr-only">Grid view</span>
         </Button>
       </ButtonGroup>
@@ -335,10 +335,7 @@ export function NeedsTableToolbar({
         </span>
 
         {isAdvance && activeManualCount > 0 && (
-          <Badge
-            variant="secondary"
-            className="ml-0.5 rounded-sm px-1 font-mono text-[10px]"
-          >
+          <Badge variant="secondary" className="ml-0.5 font-mono">
             {activeManualCount}
           </Badge>
         )}
@@ -362,18 +359,18 @@ export function NeedsTableToolbar({
                   onAttentionFilterChange(isActive ? null : chip.key)
                 }
                 className={cn(
-                  'h-8 gap-1.5 border px-2.5 text-xs font-normal transition-colors',
+                  'border transition-colors',
                   isActive
                     ? 'border-primary bg-primary/10 font-medium text-primary hover:bg-primary/15'
                     : 'border-border/80 bg-background text-foreground/80 hover:bg-muted/60',
                 )}
               >
-                <Icon className="size-3.5 shrink-0" />
+                <Icon data-icon="inline-start" />
                 <span>{chip.label}</span>
                 <Badge
                   variant={isActive ? 'default' : 'secondary'}
                   className={cn(
-                    'rounded-sm px-1 font-mono text-[10px]',
+                    'font-mono',
                     isActive && 'bg-primary text-primary-foreground',
                   )}
                 >
@@ -387,11 +384,11 @@ export function NeedsTableToolbar({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground"
               onClick={() => onAttentionFilterChange(null)}
             >
               Reset
-              <RiCloseLine className="ml-1 size-3.5" />
+              <RiCloseLine data-icon="inline-end" />
             </Button>
           )}
         </>
@@ -465,11 +462,11 @@ export function NeedsTableToolbar({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground"
               onClick={handleResetManualFilters}
             >
               Reset Filter
-              <RiCloseLine className="ml-1 size-3.5" />
+              <RiCloseLine data-icon="inline-end" />
             </Button>
           )}
         </>

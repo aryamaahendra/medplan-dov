@@ -53,32 +53,32 @@ export function DataTableColumnHeader<TData, TValue>({
             <Button
               variant="ghost"
               size="sm"
-              className="-ml-3 h-8 data-open:bg-accent"
+              className="-ml-3 data-open:bg-accent"
             />
           }
         >
           <span>{title}</span>
           {direction === 'desc' ? (
-            <RiArrowDownLine className="ml-1 size-3.5" />
+            <RiArrowDownLine data-icon="inline-end" />
           ) : direction === 'asc' ? (
-            <RiArrowUpLine className="ml-1 size-3.5" />
+            <RiArrowUpLine data-icon="inline-end" />
           ) : (
-            <RiExpandUpDownLine className="ml-1 size-3.5" />
+            <RiExpandUpDownLine data-icon="inline-end" />
           )}
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="start">
           <DropdownMenuItem onClick={() => onSort?.(column.id, 'asc')}>
-            <RiArrowUpLine className="mr-2 size-3.5 text-muted-foreground/70" />
+            <RiArrowUpLine />
             Asc
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => onSort?.(column.id, 'desc')}>
-            <RiArrowDownLine className="mr-2 size-3.5 text-muted-foreground/70" />
+            <RiArrowDownLine />
             Desc
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
-            <RiEyeOffLine className="mr-2 size-3.5 text-muted-foreground/70" />
+            <RiEyeOffLine />
             Hide
           </DropdownMenuItem>
         </DropdownMenuContent>

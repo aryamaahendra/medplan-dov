@@ -49,8 +49,8 @@ export function OperationsHeader({
   const daysRemaining = meta?.days_remaining;
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-border/80 bg-card p-4 shadow-2xs">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="flex flex-col gap-3 rounded-xl border border-dashed bg-card">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 pt-4">
         {/* Left: Window status & Scope Badge */}
         <div className="flex flex-wrap items-center gap-2">
           {windowStatus === 'open' ? (
@@ -113,7 +113,7 @@ export function OperationsHeader({
       </div>
 
       {/* Summary KPI Strip */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-dashed p-4 text-xs text-muted-foreground">
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-1.5">
             <RiBuildingLine className="size-3.5 text-muted-foreground" />

@@ -281,7 +281,7 @@ export function VariantCAnalytical({
           onValueChange={(val) => setActiveTab(val as AnalyticalTabKey)}
           className="w-full"
         >
-          <TabsList className="grid h-auto w-full grid-cols-2 gap-2 border-none bg-transparent p-0 sm:grid-cols-3 lg:grid-cols-5">
+          <TabsList className="grid h-auto! w-full grid-cols-2 gap-2 border-none bg-transparent p-0 sm:grid-cols-3 lg:grid-cols-5">
             {/* Tab 1: Ringkasan (hidden for staff role per DC4) */}
             {!isStaff && (
               <TabsTrigger

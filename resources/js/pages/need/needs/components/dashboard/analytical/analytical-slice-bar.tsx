@@ -189,12 +189,12 @@ export function AnalyticalSliceBar({
   return (
     <div
       className={cn(
-        'sticky top-0 z-20 flex flex-col gap-3 rounded-xl border border-border/80 bg-card/95 p-3.5 shadow-xs backdrop-blur-md transition-all',
+        'flex flex-col gap-4 rounded-xl border border-dashed bg-card backdrop-blur-md transition-all',
         className,
       )}
     >
       {/* Top Bar: Title, Counters, and Primary "Buka di daftar" Link */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 pt-4">
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-1.5 font-semibold text-foreground">
             <RiFilterLine className="size-4 text-primary" />
@@ -279,7 +279,7 @@ export function AnalyticalSliceBar({
       </div>
 
       {/* Filter Popover Buttons */}
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2 border-t border-dashed p-4">
         {/* 1. Unit Kerja Popover */}
         <Popover>
           <PopoverTrigger

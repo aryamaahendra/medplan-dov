@@ -27,7 +27,7 @@ const statusVariants: Record<
 > = {
   draft: 'secondary',
   submitted: 'default',
-  approved: 'outline', // Usually success/green but shadcn default doesn't have it
+  approved: 'outline',
   archived: 'destructive',
 };
 

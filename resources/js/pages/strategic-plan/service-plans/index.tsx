@@ -1,19 +1,14 @@
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { RiAddLine } from '@remixicon/react';
-import { useMemo, useState } from 'react';
-import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
-
-import { useDataTable } from '@/hooks/use-data-table';
+import { StrategicServicePlanDialog } from '@/features/strategic-service-plan/components/strategic-service-plan-dialog';
+import { useStrategicServicePlansIndex } from '@/features/strategic-service-plan/hooks/use-strategic-service-plans-index';
 import type { DataTableFilters } from '@/hooks/use-data-table';
-import { usePermission } from '@/hooks/use-permission';
 import strategicServicePlansRoutes from '@/routes/strategic-service-plans';
 import type { StrategicServicePlan } from '@/types';
-import { getColumns } from './columns';
-import { StrategicServicePlanDialog } from './strategic-service-plan-dialog';
 
 interface PaginatedStrategicServicePlans {
   data: StrategicServicePlan[];
@@ -34,55 +29,19 @@ export default function StrategicServicePlansIndex({
   plans,
   filters,
 }: StrategicServicePlansIndexProps) {
-  const { hasPermission } = usePermission();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingPlan, setEditingPlan] = useState<StrategicServicePlan | null>(
-    null,
-  );
-  const [deletingPlan, setDeletingPlan] = useState<StrategicServicePlan | null>(
-    null,
-  );
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const { onSearch, onSort, onPageChange, onPerPageChange, onReset } =
-    useDataTable({
-      only: ['plans', 'filters'],
-    });
-
-  const onEdit = (plan: StrategicServicePlan) => {
-    setEditingPlan(plan);
-    setDialogOpen(true);
-  };
-
-  const onCreate = () => {
-    setEditingPlan(null);
-    setDialogOpen(true);
-  };
-
-  const onDelete = (plan: StrategicServicePlan) => {
-    setDeletingPlan(plan);
-  };
-
-  const handleConfirmDelete = () => {
-    if (!deletingPlan) {
-      return;
-    }
-
-    setIsDeleting(true);
-
-    router.delete(
-      strategicServicePlansRoutes.destroy.url({
-        strategic_service_plan: deletingPlan.id,
-      }),
-      {
-        onSuccess: () => {
-          toast.success('Rencana pengembangan layanan berhasil dihapus.');
-          setDeletingPlan(null);
-        },
-        onFinish: () => setIsDeleting(false),
-      },
-    );
-  };
+  const {
+    hasPermission,
+    dialogOpen,
+    setDialogOpen,
+    editingPlan,
+    deletingPlan,
+    setDeletingPlan,
+    isDeleting,
+    onCreate,
+    handleConfirmDelete,
+    columns,
+    dataTable,
+  } = useStrategicServicePlansIndex();
 
   return (
     <>
@@ -107,18 +66,11 @@ export default function StrategicServicePlansIndex({
         </div>
 
         <DataTable
-          columns={useMemo(
-            () => getColumns(onEdit, onDelete, hasPermission),
-            [hasPermission],
-          )}
+          columns={columns}
           data={plans.data}
           meta={plans}
           filters={filters}
-          onSearch={onSearch}
-          onSort={onSort}
-          onPageChange={onPageChange}
-          onPerPageChange={onPerPageChange}
-          onReset={onReset}
+          {...dataTable}
           searchPlaceholder="Cari program, rencana, sasaran..."
         />
       </div>

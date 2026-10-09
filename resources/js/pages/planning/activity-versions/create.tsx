@@ -1,12 +1,11 @@
 import { Head } from '@inertiajs/react';
 
+import { ActivityVersionForm } from '@/features/planning-activity-version/components/activity-version-form';
 import planningVersions from '@/routes/planning-versions';
 import type {
   PlanningActivityVersion,
   PlanningVersion,
 } from '@/types/planning-version';
-
-import { ActivityVersionForm } from './form';
 
 interface CreateProps {
   version: PlanningVersion;

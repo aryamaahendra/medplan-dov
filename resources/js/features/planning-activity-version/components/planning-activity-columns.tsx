@@ -7,6 +7,7 @@ import type {
   PlanningActivityVersion,
   PlanningVersion,
 } from '@/types/planning-version';
+
 import { TypeBadge } from './type-badge';
 import { YearlyDataCell } from './yearly-data-cell';
 

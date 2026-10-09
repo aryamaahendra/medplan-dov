@@ -1,19 +1,14 @@
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { RiAddLine } from '@remixicon/react';
-import { useMemo, useState } from 'react';
-import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
-import { useDataTable } from '@/hooks/use-data-table';
+import { RenstraDialog } from '@/features/renstra/components/renstra-dialog';
+import { useRenstrasIndex } from '@/features/renstra/hooks/use-renstras-index';
 import type { DataTableFilters } from '@/hooks/use-data-table';
-import { usePermission } from '@/hooks/use-permission';
 import renstraRoutes from '@/routes/renstras';
 import type { Renstra } from '@/types';
-
-import { getColumns } from './columns';
-import { RenstraDialog } from './renstra-dialog';
 
 interface PaginatedRenstras {
   data: Renstra[];
@@ -34,44 +29,19 @@ export default function RenstrasIndex({
   renstras,
   filters,
 }: RenstrasIndexProps) {
-  const { hasPermission } = usePermission();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingRenstra, setEditingRenstra] = useState<Renstra | null>(null);
-  const [deletingRenstra, setDeletingRenstra] = useState<Renstra | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const { onSearch, onSort, onPageChange, onPerPageChange, onReset } =
-    useDataTable({ only: ['renstras', 'filters'] });
-
-  const onEdit = (renstra: Renstra) => {
-    setEditingRenstra(renstra);
-    setDialogOpen(true);
-  };
-
-  const onCreate = () => {
-    setEditingRenstra(null);
-    setDialogOpen(true);
-  };
-
-  const onDelete = (renstra: Renstra) => {
-    setDeletingRenstra(renstra);
-  };
-
-  const handleConfirmDelete = () => {
-    if (!deletingRenstra) {
-      return;
-    }
-
-    setIsDeleting(true);
-
-    router.delete(renstraRoutes.destroy.url({ renstra: deletingRenstra.id }), {
-      onSuccess: () => {
-        toast.success('Renstra berhasil dihapus.');
-        setDeletingRenstra(null);
-      },
-      onFinish: () => setIsDeleting(false),
-    });
-  };
+  const {
+    hasPermission,
+    dialogOpen,
+    setDialogOpen,
+    editingRenstra,
+    deletingRenstra,
+    setDeletingRenstra,
+    isDeleting,
+    onCreate,
+    handleConfirmDelete,
+    columns,
+    dataTable,
+  } = useRenstrasIndex();
 
   return (
     <>
@@ -97,18 +67,11 @@ export default function RenstrasIndex({
         </div>
 
         <DataTable
-          columns={useMemo(
-            () => getColumns(onEdit, onDelete, hasPermission),
-            [hasPermission],
-          )}
+          columns={columns}
           data={renstras.data}
           meta={renstras}
           filters={filters}
-          onSearch={onSearch}
-          onSort={onSort}
-          onPageChange={onPageChange}
-          onPerPageChange={onPerPageChange}
-          onReset={onReset}
+          {...dataTable}
           searchPlaceholder="Cari renstra..."
         />
       </div>

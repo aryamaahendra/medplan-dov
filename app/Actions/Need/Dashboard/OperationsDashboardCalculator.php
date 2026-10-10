@@ -73,15 +73,22 @@ class OperationsDashboardCalculator
         $e9Needs = $e9Item['needs'] ?? [];
 
         // 4. Lock Monitor
-        $activeUnlocksCount = (int) (clone $baseQuery)->whereNotNull('unlocked_until')->where('unlocked_until', '>=', $now)->count();
-        $manualLockedCount = (int) (clone $baseQuery)->where('is_locked', true)->whereNull('approved_by_director_at')->count();
-        $directorLockedCount = (int) (clone $baseQuery)->whereNotNull('approved_by_director_at')->count();
+        /** @var object{c_unlock?: int|string, c_manual?: int|string, c_director?: int|string, c_window?: int|string}|null $lockRow */
+        $lockRow = (clone $baseQuery)
+            ->toBase()
+            ->selectRaw('
+                COUNT(CASE WHEN unlocked_until IS NOT NULL AND unlocked_until >= ? THEN 1 END) as c_unlock,
+                COUNT(CASE WHEN is_locked = true AND approved_by_director_at IS NULL THEN 1 END) as c_manual,
+                COUNT(CASE WHEN approved_by_director_at IS NOT NULL THEN 1 END) as c_director,
+                COUNT(CASE WHEN approved_by_director_at IS NULL AND is_locked != false AND (unlocked_until IS NULL OR unlocked_until < ?) THEN 1 END) as c_window
+            ', [$now, $now])
+            ->first();
+
+        $activeUnlocksCount = (int) ($lockRow->c_unlock ?? 0);
+        $manualLockedCount = (int) ($lockRow->c_manual ?? 0);
+        $directorLockedCount = (int) ($lockRow->c_director ?? 0);
         $isWindowClosed = $currentGroup && ! $currentGroup->isOpenForSubmission();
-        $windowClosedLockedCount = $isWindowClosed
-            ? (int) (clone $baseQuery)->whereNull('approved_by_director_at')->where('is_locked', '!=', false)->where(function ($q) use ($now) {
-                $q->whereNull('unlocked_until')->orWhere('unlocked_until', '<', $now);
-            })->count()
-            : 0;
+        $windowClosedLockedCount = $isWindowClosed ? (int) ($lockRow->c_window ?? 0) : 0;
 
         $lockAnomalies = [];
         if ($e9Count > 0) {
@@ -95,90 +102,80 @@ class OperationsDashboardCalculator
         }
 
         // 5. Aging Histograms (idle days based on updated_at)
+        $sub7 = $now->subDays(7);
+        $sub14 = $now->subDays(14);
+        $sub30 = $now->subDays(30);
+
+        /** @var object{c1?: int|string, b1?: int|float|string, c2?: int|string, b2?: int|float|string, c3?: int|string, b3?: int|float|string, c4?: int|string, b4?: int|float|string}|null $dAging */
+        $dAging = (clone $baseQuery)
+            ->toBase()
+            ->where('status', 'draft')
+            ->whereNull('approved_by_director_at')
+            ->selectRaw('
+                COUNT(CASE WHEN updated_at > ? THEN 1 END) as c1,
+                COALESCE(SUM(CASE WHEN updated_at > ? THEN total_price ELSE 0 END), 0) as b1,
+                COUNT(CASE WHEN updated_at <= ? AND updated_at > ? THEN 1 END) as c2,
+                COALESCE(SUM(CASE WHEN updated_at <= ? AND updated_at > ? THEN total_price ELSE 0 END), 0) as b2,
+                COUNT(CASE WHEN updated_at <= ? AND updated_at > ? THEN 1 END) as c3,
+                COALESCE(SUM(CASE WHEN updated_at <= ? AND updated_at > ? THEN total_price ELSE 0 END), 0) as b3,
+                COUNT(CASE WHEN updated_at <= ? THEN 1 END) as c4,
+                COALESCE(SUM(CASE WHEN updated_at <= ? THEN total_price ELSE 0 END), 0) as b4
+            ', [$sub7, $sub7, $sub7, $sub14, $sub7, $sub14, $sub14, $sub30, $sub14, $sub30, $sub30, $sub30])
+            ->first();
+
         $draftAging = [
-            [
-                'key' => 'fresh',
-                'label' => '< 7 Hari',
-                'description' => 'Aktivitas wajar',
-                'count' => (int) (clone $baseQuery)->where('status', 'draft')->whereNull('approved_by_director_at')->where('updated_at', '>', $now->subDays(7))->count(),
-                'budget' => (float) (clone $baseQuery)->where('status', 'draft')->whereNull('approved_by_director_at')->where('updated_at', '>', $now->subDays(7))->sum('total_price'),
-            ],
-            [
-                'key' => 'stale',
-                'label' => '7 - 14 Hari',
-                'description' => 'Perlu perhatian',
-                'count' => (int) (clone $baseQuery)->where('status', 'draft')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(7))->where('updated_at', '>', $now->subDays(14))->count(),
-                'budget' => (float) (clone $baseQuery)->where('status', 'draft')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(7))->where('updated_at', '>', $now->subDays(14))->sum('total_price'),
-            ],
-            [
-                'key' => 'delayed',
-                'label' => '15 - 30 Hari',
-                'description' => 'Tertahan lama',
-                'count' => (int) (clone $baseQuery)->where('status', 'draft')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(14))->where('updated_at', '>', $now->subDays(30))->count(),
-                'budget' => (float) (clone $baseQuery)->where('status', 'draft')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(14))->where('updated_at', '>', $now->subDays(30))->sum('total_price'),
-            ],
-            [
-                'key' => 'stuck',
-                'label' => '> 30 Hari',
-                'description' => 'Macet kritis',
-                'count' => (int) (clone $baseQuery)->where('status', 'draft')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(30))->count(),
-                'budget' => (float) (clone $baseQuery)->where('status', 'draft')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(30))->sum('total_price'),
-            ],
+            ['key' => 'fresh', 'label' => '< 7 Hari', 'description' => 'Aktivitas wajar', 'count' => (int) ($dAging->c1 ?? 0), 'budget' => (float) ($dAging->b1 ?? 0)],
+            ['key' => 'stale', 'label' => '7 - 14 Hari', 'description' => 'Perlu perhatian', 'count' => (int) ($dAging->c2 ?? 0), 'budget' => (float) ($dAging->b2 ?? 0)],
+            ['key' => 'delayed', 'label' => '15 - 30 Hari', 'description' => 'Tertahan lama', 'count' => (int) ($dAging->c3 ?? 0), 'budget' => (float) ($dAging->b3 ?? 0)],
+            ['key' => 'stuck', 'label' => '> 30 Hari', 'description' => 'Macet kritis', 'count' => (int) ($dAging->c4 ?? 0), 'budget' => (float) ($dAging->b4 ?? 0)],
         ];
+
+        $sub5 = $now->subDays(5);
+        $sub10 = $now->subDays(10);
+        $sub20 = $now->subDays(20);
+
+        /** @var object{c1?: int|string, b1?: int|float|string, c2?: int|string, b2?: int|float|string, c3?: int|string, b3?: int|float|string, c4?: int|string, b4?: int|float|string}|null $rAging */
+        $rAging = (clone $baseQuery)
+            ->toBase()
+            ->where('status', 'approved')
+            ->whereNull('approved_by_director_at')
+            ->selectRaw('
+                COUNT(CASE WHEN updated_at > ? THEN 1 END) as c1,
+                COALESCE(SUM(CASE WHEN updated_at > ? THEN total_price ELSE 0 END), 0) as b1,
+                COUNT(CASE WHEN updated_at <= ? AND updated_at > ? THEN 1 END) as c2,
+                COALESCE(SUM(CASE WHEN updated_at <= ? AND updated_at > ? THEN total_price ELSE 0 END), 0) as b2,
+                COUNT(CASE WHEN updated_at <= ? AND updated_at > ? THEN 1 END) as c3,
+                COALESCE(SUM(CASE WHEN updated_at <= ? AND updated_at > ? THEN total_price ELSE 0 END), 0) as b3,
+                COUNT(CASE WHEN updated_at <= ? THEN 1 END) as c4,
+                COALESCE(SUM(CASE WHEN updated_at <= ? THEN total_price ELSE 0 END), 0) as b4
+            ', [$sub5, $sub5, $sub5, $sub10, $sub5, $sub10, $sub10, $sub20, $sub10, $sub20, $sub20, $sub20])
+            ->first();
 
         $reviewAging = [
-            [
-                'key' => 'fresh',
-                'label' => '< 5 Hari',
-                'description' => 'Antrean baru',
-                'count' => (int) (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '>', $now->subDays(5))->count(),
-                'budget' => (float) (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '>', $now->subDays(5))->sum('total_price'),
-            ],
-            [
-                'key' => 'stale',
-                'label' => '5 - 10 Hari',
-                'description' => 'Mulai terlambat',
-                'count' => (int) (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(5))->where('updated_at', '>', $now->subDays(10))->count(),
-                'budget' => (float) (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(5))->where('updated_at', '>', $now->subDays(10))->sum('total_price'),
-            ],
-            [
-                'key' => 'delayed',
-                'label' => '10 - 20 Hari',
-                'description' => 'Tertahan verifikasi',
-                'count' => (int) (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(10))->where('updated_at', '>', $now->subDays(20))->count(),
-                'budget' => (float) (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(10))->where('updated_at', '>', $now->subDays(20))->sum('total_price'),
-            ],
-            [
-                'key' => 'stuck',
-                'label' => '> 20 Hari',
-                'description' => 'Macet verifikasi',
-                'count' => (int) (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(20))->count(),
-                'budget' => (float) (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '<=', $now->subDays(20))->sum('total_price'),
-            ],
+            ['key' => 'fresh', 'label' => '< 5 Hari', 'description' => 'Antrean baru', 'count' => (int) ($rAging->c1 ?? 0), 'budget' => (float) ($rAging->b1 ?? 0)],
+            ['key' => 'stale', 'label' => '5 - 10 Hari', 'description' => 'Mulai terlambat', 'count' => (int) ($rAging->c2 ?? 0), 'budget' => (float) ($rAging->b2 ?? 0)],
+            ['key' => 'delayed', 'label' => '10 - 20 Hari', 'description' => 'Tertahan verifikasi', 'count' => (int) ($rAging->c3 ?? 0), 'budget' => (float) ($rAging->b3 ?? 0)],
+            ['key' => 'stuck', 'label' => '> 20 Hari', 'description' => 'Macet verifikasi', 'count' => (int) ($rAging->c4 ?? 0), 'budget' => (float) ($rAging->b4 ?? 0)],
         ];
 
+        /** @var object{c1?: int|string, b1?: int|float|string, c2?: int|string, b2?: int|float|string, c3?: int|string, b3?: int|float|string}|null $rejAging */
+        $rejAging = (clone $baseQuery)
+            ->toBase()
+            ->where('status', 'rejected')
+            ->selectRaw('
+                COUNT(CASE WHEN updated_at > ? THEN 1 END) as c1,
+                COALESCE(SUM(CASE WHEN updated_at > ? THEN total_price ELSE 0 END), 0) as b1,
+                COUNT(CASE WHEN updated_at <= ? AND updated_at > ? THEN 1 END) as c2,
+                COALESCE(SUM(CASE WHEN updated_at <= ? AND updated_at > ? THEN total_price ELSE 0 END), 0) as b2,
+                COUNT(CASE WHEN updated_at <= ? THEN 1 END) as c3,
+                COALESCE(SUM(CASE WHEN updated_at <= ? THEN total_price ELSE 0 END), 0) as b3
+            ', [$sub7, $sub7, $sub7, $sub14, $sub7, $sub14, $sub14, $sub14])
+            ->first();
+
         $rejectedAging = [
-            [
-                'key' => 'fresh',
-                'label' => '< 7 Hari',
-                'description' => 'Baru ditolak',
-                'count' => (int) (clone $baseQuery)->where('status', 'rejected')->where('updated_at', '>', $now->subDays(7))->count(),
-                'budget' => (float) (clone $baseQuery)->where('status', 'rejected')->where('updated_at', '>', $now->subDays(7))->sum('total_price'),
-            ],
-            [
-                'key' => 'stale',
-                'label' => '7 - 14 Hari',
-                'description' => 'Belum ada revisi',
-                'count' => (int) (clone $baseQuery)->where('status', 'rejected')->where('updated_at', '<=', $now->subDays(7))->where('updated_at', '>', $now->subDays(14))->count(),
-                'budget' => (float) (clone $baseQuery)->where('status', 'rejected')->where('updated_at', '<=', $now->subDays(7))->where('updated_at', '>', $now->subDays(14))->sum('total_price'),
-            ],
-            [
-                'key' => 'stuck',
-                'label' => '> 14 Hari',
-                'description' => 'Revisi terabaikan',
-                'count' => (int) (clone $baseQuery)->where('status', 'rejected')->where('updated_at', '<=', $now->subDays(14))->count(),
-                'budget' => (float) (clone $baseQuery)->where('status', 'rejected')->where('updated_at', '<=', $now->subDays(14))->sum('total_price'),
-            ],
+            ['key' => 'fresh', 'label' => '< 7 Hari', 'description' => 'Baru ditolak', 'count' => (int) ($rejAging->c1 ?? 0), 'budget' => (float) ($rejAging->b1 ?? 0)],
+            ['key' => 'stale', 'label' => '7 - 14 Hari', 'description' => 'Belum ada revisi', 'count' => (int) ($rejAging->c2 ?? 0), 'budget' => (float) ($rejAging->b2 ?? 0)],
+            ['key' => 'stuck', 'label' => '> 14 Hari', 'description' => 'Revisi terabaikan', 'count' => (int) ($rejAging->c3 ?? 0), 'budget' => (float) ($rejAging->b3 ?? 0)],
         ];
 
         // 6. Enrich Unit Progress with readiness and exceptions

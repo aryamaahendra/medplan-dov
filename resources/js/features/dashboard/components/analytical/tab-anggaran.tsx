@@ -138,68 +138,63 @@ export function TabAnggaran({
 
   // 3. Need-Size Histogram Bins
   const histogramBins = useMemo(() => {
-    // Approximation from existing stats and decision queue
-    // Bins: < 10jt, 10-50jt, 50-200jt, 200jt-1M, > 1M
     const totalNeeds = metrics.totalCount;
 
     if (totalNeeds === 0) {
       return [];
     }
 
-    const b1Count = Math.round(totalNeeds * 0.35);
-    const b2Count = Math.round(totalNeeds * 0.3);
-    const b3Count = Math.round(totalNeeds * 0.2);
-    const b4Count = Math.round(totalNeeds * 0.1);
-    const b5Count = Math.max(
-      0,
-      totalNeeds - (b1Count + b2Count + b3Count + b4Count),
-    );
+    const sb = payload.sizeBuckets ?? {};
+    const b1 = sb['< 10 Juta'] ?? 0;
+    const b2 = sb['10 - 50 Juta'] ?? 0;
+    const b3 = sb['50 - 200 Juta'] ?? 0;
+    const b4 = sb['200 Jt - 1 Milyar'] ?? 0;
+    const b5 = sb['> 1 Milyar'] ?? 0;
 
     return [
       {
         bin: '< 10 Juta',
         label: 'Skala Mikro',
-        count: b1Count,
-        pct: Math.round((b1Count / totalNeeds) * 100),
+        count: b1,
+        pct: Math.round((b1 / totalNeeds) * 100),
       },
       {
         bin: '10 - 50 Juta',
         label: 'Skala Kecil',
-        count: b2Count,
-        pct: Math.round((b2Count / totalNeeds) * 100),
+        count: b2,
+        pct: Math.round((b2 / totalNeeds) * 100),
       },
       {
         bin: '50 - 200 Juta',
         label: 'Skala Menengah',
-        count: b3Count,
-        pct: Math.round((b3Count / totalNeeds) * 100),
+        count: b3,
+        pct: Math.round((b3 / totalNeeds) * 100),
       },
       {
         bin: '200 Jt - 1 Milyar',
         label: 'Skala Signifikan',
-        count: b4Count,
-        pct: Math.round((b4Count / totalNeeds) * 100),
+        count: b4,
+        pct: Math.round((b4 / totalNeeds) * 100),
       },
       {
         bin: '> 1 Milyar',
         label: 'Skala Strategis',
-        count: b5Count,
-        pct: Math.round((b5Count / totalNeeds) * 100),
+        count: b5,
+        pct: Math.round((b5 / totalNeeds) * 100),
       },
     ];
-  }, [metrics.totalCount]);
+  }, [metrics.totalCount, payload.sizeBuckets]);
 
   // 4. Heat Matrix: Unit (rows) x Kategori (columns) (Cap at 8 x 6)
   const heatMatrixData = useMemo(() => {
     const topUnits = needsByUnit.slice(0, 8);
     const topTypes = needsByType.slice(0, 6);
+    const matrixMap = payload.unitTypeMatrix ?? {};
 
-    // Matrix cell estimation based on proportion
     const rows = topUnits.map((u) => {
-      const uBudget = u.total_budget;
       const cells = topTypes.map((t) => {
-        const tWeight = (t.percentage || 10) / 100;
-        const cellBudget = Math.round(uBudget * tWeight * 0.9);
+        const key = `${u.unit_id}_${t.type_id}`;
+        const cellBudget = matrixMap[key] ?? 0;
 
         return {
           typeId: t.type_id,
@@ -225,7 +220,7 @@ export function TabAnggaran({
       rows,
       maxCellBudget,
     };
-  }, [needsByUnit, needsByType]);
+  }, [needsByUnit, needsByType, payload.unitTypeMatrix]);
 
   // 5. Largest Needs Table (from Decision Queue or proxy)
   const largestNeeds = useMemo(() => {
@@ -779,8 +774,8 @@ export function TabAnggaran({
 
       {/* 4. TABLE OF 10 LARGEST NEEDS */}
       <AnalyticalWidgetFrame
-        title="10 Usulan Anggaran Terbesar"
-        subtitle="Rincian usulan bernilai signifikan dalam siklus berjalan yang membutuhkan atensi khusus."
+        title="10 Usulan Anggaran Terbesar (Antrean Telaah)"
+        subtitle="Rincian usulan antrean telaah bernilai signifikan dalam siklus berjalan yang membutuhkan atensi khusus."
         listHref={needRoutes.index.url({ query: { need_group_id: groupId } })}
         listActionLabel="Buka Semua Usulan"
       >

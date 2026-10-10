@@ -9,7 +9,7 @@ import {
   RiArrowDownSLine,
   RiLineChartLine,
 } from '@remixicon/react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -48,6 +48,7 @@ export function GlobalDashboardControls({
   compareGroupId,
   onCompareGroupChange,
 }: GlobalDashboardControlsProps) {
+  const [mountTime] = useState(() => Date.now());
   const windowStatusMeta = useMemo(() => {
     if (!currentGroup) {
       return { label: 'Tidak Aktif', variant: 'secondary' as const };
@@ -83,16 +84,14 @@ export function GlobalDashboardControls({
     }
 
     const end = new Date(currentGroup.submission_end_at).getTime();
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const diffDays = Math.ceil((end - today.getTime()) / (1000 * 60 * 60 * 24));
+    const diffDays = Math.ceil((end - mountTime) / (1000 * 60 * 60 * 24));
 
     if (diffDays <= 0) {
       return 'Batas waktu berakhir';
     }
 
     return `Sisa ${diffDays} hari`;
-  }, [currentGroup]);
+  }, [currentGroup, mountTime]);
 
   const compareGroup = useMemo(
     () => availableGroups.find((g) => g.id === compareGroupId) || null,

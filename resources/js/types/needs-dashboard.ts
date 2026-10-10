@@ -14,6 +14,7 @@ export interface DashboardStats {
   active_needs_count?: number;
   total_budget: number;
   priority_needs: number;
+  priority_budget?: number;
   unapproved_priority_count?: number;
   unapproved_priority_budget?: number;
   avg_completeness: number;
@@ -75,6 +76,7 @@ export interface UnitBudgetStat {
   count: number;
   total_budget: number;
   priority_count: number;
+  priority_budget?: number;
   approved_count: number;
   approved_budget?: number;
   under_review_count?: number;
@@ -283,5 +285,7 @@ export interface NeedsDashboardPayload {
   fundingSources: FundingSourceStat[];
   checklistBuckets: Record<string, number>;
   myUnitData: MyUnitData | null;
+  sizeBuckets?: Record<string, number>;
+  unitTypeMatrix?: Record<string, number>;
   operations?: OperationsPayload;
 }

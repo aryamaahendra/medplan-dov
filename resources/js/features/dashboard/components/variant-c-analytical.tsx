@@ -104,7 +104,8 @@ export function VariantCAnalytical({
     let rejCount = stats.rejected_count;
     const rejBudget = stats.rejected_budget;
     let priCount = stats.priority_needs;
-    const priBudget = (stats.unapproved_priority_budget ?? 0) + appBudget;
+    let priBudget =
+      stats.priority_budget ?? stats.unapproved_priority_budget ?? 0;
 
     // Unit filter reduction
     if (slice.unitIds.length > 0) {
@@ -140,6 +141,10 @@ export function VariantCAnalytical({
       );
       priCount = selectedUnits.reduce(
         (acc, u) => acc + (u.priority_count ?? 0),
+        0,
+      );
+      priBudget = selectedUnits.reduce(
+        (acc, u) => acc + (u.priority_budget ?? 0),
         0,
       );
     }

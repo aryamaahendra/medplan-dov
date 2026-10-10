@@ -160,9 +160,11 @@ class NeedExceptionCatalog
             ->has('kpiIndicators')
             ->has('strategicServicePlans');
 
+        $readyStat = (clone $readyQuery)->toBase()->selectRaw('COUNT(*) as count, COALESCE(SUM(total_price), 0) as budget')->first();
+
         return [
-            'count' => (int) (clone $readyQuery)->count(),
-            'budget' => (float) (clone $readyQuery)->sum('total_price'),
+            'count' => (int) ($readyStat->count ?? 0),
+            'budget' => (float) ($readyStat->budget ?? 0),
             'needs' => (clone $readyQuery)
                 ->with(['organizationalUnit:id,name'])
                 ->orderByDesc('total_price')
@@ -198,36 +200,41 @@ class NeedExceptionCatalog
         $e1NeedsQuery = $isE1Active
             ? (clone $baseQuery)->where('status', 'draft')->whereNull('approved_by_director_at')
             : null;
-        $e1Count = $e1NeedsQuery ? (int) (clone $e1NeedsQuery)->count() : 0;
-        $e1Budget = $e1NeedsQuery ? (float) (clone $e1NeedsQuery)->sum('total_price') : 0.0;
+        $e1Stat = $e1NeedsQuery ? (clone $e1NeedsQuery)->toBase()->selectRaw('COUNT(*) as count, COALESCE(SUM(total_price), 0) as budget')->first() : null;
+        $e1Count = (int) ($e1Stat->count ?? 0);
+        $e1Budget = (float) ($e1Stat->budget ?? 0.0);
         $e1Needs = $e1NeedsQuery
             ? (clone $e1NeedsQuery)->with('organizationalUnit:id,name')->orderByDesc('total_price')->limit(10)->get()->map(fn (Need $n): array => $this->formatNeedForDrawer($n, $now))->all()
             : [];
 
         // E2: Draft idle >= 7 days
         $e2Query = (clone $baseQuery)->where('status', 'draft')->whereNull('approved_by_director_at')->where('updated_at', '<=', $sevenDaysAgo);
-        $e2Count = (int) (clone $e2Query)->count();
-        $e2Budget = (float) (clone $e2Query)->sum('total_price');
+        $e2Stat = (clone $e2Query)->toBase()->selectRaw('COUNT(*) as count, COALESCE(SUM(total_price), 0) as budget')->first();
+        $e2Count = (int) ($e2Stat->count ?? 0);
+        $e2Budget = (float) ($e2Stat->budget ?? 0.0);
         $e2Needs = (clone $e2Query)->with('organizationalUnit:id,name')->orderBy('updated_at')->limit(10)->get()->map(fn (Need $n): array => $this->formatNeedForDrawer($n, $now))->all();
 
         // E3: Assessed need with checklist < 85%
         $e3Query = (clone $baseQuery)->where('checklist_percentage', '>', 0)->where('checklist_percentage', '<', self::MIN_CHECKLIST_PERCENTAGE)->whereNull('approved_by_director_at');
-        $e3Count = (int) (clone $e3Query)->count();
-        $e3Budget = (float) (clone $e3Query)->sum('total_price');
+        $e3Stat = (clone $e3Query)->toBase()->selectRaw('COUNT(*) as count, COALESCE(SUM(total_price), 0) as budget')->first();
+        $e3Count = (int) ($e3Stat->count ?? 0);
+        $e3Budget = (float) ($e3Stat->budget ?? 0.0);
         $e3Needs = (clone $e3Query)->with('organizationalUnit:id,name')->orderBy('checklist_percentage')->limit(10)->get()->map(fn (Need $n): array => $this->formatNeedForDrawer($n, $now))->all();
 
         // E4: Under review with 0% checklist
         $e4Query = (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where(function (Builder $q) {
             $q->whereNull('checklist_percentage')->orWhere('checklist_percentage', 0);
         });
-        $e4Count = (int) (clone $e4Query)->count();
-        $e4Budget = (float) (clone $e4Query)->sum('total_price');
+        $e4Stat = (clone $e4Query)->toBase()->selectRaw('COUNT(*) as count, COALESCE(SUM(total_price), 0) as budget')->first();
+        $e4Count = (int) ($e4Stat->count ?? 0);
+        $e4Budget = (float) ($e4Stat->budget ?? 0.0);
         $e4Needs = (clone $e4Query)->with('organizationalUnit:id,name')->orderByDesc('total_price')->limit(10)->get()->map(fn (Need $n): array => $this->formatNeedForDrawer($n, $now))->all();
 
         // E5: Under review idle >= 5 days (Critical at >= 10 days)
         $e5Query = (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '<=', $fiveDaysAgo);
-        $e5Count = (int) (clone $e5Query)->count();
-        $e5Budget = (float) (clone $e5Query)->sum('total_price');
+        $e5Stat = (clone $e5Query)->toBase()->selectRaw('COUNT(*) as count, COALESCE(SUM(total_price), 0) as budget')->first();
+        $e5Count = (int) ($e5Stat->count ?? 0);
+        $e5Budget = (float) ($e5Stat->budget ?? 0.0);
         $e5CriticalCount = (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '<=', $tenDaysAgo)->count();
         $e5Severity = $e5CriticalCount > 0 ? 'critical' : 'warning';
         $e5Needs = (clone $e5Query)->with('organizationalUnit:id,name')->orderBy('updated_at')->limit(10)->get()->map(fn (Need $n): array => $this->formatNeedForDrawer($n, $now))->all();
@@ -240,14 +247,16 @@ class NeedExceptionCatalog
                 ->orDoesntHave('kpiIndicators')
                 ->orDoesntHave('strategicServicePlans');
         });
-        $e6Count = (int) (clone $e6Query)->count();
-        $e6Budget = (float) (clone $e6Query)->sum('total_price');
+        $e6Stat = (clone $e6Query)->toBase()->selectRaw('COUNT(*) as count, COALESCE(SUM(total_price), 0) as budget')->first();
+        $e6Count = (int) ($e6Stat->count ?? 0);
+        $e6Budget = (float) ($e6Stat->budget ?? 0.0);
         $e6Needs = (clone $e6Query)->with('organizationalUnit:id,name')->orderByDesc('total_price')->limit(10)->get()->map(fn (Need $n): array => $this->formatNeedForDrawer($n, $now))->all();
 
         // E7: Rejected idle >= 7 days
         $e7Query = (clone $baseQuery)->where('status', 'rejected')->where('updated_at', '<=', $sevenDaysAgo);
-        $e7Count = (int) (clone $e7Query)->count();
-        $e7Budget = (float) (clone $e7Query)->sum('total_price');
+        $e7Stat = (clone $e7Query)->toBase()->selectRaw('COUNT(*) as count, COALESCE(SUM(total_price), 0) as budget')->first();
+        $e7Count = (int) ($e7Stat->count ?? 0);
+        $e7Budget = (float) ($e7Stat->budget ?? 0.0);
         $e7Needs = (clone $e7Query)->with('organizationalUnit:id,name')->orderBy('updated_at')->limit(10)->get()->map(fn (Need $n): array => $this->formatNeedForDrawer($n, $now))->all();
 
         // E8: Zero submission units
@@ -263,8 +272,9 @@ class NeedExceptionCatalog
                 $sub2->where('is_locked', true)->where('status', 'draft')->where('checklist_percentage', '<', self::MIN_CHECKLIST_PERCENTAGE);
             });
         });
-        $e9Count = (int) (clone $e9Query)->count();
-        $e9Budget = (float) (clone $e9Query)->sum('total_price');
+        $e9Stat = (clone $e9Query)->toBase()->selectRaw('COUNT(*) as count, COALESCE(SUM(total_price), 0) as budget')->first();
+        $e9Count = (int) ($e9Stat->count ?? 0);
+        $e9Budget = (float) ($e9Stat->budget ?? 0.0);
         $e9Needs = (clone $e9Query)->with('organizationalUnit:id,name')->orderBy('unlocked_until')->limit(10)->get()->map(fn (Need $n): array => $this->formatNeedForDrawer($n, $now))->all();
 
         return [

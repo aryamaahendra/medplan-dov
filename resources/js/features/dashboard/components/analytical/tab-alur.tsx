@@ -56,44 +56,8 @@ export function TabAlur({ payload, metrics }: TabAlurProps) {
     };
   }, [metrics]);
 
-  // Durations in stage (Median and 90th percentile) per DC7 and Section 12
-  const durationMetrics = [
-    {
-      stageName: 'Penyusunan Draft Unit',
-      medianDays: 4,
-      p90Days: 9,
-      unitCount: metrics.draftCount,
-      color: 'bg-info',
-    },
-    {
-      stageName: 'Telaah & Verifikasi Review',
-      medianDays: 3,
-      p90Days: 7,
-      unitCount: metrics.reviewCount,
-      color: 'bg-warning',
-    },
-    {
-      stageName: 'Proses Persetujuan Direktur',
-      medianDays: 2,
-      p90Days: 5,
-      unitCount: metrics.approvedCount,
-      color: 'bg-success',
-    },
-  ];
-
-  // Weekly Throughput Simulation
-  const weeklyThroughput = [
-    { week: 'Minggu ke-1', processed: 18, approved: 12, rejected: 3 },
-    { week: 'Minggu ke-2', processed: 29, approved: 22, rejected: 4 },
-    { week: 'Minggu ke-3', processed: 34, approved: 28, rejected: 2 },
-    {
-      week: 'Minggu ke-4 (Berjalan)',
-      processed: 21,
-      approved: 16,
-      rejected: 1,
-    },
-  ];
-
+  // Durations & weekly throughput require status log history (DC7 gating)
+  // When isGated is true, we display accumulation state without mock numbers.
   return (
     <div className="flex flex-col gap-6">
       {/* 1. DC7 GATING EXPLAINER BANNER */}
@@ -286,78 +250,16 @@ export function TabAlur({ payload, metrics }: TabAlurProps) {
         title="Durasi Waktu Berada di Tahapan (Hari Kerja)"
         subtitle="Metrik durasi dihitung menggunakan Median dan Persentil ke-90 (P90), bukan rata-rata."
         infoTooltip="Penggunaan median dan P90 mencegah distorsi statistik akibat outlier data lama."
-        tableView={
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Tahapan Siklus</TableHead>
-                <TableHead className="text-right">Median Durasi</TableHead>
-                <TableHead className="text-right">
-                  Persentil ke-90 (P90)
-                </TableHead>
-                <TableHead className="text-right">Usulan Terdampak</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {durationMetrics.map((dm) => (
-                <TableRow key={dm.stageName}>
-                  <TableCell className="font-medium">{dm.stageName}</TableCell>
-                  <TableCell className="text-right font-mono font-semibold">
-                    {dm.medianDays} hari
-                  </TableCell>
-                  <TableCell className="text-right font-mono text-muted-foreground">
-                    {dm.p90Days} hari
-                  </TableCell>
-                  <TableCell className="text-right font-mono">
-                    {dm.unitCount} usulan
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        }
       >
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-3">
-            {durationMetrics.map((dm) => (
-              <div key={dm.stageName} className="flex flex-col gap-1.5">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-medium text-foreground">
-                    {dm.stageName}
-                  </span>
-                  <div className="flex items-center gap-2 font-mono text-xs">
-                    <span className="font-semibold text-foreground">
-                      Median: {dm.medianDays} hari
-                    </span>
-                    <span className="text-muted-foreground">
-                      (P90: {dm.p90Days} hari)
-                    </span>
-                  </div>
-                </div>
-
-                {/* Range Bar */}
-                <div className="flex h-3 w-full items-center rounded-md bg-muted/60 px-0.5">
-                  <div
-                    style={{ width: `${Math.min(100, dm.p90Days * 7)}%` }}
-                    className="relative h-2 rounded bg-muted-foreground/30"
-                  >
-                    {/* Median marker */}
-                    <div
-                      style={{
-                        width: `${Math.min(100, (dm.medianDays / dm.p90Days) * 100)}%`,
-                      }}
-                      className={cn('h-full rounded', dm.color)}
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <p className="text-[11px] text-muted-foreground">
-            * Catatan metodologi: Baris data backfill diperhitungkan dalam
-            volume siklus, namun dikecualikan dari perhitungan metrik durasi
-            waktu untuk menjaga akurasi statistik.
+        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-6 text-center text-xs text-muted-foreground">
+          <RiInformationLine className="mb-2 size-6 text-info" />
+          <p className="font-medium text-foreground">
+            Data Durasi dalam Tahap Akumulasi (DC7)
+          </p>
+          <p className="mt-1 max-w-md">
+            Metrik durasi siklus memerlukan data audit log minimal 14 hari kerja
+            aktif. Telemetri akan ditampilkan secara otomatis setelah periode
+            kohort mencukupi tanpa menggunakan data rekaan.
           </p>
         </div>
       </AnalyticalWidgetFrame>
@@ -366,61 +268,16 @@ export function TabAlur({ payload, metrics }: TabAlurProps) {
       <AnalyticalWidgetFrame
         title="Throughput Penyelesaian Usulan Mingguan"
         subtitle="Kecepatan verifikasi usulan per minggu selama periode siklus pengajuan aktif."
-        tableView={
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Periode</TableHead>
-                <TableHead className="text-right">Total Diproses</TableHead>
-                <TableHead className="text-right">Disetujui</TableHead>
-                <TableHead className="text-right">Ditolak / Revisi</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {weeklyThroughput.map((w) => (
-                <TableRow key={w.week}>
-                  <TableCell className="font-medium">{w.week}</TableCell>
-                  <TableCell className="text-right font-mono font-semibold">
-                    {w.processed} usulan
-                  </TableCell>
-                  <TableCell className="text-right font-mono text-success-foreground dark:text-success">
-                    {w.approved}
-                  </TableCell>
-                  <TableCell className="text-right font-mono text-destructive">
-                    {w.rejected}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        }
       >
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {weeklyThroughput.map((w) => (
-            <div
-              key={w.week}
-              className="flex flex-col justify-between rounded-lg border border-border/70 bg-card p-3"
-            >
-              <div>
-                <span className="text-[11px] font-semibold text-muted-foreground">
-                  {w.week}
-                </span>
-                <div className="mt-1 font-mono text-xl font-bold text-foreground">
-                  {w.processed} usulan
-                </div>
-              </div>
-              <div className="mt-3 flex items-center justify-between border-t border-border/50 pt-2 font-mono text-xs">
-                <span className="font-medium text-success-foreground dark:text-success">
-                  +{w.approved} disetujui
-                </span>
-                {w.rejected > 0 && (
-                  <span className="font-medium text-destructive">
-                    {w.rejected} revisi
-                  </span>
-                )}
-              </div>
-            </div>
-          ))}
+        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-6 text-center text-xs text-muted-foreground">
+          <RiInformationLine className="mb-2 size-6 text-info" />
+          <p className="font-medium text-foreground">
+            Data Throughput dalam Tahap Akumulasi
+          </p>
+          <p className="mt-1 max-w-md">
+            Penyelesaian usulan mingguan akan dikompilasi secara otomatis
+            setelah kohort pengajuan mencapai siklus mingguan penuh.
+          </p>
         </div>
       </AnalyticalWidgetFrame>
     </div>

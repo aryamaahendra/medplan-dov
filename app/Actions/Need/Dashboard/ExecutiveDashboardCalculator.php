@@ -43,6 +43,7 @@ class ExecutiveDashboardCalculator
                 COUNT(CASE WHEN {$stageCase} != 'rejected' AND checklist_percentage > 0 THEN 1 END) as assessed_needs_count,
                 COALESCE(AVG(CASE WHEN {$stageCase} != 'rejected' AND checklist_percentage > 0 THEN checklist_percentage END), 0) as avg_completeness,
                 COUNT(CASE WHEN is_priority = true AND {$stageCase} != 'rejected' THEN 1 END) as priority_needs,
+                COALESCE(SUM(CASE WHEN is_priority = true AND {$stageCase} != 'rejected' THEN total_price ELSE 0 END), 0) as priority_budget,
                 COUNT(CASE WHEN is_priority = true AND approved_by_director_at IS NULL AND {$stageCase} != 'rejected' THEN 1 END) as unapproved_priority_count,
                 COALESCE(SUM(CASE WHEN is_priority = true AND approved_by_director_at IS NULL AND {$stageCase} != 'rejected' THEN total_price ELSE 0 END), 0) as unapproved_priority_budget,
                 COUNT(CASE WHEN approved_by_director_at IS NOT NULL THEN 1 END) as approved_by_director_count,
@@ -87,6 +88,7 @@ class ExecutiveDashboardCalculator
             'active_needs_count' => $activeNeedsCount,
             'total_budget' => $totalBudget,
             'priority_needs' => (int) ($aggregates->priority_needs ?? 0),
+            'priority_budget' => (float) ($aggregates->priority_budget ?? 0),
             'unapproved_priority_count' => (int) ($aggregates->unapproved_priority_count ?? 0),
             'unapproved_priority_budget' => (float) ($aggregates->unapproved_priority_budget ?? 0),
             'avg_completeness' => (float) ($aggregates->avg_completeness ?? 0),
@@ -111,26 +113,27 @@ class ExecutiveDashboardCalculator
         ];
 
         // 2. Budget Pipeline & Stage Breakdown
+        $totalSubmittedBudget = $totalBudget + $stats['rejected_budget'];
         $stageDistribution = [
             'draft' => [
                 'count' => $stats['draft_count'],
                 'budget' => $stats['draft_budget'],
-                'percentage' => $totalBudget > 0 ? round(($stats['draft_budget'] / $totalBudget) * 100, 1) : 0,
+                'percentage' => $totalSubmittedBudget > 0 ? round(($stats['draft_budget'] / $totalSubmittedBudget) * 100, 1) : 0.0,
             ],
             'under_review' => [
                 'count' => $stats['awaiting_director'],
                 'budget' => $stats['awaiting_director_budget'],
-                'percentage' => $totalBudget > 0 ? round(($stats['awaiting_director_budget'] / $totalBudget) * 100, 1) : 0,
+                'percentage' => $totalSubmittedBudget > 0 ? round(($stats['awaiting_director_budget'] / $totalSubmittedBudget) * 100, 1) : 0.0,
             ],
             'approved' => [
                 'count' => $stats['approved_by_director'],
                 'budget' => $stats['approved_budget'],
-                'percentage' => $totalBudget > 0 ? round(($stats['approved_budget'] / $totalBudget) * 100, 1) : 0,
+                'percentage' => $totalSubmittedBudget > 0 ? round(($stats['approved_budget'] / $totalSubmittedBudget) * 100, 1) : 0.0,
             ],
             'rejected' => [
                 'count' => $stats['rejected_count'],
                 'budget' => $stats['rejected_budget'],
-                'percentage' => $totalBudget > 0 ? round(($stats['rejected_budget'] / $totalBudget) * 100, 1) : 0,
+                'percentage' => $totalSubmittedBudget > 0 ? round(($stats['rejected_budget'] / $totalSubmittedBudget) * 100, 1) : 0.0,
             ],
         ];
 
@@ -216,6 +219,7 @@ class ExecutiveDashboardCalculator
                 COUNT(*) as count,
                 COALESCE(SUM(total_price), 0) as total_budget,
                 COUNT(CASE WHEN is_priority = true THEN 1 END) as priority_count,
+                COALESCE(SUM(CASE WHEN is_priority = true THEN total_price ELSE 0 END), 0) as priority_budget,
                 COUNT(CASE WHEN approved_by_director_at IS NOT NULL THEN 1 END) as approved_count,
                 COALESCE(SUM(CASE WHEN approved_by_director_at IS NOT NULL THEN total_price ELSE 0 END), 0) as approved_budget,
                 COUNT(CASE WHEN status = 'approved' AND approved_by_director_at IS NULL THEN 1 END) as under_review_count,
@@ -252,6 +256,7 @@ class ExecutiveDashboardCalculator
                 'count' => (int) $item->count,
                 'total_budget' => (float) $item->total_budget,
                 'priority_count' => (int) $item->priority_count,
+                'priority_budget' => (float) $item->priority_budget,
                 'approved_count' => (int) $item->approved_count,
                 'approved_budget' => (float) $item->approved_budget,
                 'under_review_count' => (int) $item->under_review_count,
@@ -370,7 +375,7 @@ class ExecutiveDashboardCalculator
             ->where('unlocked_until', '<=', $threeDaysAhead)
             ->count();
 
-        $rejectedNotRevised = (clone $baseQuery)->where('status', 'rejected')->count();
+        $rejectedNotRevised = $stats['rejected_count'];
         $zeroSubmissionUnitsCount = collect($allUnitProgress)->where('has_submission', false)->count();
 
         $exceptions = [
@@ -433,6 +438,8 @@ class ExecutiveDashboardCalculator
             ->join('need_details', 'need_detail_funding_source.need_detail_id', '=', 'need_details.id')
             ->join('needs', 'need_details.need_id', '=', 'needs.id')
             ->where('needs.need_group_id', $groupId)
+            ->whereNull('needs.deleted_at')
+            ->where('needs.status', '!=', 'rejected')
             ->when(! $user?->can('view any needs'), function ($q) use ($user) {
                 if ($user?->can('view descendant needs') && $user->organizational_unit_id) {
                     $unit = $user->organizationalUnit;
@@ -456,40 +463,56 @@ class ExecutiveDashboardCalculator
             ->all();
 
         // 11. Checklist score histogram
+        /** @var object{b1?: int|string, b2?: int|string, b3?: int|string, b4?: int|string, b5?: int|string}|null $clBuckets */
+        $clBuckets = (clone $baseQuery)
+            ->toBase()
+            ->selectRaw('
+                COUNT(CASE WHEN checklist_percentage BETWEEN 0 AND 20 THEN 1 END) as b1,
+                COUNT(CASE WHEN checklist_percentage BETWEEN 21 AND 40 THEN 1 END) as b2,
+                COUNT(CASE WHEN checklist_percentage BETWEEN 41 AND 60 THEN 1 END) as b3,
+                COUNT(CASE WHEN checklist_percentage BETWEEN 61 AND 80 THEN 1 END) as b4,
+                COUNT(CASE WHEN checklist_percentage BETWEEN 81 AND 100 THEN 1 END) as b5
+            ')
+            ->first();
+
         $checklistBuckets = [
-            '0-20' => (clone $baseQuery)->whereBetween('checklist_percentage', [0, 20])->count(),
-            '21-40' => (clone $baseQuery)->whereBetween('checklist_percentage', [21, 40])->count(),
-            '41-60' => (clone $baseQuery)->whereBetween('checklist_percentage', [41, 60])->count(),
-            '61-80' => (clone $baseQuery)->whereBetween('checklist_percentage', [61, 80])->count(),
-            '81-100' => (clone $baseQuery)->whereBetween('checklist_percentage', [81, 100])->count(),
+            '0-20' => (int) ($clBuckets->b1 ?? 0),
+            '21-40' => (int) ($clBuckets->b2 ?? 0),
+            '41-60' => (int) ($clBuckets->b3 ?? 0),
+            '61-80' => (int) ($clBuckets->b4 ?? 0),
+            '81-100' => (int) ($clBuckets->b5 ?? 0),
         ];
 
         // 12. Own Unit KPIs
         $userUnitId = $user?->organizational_unit_id;
         $myUnitData = null;
         if ($userUnitId && isset($allUnits[$userUnitId])) {
-            $myUnitQuery = Need::query()
+            /** @var object{total_needs?: int|string, total_budget?: int|float|string, approved_count?: int|string, under_review_count?: int|string, draft_count?: int|string, rejected_count?: int|string, priority_count?: int|string}|null $myUnitRow */
+            $myUnitRow = Need::query()
                 ->where('need_group_id', $groupId)
-                ->where('organizational_unit_id', $userUnitId);
-
-            $myUnitNeeds = $myUnitQuery->count();
-            $myUnitBudget = (float) $myUnitQuery->sum('total_price');
-            $myUnitApproved = (clone $myUnitQuery)->whereNotNull('approved_by_director_at')->count();
-            $myUnitUnderReview = (clone $myUnitQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->count();
-            $myUnitDraft = (clone $myUnitQuery)->where('status', 'draft')->count();
-            $myUnitRejected = (clone $myUnitQuery)->where('status', 'rejected')->count();
-            $myUnitPriority = (clone $myUnitQuery)->where('is_priority', true)->count();
+                ->where('organizational_unit_id', $userUnitId)
+                ->toBase()
+                ->selectRaw("
+                    COUNT(*) as total_needs,
+                    COALESCE(SUM(total_price), 0) as total_budget,
+                    COUNT(CASE WHEN approved_by_director_at IS NOT NULL THEN 1 END) as approved_count,
+                    COUNT(CASE WHEN status = 'approved' AND approved_by_director_at IS NULL THEN 1 END) as under_review_count,
+                    COUNT(CASE WHEN {$stageCase} = 'draft' THEN 1 END) as draft_count,
+                    COUNT(CASE WHEN {$stageCase} = 'rejected' THEN 1 END) as rejected_count,
+                    COUNT(CASE WHEN is_priority = true THEN 1 END) as priority_count
+                ")
+                ->first();
 
             $myUnitData = [
                 'unit_id' => $userUnitId,
                 'name' => $allUnits[$userUnitId]->name,
-                'total_needs' => $myUnitNeeds,
-                'total_budget' => $myUnitBudget,
-                'approved_count' => $myUnitApproved,
-                'under_review_count' => $myUnitUnderReview,
-                'draft_count' => $myUnitDraft,
-                'rejected_count' => $myUnitRejected,
-                'priority_count' => $myUnitPriority,
+                'total_needs' => (int) ($myUnitRow->total_needs ?? 0),
+                'total_budget' => (float) ($myUnitRow->total_budget ?? 0),
+                'approved_count' => (int) ($myUnitRow->approved_count ?? 0),
+                'under_review_count' => (int) ($myUnitRow->under_review_count ?? 0),
+                'draft_count' => (int) ($myUnitRow->draft_count ?? 0),
+                'rejected_count' => (int) ($myUnitRow->rejected_count ?? 0),
+                'priority_count' => (int) ($myUnitRow->priority_count ?? 0),
             ];
         }
 
@@ -512,6 +535,38 @@ class ExecutiveDashboardCalculator
                 ];
             })
             ->all();
+        /** @var object{b1?: int|string, b2?: int|string, b3?: int|string, b4?: int|string, b5?: int|string}|null $sbRow */
+        $sbRow = (clone $baseQuery)
+            ->toBase()
+            ->whereRaw("{$stageCase} != 'rejected'")
+            ->selectRaw('
+                COUNT(CASE WHEN total_price < 10000000 THEN 1 END) as b1,
+                COUNT(CASE WHEN total_price >= 10000000 AND total_price <= 50000000 THEN 1 END) as b2,
+                COUNT(CASE WHEN total_price > 50000000 AND total_price <= 200000000 THEN 1 END) as b3,
+                COUNT(CASE WHEN total_price > 200000000 AND total_price <= 1000000000 THEN 1 END) as b4,
+                COUNT(CASE WHEN total_price > 1000000000 THEN 1 END) as b5
+            ')
+            ->first();
+
+        $sizeBuckets = [
+            '< 10 Juta' => (int) ($sbRow->b1 ?? 0),
+            '10 - 50 Juta' => (int) ($sbRow->b2 ?? 0),
+            '50 - 200 Juta' => (int) ($sbRow->b3 ?? 0),
+            '200 Jt - 1 Milyar' => (int) ($sbRow->b4 ?? 0),
+            '> 1 Milyar' => (int) ($sbRow->b5 ?? 0),
+        ];
+
+        $unitTypeRows = (clone $baseQuery)
+            ->toBase()
+            ->whereRaw("{$stageCase} != 'rejected'")
+            ->selectRaw('organizational_unit_id, need_type_id, COALESCE(SUM(total_price), 0) as budget')
+            ->groupBy('organizational_unit_id', 'need_type_id')
+            ->get();
+
+        $unitTypeMatrix = [];
+        foreach ($unitTypeRows as $r) {
+            $unitTypeMatrix["{$r->organizational_unit_id}_{$r->need_type_id}"] = (float) $r->budget;
+        }
 
         return [
             'baseQuery' => $baseQuery,
@@ -531,6 +586,8 @@ class ExecutiveDashboardCalculator
             'fundingSources' => $fundingSources,
             'checklistBuckets' => $checklistBuckets,
             'myUnitData' => $myUnitData,
+            'sizeBuckets' => $sizeBuckets,
+            'unitTypeMatrix' => $unitTypeMatrix,
             'availableGroups' => $availableGroups,
         ];
     }

@@ -175,6 +175,8 @@ class GetNeedDashboardStatsAction
             'fundingSources' => $exec['fundingSources'],
             'checklistBuckets' => $exec['checklistBuckets'],
             'myUnitData' => $exec['myUnitData'],
+            'sizeBuckets' => $exec['sizeBuckets'] ?? [],
+            'unitTypeMatrix' => $exec['unitTypeMatrix'] ?? [],
             'operations' => $operations,
         ];
     }

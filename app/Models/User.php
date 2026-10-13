@@ -21,6 +21,25 @@ class User extends Authenticatable
     use HasFactory, HasRoles, Notifiable, TwoFactorAuthenticatable;
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var list<string>
+     */
+    protected $appends = [
+        'avatar',
+    ];
+
+    /**
+     * Get the default Dicebear Clay avatar URL for the user.
+     */
+    public function getAvatarAttribute(): string
+    {
+        $seed = rawurlencode($this->email ?: $this->name ?: (string) $this->id);
+
+        return "https://api.dicebear.com/10.x/clay/svg?seed={$seed}";
+    }
+
+    /**
      * @return BelongsTo<OrganizationalUnit, $this>
      */
     public function organizationalUnit(): BelongsTo

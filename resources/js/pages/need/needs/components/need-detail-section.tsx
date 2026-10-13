@@ -192,7 +192,15 @@ export function NeedDetailSection({
                 }}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Pilih K/L/D/I" />
+                  <SelectValue placeholder="Pilih K/L/D/I">
+                    {(val) => {
+                      const found = kldiOptions?.find(
+                        (opt) => opt.value === val,
+                      );
+
+                      return found ? found.name : val;
+                    }}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {kldiOptions.map((opt) => (
@@ -217,7 +225,15 @@ export function NeedDetailSection({
                 }}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Pilih Satker/SKPD" />
+                  <SelectValue placeholder="Pilih Satker/SKPD">
+                    {(val) => {
+                      const found = satkerOptions?.find(
+                        (opt) => opt.value === val,
+                      );
+
+                      return found ? found.name : val;
+                    }}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {satkerOptions.map((opt) => (
@@ -240,7 +256,17 @@ export function NeedDetailSection({
                 }}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Pilih KPA" />
+                  <SelectValue placeholder="Pilih KPA">
+                    {(val) => {
+                      const found = users?.find(
+                        (u) => u.id.toString() === val?.toString(),
+                      );
+
+                      return found
+                        ? `${found.name}${found.nip ? ` (NIP: ${found.nip})` : ''}`
+                        : val;
+                    }}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {users.map((u) => (

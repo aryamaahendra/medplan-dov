@@ -85,7 +85,15 @@ export function GeneralInfoSection({
               id="need_type_id"
               className="w-full bg-muted/20 transition-colors hover:bg-muted/40"
             >
-              <SelectValue placeholder="Pilih kategori kebutuhan" />
+              <SelectValue placeholder="Pilih kategori kebutuhan">
+                {(val) => {
+                  const found = needTypes.find(
+                    (t) => t.id.toString() === val?.toString(),
+                  );
+
+                  return found ? found.name : val;
+                }}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {needTypes.map((t) => (

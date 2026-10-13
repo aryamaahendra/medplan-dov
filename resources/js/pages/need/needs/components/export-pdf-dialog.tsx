@@ -132,7 +132,15 @@ export function ExportPdfDialog({
               }}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Choose a signer" />
+                <SelectValue placeholder="Choose a signer">
+                  {(val) => {
+                    const found = users.find((u) => u.id.toString() === val);
+
+                    return found
+                      ? `${found.name} ${found.nip ? `(NIP. ${found.nip})` : ''}`.trim()
+                      : val;
+                  }}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {users.map((user) => (
@@ -155,7 +163,18 @@ export function ExportPdfDialog({
               }}
             >
               <SelectTrigger id="paper_size" className="w-full">
-                <SelectValue placeholder="Pilih ukuran kertas" />
+                <SelectValue placeholder="Pilih ukuran kertas">
+                  {(val) => {
+                    const labels: Record<string, string> = {
+                      a4: 'A4 (210 x 297 mm)',
+                      f4: 'F4 / Folio (215 x 330 mm)',
+                      legal: 'Legal (216 x 356 mm)',
+                      letter: 'Letter (216 x 279 mm)',
+                    };
+
+                    return labels[val] ?? val;
+                  }}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="a4">A4 (210 x 297 mm)</SelectItem>

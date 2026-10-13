@@ -4,13 +4,15 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { getIndexColumn } from '@/components/data-table/data-table-index-column';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { getDicebearClayAvatar } from '@/lib/avatar';
 import { formatDate } from '@/lib/formatters';
-
 export interface User {
   id: number;
   name: string;
   nip?: string;
   email: string;
+  avatar?: string;
   created_at: string;
   roles?: { id: number; name: string }[];
   organizational_unit_id?: number;
@@ -25,6 +27,35 @@ export const getColumns = (
   {
     accessorKey: 'name',
     header: (props) => <DataTableColumnHeader {...props} title="Name" />,
+    cell: ({ row }) => {
+      const user = row.original;
+      const initials = user.name
+        ? user.name
+            .trim()
+            .split(' ')
+            .slice(0, 2)
+            .map((part) => part.charAt(0).toUpperCase())
+            .join('')
+        : '';
+      const avatarSrc =
+        user.avatar ||
+        getDicebearClayAvatar(user.email || user.name || user.id);
+
+      return (
+        <div className="flex items-center gap-2.5">
+          <Avatar
+            size="sm"
+            className="size-7 shrink-0 overflow-hidden rounded-full"
+          >
+            <AvatarImage src={avatarSrc} alt={user.name} />
+            <AvatarFallback className="rounded-full bg-muted text-[10px] text-foreground">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <span className="font-medium text-foreground">{user.name}</span>
+        </div>
+      );
+    },
   },
   {
     accessorKey: 'nip',
@@ -37,7 +68,7 @@ export const getColumns = (
     accessorKey: 'email',
     header: (props) => <DataTableColumnHeader {...props} title="Email" />,
     meta: {
-      cellClassName: 'text-primary font-medium',
+      cellClassName: 'text-foreground font-medium',
     },
   },
   {
@@ -55,7 +86,7 @@ export const getColumns = (
           {roles.map((role) => (
             <span
               key={role.id}
-              className="rounded bg-primary/10 px-2 py-0.5 text-xs text-primary"
+              className="rounded bg-muted px-2 py-0.5 text-xs font-medium text-foreground"
             >
               {role.name}
             </span>

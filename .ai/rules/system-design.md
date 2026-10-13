@@ -65,3 +65,7 @@ Standardize all status colors using project OKLCH CSS variables in resources/css
 - muted: neutral gray for inactive/draft states.
   Never use ad-hoc Tailwind color utilities (e.g., text-emerald-_, bg-rose-_, text-blue-_, bg-amber-_, text-red-*).
   Do not modify primitive shadcn components in resources/js/components/ui/ to add custom status colors; instead use dedicated forked components such as @/components/status-badge.
+
+## Text Color Contrast - No Primary as Text
+
+Do not use primary color as text color (e.g. text-primary). Primary color has low contrast with background when used as text. Use foreground with bold instead (e.g. text-foreground font-semibold/font-bold).

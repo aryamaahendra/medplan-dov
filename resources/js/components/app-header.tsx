@@ -39,6 +39,7 @@ import {
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
+import { getDicebearClayAvatar } from '@/lib/avatar';
 import { cn, toUrl } from '@/lib/utils';
 import type { BreadcrumbItem, NavItem } from '@/types';
 
@@ -214,7 +215,17 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                 render={<Button variant="ghost" size="icon" className="p-1" />}
               >
                 <Avatar className="size-8 overflow-hidden rounded-full">
-                  <AvatarImage src={auth.user?.avatar} alt={auth.user?.name} />
+                  <AvatarImage
+                    src={
+                      auth.user?.avatar ||
+                      (auth.user
+                        ? getDicebearClayAvatar(
+                            auth.user.email || auth.user.name || auth.user.id,
+                          )
+                        : undefined)
+                    }
+                    alt={auth.user?.name}
+                  />
                   <AvatarFallback className="rounded-lg bg-muted text-foreground">
                     {getInitials(auth.user?.name ?? '')}
                   </AvatarFallback>

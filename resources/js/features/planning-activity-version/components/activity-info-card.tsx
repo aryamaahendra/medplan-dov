@@ -62,7 +62,17 @@ export function ActivityInfoCard({
                 id="parent_id"
                 className="w-full max-w-full truncate"
               >
-                <SelectValue placeholder="Pilih induk (opsional)" />
+                <SelectValue placeholder="Pilih induk (opsional)">
+                  {(val) => {
+                    if (!val || val === 'none') {
+return 'Tanpa Induk';
+}
+
+                    const found = parents.find((p) => p.id.toString() === val);
+
+                    return found ? `${found.code} - ${found.name}` : val;
+                  }}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">Tanpa Induk</SelectItem>
@@ -119,7 +129,15 @@ export function ActivityInfoCard({
                 name="type"
               >
                 <SelectTrigger id="type">
-                  <SelectValue placeholder="Pilih Tipe" />
+                  <SelectValue placeholder="Pilih Tipe">
+                    {(val) => {
+                      const found = activityTypes.find(
+                        (opt) => opt.value === val,
+                      );
+
+                      return found ? found.label : val;
+                    }}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {activityTypes.map((opt) => (

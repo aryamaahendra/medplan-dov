@@ -87,8 +87,8 @@ export function PlanningAlignmentSection({
   };
 
   const planningErrors =
-    errors.planning_activity_version_ids ||
-    errors.planning_activity_indicator_ids;
+    errors?.planning_activity_version_ids ||
+    errors?.planning_activity_indicator_ids;
 
   return (
     <div className="space-y-6">

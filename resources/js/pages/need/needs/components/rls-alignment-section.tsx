@@ -27,7 +27,7 @@ export function RlsAlignmentSection({
     }));
   };
 
-  const rlsErrors = errors.strategic_service_plan_ids;
+  const rlsErrors = errors?.strategic_service_plan_ids;
 
   return (
     <div className="space-y-6">

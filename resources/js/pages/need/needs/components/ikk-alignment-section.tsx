@@ -29,7 +29,7 @@ export function IkkAlignmentSection({
     }));
   };
 
-  const ikkErrors = errors.kpi_indicator_ids;
+  const ikkErrors = errors?.kpi_indicator_ids;
 
   return (
     <div className="space-y-6">

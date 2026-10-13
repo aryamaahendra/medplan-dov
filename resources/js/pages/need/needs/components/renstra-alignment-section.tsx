@@ -62,7 +62,7 @@ export function RenstraAlignmentSection({
     }));
   };
 
-  const renstraErrors = errors.sasaran_ids || errors.indicator_ids;
+  const renstraErrors = errors?.sasaran_ids || errors?.indicator_ids;
 
   return (
     <div className="space-y-6">

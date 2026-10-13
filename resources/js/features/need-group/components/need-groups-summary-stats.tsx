@@ -8,10 +8,9 @@ import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
 import {
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent
-  
+  ChartTooltipContent,
 } from '@/components/ui/chart';
-import type {ChartConfig} from '@/components/ui/chart';
+import type { ChartConfig } from '@/components/ui/chart';
 import { formatCompactIDR, formatIDR, formatNumber } from '@/lib/formatters';
 import type { NeedGroupsSummaryStatsData } from '../types/need-group.types';
 

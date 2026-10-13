@@ -8,7 +8,7 @@ interface StrategicAlignmentSectionProps {
 }
 
 export function StrategicAlignmentSection({
-  groupedRenstra,
+  groupedRenstra = [],
 }: StrategicAlignmentSectionProps) {
   return (
     <div className="pt-4">

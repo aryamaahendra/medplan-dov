@@ -1,13 +1,9 @@
 import { Head } from '@inertiajs/react';
 
-import { NeedShowTabs } from '@/features/need/components/need-show-tabs';
 import needRoutes from '@/routes/needs';
-import type { ChecklistQuestion, ChecklistAnswer, Need } from '@/types';
+import type { ChecklistAnswer, ChecklistQuestion, Need } from '@/types';
 
-import { NeedHeader } from './components/need-header';
-import { NeedLockBanner } from './components/need-lock-banner';
-import { NeedSidebar } from './components/need-sidebar';
-
+import { NeedShowVariant1 } from './components/details/need-show-variant-1';
 interface NeedShowProps {
   need: Need;
   checklistQuestions: { data: ChecklistQuestion[] };
@@ -26,24 +22,12 @@ export default function NeedShow({
       <Head title={`Detail Usulan: ${need.title}`} />
 
       <div className="flex flex-col gap-4 p-4 md:p-8">
-        <NeedHeader need={need} />
-
-        <NeedLockBanner need={need} />
-
-        <div className="grid grid-cols-1 items-start gap-4 pt-8 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <NeedShowTabs
-              need={need}
-              checklistQuestions={checklistQuestions}
-              existingAnswers={existingAnswers}
-              users={users}
-            />
-          </div>
-
-          <div className="sticky top-4">
-            <NeedSidebar need={need} />
-          </div>
-        </div>
+        <NeedShowVariant1
+          need={need}
+          checklistQuestions={checklistQuestions}
+          existingAnswers={existingAnswers}
+          users={users}
+        />
       </div>
     </>
   );

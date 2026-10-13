@@ -141,3 +141,11 @@ _Avoid_: Department, branch, team
 **Director Review**:
 The formal executive decision step where a Director approves or rejects a submitted need with optional directives.
 _Avoid_: Final sign-off, executive stamp
+
+**Trashed Unit**:
+An Organizational Unit that has been deactivated through soft deletion, removing it from active planning filters while preserving its historical relationship to existing proposals.
+_Avoid_: Inactive department, deleted agency, archived office
+
+**Orphaned Proposal**:
+A Need proposal whose originating Organizational Unit has been soft-deleted, suppressing the unit display in overview lists until restored or reassigned to an active unit.
+_Avoid_: Unitless need, detached item, parentless proposal

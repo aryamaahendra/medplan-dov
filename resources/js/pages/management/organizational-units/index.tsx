@@ -1,9 +1,12 @@
 import { Head } from '@inertiajs/react';
-import { RiAddLine } from '@remixicon/react';
+import { RiAddLine, RiAlertLine, RiDeleteBinLine } from '@remixicon/react';
 
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 
 import { OrganizationalUnitDialog } from '@/features/organizational-unit/components/organizational-unit-dialog';
 import { useOrganizationalUnitsIndex } from '@/features/organizational-unit/hooks/use-organizational-units-index';
@@ -30,13 +33,29 @@ export default function OrganizationalUnitsIndex(
               Kelola struktur organisasi, bidang, dan subbagian.
             </p>
           </div>
-          {hasPermission('create organizational-units') && (
+          {!state.isTrash && hasPermission('create organizational-units') && (
             <Button onClick={handlers.onCreate}>
               <RiAddLine data-icon="inline-start" />
               Tambah Unit
             </Button>
           )}
         </div>
+
+        {state.isTrash && (
+          <Alert
+            variant="default"
+            className="border-warning/40 bg-warning/10 text-warning-foreground dark:border-warning/30 dark:bg-warning/20"
+          >
+            <RiAlertLine className="text-warning" />
+            <AlertTitle className="font-semibold text-warning-foreground">
+              Mode Tempat Sampah
+            </AlertTitle>
+            <AlertDescription className="text-sm text-warning-foreground/90">
+              Anda sedang melihat unit organisasi yang telah dihapus (soft
+              delete). Data di sini tidak aktif dalam operasional sistem.
+            </AlertDescription>
+          </Alert>
+        )}
 
         <DataTable
           columns={table.columns}
@@ -49,6 +68,24 @@ export default function OrganizationalUnitsIndex(
           onPerPageChange={table.onPerPageChange}
           onReset={table.onReset}
           searchPlaceholder="Cari berdasarkan nama atau kode..."
+          toolbarChildren={
+            <div className="flex items-center gap-2 rounded-lg border border-border/80 bg-background/50 px-3 py-1.5 shadow-xs">
+              <RiDeleteBinLine className="size-4 text-muted-foreground" />
+              <Label
+                htmlFor="trash-mode-switch"
+                className="cursor-pointer text-xs font-medium text-foreground select-none"
+              >
+                Lihat Tempat Sampah
+              </Label>
+              <Switch
+                id="trash-mode-switch"
+                size="sm"
+                checked={state.isTrash}
+                onCheckedChange={handlers.onToggleTrash}
+                aria-label="Tampilkan unit organisasi yang dihapus"
+              />
+            </div>
+          }
         />
       </div>
 

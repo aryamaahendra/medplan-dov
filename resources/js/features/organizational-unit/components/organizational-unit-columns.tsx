@@ -4,21 +4,16 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { ActionDropdown } from '@/components/action-dropdown';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { getIndexColumn } from '@/components/data-table/data-table-index-column';
-import { formatDate } from '@/lib/formatters';
+import { formatDate, formatDateTime } from '@/lib/formatters';
+import type { OrganizationalUnit } from '../types/organizational-unit.types';
 
-export interface OrganizationalUnit {
-  id: number;
-  name: string;
-  code: string;
-  parent_id: number | null;
-  parent?: OrganizationalUnit | null;
-  created_at: string;
-}
+export type { OrganizationalUnit };
 
 export const getColumns = (
   onEdit: (unit: OrganizationalUnit) => void,
   onDelete: (unit: OrganizationalUnit) => void,
   hasPermission: (permission: string) => boolean,
+  isTrash = false,
 ): ColumnDef<OrganizationalUnit>[] => [
   getIndexColumn(),
   {
@@ -40,20 +35,46 @@ export const getColumns = (
     header: (props) => <DataTableColumnHeader {...props} title="Unit Induk" />,
     cell: ({ row }) => row.original.parent?.name || '-',
   },
-  {
-    accessorKey: 'created_at',
-    header: (props) => <DataTableColumnHeader {...props} title="Dibuat" />,
-    cell: ({ row }) =>
-      formatDate(row.getValue('created_at'), {
-        day: '2-digit',
-      }),
-  },
+  isTrash
+    ? {
+        accessorKey: 'deleted_at',
+        header: (props) => (
+          <DataTableColumnHeader {...props} title="Dihapus Pada" />
+        ),
+        cell: ({ row }) => {
+          const deletedAt = row.original.deleted_at;
+
+          return deletedAt
+            ? formatDateTime(deletedAt, {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })
+            : '-';
+        },
+      }
+    : {
+        accessorKey: 'created_at',
+        header: (props) => <DataTableColumnHeader {...props} title="Dibuat" />,
+        cell: ({ row }) =>
+          formatDate(row.getValue('created_at'), {
+            day: '2-digit',
+          }),
+      },
   {
     id: 'actions',
     meta: {
       cellClassName: 'w-1',
     },
     cell: ({ row }) => {
+      if (isTrash) {
+        // In trash mode, standard edit and standard soft-delete actions are hidden.
+        // Restore and permanent delete actions will be added in Issue #5.
+        return null;
+      }
+
       const unit = row.original;
 
       const actions: any[] = [];

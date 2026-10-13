@@ -39,10 +39,25 @@ export function useOrganizationalUnitsIndex(
   );
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const { onSearch, onSort, onPageChange, onPerPageChange, onReset } =
-    useDataTable({
-      only: ['units', 'filters'],
+  const {
+    onSearch,
+    onSort,
+    onPageChange,
+    onPerPageChange,
+    onReset,
+    mergeParams,
+  } = useDataTable({
+    only: ['units', 'filters'],
+  });
+
+  const isTrash = Boolean(props.filters.trash);
+
+  const onToggleTrash = (checked: boolean) => {
+    mergeParams({
+      trash: checked ? true : undefined,
+      page: 1,
     });
+  };
 
   const onEdit = (unit: OrganizationalUnit) => {
     setEditingUnit(unit);
@@ -80,8 +95,8 @@ export function useOrganizationalUnitsIndex(
   };
 
   const columns = useMemo(
-    () => getColumns(onEdit, onDelete, hasPermission),
-    [hasPermission],
+    () => getColumns(onEdit, onDelete, hasPermission, isTrash),
+    [hasPermission, isTrash],
   );
 
   return {
@@ -90,6 +105,7 @@ export function useOrganizationalUnitsIndex(
       editingUnit,
       deletingUnit,
       isDeleting,
+      isTrash,
     },
     handlers: {
       onEdit,
@@ -98,6 +114,7 @@ export function useOrganizationalUnitsIndex(
       handleConfirmDelete,
       setDialogOpen,
       setDeletingUnit,
+      onToggleTrash,
     },
     table: {
       columns,

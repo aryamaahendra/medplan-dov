@@ -38,6 +38,13 @@ export function useOrganizationalUnitsIndex(
     null,
   );
   const [isDeleting, setIsDeleting] = useState(false);
+  const [restoringUnit, setRestoringUnit] = useState<OrganizationalUnit | null>(
+    null,
+  );
+  const [isRestoring, setIsRestoring] = useState(false);
+  const [forceDeletingUnit, setForceDeletingUnit] =
+    useState<OrganizationalUnit | null>(null);
+  const [isForceDeleting, setIsForceDeleting] = useState(false);
 
   const {
     onSearch,
@@ -73,6 +80,14 @@ export function useOrganizationalUnitsIndex(
     setDeletingUnit(unit);
   };
 
+  const onRestore = (unit: OrganizationalUnit) => {
+    setRestoringUnit(unit);
+  };
+
+  const onForceDelete = (unit: OrganizationalUnit) => {
+    setForceDeletingUnit(unit);
+  };
+
   const handleConfirmDelete = () => {
     if (!deletingUnit) {
       return;
@@ -94,8 +109,73 @@ export function useOrganizationalUnitsIndex(
     );
   };
 
+  const handleConfirmRestore = () => {
+    if (!restoringUnit) {
+      return;
+    }
+
+    setIsRestoring(true);
+
+    router.post(
+      organizationalUnitRoutes.restore.url({
+        id: restoringUnit.id,
+      }),
+      {},
+      {
+        onSuccess: () => {
+          toast.success('Unit organisasi berhasil dipulihkan.');
+          setRestoringUnit(null);
+        },
+        onError: (errors) => {
+          const errorMessage =
+            errors.error ||
+            errors.message ||
+            'Gagal memulihkan unit organisasi.';
+          toast.error(errorMessage);
+        },
+        onFinish: () => setIsRestoring(false),
+      },
+    );
+  };
+
+  const handleConfirmForceDelete = () => {
+    if (!forceDeletingUnit) {
+      return;
+    }
+
+    setIsForceDeleting(true);
+
+    router.delete(
+      organizationalUnitRoutes.forceDelete.url({
+        id: forceDeletingUnit.id,
+      }),
+      {
+        onSuccess: () => {
+          toast.success('Unit organisasi berhasil dihapus secara permanen.');
+          setForceDeletingUnit(null);
+        },
+        onError: (errors) => {
+          const errorMessage =
+            errors.error ||
+            errors.message ||
+            'Gagal menghapus unit organisasi secara permanen.';
+          toast.error(errorMessage);
+        },
+        onFinish: () => setIsForceDeleting(false),
+      },
+    );
+  };
+
   const columns = useMemo(
-    () => getColumns(onEdit, onDelete, hasPermission, isTrash),
+    () =>
+      getColumns(
+        onEdit,
+        onDelete,
+        hasPermission,
+        isTrash,
+        onRestore,
+        onForceDelete,
+      ),
     [hasPermission, isTrash],
   );
 
@@ -105,15 +185,25 @@ export function useOrganizationalUnitsIndex(
       editingUnit,
       deletingUnit,
       isDeleting,
+      restoringUnit,
+      isRestoring,
+      forceDeletingUnit,
+      isForceDeleting,
       isTrash,
     },
     handlers: {
       onEdit,
       onCreate,
       onDelete,
+      onRestore,
+      onForceDelete,
       handleConfirmDelete,
+      handleConfirmRestore,
+      handleConfirmForceDelete,
       setDialogOpen,
       setDeletingUnit,
+      setRestoringUnit,
+      setForceDeletingUnit,
       onToggleTrash,
     },
     table: {

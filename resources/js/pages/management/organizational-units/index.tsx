@@ -107,6 +107,28 @@ export default function OrganizationalUnitsIndex(
         variant="destructive"
         loading={state.isDeleting}
       />
+
+      <ConfirmDialog
+        open={!!state.restoringUnit}
+        onOpenChange={(open) => !open && handlers.setRestoringUnit(null)}
+        onConfirm={handlers.handleConfirmRestore}
+        title="Pulihkan Unit Organisasi"
+        description={`Apakah Anda yakin ingin memulihkan "${state.restoringUnit?.name}"? Unit ini akan dikembalikan ke operasional perencanaan aktif.`}
+        confirmText="Pulihkan"
+        variant="default"
+        loading={state.isRestoring}
+      />
+
+      <ConfirmDialog
+        open={!!state.forceDeletingUnit}
+        onOpenChange={(open) => !open && handlers.setForceDeletingUnit(null)}
+        onConfirm={handlers.handleConfirmForceDelete}
+        title="Hapus Permanen Unit Organisasi"
+        description={`Apakah Anda yakin ingin menghapus permanen "${state.forceDeletingUnit?.name}"? Tindakan ini bersifat destruktif dan data tidak dapat dikembalikan lagi.`}
+        confirmText="Hapus Permanen"
+        variant="destructive"
+        loading={state.isForceDeleting}
+      />
     </>
   );
 }

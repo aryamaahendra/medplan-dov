@@ -1,4 +1,4 @@
-import { RiEdit2Line, RiDeleteBinLine } from '@remixicon/react';
+import { RiEdit2Line, RiDeleteBinLine, RiRefreshLine } from '@remixicon/react';
 import type { ColumnDef } from '@tanstack/react-table';
 
 import { ActionDropdown } from '@/components/action-dropdown';
@@ -14,6 +14,8 @@ export const getColumns = (
   onDelete: (unit: OrganizationalUnit) => void,
   hasPermission: (permission: string) => boolean,
   isTrash = false,
+  onRestore?: (unit: OrganizationalUnit) => void,
+  onForceDelete?: (unit: OrganizationalUnit) => void,
 ): ColumnDef<OrganizationalUnit>[] => [
   getIndexColumn(),
   {
@@ -69,15 +71,42 @@ export const getColumns = (
       cellClassName: 'w-1',
     },
     cell: ({ row }) => {
-      if (isTrash) {
-        // In trash mode, standard edit and standard soft-delete actions are hidden.
-        // Restore and permanent delete actions will be added in Issue #5.
-        return null;
-      }
-
       const unit = row.original;
-
       const actions: any[] = [];
+
+      if (isTrash) {
+        const canRestore =
+          unit.can?.restore ?? hasPermission('restore org-units');
+        const canForceDelete =
+          unit.can?.forceDelete ?? hasPermission('force-delete org-units');
+
+        if (canRestore && onRestore) {
+          actions.push({
+            label: 'Pulihkan',
+            icon: RiRefreshLine,
+            onClick: () => onRestore(unit),
+          });
+        }
+
+        if (canForceDelete && onForceDelete) {
+          if (actions.length > 0) {
+            actions.push('separator');
+          }
+
+          actions.push({
+            label: 'Hapus Permanen',
+            icon: RiDeleteBinLine,
+            onClick: () => onForceDelete(unit),
+            variant: 'destructive',
+          });
+        }
+
+        if (actions.length === 0) {
+          return null;
+        }
+
+        return <ActionDropdown actions={actions} />;
+      }
 
       if (hasPermission('update organizational-units')) {
         actions.push({

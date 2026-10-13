@@ -83,7 +83,7 @@ class StoreNeedRequest extends FormRequest
             'organizational_unit_id' => [
                 'required',
                 'integer',
-                'exists:organizational_units,id',
+                Rule::exists('organizational_units', 'id')->whereNull('deleted_at'),
                 function ($attribute, $value, $fail) {
                     $user = $this->user();
                     if ($user->hasRole('super-admin') || $user->hasPermissionTo('create any needs')) {

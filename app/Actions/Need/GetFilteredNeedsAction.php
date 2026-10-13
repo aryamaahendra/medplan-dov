@@ -74,7 +74,38 @@ class GetFilteredNeedsAction
             ->when($filters['status'] ?? null, fn ($q, $v) => $q->whereIn('status', (array) $v))
             ->when($filters['need_type_id'] ?? null, fn ($q, $v) => $q->whereIn('need_type_id', (array) $v))
             ->when($filters['organizational_unit_id'] ?? null, function ($q, $v) use ($filters) {
-                $unitIds = array_filter((array) $v);
+                $rawValues = (array) $v;
+                if (in_array('trashed', $rawValues, true)) {
+                    $otherIds = array_filter($rawValues, fn ($id) => $id !== 'trashed');
+                    if (empty($otherIds)) {
+                        $q->whereIn('organizational_unit_id', OrganizationalUnit::onlyTrashed()->select('id'));
+
+                        return;
+                    }
+
+                    $q->where(function ($sub) use ($otherIds, $filters) {
+                        $sub->whereIn('organizational_unit_id', OrganizationalUnit::onlyTrashed()->select('id'));
+                        if (! empty($filters['include_descendants'])) {
+                            $allUnitIds = [];
+                            foreach ($otherIds as $uId) {
+                                $unit = OrganizationalUnit::query()->find($uId);
+                                if ($unit) {
+                                    $unit->loadMissing('descendantsRecursive');
+                                    $allUnitIds = array_merge($allUnitIds, $this->extractUnitIds($unit));
+                                } else {
+                                    $allUnitIds[] = (int) $uId;
+                                }
+                            }
+                            $sub->orWhereIn('organizational_unit_id', array_unique($allUnitIds));
+                        } else {
+                            $sub->orWhereIn('organizational_unit_id', $otherIds);
+                        }
+                    });
+
+                    return;
+                }
+
+                $unitIds = array_filter($rawValues);
                 if (empty($unitIds)) {
                     return;
                 }

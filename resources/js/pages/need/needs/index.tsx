@@ -77,8 +77,6 @@ export default function NeedsIndex({
 
       <NeedIndexDialogs
         needs={needs.data}
-        selectedDrawerNeed={state.selectedDrawerNeed}
-        onDrawerClose={() => actions.setSelectedDrawerNeed(null)}
         deletingNeed={state.deletingNeed}
         onDeletingNeedChange={actions.setDeletingNeed}
         onConfirmDelete={actions.handleConfirmDelete}
@@ -89,11 +87,6 @@ export default function NeedsIndex({
         lockDialogMode={state.lockDialogMode}
         isLockDialogOpen={state.isLockDialogOpen}
         onLockDialogOpenChange={actions.setIsLockDialogOpen}
-        onEdit={actions.onEdit}
-        onDelete={actions.onDelete}
-        onReview={actions.onReview}
-        onLock={actions.onLock}
-        onUnlock={actions.onUnlock}
       />
     </>
   );

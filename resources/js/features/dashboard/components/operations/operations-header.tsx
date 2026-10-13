@@ -9,7 +9,7 @@ import {
 } from '@remixicon/react';
 import { useState } from 'react';
 
-import { StatusBadge } from '@/components/status-badge';
+import { SubmissionWindowBadge } from '@/components/badges';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatCompactIDR, formatNumber } from '@/lib/formatters';
@@ -53,15 +53,7 @@ export function OperationsHeader({
       <div className="flex flex-wrap items-center justify-between gap-3 px-4 pt-4">
         {/* Left: Window status & Scope Badge */}
         <div className="flex flex-wrap items-center gap-2">
-          {windowStatus === 'open' ? (
-            <StatusBadge status="success">Buka Pengajuan</StatusBadge>
-          ) : windowStatus === 'closed' ? (
-            <StatusBadge status="destructive">Pengajuan Ditutup</StatusBadge>
-          ) : windowStatus === 'upcoming' ? (
-            <StatusBadge status="warning">Mendatang</StatusBadge>
-          ) : (
-            <StatusBadge status="muted">Jadwal Fleksibel</StatusBadge>
-          )}
+          <SubmissionWindowBadge status={windowStatus} />
 
           {daysRemaining !== null && daysRemaining !== undefined && (
             <span

@@ -84,7 +84,6 @@ export function NeedsTableSection({
               onEdit={actions.onEdit}
               onDelete={actions.onDelete}
               onReview={actions.onReview}
-              onSelectDetail={(need) => actions.setSelectedDrawerNeed(need)}
               onLock={actions.onLock}
               onUnlock={actions.onUnlock}
             />

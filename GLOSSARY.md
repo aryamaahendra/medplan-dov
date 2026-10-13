@@ -26,6 +26,10 @@ _Avoid_: Audit item, survey question
 The evaluation response (yes, no, or skip) assigned to a checklist question for a specific need.
 _Avoid_: Checklist result, questionnaire response
 
+**Checklist Readiness Band**:
+The proposal evaluation completeness tier computed from the checklist percentage: Siap Ditinjau / Ready (≥85%), Perlu Dilengkapi / In Progress (50–84%), or Belum Lengkap / Incomplete (<50%).
+_Avoid_: Completeness level, completion score
+
 **Need Detail**:
 The detailed proposal information accompanying a need, including terms of reference (TOR), background, specifications, cost estimates, and KPA assignment.
 _Avoid_: Need description, proposal body
@@ -41,6 +45,25 @@ _Avoid_: Reassigned need, duplicate need
 **Funding Source**:
 The financial appropriation or revenue source allocated to cover the estimated expenditure of a need.
 _Avoid_: Budget source, payment origin
+
+**Proposal Status**:
+The baseline proposal lifecycle state of a Need: Draft (belum diajukan / masih penyusunan), Diajukan (telah diverifikasi dan diajukan oleh unit), or Ditolak (ditolak pada tahap internal).
+_Avoid_: Technical status, stage flag
+
+**Director Review Status**:
+The executive review determination rendered by the Director on a proposal: Disetujui (Approved, marked with `approved_by_director_at`), Perlu Revisi / Ada Catatan (has review comments without approval, rendered in destructive red), or Menunggu Review (pending executive evaluation).
+_Avoid_: Workflow stage, final sign-off, executive stamp
+**Priority Flag**:
+A binary designation indicating an executive or strategic prioritization mandate on a Need, separate from operational urgency or risk analysis.
+_Avoid_: Priority level, priority score
+
+**Urgency**:
+A multi-level operational assessment indicating the time sensitivity of fulfilling a Need (Tinggi, Sedang, Rendah).
+_Avoid_: Priority, rush level
+
+**Impact**:
+A multi-level operational assessment indicating the magnitude of organizational consequence if a Need is unfulfilled (Tinggi, Sedang, Rendah).
+_Avoid_: Importance, criticality
 
 ### Strategic Planning & Alignment
 
@@ -98,6 +121,9 @@ _Avoid_: Request lock, item lock, frozen proposal
 The scheduled time interval defined on a Need Group during which organizational units may create and edit needs.
 _Avoid_: Open period, proposal timeframe, intake window
 
+**Submission Window Status**:
+The active lifecycle availability of a Need Group's submission intake period: Open (Buka Pengajuan), Closed (Pengajuan Ditutup), Upcoming (Mendatang), or Indefinite (Jadwal Fleksibel).
+_Avoid_: Group status, intake status
 **Lock Override**:
 An explicit exemption granting temporary or individual edit access to a specific Need when its submission window is closed or group is locked.
 _Avoid_: Exception pass, manual unlock bypass

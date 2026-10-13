@@ -1,9 +1,11 @@
-import { RiCheckboxCircleLine, RiCloseCircleLine } from '@remixicon/react';
-import { PriorityBadge } from '@/components/priority-badge';
-import { Badge } from '@/components/ui/badge';
+import {
+  DirectorReviewBadge,
+  PriorityBadge,
+  ProposalStatusBadge,
+  ReadinessBadge,
+  UrgencyImpactBadge,
+} from '@/components/badges';
 import { Card, CardContent } from '@/components/ui/card';
-
-import { STATUS_ICONS, STATUS_LABELS, STATUS_VARIANTS } from '@/constants/need';
 import type { Need } from '@/types';
 
 interface NeedStatusOverviewProps {
@@ -11,8 +13,6 @@ interface NeedStatusOverviewProps {
 }
 
 export function NeedStatusOverview({ need }: NeedStatusOverviewProps) {
-  const StatusIcon = STATUS_ICONS[need.status];
-
   return (
     <div className="">
       <Card className="p-0">
@@ -20,45 +20,37 @@ export function NeedStatusOverview({ need }: NeedStatusOverviewProps) {
           <div className="bg-muted/30 px-4 py-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
             Overview Usulan
           </div>
-          <div className="flex justify-between px-4 py-3">
-            <div className="">Urgensi</div>
-            <PriorityBadge level={need.urgency} />
-          </div>
-          <div className="flex justify-between px-4 py-3">
-            <div className="">Dampak</div>
-            <PriorityBadge level={need.impact} />
-          </div>
-          <div className="flex justify-between px-4 py-3">
-            <div className="">Prioritas</div>
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="text-sm">Prioritas</div>
             {need.is_priority ? (
-              <PriorityBadge level="Urgent" fallback="Prioritas" />
+              <PriorityBadge isPriority={need.is_priority} />
             ) : (
-              <PriorityBadge level="Normal" fallback="Biasa" />
+              <span className="text-xs text-muted-foreground">Biasa</span>
             )}
           </div>
-          <div className="flex justify-between px-4 py-3">
-            <div className="">Status</div>
-            <Badge
-              variant={STATUS_VARIANTS[need.status]}
-              className="flex items-center gap-1"
-            >
-              {StatusIcon && <StatusIcon data-icon="inline-start" />}
-              {STATUS_LABELS[need.status]}
-            </Badge>
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="text-sm">Urgensi & Dampak</div>
+            <UrgencyImpactBadge urgency={need.urgency} impact={need.impact} />
           </div>
-          <div className="flex justify-between px-4 py-3">
-            <div className="">Review Direktur</div>
-            <Badge
-              variant={need.approved_by_director_at ? 'default' : 'secondary'}
-              className="flex items-center gap-1.5"
-            >
-              {need.approved_by_director_at ? (
-                <RiCheckboxCircleLine data-icon="inline-start" />
-              ) : (
-                <RiCloseCircleLine data-icon="inline-start" />
-              )}
-              {need.approved_by_director_at ? 'Disetujui' : 'Belum'}
-            </Badge>
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="text-sm">Status Usulan</div>
+            <ProposalStatusBadge status={need.status} />
+          </div>
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="text-sm">Review Direktur</div>
+            {need.approved_by_director_at ||
+            need.notes ||
+            need.status === 'approved' ? (
+              <DirectorReviewBadge need={need} />
+            ) : (
+              <span className="text-xs text-muted-foreground">
+                Belum ada review
+              </span>
+            )}
+          </div>
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="text-sm">Kesiapan Dokumen</div>
+            <ReadinessBadge percentage={need.checklist_percentage} />
           </div>
           <div className="flex flex-col gap-2 px-4 py-4">
             <div className="flex items-center justify-between">

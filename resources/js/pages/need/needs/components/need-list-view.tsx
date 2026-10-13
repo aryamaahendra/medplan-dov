@@ -6,7 +6,6 @@ interface NeedListViewProps {
   onEdit: (need: Need) => void;
   onDelete: (need: Need) => void;
   onReview: (need: Need) => void;
-  onSelectDetail?: (need: Need) => void;
   onLock?: (need: Need) => void;
   onUnlock?: (need: Need) => void;
 }
@@ -16,7 +15,6 @@ export function NeedListView({
   onEdit,
   onDelete,
   onReview,
-  onSelectDetail,
   onLock,
   onUnlock,
 }: NeedListViewProps) {
@@ -37,7 +35,6 @@ export function NeedListView({
           onEdit={onEdit}
           onDelete={onDelete}
           onReview={onReview}
-          onSelectDetail={onSelectDetail}
           onLock={onLock}
           onUnlock={onUnlock}
         />

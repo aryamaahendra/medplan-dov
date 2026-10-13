@@ -31,9 +31,10 @@ export const WORKFLOW_STAGES: Record<NeedWorkflowStage, WorkflowStageMeta> = {
   },
   approved: {
     label: 'Disetujui',
-    variant: 'default',
+    variant: 'outline',
     icon: RiCheckboxCircleLine,
-    colorClass: 'bg-primary text-primary-foreground',
+    colorClass:
+      'border-success/30 bg-success/15 text-success-foreground dark:bg-success/20 dark:text-success',
   },
   rejected: {
     label: 'Ditolak',

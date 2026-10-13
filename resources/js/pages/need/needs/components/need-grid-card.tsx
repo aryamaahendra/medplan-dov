@@ -1,32 +1,26 @@
 import { Link } from '@inertiajs/react';
 import {
-  RiCheckboxCircleLine,
   RiFileTextLine,
   RiAttachmentLine,
   RiEdit2Line,
   RiQuillPenLine,
   RiDeleteBinLine,
-  RiCloseCircleLine,
 } from '@remixicon/react';
 
 import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 import { ActionDropdown } from '@/components/action-dropdown';
-import { PriorityBadge } from '@/components/priority-badge';
+import {
+  DirectorReviewBadge,
+  PriorityBadge,
+  ProposalStatusBadge,
+  UrgencyImpactBadge,
+} from '@/components/badges';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-  LABELED_PRIORITY_CLASSES,
-  LABELED_PRIORITY_LABELS,
-  STATUS_ICONS,
-  STATUS_LABELS,
-  STATUS_VARIANTS,
-} from '@/constants/need';
 import { formatIDR } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
-
 import type { Need } from '@/types';
-
 interface NeedGridCardProps {
   need: Need;
   onEdit: (need: Need) => void;
@@ -82,7 +76,6 @@ export function NeedGridCard({
   }
 
   const percentage = Number(need.checklist_percentage || 0);
-  const StatusIcon = STATUS_ICONS[need.status];
 
   // Build unit path
   const unitPath: string[] = [];
@@ -107,7 +100,7 @@ export function NeedGridCard({
       <CardContent className="flex flex-1 flex-col p-0">
         <div className="">
           {/* Identity row */}
-          <div className="flex items-start gap-2 p-3 pb-2">
+          <div className="flex items-start gap-2 px-3 pb-2">
             <div className="flex flex-1 flex-wrap gap-1.5">
               <Badge variant="outline">{need.year}</Badge>
               {need.need_type?.name && (
@@ -149,38 +142,21 @@ export function NeedGridCard({
             </div>
           </div>
 
-          {/* Priority signals */}
+          {/* Priority & Urgency/Impact signals */}
           <div className="flex flex-wrap items-center gap-1.5 border-t px-3 py-2">
-            <LabeledPriorityBadge prefix="Urgensi" level={need.urgency} />
-            <LabeledPriorityBadge prefix="Dampak" level={need.impact} />
-            <PriorityBadge
-              level={need.is_priority ? 'Urgent' : 'Normal'}
-              fallback={need.is_priority ? 'Prioritas' : 'Biasa'}
-            />
+            <PriorityBadge isPriority={need.is_priority} />
+            <UrgencyImpactBadge urgency={need.urgency} impact={need.impact} />
           </div>
 
-          {/* Status + Director */}
+          {/* Proposal Status & Director Review */}
           <div className="flex flex-wrap items-center gap-1.5 border-t px-3 py-2">
-            <Badge variant={STATUS_VARIANTS[need.status]}>
-              {StatusIcon && <StatusIcon data-icon="inline-start" />}
-              {STATUS_LABELS[need.status]}
-            </Badge>
-
-            <Badge
-              variant={need.approved_by_director_at ? 'default' : 'secondary'}
-            >
-              {need.approved_by_director_at ? (
-                <RiCheckboxCircleLine data-icon="inline-start" />
-              ) : (
-                <RiCloseCircleLine data-icon="inline-start" />
-              )}
-              {need.approved_by_director_at ? 'Disetujui' : 'Belum Review'}
-            </Badge>
+            <ProposalStatusBadge status={need.status} />
+            <DirectorReviewBadge need={need} />
           </div>
         </div>
 
         {/* Checklist score */}
-        <div className="mt-auto flex shrink grow flex-col justify-end border-t px-3 py-2.5">
+        <div className="mt-auto flex shrink grow flex-col justify-end border-t px-3 pt-2.5">
           <div className="mb-1 flex items-center justify-between">
             <span className="text-xs text-muted-foreground tabular-nums">
               Checklist
@@ -216,25 +192,5 @@ export function NeedGridCard({
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-function LabeledPriorityBadge({
-  prefix,
-  level,
-}: {
-  prefix: string;
-  level: string;
-}) {
-  const key = level?.toLowerCase();
-  const label = LABELED_PRIORITY_LABELS[key] ?? level ?? '-';
-  const colorClass =
-    LABELED_PRIORITY_CLASSES[key] ??
-    'bg-secondary/50 text-secondary-foreground border-transparent';
-
-  return (
-    <Badge variant="outline" className={colorClass}>
-      <span className="opacity-60">{prefix}:</span>&nbsp;{label}
-    </Badge>
   );
 }

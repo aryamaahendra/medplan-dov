@@ -1,3 +1,4 @@
+import { Link } from '@inertiajs/react';
 import {
   RiFileTextLine,
   RiAttachmentLine,
@@ -11,20 +12,20 @@ import {
   RiCoinsLine,
   RiTimeLine,
   RiChat1Line,
-  RiInformationLine,
-  RiStarFill,
 } from '@remixicon/react';
 
 import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 import { ActionDropdown } from '@/components/action-dropdown';
+import {
+  DirectorReviewBadge,
+  LockStatusBadge,
+  PriorityBadge,
+  ProposalStatusBadge,
+  UrgencyImpactBadge,
+} from '@/components/badges';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDateTime, formatIDR } from '@/lib/formatters';
-import {
-  getCombinedPriority,
-  getNeedWorkflowStage,
-  WORKFLOW_STAGES,
-} from '@/lib/need-workflow';
 import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
 import type { Need } from '@/types';
@@ -34,7 +35,6 @@ interface NeedListCardDetailedProps {
   onEdit: (need: Need) => void;
   onDelete: (need: Need) => void;
   onReview: (need: Need) => void;
-  onSelectDetail?: (need: Need) => void;
   onLock?: (need: Need) => void;
   onUnlock?: (need: Need) => void;
 }
@@ -44,18 +44,12 @@ export function NeedListCardDetailed({
   onEdit,
   onDelete,
   onReview,
-  onSelectDetail,
   onLock,
   onUnlock,
 }: NeedListCardDetailedProps) {
   const actions: Parameters<typeof ActionDropdown>[0]['actions'] = [
     {
-      label: 'Buka Drawer Detail',
-      icon: RiInformationLine,
-      onClick: onSelectDetail ? () => onSelectDetail(need) : undefined,
-    },
-    {
-      label: 'Halaman Penuh',
+      label: 'Lihat Detail',
       icon: RiFileTextLine,
       href: needRoutes.show.url({ need: need.id }),
     },
@@ -116,10 +110,6 @@ export function NeedListCardDetailed({
     });
   }
 
-  const stage = getNeedWorkflowStage(need);
-  const stageMeta = WORKFLOW_STAGES[stage];
-  const StageIcon = stageMeta.icon;
-  const priority = getCombinedPriority(need);
   const checklistScore = Number(need.checklist_percentage || 0);
 
   // Build recursive unit path
@@ -153,17 +143,14 @@ export function NeedListCardDetailed({
             </span>
           )}
 
-          <Badge variant={stageMeta.variant}>
-            <StageIcon data-icon="inline-start" />
-            {stageMeta.label}
-          </Badge>
+          <ProposalStatusBadge status={need.status} />
+          <DirectorReviewBadge need={need} />
 
-          {need.is_locked && (
-            <span className="inline-flex items-center gap-1 rounded bg-warning/10 px-1.5 py-0.5 text-[11px] font-medium text-warning-foreground dark:text-warning">
-              <RiLockLine className="size-3" />
-              Terkunci
-            </span>
-          )}
+          <LockStatusBadge
+            isLocked={need.is_locked}
+            unlockedUntil={need.unlocked_until}
+            lockReason={need.lock_reason}
+          />
         </div>
 
         <div className="flex items-center gap-1.5">
@@ -178,15 +165,17 @@ export function NeedListCardDetailed({
               <RiEdit2Line data-icon="inline-start" />
               Edit Usulan
             </Button>
-          ) : onSelectDetail ? (
+          ) : (
             <Button
               size="sm"
               variant="ghost"
-              onClick={() => onSelectDetail(need)}
-            >
-              Detail
-            </Button>
-          ) : null}
+              render={
+                <Link href={needRoutes.show.url({ need: need.id })}>
+                  Detail
+                </Link>
+              }
+            />
+          )}
 
           <ActionDropdown actions={actions} align="end" />
         </div>
@@ -198,20 +187,12 @@ export function NeedListCardDetailed({
         <div className="flex flex-col gap-3 md:col-span-7 lg:col-span-8">
           <div>
             <div className="flex items-start gap-1.5">
-              {need.is_priority ? (
-                <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-warning/10 text-warning-foreground dark:text-warning">
-                  <RiStarFill className="size-3.5" />
-                </span>
-              ) : null}
-              <button
-                type="button"
-                onClick={
-                  onSelectDetail ? () => onSelectDetail(need) : undefined
-                }
+              <Link
+                href={needRoutes.show.url({ need: need.id })}
                 className="text-left text-base leading-snug font-semibold text-foreground transition-colors hover:text-primary hover:underline sm:text-lg"
               >
                 {need.title}
-              </button>
+              </Link>
             </div>
 
             {need.description && (
@@ -333,18 +314,8 @@ export function NeedListCardDetailed({
       {/* Bottom Footer: Priority & Dampak Matrix, Attachments & Time */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-t bg-muted/10 px-4 py-2 text-xs">
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="outline" className={priority.colorClass}>
-            {priority.label}
-          </Badge>
-
-          {need.is_priority && (
-            <Badge
-              variant="outline"
-              className="border-warning/40 text-warning-foreground dark:text-warning"
-            >
-              Prioritas Utama
-            </Badge>
-          )}
+          <PriorityBadge isPriority={need.is_priority} />
+          <UrgencyImpactBadge urgency={need.urgency} impact={need.impact} />
 
           <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
             <RiAttachmentLine className="size-3 opacity-70" />
@@ -353,15 +324,12 @@ export function NeedListCardDetailed({
         </div>
 
         <div className="flex items-center gap-2">
-          {onSelectDetail && (
-            <button
-              type="button"
-              onClick={() => onSelectDetail(need)}
-              className="text-[11px] font-medium text-primary hover:underline"
-            >
-              Lihat Detail Lengkap ›
-            </button>
-          )}
+          <Link
+            href={needRoutes.show.url({ need: need.id })}
+            className="text-[11px] font-medium text-primary hover:underline"
+          >
+            Lihat Detail Lengkap ›
+          </Link>
 
           {need.created_at && (
             <span className="hidden font-mono text-[11px] text-muted-foreground lg:inline-block">

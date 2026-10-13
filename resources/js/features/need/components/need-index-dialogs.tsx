@@ -1,13 +1,10 @@
 import { ConfirmDialog } from '@/components/confirm-dialog';
-import { NeedDetailDrawer } from '@/pages/need/needs/components/need-detail-drawer';
 import { NeedDirectorReviewDialog } from '@/pages/need/needs/components/need-director-review-dialog';
 import { NeedLockDialog } from '@/pages/need/needs/components/need-lock-dialog';
 import type { Need } from '@/types';
 
 interface NeedIndexDialogsProps {
   needs: Need[];
-  selectedDrawerNeed: Need | null;
-  onDrawerClose: () => void;
   deletingNeed: Need | null;
   onDeletingNeedChange: (need: Need | null) => void;
   onConfirmDelete: () => void;
@@ -18,17 +15,10 @@ interface NeedIndexDialogsProps {
   lockDialogMode: 'lock' | 'unlock';
   isLockDialogOpen: boolean;
   onLockDialogOpenChange: (open: boolean) => void;
-  onEdit: (need: Need) => void;
-  onDelete: (need: Need) => void;
-  onReview: (need: Need) => void;
-  onLock: (need: Need) => void;
-  onUnlock: (need: Need) => void;
 }
 
 export function NeedIndexDialogs({
   needs,
-  selectedDrawerNeed,
-  onDrawerClose,
   deletingNeed,
   onDeletingNeedChange,
   onConfirmDelete,
@@ -39,11 +29,6 @@ export function NeedIndexDialogs({
   lockDialogMode,
   isLockDialogOpen,
   onLockDialogOpenChange,
-  onEdit,
-  onDelete,
-  onReview,
-  onLock,
-  onUnlock,
 }: NeedIndexDialogsProps) {
   const reviewingNeed = reviewingNeedId
     ? needs.find((n) => n.id === reviewingNeedId)
@@ -51,17 +36,6 @@ export function NeedIndexDialogs({
 
   return (
     <>
-      <NeedDetailDrawer
-        need={selectedDrawerNeed}
-        open={!!selectedDrawerNeed}
-        onOpenChange={(open) => !open && onDrawerClose()}
-        onEdit={onEdit}
-        onDelete={onDelete}
-        onReview={onReview}
-        onLock={onLock}
-        onUnlock={onUnlock}
-      />
-
       <ConfirmDialog
         open={!!deletingNeed}
         onOpenChange={(open) => !open && onDeletingNeedChange(null)}

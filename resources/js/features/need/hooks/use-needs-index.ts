@@ -37,7 +37,6 @@ export interface UseNeedsIndexProps {
 
 export interface UseNeedsIndexState {
   viewMode: 'table' | 'grid' | 'list' | 'loading';
-  selectedDrawerNeed: Need | null;
   currentStageTab: StageTabKey;
   attentionFilter: AttentionFilterKey | null;
   deletingNeed: Need | null;
@@ -53,7 +52,6 @@ export interface UseNeedsIndexState {
 
 export interface UseNeedsIndexActions {
   setViewMode: (mode: 'table' | 'grid' | 'list') => void;
-  setSelectedDrawerNeed: (need: Need | null) => void;
   setCurrentStageTab: (stage: StageTabKey) => void;
   setAttentionFilter: (key: AttentionFilterKey | null) => void;
   setDeletingNeed: (need: Need | null) => void;
@@ -81,9 +79,6 @@ export function useNeedsIndex({
   filters,
 }: UseNeedsIndexProps): UseNeedsIndexReturn {
   const [viewMode, setViewMode] = useViewMode();
-  const [selectedDrawerNeed, setSelectedDrawerNeed] = useState<Need | null>(
-    null,
-  );
 
   const [deletingNeed, setDeletingNeed] = useState<Need | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -187,14 +182,7 @@ export function useNeedsIndex({
 
   const columns = useMemo(
     () =>
-      getNeedColumns(
-        onEdit,
-        onDelete,
-        onReview,
-        (need) => setSelectedDrawerNeed(need),
-        onLock,
-        onUnlock,
-      ),
+      getNeedColumns(onEdit, onDelete, onReview, undefined, onLock, onUnlock),
     [],
   );
 
@@ -218,7 +206,6 @@ export function useNeedsIndex({
   return {
     state: {
       viewMode,
-      selectedDrawerNeed,
       currentStageTab,
       attentionFilter,
       deletingNeed,
@@ -233,7 +220,6 @@ export function useNeedsIndex({
     },
     actions: {
       setViewMode,
-      setSelectedDrawerNeed,
       setCurrentStageTab,
       setAttentionFilter,
       setDeletingNeed,

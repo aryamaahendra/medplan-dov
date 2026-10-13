@@ -1,19 +1,25 @@
+import { Link } from '@inertiajs/react';
 import {
   RiFileTextLine,
   RiAttachmentLine,
   RiEdit2Line,
   RiQuillPenLine,
   RiDeleteBinLine,
-  RiLockLine,
   RiLockUnlockLine,
-  RiStarFill,
-  RiInformationLine,
   RiLinksLine,
+  RiLockLine,
 } from '@remixicon/react';
 import type { ColumnDef } from '@tanstack/react-table';
 
 import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 import { ActionDropdown } from '@/components/action-dropdown';
+import {
+  DirectorReviewBadge,
+  LockStatusBadge,
+  PriorityBadge,
+  ProposalStatusBadge,
+  UrgencyImpactBadge,
+} from '@/components/badges';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { getIndexColumn } from '@/components/data-table/data-table-index-column';
 import { Badge } from '@/components/ui/badge';
@@ -25,11 +31,6 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { formatIDR } from '@/lib/formatters';
-import {
-  getCombinedPriority,
-  getNeedWorkflowStage,
-  WORKFLOW_STAGES,
-} from '@/lib/need-workflow';
 import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
 import type { Need } from '@/types';
@@ -38,7 +39,7 @@ export const getNeedColumns = (
   onEdit: (need: Need) => void,
   onDelete: (need: Need) => void,
   onReview: (need: Need) => void,
-  onSelectDetail: (need: Need) => void,
+  onSelectDetail?: (need: Need) => void,
   onLock?: (need: Need) => void,
   onUnlock?: (need: Need) => void,
 ): ColumnDef<Need>[] => [
@@ -65,13 +66,12 @@ export const getNeedColumns = (
       return (
         <div className="flex max-w-[340px] flex-col gap-1 py-1">
           <div className="flex items-start gap-1.5">
-            <button
-              type="button"
-              onClick={() => onSelectDetail(need)}
+            <Link
+              href={needRoutes.show.url({ need: need.id })}
               className="line-clamp-2 text-left leading-snug font-semibold text-foreground transition-colors hover:text-primary hover:underline"
             >
               {need.title}
-            </button>
+            </Link>
           </div>
 
           <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
@@ -133,77 +133,32 @@ export const getNeedColumns = (
     header: 'Prioritas & Dampak',
     cell: ({ row }) => {
       const need = row.original;
-      const priority = getCombinedPriority(need);
 
       return (
         <div className="flex items-center gap-1.5">
-          {need.is_priority ? (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-warning/10 text-warning-foreground dark:text-warning">
-                      <RiStarFill className="size-3.5" />
-                    </span>
-                  }
-                />
-                <TooltipContent side="top">Usulan Prioritas</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          ) : null}
-
-          <Badge variant="outline" className={priority.colorClass}>
-            {priority.label}
-          </Badge>
+          <PriorityBadge isPriority={need.is_priority} />
+          <UrgencyImpactBadge urgency={need.urgency} impact={need.impact} />
         </div>
       );
     },
   },
-
-  // Column 4: Tahapan Alur (Derived Workflow Stage + Lock status)
   {
-    id: 'stage',
-    header: 'Tahapan Alur',
+    id: 'status_review',
+    header: 'Status & Review',
     cell: ({ row }) => {
       const need = row.original;
-      const stage = getNeedWorkflowStage(need);
-      const stageMeta = WORKFLOW_STAGES[stage];
-      const StageIcon = stageMeta.icon;
 
       return (
         <div className="flex flex-col items-start gap-1">
-          <Badge variant={stageMeta.variant}>
-            <StageIcon data-icon="inline-start" />
-            {stageMeta.label}
-          </Badge>
-
-          {need.is_locked && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <span className="inline-flex cursor-help items-center gap-0.5 text-[10px] font-medium text-warning-foreground dark:text-warning">
-                      <RiLockLine className="size-2.5" />
-                      Terkunci
-                    </span>
-                  }
-                />
-                <TooltipContent
-                  side="bottom"
-                  align="start"
-                  className="max-w-xs text-xs"
-                >
-                  {need.lock_reason || 'Usulan telah dikunci untuk revisi.'}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-
-          {need.unlocked_until && (
-            <span className="text-[10px] text-warning-foreground dark:text-warning">
-              Perpanjangan aktif
-            </span>
-          )}
+          <div className="flex flex-wrap items-center gap-1">
+            <ProposalStatusBadge status={need.status} />
+            <DirectorReviewBadge need={need} />
+          </div>
+          <LockStatusBadge
+            isLocked={need.is_locked}
+            unlockedUntil={need.unlocked_until}
+            lockReason={need.lock_reason}
+          />
         </div>
       );
     },
@@ -273,12 +228,7 @@ export const getNeedColumns = (
 
       const actions: Parameters<typeof ActionDropdown>[0]['actions'] = [
         {
-          label: 'Detail Panel',
-          icon: RiInformationLine,
-          onClick: () => onSelectDetail(need),
-        },
-        {
-          label: 'Halaman Penuh',
+          label: 'Lihat Detail',
           icon: RiFileTextLine,
           href: needRoutes.show.url({ need: need.id }),
         },
@@ -346,10 +296,12 @@ export const getNeedColumns = (
             <Button
               size="sm"
               variant="ghost"
-              onClick={() => onSelectDetail(need)}
-            >
-              Detail
-            </Button>
+              render={
+                <Link href={needRoutes.show.url({ need: need.id })}>
+                  Detail
+                </Link>
+              }
+            />
           )}
 
           <ActionDropdown actions={actions} align="end" />

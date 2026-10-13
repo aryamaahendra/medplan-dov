@@ -64,6 +64,7 @@ export default function NeedGroupsIndex({
               total_needs: 0,
               total_approved: 0,
               total_budget: 0,
+              yearly_trends: [],
             }
           }
         />

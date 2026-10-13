@@ -51,7 +51,7 @@ export function NeedGroupCard({
   return (
     <article
       data-slot="need-group-card"
-      className="group relative w-full overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-xs transition-all hover:border-primary/50 hover:shadow-md sm:p-6"
+      className="relative w-full overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-xs sm:p-6"
     >
       {/* Top Telemetry Header */}
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">

@@ -25,10 +25,17 @@ export interface PaginatedNeedGroups {
   to: number | null;
 }
 
+export interface YearlyTrendStat {
+  year: number;
+  total_needs: number;
+  total_budget: number;
+}
+
 export interface NeedGroupsSummaryStatsData {
   total_groups: number;
   active_groups: number;
-  total_needs: number;
-  total_approved: number;
-  total_budget: number;
+  total_needs?: number;
+  total_approved?: number;
+  total_budget?: number;
+  yearly_trends?: YearlyTrendStat[];
 }

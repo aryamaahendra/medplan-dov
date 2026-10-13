@@ -18,6 +18,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('users', 'UserController')->except(['create', 'edit', 'show']);
         Route::resource('roles', 'RoleController')->except(['show']);
         Route::resource('permissions', 'PermissionController')->only(['index']);
+        Route::post('organizational-units/{id}/restore', 'OrganizationalUnitController@restore')
+            ->name('organizational-units.restore');
+        Route::delete('organizational-units/{id}/force', 'OrganizationalUnitController@forceDelete')
+            ->name('organizational-units.force-delete');
         Route::resource('organizational-units', 'OrganizationalUnitController')
             ->except(['create', 'edit', 'show']);
     });

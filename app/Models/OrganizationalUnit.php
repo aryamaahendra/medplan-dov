@@ -27,6 +27,8 @@ class OrganizationalUnit extends Model
 
     /**
      * Get the parent unit.
+     *
+     * @return BelongsTo<OrganizationalUnit, $this>
      */
     public function parent(): BelongsTo
     {
@@ -35,6 +37,8 @@ class OrganizationalUnit extends Model
 
     /**
      * Get all parent units recursively.
+     *
+     * @return BelongsTo<OrganizationalUnit, $this>
      */
     public function parentsRecursive(): BelongsTo
     {
@@ -69,6 +73,16 @@ class OrganizationalUnit extends Model
     public function users(): HasMany
     {
         return $this->hasMany(User::class, 'organizational_unit_id');
+    }
+
+    /**
+     * Get needs assigned to this unit.
+     *
+     * @return HasMany<Need, $this>
+     */
+    public function needs(): HasMany
+    {
+        return $this->hasMany(Need::class, 'organizational_unit_id');
     }
 
     /**

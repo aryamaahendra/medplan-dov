@@ -1,6 +1,5 @@
 parameters:
 	ignoreErrors:
-
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$type\.$#'
 			identifier: property.notFound
@@ -74,12 +73,6 @@ parameters:
 			path: app/Exports/PlanningHierarchyExport.php
 
 		-
-			message: '#^Call to an undefined method Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\:\:getCollection\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Http/Controllers/Need/NeedController.php
-
-		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:checklistQuestions\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -136,18 +129,6 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
 			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Planning/PlanningActivityVersionController.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\:\:getCollection\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Http/Controllers/Planning/PlanningActivityVersionController.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\:\:setCollection\(\)\.$#'
-			identifier: method.notFound
 			count: 1
 			path: app/Http/Controllers/Planning/PlanningActivityVersionController.php
 
@@ -288,12 +269,6 @@ parameters:
 			identifier: method.nonObject
 			count: 1
 			path: app/Models/Need.php
-
-		-
-			message: '#^Parameter \#2 \$parent of method App\\Models\\OrganizationalUnit\:\:isDescendantOfUsingLoadedRelations\(\) expects App\\Models\\OrganizationalUnit\|null, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Models/OrganizationalUnit.php
 
 		-
 			message: '#^Parameter \#1 \$activity of job class App\\Jobs\\CalculateActivityBudgetJob constructor expects App\\Models\\PlanningActivityVersion in App\\Jobs\\CalculateActivityBudgetJob\:\:dispatch\(\), Illuminate\\Database\\Eloquent\\Model given\.$#'

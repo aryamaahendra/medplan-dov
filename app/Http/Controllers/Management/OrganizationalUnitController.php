@@ -33,17 +33,46 @@ final class OrganizationalUnitController extends Controller
     public function index(Request $request): Response
     {
         $this->authorize('viewAny', OrganizationalUnit::class);
+
+        $isTrash = $request->boolean('trash');
+        $query = $isTrash
+            ? OrganizationalUnit::onlyTrashed()->with('parent')
+            : OrganizationalUnit::query()->with('parent');
+
         $units = $this->applyDataTable(
-            OrganizationalUnit::query()->with('parent'),
+            $query,
             $request,
             self::SEARCH_COLUMNS,
             self::SORTABLE_COLUMNS,
         );
 
+        $user = $request->user();
+        $units->through(fn (OrganizationalUnit $unit): array => [
+            'id' => $unit->id,
+            'name' => $unit->name,
+            'code' => $unit->code,
+            'parent_id' => $unit->parent_id,
+            'parent' => $unit->parent ? [
+                'id' => $unit->parent->id,
+                'name' => $unit->parent->name,
+                'code' => $unit->parent->code,
+            ] : null,
+            'created_at' => $unit->created_at?->toISOString(),
+            'deleted_at' => $unit->deleted_at?->toISOString(),
+            'can' => [
+                'update' => $user?->can('update', $unit) ?? false,
+                'delete' => $user?->can('delete', $unit) ?? false,
+                'restore' => $user?->can('restore', $unit) ?? false,
+                'forceDelete' => $user?->can('forceDelete', $unit) ?? false,
+            ],
+        ]);
+
         return Inertia::render('management/organizational-units/index', [
             'units' => $units,
             'allUnits' => OrganizationalUnit::query()->select(['id', 'name'])->get(),
-            'filters' => $this->dataTableFilters($request),
+            'filters' => array_merge($this->dataTableFilters($request), [
+                'trash' => $isTrash,
+            ]),
         ]);
     }
 
@@ -85,5 +114,54 @@ final class OrganizationalUnitController extends Controller
 
         return redirect()->route('organizational-units.index')
             ->with('success', 'Unit organisasi berhasil dihapus.');
+    }
+
+    public function restore(int $id): RedirectResponse
+    {
+        /** @var OrganizationalUnit $unit */
+        $unit = OrganizationalUnit::onlyTrashed()->findOrFail($id);
+
+        $this->authorize('restore', $unit);
+
+        if ($unit->parent_id !== null) {
+            $parentIsActive = OrganizationalUnit::query()
+                ->where('id', $unit->parent_id)
+                ->exists();
+
+            if (! $parentIsActive) {
+                $unit->parent_id = null;
+                $unit->save();
+            }
+        }
+
+        $unit->restore();
+
+        return redirect()->route('organizational-units.index')
+            ->with('success', 'Unit organisasi berhasil dipulihkan.');
+    }
+
+    public function forceDelete(int $id): RedirectResponse
+    {
+        /** @var OrganizationalUnit $unit */
+        $unit = OrganizationalUnit::onlyTrashed()->findOrFail($id);
+
+        $this->authorize('forceDelete', $unit);
+
+        if ($unit->needs()->exists()) {
+            throw ValidationException::withMessages([
+                'error' => 'Unit organisasi tidak dapat dihapus permanen karena masih memiliki riwayat usulan kebutuhan.',
+            ]);
+        }
+
+        if ($unit->users()->exists()) {
+            throw ValidationException::withMessages([
+                'error' => 'Unit organisasi tidak dapat dihapus permanen karena masih memiliki pengguna terdaftar.',
+            ]);
+        }
+
+        $unit->forceDelete();
+
+        return redirect()->route('organizational-units.index')
+            ->with('success', 'Unit organisasi berhasil dihapus secara permanen.');
     }
 }

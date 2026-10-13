@@ -2,7 +2,7 @@ import { useForm } from '@inertiajs/react';
 import { toast } from 'sonner';
 
 import ChecklistQuestionController from '@/actions/App/Http/Controllers/Need/ChecklistQuestionController';
-import InputError from '@/components/input-error';
+import { InputField, SwitchField, TextareaField } from '@/components/form';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -12,10 +12,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
 import type { ChecklistQuestion } from '../types/checklist-question.types';
 
 interface ChecklistQuestionDialogProps {
@@ -96,51 +92,46 @@ function ChecklistQuestionForm({
       </DialogHeader>
 
       <div className="grid gap-4 py-4">
-        <div className="grid gap-2">
-          <Label htmlFor="question_text">Pertanyaan</Label>
-          <Input
-            id="question_text"
-            value={data.question}
-            onChange={(e) => setData('question', e.target.value)}
-            placeholder="Contoh: Apakah usulan ini selaras dengan Renstra?"
-            required
-          />
-          <InputError message={errors.question} />
-        </div>
+        <InputField
+          id="question_text"
+          label="Pertanyaan"
+          value={data.question}
+          onChange={(e) => setData('question', e.target.value)}
+          placeholder="Contoh: Apakah usulan ini selaras dengan Renstra?"
+          required
+          error={errors.question}
+        />
 
-        <div className="grid gap-2">
-          <Label htmlFor="order_column">Urutan</Label>
-          <Input
-            id="order_column"
-            type="number"
-            value={data.order_column}
-            onChange={(e) => setData('order_column', parseInt(e.target.value))}
-            min={0}
-            required
-          />
-          <InputError message={errors.order_column} />
-        </div>
+        <InputField
+          id="order_column"
+          type="number"
+          label="Urutan"
+          value={data.order_column}
+          onChange={(e) =>
+            setData('order_column', parseInt(e.target.value) || 0)
+          }
+          min={0}
+          required
+          error={errors.order_column}
+        />
 
-        <div className="grid gap-2">
-          <Label htmlFor="description">Deskripsi</Label>
-          <Textarea
-            id="description"
-            value={data.description}
-            onChange={(e) => setData('description', e.target.value)}
-            placeholder="Keterangan tambahan (opsional)..."
-            rows={3}
-          />
-          <InputError message={errors.description} />
-        </div>
+        <TextareaField
+          id="description"
+          label="Deskripsi"
+          value={data.description}
+          onChange={(e) => setData('description', e.target.value)}
+          placeholder="Keterangan tambahan (opsional)..."
+          rows={3}
+          error={errors.description}
+        />
 
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="is_active"
-            checked={data.is_active}
-            onCheckedChange={(checked) => setData('is_active', checked)}
-          />
-          <Label htmlFor="is_active">Aktif</Label>
-        </div>
+        <SwitchField
+          id="is_active"
+          label="Aktif"
+          checked={data.is_active}
+          onCheckedChange={(checked) => setData('is_active', checked)}
+          error={errors.is_active}
+        />
       </div>
 
       <DialogFooter className="mb-0!">

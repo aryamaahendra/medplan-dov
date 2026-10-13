@@ -2,7 +2,7 @@ import { Form } from '@inertiajs/react';
 import { toast } from 'sonner';
 
 import NeedTypeController from '@/actions/App/Http/Controllers/Need/NeedTypeController';
-import InputError from '@/components/input-error';
+import { InputField, SwitchField, TextareaField } from '@/components/form';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -12,10 +12,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
 import type { NeedType } from '../types/need-type.types';
 
 interface NeedTypeDialogProps {
@@ -64,65 +60,54 @@ export function NeedTypeDialog({
         >
           {({ setData, processing, errors }: any) => (
             <>
-              <div className="grid gap-2">
-                <Label htmlFor="name">Nama</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  placeholder="Contoh: Kebutuhan Mendesak, Rutin Bulanan"
-                  defaultValue={needType?.name ?? ''}
-                  required
-                  autoFocus
-                />
-                <InputError message={errors.name} />
-              </div>
+              <InputField
+                id="name"
+                name="name"
+                label="Nama"
+                placeholder="Contoh: Kebutuhan Mendesak, Rutin Bulanan"
+                defaultValue={needType?.name ?? ''}
+                required
+                autoFocus
+                error={errors.name}
+              />
 
-              <div className="grid gap-2">
-                <Label htmlFor="code">Kode</Label>
-                <Input
-                  id="code"
-                  name="code"
-                  placeholder="Contoh: URGENT, ROUTINE"
-                  defaultValue={needType?.code ?? ''}
-                  required
-                />
-                <InputError message={errors.code} />
-              </div>
+              <InputField
+                id="code"
+                name="code"
+                label="Kode"
+                placeholder="Contoh: URGENT, ROUTINE"
+                defaultValue={needType?.code ?? ''}
+                required
+                error={errors.code}
+              />
 
-              <div className="grid gap-2">
-                <Label htmlFor="description">Deskripsi</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  placeholder="Masukkan deskripsi opsional untuk kategori kebutuhan ini..."
-                  defaultValue={needType?.description ?? ''}
-                />
-                <InputError message={errors.description} />
-              </div>
+              <TextareaField
+                id="description"
+                name="description"
+                label="Deskripsi"
+                placeholder="Masukkan deskripsi opsional untuk kategori kebutuhan ini..."
+                defaultValue={needType?.description ?? ''}
+                error={errors.description}
+              />
 
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="is_active"
-                  checked={needType?.is_active ?? true}
-                  onCheckedChange={(checked) => setData('is_active', checked)}
-                />
-                <Label htmlFor="is_active">Aktif</Label>
-                <InputError message={errors.is_active} />
-              </div>
+              <SwitchField
+                id="is_active"
+                label="Aktif"
+                checked={needType?.is_active ?? true}
+                onCheckedChange={(checked) => setData('is_active', checked)}
+                error={errors.is_active}
+              />
 
-              <div className="grid gap-2">
-                <Label htmlFor="order_column">Urutan</Label>
-                <Input
-                  id="order_column"
-                  name="order_column"
-                  type="number"
-                  placeholder="0"
-                  defaultValue={needType?.order_column ?? 0}
-                  required
-                />
-                <InputError message={errors.order_column} />
-              </div>
-
+              <InputField
+                id="order_column"
+                name="order_column"
+                type="number"
+                label="Urutan"
+                placeholder="0"
+                defaultValue={needType?.order_column ?? 0}
+                required
+                error={errors.order_column}
+              />
               <DialogFooter className="mb-0!">
                 <Button
                   type="button"

@@ -1,9 +1,8 @@
 import { Form } from '@inertiajs/react';
 import { useRef } from 'react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
+import { PasswordField } from '@/components/form';
 import Heading from '@/components/heading';
-import InputError from '@/components/input-error';
-import PasswordInput from '@/components/password-input';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -14,8 +13,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-
 export default function DeleteUser() {
   const passwordInput = useRef<HTMLInputElement>(null);
 
@@ -63,21 +60,16 @@ export default function DeleteUser() {
             >
               {({ resetAndClearErrors, processing, errors }) => (
                 <>
-                  <div className="grid gap-2">
-                    <Label htmlFor="password" className="sr-only">
-                      Password
-                    </Label>
-
-                    <PasswordInput
-                      id="password"
-                      name="password"
-                      ref={passwordInput}
-                      placeholder="Password"
-                      autoComplete="current-password"
-                    />
-
-                    <InputError message={errors.password} />
-                  </div>
+                  <PasswordField
+                    id="password"
+                    name="password"
+                    label="Password"
+                    hideLabel
+                    inputRef={passwordInput}
+                    placeholder="Password"
+                    autoComplete="current-password"
+                    error={errors.password}
+                  />
 
                   <DialogFooter className="gap-2">
                     <DialogClose

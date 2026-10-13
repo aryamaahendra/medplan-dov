@@ -2,8 +2,12 @@ import { useForm } from '@inertiajs/react';
 import { toast } from 'sonner';
 
 import UserController from '@/actions/App/Http/Controllers/Management/UserController';
-import InputError from '@/components/input-error';
-import PasswordInput from '@/components/password-input';
+import {
+  FieldWrapper,
+  InputField,
+  PasswordField,
+  SingleCheckboxField,
+} from '@/components/form';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -13,10 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { TreeSelect } from '@/components/ui/tree-select';
-
 import type { User } from './user-columns';
 
 interface UserDialogProps {
@@ -96,111 +97,93 @@ function UserFormContent({
       </DialogHeader>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid gap-2">
-          <Label htmlFor="name">Name</Label>
-          <Input
-            id="name"
-            name="name"
-            value={data.name}
-            onChange={(e) => setData('name', e.target.value)}
-            required
-            autoFocus
-            placeholder="Full name"
-          />
-          <InputError message={errors.name} />
-        </div>
+        <InputField
+          id="name"
+          name="name"
+          label="Name"
+          value={data.name}
+          onChange={(e) => setData('name', e.target.value)}
+          required
+          autoFocus
+          placeholder="Full name"
+          error={errors.name}
+        />
 
-        <div className="grid gap-2">
-          <Label htmlFor="nip">NIP (Optional)</Label>
-          <Input
-            id="nip"
-            name="nip"
-            value={data.nip}
-            onChange={(e) => setData('nip', e.target.value)}
-            placeholder="Employee Identification Number"
-          />
-          <InputError message={errors.nip} />
-        </div>
+        <InputField
+          id="nip"
+          name="nip"
+          label="NIP (Optional)"
+          value={data.nip}
+          onChange={(e) => setData('nip', e.target.value)}
+          placeholder="Employee Identification Number"
+          error={errors.nip}
+        />
 
-        <div className="grid gap-2">
-          <Label htmlFor="email">Email address</Label>
-          <Input
-            id="email"
-            type="email"
-            name="email"
-            value={data.email}
-            onChange={(e) => setData('email', e.target.value)}
-            required
-            placeholder="email@example.com"
-          />
-          <InputError message={errors.email} />
-        </div>
+        <InputField
+          id="email"
+          type="email"
+          name="email"
+          label="Email address"
+          value={data.email}
+          onChange={(e) => setData('email', e.target.value)}
+          required
+          placeholder="email@example.com"
+          error={errors.email}
+        />
 
-        <div className="grid gap-2">
-          <Label htmlFor="password">
-            {isEditing ? 'New Password (optional)' : 'Password'}
-          </Label>
-          <PasswordInput
-            id="password"
-            name="password"
-            value={data.password}
-            onChange={(e) => setData('password', e.target.value)}
-            required={!isEditing}
-            placeholder={
-              isEditing ? 'Leave blank to keep current' : 'Min 8 characters'
-            }
-          />
-          <InputError message={errors.password} />
-        </div>
+        <PasswordField
+          id="password"
+          name="password"
+          label={isEditing ? 'New Password (optional)' : 'Password'}
+          value={data.password}
+          onChange={(e) => setData('password', e.target.value)}
+          required={!isEditing}
+          placeholder={
+            isEditing ? 'Leave blank to keep current' : 'Min 8 characters'
+          }
+          error={errors.password}
+        />
 
-        <div className="grid gap-2">
-          <Label htmlFor="password_confirmation">Confirm Password</Label>
-          <PasswordInput
-            id="password_confirmation"
-            name="password_confirmation"
-            value={data.password_confirmation}
-            onChange={(e) => setData('password_confirmation', e.target.value)}
-            required={!isEditing}
-            placeholder="Repeat password"
-          />
-          <InputError message={errors.password_confirmation} />
-        </div>
+        <PasswordField
+          id="password_confirmation"
+          name="password_confirmation"
+          label="Confirm Password"
+          value={data.password_confirmation}
+          onChange={(e) => setData('password_confirmation', e.target.value)}
+          required={!isEditing}
+          placeholder="Repeat password"
+          error={errors.password_confirmation}
+        />
 
-        <div className="grid gap-2">
-          <Label htmlFor="organizational_unit_id">Unit Kerja</Label>
-          <TreeSelect
-            items={organizationalUnits}
-            value={data.organizational_unit_id}
-            onValueChange={(v) => setData('organizational_unit_id', v)}
-            placeholder="Pilih unit kerja"
-            className="bg-muted/20 transition-colors hover:bg-muted/40"
-          />
-          <InputError message={errors.organizational_unit_id} />
-        </div>
+        <FieldWrapper
+          id="organizational_unit_id"
+          label="Unit Kerja"
+          error={errors.organizational_unit_id}
+        >
+          {() => (
+            <TreeSelect
+              items={organizationalUnits}
+              value={data.organizational_unit_id}
+              onValueChange={(v) => setData('organizational_unit_id', v)}
+              placeholder="Pilih unit kerja"
+              className="bg-muted/20 transition-colors hover:bg-muted/40"
+            />
+          )}
+        </FieldWrapper>
 
-        <div className="grid gap-2">
-          <Label>Roles</Label>
-          <div className="mt-2 grid max-h-[150px] grid-cols-2 gap-2 overflow-y-auto rounded-md border p-3">
+        <FieldWrapper label="Roles" error={errors.roles}>
+          <div className="grid max-h-[150px] grid-cols-2 gap-2 overflow-y-auto rounded-md border p-3">
             {roles.map((role) => (
-              <div key={role.id} className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id={`role-${role.id}`}
-                  checked={data.roles.includes(role.id)}
-                  onChange={() => handleRoleToggle(role.id)}
-                  className="rounded border-input text-primary shadow-xs focus:ring-ring"
-                />
-                <Label
-                  htmlFor={`role-${role.id}`}
-                  className="cursor-pointer text-sm leading-none font-normal"
-                >
-                  {role.name}
-                </Label>
-              </div>
+              <SingleCheckboxField
+                key={role.id}
+                id={`role-${role.id}`}
+                label={role.name}
+                checked={data.roles.includes(role.id)}
+                onCheckedChange={() => handleRoleToggle(role.id)}
+              />
             ))}
           </div>
-          <InputError message={errors.roles} />
-        </div>
+        </FieldWrapper>
 
         <DialogFooter className="mb-0!">
           <Button

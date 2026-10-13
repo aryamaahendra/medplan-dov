@@ -4,7 +4,12 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 
 import NeedGroupController from '@/actions/App/Http/Controllers/Need/NeedGroupController';
-import InputError from '@/components/input-error';
+import {
+  FormGrid,
+  InputField,
+  SwitchField,
+  TextareaField,
+} from '@/components/form';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -14,10 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
 
 import { formatForDateTimeInput } from '@/lib/formatters';
 import type { NeedGroup } from '../types/need-group.types';
@@ -102,76 +104,65 @@ function NeedGroupForm({
       </DialogHeader>
 
       <div className="grid gap-4 py-4">
-        <div className="grid gap-2">
-          <Label htmlFor="name">Nama Kelompok</Label>
-          <Input
-            id="name"
-            value={data.name}
-            onChange={(e) => setData('name', e.target.value)}
-            placeholder="Contoh: Usulan Kebutuhan 2026"
-            required
+        <InputField
+          id="name"
+          label="Nama Kelompok"
+          value={data.name}
+          onChange={(e) => setData('name', e.target.value)}
+          placeholder="Contoh: Usulan Kebutuhan 2026"
+          required
+          error={errors.name}
+        />
+
+        <InputField
+          id="year"
+          type="number"
+          label="Tahun"
+          value={data.year}
+          onChange={(e) => setData('year', parseInt(e.target.value) || 0)}
+          min={2020}
+          max={2030}
+          required
+          error={errors.year}
+        />
+
+        <TextareaField
+          id="description"
+          label="Deskripsi"
+          value={data.description}
+          onChange={(e) => setData('description', e.target.value)}
+          placeholder="Deskripsi opsional..."
+          rows={3}
+          error={errors.description}
+        />
+
+        <FormGrid cols={2}>
+          <InputField
+            id="submission_start_at"
+            label="Mulai Pengajuan"
+            type="datetime-local"
+            value={data.submission_start_at}
+            onChange={(e) => setData('submission_start_at', e.target.value)}
+            error={errors.submission_start_at}
           />
-          <InputError message={errors.name} />
-        </div>
 
-        <div className="grid gap-2">
-          <Label htmlFor="year">Tahun</Label>
-          <Input
-            id="year"
-            type="number"
-            value={data.year}
-            onChange={(e) => setData('year', parseInt(e.target.value))}
-            min={2020}
-            max={2030}
-            required
+          <InputField
+            id="submission_end_at"
+            label="Batas Pengajuan"
+            type="datetime-local"
+            value={data.submission_end_at}
+            onChange={(e) => setData('submission_end_at', e.target.value)}
+            error={errors.submission_end_at}
           />
-          <InputError message={errors.year} />
-        </div>
+        </FormGrid>
 
-        <div className="grid gap-2">
-          <Label htmlFor="description">Deskripsi</Label>
-          <Textarea
-            id="description"
-            value={data.description}
-            onChange={(e) => setData('description', e.target.value)}
-            placeholder="Deskripsi opsional..."
-            rows={3}
-          />
-          <InputError message={errors.description} />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="submission_start_at">Mulai Pengajuan</Label>
-            <Input
-              id="submission_start_at"
-              type="datetime-local"
-              value={data.submission_start_at}
-              onChange={(e) => setData('submission_start_at', e.target.value)}
-            />
-            <InputError message={errors.submission_start_at} />
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="submission_end_at">Batas Pengajuan</Label>
-            <Input
-              id="submission_end_at"
-              type="datetime-local"
-              value={data.submission_end_at}
-              onChange={(e) => setData('submission_end_at', e.target.value)}
-            />
-            <InputError message={errors.submission_end_at} />
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="is_active"
-            checked={data.is_active}
-            onCheckedChange={(checked) => setData('is_active', checked)}
-          />
-          <Label htmlFor="is_active">Aktif</Label>
-        </div>
-
+        <SwitchField
+          id="is_active"
+          label="Aktif"
+          checked={data.is_active}
+          onCheckedChange={(checked) => setData('is_active', checked)}
+          error={errors.is_active}
+        />
         {!isEditing && (
           <div className="rounded-md border bg-muted/40 p-3">
             <div className="flex items-center justify-between gap-2">

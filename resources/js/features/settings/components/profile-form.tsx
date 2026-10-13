@@ -1,10 +1,8 @@
 import { Transition } from '@headlessui/react';
 import { Form, Link, usePage } from '@inertiajs/react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
-import InputError from '@/components/input-error';
+import { InputField } from '@/components/form';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { send } from '@/routes/verification';
 
 interface ProfileFormProps {
@@ -25,37 +23,29 @@ export function ProfileForm({ mustVerifyEmail, status }: ProfileFormProps) {
     >
       {({ processing, recentlySuccessful, errors }) => (
         <>
-          <div className="grid gap-2">
-            <Label htmlFor="name">Name</Label>
-
-            <Input
+          <div className="space-y-6">
+            <InputField
               id="name"
-              className="mt-1 block w-full"
+              label="Name"
               defaultValue={auth.user?.name}
               name="name"
               required
               autoComplete="name"
               placeholder="Full name"
+              error={errors.name}
             />
 
-            <InputError className="mt-2" message={errors.name} />
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email address</Label>
-
-            <Input
+            <InputField
               id="email"
               type="email"
-              className="mt-1 block w-full"
+              label="Email address"
               defaultValue={auth.user?.email}
               name="email"
               required
               autoComplete="username"
               placeholder="Email address"
+              error={errors.email}
             />
-
-            <InputError className="mt-2" message={errors.email} />
           </div>
 
           {mustVerifyEmail && auth.user?.email_verified_at === null && (

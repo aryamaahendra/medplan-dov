@@ -1,4 +1,9 @@
-import InputError from '@/components/input-error';
+import {
+  FormGrid,
+  InputField,
+  SelectField,
+  TextareaField,
+} from '@/components/form';
 import {
   Card,
   CardContent,
@@ -6,16 +11,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import type { PlanningActivityVersion } from '@/types/planning-version';
 
 interface ActivityInfoCardProps {
@@ -55,146 +50,103 @@ export function ActivityInfoCard({
       </CardHeader>
       <CardContent>
         <div className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="parent_id">Induk (Parent)</Label>
-            <Select value={parentId} onValueChange={onParentChange}>
-              <SelectTrigger
-                id="parent_id"
-                className="w-full max-w-full truncate"
-              >
-                <SelectValue placeholder="Pilih induk (opsional)">
-                  {(val) => {
-                    if (!val || val === 'none') {
-                      return 'Tanpa Induk';
-                    }
+          <SelectField
+            id="parent_id"
+            label="Induk (Parent)"
+            value={parentId}
+            onValueChange={onParentChange}
+            placeholder="Pilih induk (opsional)"
+            options={[
+              { label: 'Tanpa Induk', value: 'none' },
+              ...parents
+                .filter(
+                  (p) =>
+                    p.id !== activity?.id &&
+                    p.code &&
+                    !/[a-zA-Z]$/.test(p.code),
+                )
+                .map((parent) => ({
+                  label: `${parent.code} - ${parent.name}`,
+                  value: parent.id.toString(),
+                })),
+            ]}
+            error={errors.parent_id}
+          />
+          <input
+            type="hidden"
+            name="parent_id"
+            value={parentId === 'none' ? '' : parentId}
+          />
 
-                    const found = parents.find((p) => p.id.toString() === val);
-
-                    return found ? `${found.code} - ${found.name}` : val;
-                  }}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">Tanpa Induk</SelectItem>
-                {parents
-                  .filter(
-                    (p) =>
-                      p.id !== activity?.id &&
-                      p.code &&
-                      !/[a-zA-Z]$/.test(p.code),
-                  )
-                  .map((parent) => (
-                    <SelectItem key={parent.id} value={parent.id.toString()}>
-                      {parent.code} - {parent.name}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-            <input
-              type="hidden"
-              name="parent_id"
-              value={parentId === 'none' ? '' : parentId}
+          <FormGrid cols={3}>
+            <InputField
+              id="code"
+              name="code"
+              label="Kode"
+              value={code}
+              onChange={(e) => onCodeChange(e.target.value)}
+              placeholder="Contoh: 1.02.01"
+              className={codeExists ? 'border-destructive' : ''}
+              description={
+                codeExists
+                  ? 'Kode ini sudah digunakan dalam versi ini.'
+                  : undefined
+              }
+              error={errors.code}
             />
-            <InputError message={errors.parent_id} />
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="code">Kode</Label>
-              <Input
-                id="code"
-                name="code"
-                value={code}
-                onChange={(e) => onCodeChange(e.target.value)}
-                placeholder="Contoh: 1.02.01"
-                className={codeExists ? 'border-destructive' : ''}
-              />
-              {codeExists && (
-                <p className="text-xs text-destructive">
-                  Kode ini sudah digunakan dalam versi ini.
-                </p>
-              )}
-              <InputError message={errors.code} />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="type">Tipe</Label>
-              <Select
-                value={type}
-                onValueChange={(val) => {
-                  if (val) {
-                    onTypeChange(val);
-                  }
-                }}
-                name="type"
-              >
-                <SelectTrigger id="type">
-                  <SelectValue placeholder="Pilih Tipe">
-                    {(val) => {
-                      const found = activityTypes.find(
-                        (opt) => opt.value === val,
-                      );
-
-                      return found ? found.label : val;
-                    }}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {activityTypes.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <input type="hidden" name="type" value={type} />
-              <InputError message={errors.type} />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="sort_order">Urutan (Sort Order)</Label>
-              <Input
-                id="sort_order"
-                name="sort_order"
-                type="number"
-                defaultValue={activity?.sort_order ?? 0}
-                placeholder="0"
-              />
-              <InputError message={errors.sort_order} />
-            </div>
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="name">Nama Nomenklatur</Label>
-            <Textarea
-              id="name"
-              name="name"
-              defaultValue={activity?.name ?? ''}
-              className="min-h-[100px]"
-              required
+            <SelectField
+              id="type"
+              name="type"
+              label="Tipe"
+              value={type}
+              onValueChange={(val) => {
+                if (val) {
+                  onTypeChange(val);
+                }
+              }}
+              placeholder="Pilih Tipe"
+              options={activityTypes}
+              error={errors.type}
             />
-            <InputError message={errors.name} />
-          </div>
+            <input type="hidden" name="type" value={type} />
 
-          <div className="grid gap-2">
-            <Label htmlFor="perangkat_daerah">Perangkat Daerah</Label>
-            <Input
-              id="perangkat_daerah"
-              name="perangkat_daerah"
-              defaultValue={activity?.perangkat_daerah ?? ''}
+            <InputField
+              id="sort_order"
+              name="sort_order"
+              type="number"
+              label="Urutan (Sort Order)"
+              defaultValue={activity?.sort_order ?? 0}
+              placeholder="0"
+              error={errors.sort_order}
             />
-            <InputError message={errors.perangkat_daerah} />
-          </div>
+          </FormGrid>
 
-          <div className="grid gap-2">
-            <Label htmlFor="keterangan">Keterangan</Label>
-            <Textarea
-              id="keterangan"
-              name="keterangan"
-              defaultValue={activity?.keterangan ?? ''}
-            />
-            <InputError message={errors.keterangan} />
-          </div>
+          <TextareaField
+            id="name"
+            name="name"
+            label="Nama Nomenklatur"
+            defaultValue={activity?.name ?? ''}
+            className="min-h-[100px]"
+            required
+            error={errors.name}
+          />
+
+          <InputField
+            id="perangkat_daerah"
+            name="perangkat_daerah"
+            label="Perangkat Daerah"
+            defaultValue={activity?.perangkat_daerah ?? ''}
+            error={errors.perangkat_daerah}
+          />
+
+          <TextareaField
+            id="keterangan"
+            name="keterangan"
+            label="Keterangan"
+            defaultValue={activity?.keterangan ?? ''}
+            error={errors.keterangan}
+          />
         </div>
       </CardContent>
     </Card>

@@ -2,7 +2,7 @@ import { Form } from '@inertiajs/react';
 import { toast } from 'sonner';
 
 import StrategicServicePlanController from '@/actions/App/Http/Controllers/StrategicPlan/StrategicServicePlanController';
-import InputError from '@/components/input-error';
+import { InputField, TextareaField } from '@/components/form';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -12,9 +12,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import type { StrategicServicePlan } from '@/types';
 
 interface StrategicServicePlanDialogProps {
@@ -65,72 +62,59 @@ export function StrategicServicePlanDialog({
         >
           {({ processing, errors }) => (
             <>
-              <div className="grid gap-2">
-                <Label htmlFor="year">Tahun</Label>
-                <Input
-                  id="year"
-                  name="year"
-                  type="number"
-                  defaultValue={plan?.year ?? new Date().getFullYear()}
-                  required
-                  autoFocus
-                />
-                <InputError message={errors.year} />
-              </div>
+              <InputField
+                id="year"
+                name="year"
+                type="number"
+                label="Tahun"
+                defaultValue={plan?.year ?? new Date().getFullYear()}
+                required
+                autoFocus
+                error={errors.year}
+              />
 
-              <div className="grid gap-2">
-                <Label htmlFor="strategic_program">Program Strategis</Label>
-                <Input
-                  id="strategic_program"
-                  name="strategic_program"
-                  defaultValue={plan?.strategic_program ?? ''}
-                  required
-                  placeholder="Nama program strategis"
-                />
-                <InputError message={errors.strategic_program} />
-              </div>
+              <InputField
+                id="strategic_program"
+                name="strategic_program"
+                label="Program Strategis"
+                defaultValue={plan?.strategic_program ?? ''}
+                required
+                placeholder="Nama program strategis"
+                error={errors.strategic_program}
+              />
 
-              <div className="grid gap-2">
-                <Label htmlFor="service_plan">
-                  Rencana Pengembangan Layanan
-                </Label>
-                <Textarea
-                  id="service_plan"
-                  name="service_plan"
-                  defaultValue={plan?.service_plan ?? ''}
-                  required
-                  placeholder="Detail rencana pengembangan layanan"
-                  rows={3}
-                />
-                <InputError message={errors.service_plan} />
-              </div>
+              <TextareaField
+                id="service_plan"
+                name="service_plan"
+                label="Rencana Pengembangan Layanan"
+                defaultValue={plan?.service_plan ?? ''}
+                required
+                placeholder="Detail rencana pengembangan layanan"
+                rows={3}
+                error={errors.service_plan}
+              />
 
-              <div className="grid gap-2">
-                <Label htmlFor="target">Sasaran</Label>
-                <Textarea
-                  id="target"
-                  name="target"
-                  defaultValue={plan?.target ?? ''}
-                  required
-                  placeholder="Sasaran yang ingin dicapai"
-                  rows={3}
-                />
-                <InputError message={errors.target} />
-              </div>
+              <TextareaField
+                id="target"
+                name="target"
+                label="Sasaran"
+                defaultValue={plan?.target ?? ''}
+                required
+                placeholder="Sasaran yang ingin dicapai"
+                rows={3}
+                error={errors.target}
+              />
 
-              <div className="grid gap-2">
-                <Label htmlFor="policy_direction">Arah Kebijakan</Label>
-                <Textarea
-                  id="policy_direction"
-                  name="policy_direction"
-                  defaultValue={plan?.policy_direction ?? ''}
-                  required
-                  placeholder="Arah kebijakan terkait"
-                  rows={3}
-                />
-                <InputError message={errors.policy_direction} />
-              </div>
-
+              <TextareaField
+                id="policy_direction"
+                name="policy_direction"
+                label="Arah Kebijakan"
+                defaultValue={plan?.policy_direction ?? ''}
+                required
+                placeholder="Arah kebijakan terkait"
+                rows={3}
+                error={errors.policy_direction}
+              />
               <DialogFooter className="mb-0!">
                 <Button
                   type="button"

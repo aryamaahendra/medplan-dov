@@ -1,6 +1,6 @@
 import { RiAddLine, RiDeleteBinLine } from '@remixicon/react';
 
-import InputError from '@/components/input-error';
+import { FormGrid, InputField } from '@/components/form';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -9,8 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import type { IndicatorFormState } from '../types/planning-activity-version.types';
 
 interface ActivityIndicatorsSectionProps {
@@ -55,39 +53,33 @@ export function ActivityIndicatorsSection({
             </CardHeader>
             <CardContent>
               <div className="grid gap-4">
-                <div className="grid gap-2">
-                  <Label>Nama Indikator</Label>
-                  <input
-                    type="hidden"
-                    name={`indicators[${index}][id]`}
-                    value={indicator.id ?? ''}
+                <input
+                  type="hidden"
+                  name={`indicators[${index}][id]`}
+                  value={indicator.id ?? ''}
+                />
+                <InputField
+                  label="Nama Indikator"
+                  name={`indicators[${index}][name]`}
+                  defaultValue={indicator.name}
+                  placeholder="Cth: Persentase Capaian"
+                  required
+                  error={errors[`indicators.${index}.name`]}
+                />
+                <FormGrid cols={2}>
+                  <InputField
+                    label="Baseline"
+                    name={`indicators[${index}][baseline]`}
+                    defaultValue={indicator.baseline}
+                    placeholder="Cth: 100"
                   />
-                  <Input
-                    name={`indicators[${index}][name]`}
-                    defaultValue={indicator.name}
-                    placeholder="Cth: Persentase Capaian"
-                    required
+                  <InputField
+                    label="Satuan"
+                    name={`indicators[${index}][unit]`}
+                    defaultValue={indicator.unit}
+                    placeholder="Cth: Persen (%)"
                   />
-                  <InputError message={errors[`indicators.${index}.name`]} />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Baseline</Label>
-                    <Input
-                      name={`indicators[${index}][baseline]`}
-                      defaultValue={indicator.baseline}
-                      placeholder="Cth: 100"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Satuan</Label>
-                    <Input
-                      name={`indicators[${index}][unit]`}
-                      defaultValue={indicator.unit}
-                      placeholder="Cth: Persen (%)"
-                    />
-                  </div>
-                </div>
+                </FormGrid>
               </div>
             </CardContent>
           </Card>

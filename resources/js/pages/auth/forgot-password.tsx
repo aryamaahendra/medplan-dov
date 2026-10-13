@@ -1,11 +1,9 @@
 // Components
 import { Form, Head } from '@inertiajs/react';
 import { RiLoader4Line } from '@remixicon/react';
-import InputError from '@/components/input-error';
+import { InputField } from '@/components/form';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { login } from '@/routes';
 import { email } from '@/routes/password';
 
@@ -24,19 +22,16 @@ export default function ForgotPassword({ status }: { status?: string }) {
         <Form {...email.form()}>
           {({ processing, errors }) => (
             <>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  name="email"
-                  autoComplete="off"
-                  autoFocus
-                  placeholder="email@example.com"
-                />
-
-                <InputError message={errors.email} />
-              </div>
+              <InputField
+                id="email"
+                type="email"
+                name="email"
+                label="Email address"
+                autoComplete="off"
+                autoFocus
+                placeholder="email@example.com"
+                error={errors.email}
+              />
 
               <div className="my-6 flex items-center justify-start">
                 <Button

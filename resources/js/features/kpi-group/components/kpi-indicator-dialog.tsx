@@ -2,7 +2,12 @@ import { useForm } from '@inertiajs/react';
 import { toast } from 'sonner';
 
 import KpiIndicatorController from '@/actions/App/Http/Controllers/Kpi/KpiIndicatorController';
-import InputError from '@/components/input-error';
+import {
+  FieldWrapper,
+  FormGrid,
+  InputField,
+  SwitchField,
+} from '@/components/form';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -12,9 +17,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import type { KpiGroup, KpiIndicator } from '@/types';
 
 interface KpiIndicatorDialogProps {
@@ -118,115 +120,98 @@ function KpiIndicatorForm({
         )}
 
         <div className="grid gap-4">
-          <div className="flex items-center space-x-2 rounded-lg border p-3">
-            <Switch
-              id="is_category"
-              checked={data.is_category}
-              onCheckedChange={(checked) => setData('is_category', checked)}
-              disabled={isEditing}
-            />
-            <div className="space-y-0.5">
-              <Label htmlFor="is_category">Jadikan sebagai Kategori</Label>
-              <p className="text-xs text-muted-foreground">
-                Kategori hanya berfungsi sebagai heading dan tidak memiliki unit
-                atau target.
-              </p>
-            </div>
-          </div>
+          <SwitchField
+            id="is_category"
+            label="Jadikan sebagai Kategori"
+            description="Kategori hanya berfungsi sebagai heading dan tidak memiliki unit atau target."
+            variant="choice-card"
+            checked={data.is_category}
+            onCheckedChange={(checked) => setData('is_category', checked)}
+            disabled={isEditing}
+          />
 
-          <div className="grid gap-2">
-            <Label htmlFor="name">
-              Nama {data.is_category ? 'Kategori' : 'Indikator'}
-            </Label>
-            <Input
-              id="name"
-              name="name"
-              placeholder={`Contoh: ${
-                data.is_category
-                  ? 'Urusan Pendidikan'
-                  : 'Persentase Sekolah Terakreditasi A'
-              }`}
-              value={data.name}
-              onChange={(e) => setData('name', e.target.value)}
-              required
-            />
-            <InputError message={errors.name} />
-          </div>
+          <InputField
+            id="name"
+            name="name"
+            label={`Nama ${data.is_category ? 'Kategori' : 'Indikator'}`}
+            placeholder={`Contoh: ${
+              data.is_category
+                ? 'Urusan Pendidikan'
+                : 'Persentase Sekolah Terakreditasi A'
+            }`}
+            value={data.name}
+            onChange={(e) => setData('name', e.target.value)}
+            required
+            error={errors.name}
+          />
 
           {!data.is_category && (
             <>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="unit">Satuan</Label>
-                  <Input
-                    id="unit"
-                    name="unit"
-                    placeholder="Contoh: %, Orang, Rupiah"
-                    value={data.unit ?? ''}
-                    onChange={(e) => setData('unit', e.target.value)}
-                  />
-                  <InputError message={errors.unit} />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="baseline_value">Baseline</Label>
-                  <Input
-                    id="baseline_value"
-                    name="baseline_value"
-                    placeholder="Nilai awal"
-                    value={data.baseline_value ?? ''}
-                    onChange={(e) => setData('baseline_value', e.target.value)}
-                  />
-                  <InputError message={errors.baseline_value} />
-                </div>
-              </div>
+              <FormGrid cols={2}>
+                <InputField
+                  id="unit"
+                  name="unit"
+                  label="Satuan"
+                  placeholder="Contoh: %, Orang, Rupiah"
+                  value={data.unit ?? ''}
+                  onChange={(e) => setData('unit', e.target.value)}
+                  error={errors.unit}
+                />
+                <InputField
+                  id="baseline_value"
+                  name="baseline_value"
+                  label="Baseline"
+                  placeholder="Nilai awal"
+                  value={data.baseline_value ?? ''}
+                  onChange={(e) => setData('baseline_value', e.target.value)}
+                  error={errors.baseline_value}
+                />
+              </FormGrid>
 
-              <div className="space-y-3">
-                <Label>
-                  Target Tahunan ({group.start_year} - {group.end_year})
-                </Label>
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <FieldWrapper
+                label={`Target Tahunan (${group.start_year} - ${group.end_year})`}
+                error={errors.annual_targets}
+              >
+                <FormGrid cols={3}>
                   {years.map((year) => {
                     const existingTarget = data.annual_targets?.find(
                       (t) => t.year === year,
                     );
 
                     return (
-                      <div key={year} className="space-y-1.5">
-                        <Label
-                          htmlFor={`target_${year}`}
-                          className="font-mono text-[10px] text-muted-foreground uppercase"
-                        >
-                          Tahun {year}
-                        </Label>
-                        <Input
-                          id={`target_${year}`}
-                          placeholder="Target"
-                          value={existingTarget?.target_value ?? ''}
-                          onChange={(e) => {
-                            const newTargets = [...(data.annual_targets || [])];
-                            const targetIndex = newTargets.findIndex(
-                              (t) => t.year === year,
-                            );
+                      <InputField
+                        key={year}
+                        id={`target_${year}`}
+                        label={`Tahun ${year}`}
+                        labelProps={{
+                          className:
+                            'font-mono text-[10px] text-muted-foreground uppercase',
+                        }}
+                        placeholder="Target"
+                        value={existingTarget?.target_value ?? ''}
+                        onChange={(e) => {
+                          const newTargets = [...(data.annual_targets || [])];
+                          const targetIndex = newTargets.findIndex(
+                            (t) => t.year === year,
+                          );
 
-                            if (targetIndex > -1) {
-                              (newTargets[targetIndex] as any).target_value =
-                                e.target.value;
-                            } else {
-                              (newTargets as any).push({
-                                year,
-                                target_value: e.target.value,
-                              });
-                            }
+                          if (targetIndex > -1) {
+                            (newTargets[targetIndex] as any).target_value =
+                              e.target.value;
+                          } else {
+                            (newTargets as any).push({
+                              year,
+                              target_value: e.target.value,
+                            });
+                          }
 
-                            setData('annual_targets', newTargets);
-                          }}
-                        />
-                      </div>
+                          setData('annual_targets', newTargets);
+                        }}
+                      />
                     );
                   })}
-                </div>
-                <InputError message={errors.annual_targets} />
-              </div>
+                </FormGrid>
+              </FieldWrapper>
             </>
           )}
         </div>

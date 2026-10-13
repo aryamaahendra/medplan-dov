@@ -2,7 +2,7 @@ import { Form } from '@inertiajs/react';
 import { toast } from 'sonner';
 
 import SasaranController from '@/actions/App/Http/Controllers/Renstra/SasaranController';
-import InputError from '@/components/input-error';
+import { InputField, TextareaField } from '@/components/form';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -12,9 +12,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import type { Sasaran, Tujuan } from '@/types';
 
 interface SasaranDialogProps {
@@ -65,30 +62,26 @@ export function SasaranDialog({
             <>
               <input type="hidden" name="tujuan_id" value={tujuan.id} />
 
-              <div className="grid gap-2">
-                <Label htmlFor="sasaran-name">Nama Sasaran</Label>
-                <Input
-                  id="sasaran-name"
-                  name="name"
-                  placeholder="Contoh: Meningkatnya Kompetensi Pegawai"
-                  defaultValue={sasaran?.name ?? ''}
-                  required
-                  autoFocus
-                />
-                <InputError message={errors.name} />
-              </div>
+              <InputField
+                id="sasaran-name"
+                name="name"
+                label="Nama Sasaran"
+                placeholder="Contoh: Meningkatnya Kompetensi Pegawai"
+                defaultValue={sasaran?.name ?? ''}
+                required
+                autoFocus
+                error={errors.name}
+              />
 
-              <div className="grid gap-2">
-                <Label htmlFor="sasaran-description">Deskripsi</Label>
-                <Textarea
-                  id="sasaran-description"
-                  name="description"
-                  placeholder="Keterangan tambahan..."
-                  defaultValue={sasaran?.description ?? ''}
-                  rows={3}
-                />
-                <InputError message={errors.description} />
-              </div>
+              <TextareaField
+                id="sasaran-description"
+                name="description"
+                label="Deskripsi"
+                placeholder="Keterangan tambahan..."
+                defaultValue={sasaran?.description ?? ''}
+                rows={3}
+                error={errors.description}
+              />
 
               <DialogFooter className="-mb-2">
                 <Button

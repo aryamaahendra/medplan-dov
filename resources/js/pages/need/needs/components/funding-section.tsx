@@ -5,17 +5,15 @@ import {
   RiAddLine,
 } from '@remixicon/react';
 import { useState, useMemo } from 'react';
-import InputError from '@/components/input-error';
+import { FieldWrapper, TextareaField } from '@/components/form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Textarea } from '@/components/ui/textarea';
 import { getFormattedCost } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import { SectionWrapper } from './section-wrapper';
@@ -85,10 +83,14 @@ export function FundingSection({
       footer="*Pilih sumber dana dan biaya estimasi (otomatis)."
     >
       <div className="space-y-4">
-        <div className="space-y-1.5">
-          <Label className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
-            Sumber Dana
-          </Label>
+        <FieldWrapper
+          label="Sumber Dana"
+          labelProps={{
+            className:
+              'text-xs font-medium tracking-wider text-muted-foreground uppercase',
+          }}
+          error={errors[`detail.funding_source_ids`]}
+        >
           <Popover open={sourceOpen} onOpenChange={setSourceOpen}>
             <PopoverTrigger
               render={
@@ -150,21 +152,20 @@ export function FundingSection({
               </ScrollArea>
             </PopoverContent>
           </Popover>
-          <InputError message={errors[`detail.funding_source_ids`]} />
-        </div>
+        </FieldWrapper>
 
-        <div className="space-y-1.5">
-          <Label className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
-            Estimasi Biaya
-          </Label>
-          <Textarea
-            disabled
-            value={getFormattedCost(totalPrice)}
-            className="min-h-[80px] bg-muted/50 font-medium"
-            placeholder="Akan terisi otomatis dari Total Biaya..."
-          />
-          <InputError message={errors[`detail.estimated_cost`]} />
-        </div>
+        <TextareaField
+          label="Estimasi Biaya"
+          labelProps={{
+            className:
+              'text-xs font-medium tracking-wider text-muted-foreground uppercase',
+          }}
+          disabled
+          value={getFormattedCost(totalPrice)}
+          className="min-h-[80px] bg-muted/50 font-medium"
+          placeholder="Akan terisi otomatis dari Total Biaya..."
+          error={errors[`detail.estimated_cost`]}
+        />
       </div>
     </SectionWrapper>
   );

@@ -1,8 +1,6 @@
 import { useForm, Link } from '@inertiajs/react';
+import { FieldWrapper, InputField, SwitchField } from '@/components/form';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import type { Permission } from '@/features/role/components/role-columns';
 import type { Role } from '@/features/role/components/role-columns';
 import rolesRoutes from '@/routes/roles';
@@ -137,25 +135,18 @@ export function RoleForm({ role, permissions }: RoleFormProps) {
     <form onSubmit={onSubmit} className="space-y-8">
       <div className="space-y-6">
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name" className="text-sm font-semibold">
-              Role Name
-            </Label>
-            <Input
-              id="name"
-              value={data.name}
-              onChange={(e) => setData('name', e.target.value)}
-              disabled={processing}
-              placeholder="e.g. Admin Unit"
-              className="max-w-md"
-            />
-            {errors.name && (
-              <p className="text-sm text-destructive">{errors.name}</p>
-            )}
-          </div>
+          <InputField
+            id="name"
+            label="Role Name"
+            value={data.name}
+            onChange={(e) => setData('name', e.target.value)}
+            disabled={processing}
+            placeholder="e.g. Admin Unit"
+            className="max-w-md"
+            error={errors.name}
+          />
 
-          <div className="space-y-4">
-            <Label className="text-sm font-semibold">Permissions</Label>
+          <FieldWrapper label="Permissions" error={errors.permissions}>
             <div className="space-y-6">
               {sortedGroups.map(([group, groupPermissions]) => (
                 <div key={group} className="space-y-4">
@@ -166,43 +157,25 @@ export function RoleForm({ role, permissions }: RoleFormProps) {
                     {groupPermissions
                       .sort((a, b) => a.name.localeCompare(b.name))
                       .map((permission) => (
-                        <div
+                        <SwitchField
                           key={permission.id}
-                          className="flex items-start justify-between space-x-2 rounded-lg border bg-background p-3 transition-colors hover:bg-muted/50"
-                        >
-                          <div className="flex flex-1 flex-col gap-1">
-                            <Label
-                              htmlFor={`permission-${permission.id}`}
-                              className="cursor-pointer text-xs leading-none font-semibold capitalize"
-                            >
-                              {permission.name}
-                            </Label>
-                            {permission.description && (
-                              <p className="text-[10px] leading-tight text-muted-foreground">
-                                {permission.description}
-                              </p>
-                            )}
-                          </div>
-                          <Switch
-                            id={`permission-${permission.id}`}
-                            checked={data.permissions.includes(permission.id)}
-                            onCheckedChange={(checked) =>
-                              handlePermissionChange(permission.id, checked)
-                            }
-                            disabled={processing}
-                            size="sm"
-                            className="mr-0"
-                          />
-                        </div>
+                          id={`permission-${permission.id}`}
+                          label={permission.name}
+                          description={permission.description}
+                          variant="choice-card"
+                          checked={data.permissions.includes(permission.id)}
+                          onCheckedChange={(checked) =>
+                            handlePermissionChange(permission.id, checked)
+                          }
+                          disabled={processing}
+                          size="sm"
+                        />
                       ))}
                   </div>
                 </div>
               ))}
             </div>
-            {errors.permissions && (
-              <p className="text-sm text-destructive">{errors.permissions}</p>
-            )}
-          </div>
+          </FieldWrapper>
         </div>
       </div>
 

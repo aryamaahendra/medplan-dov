@@ -2,7 +2,7 @@ import { useForm } from '@inertiajs/react';
 import { toast } from 'sonner';
 
 import OrganizationalUnitController from '@/actions/App/Http/Controllers/Management/OrganizationalUnitController';
-import InputError from '@/components/input-error';
+import { InputField, SelectField } from '@/components/form';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -12,15 +12,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 import type { OrganizationalUnit } from './organizational-unit-columns';
 
@@ -85,72 +76,49 @@ export function OrganizationalUnitDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid gap-2">
-            <Label htmlFor="name">Nama Unit</Label>
-            <Input
-              id="name"
-              name="name"
-              value={data.name}
-              onChange={(e) => setData('name', e.target.value)}
-              required
-              autoFocus
-              placeholder="Contoh: Bidang A, Subbagian Keuangan"
-            />
-            <InputError message={errors.name} />
-          </div>
+          <InputField
+            id="name"
+            name="name"
+            label="Nama Unit"
+            value={data.name}
+            onChange={(e) => setData('name', e.target.value)}
+            required
+            autoFocus
+            placeholder="Contoh: Bidang A, Subbagian Keuangan"
+            error={errors.name}
+          />
 
-          <div className="grid gap-2">
-            <Label htmlFor="code">Kode Resmi</Label>
-            <Input
-              id="code"
-              name="code"
-              value={data.code}
-              onChange={(e) => setData('code', e.target.value)}
-              required
-              placeholder="Contoh: BPKAD-KEU"
-            />
-            <InputError message={errors.code} />
-          </div>
+          <InputField
+            id="code"
+            name="code"
+            label="Kode Resmi"
+            value={data.code}
+            onChange={(e) => setData('code', e.target.value)}
+            required
+            placeholder="Contoh: BPKAD-KEU"
+            error={errors.code}
+          />
 
-          <div className="grid gap-2">
-            <Label htmlFor="parent_id">Unit Induk (Tree Structure)</Label>
-            <Select
-              value={data.parent_id ?? '0'}
-              onValueChange={(value) =>
-                setData('parent_id', value === '0' ? null : value)
-              }
-            >
-              <SelectTrigger id="parent_id">
-                <SelectValue placeholder="Pilih unit induk (opsional)">
-                  {(val) => {
-                    if (!val || val === '0') {
-                      return 'Tanpa Induk (Root)';
-                    }
-
-                    const found = allUnits.find((u) => u.id.toString() === val);
-
-                    return found ? found.name : val;
-                  }}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="0">Tanpa Induk (Root)</SelectItem>
-                {allUnits
-                  .filter((u) => u.id !== unit?.id)
-                  .map((u) => (
-                    <SelectItem key={u.id} value={u.id.toString()}>
-                      {u.name}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-            <input
-              type="hidden"
-              name="parent_id"
-              value={data.parent_id ?? ''}
-            />
-            <InputError message={errors.parent_id} />
-          </div>
+          <SelectField
+            id="parent_id"
+            label="Unit Induk (Tree Structure)"
+            value={data.parent_id ?? '0'}
+            onValueChange={(value) =>
+              setData('parent_id', value === '0' ? null : value)
+            }
+            options={[
+              { label: 'Tanpa Induk (Root)', value: '0' },
+              ...allUnits
+                .filter((u) => u.id !== unit?.id)
+                .map((u) => ({
+                  label: u.name,
+                  value: u.id.toString(),
+                })),
+            ]}
+            placeholder="Pilih unit induk (opsional)"
+            error={errors.parent_id}
+          />
+          <input type="hidden" name="parent_id" value={data.parent_id ?? ''} />
 
           <DialogFooter className="mb-0!">
             <Button

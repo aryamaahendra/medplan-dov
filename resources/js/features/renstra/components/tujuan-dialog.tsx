@@ -2,7 +2,7 @@ import { Form } from '@inertiajs/react';
 import { toast } from 'sonner';
 
 import TujuanController from '@/actions/App/Http/Controllers/Renstra/TujuanController';
-import InputError from '@/components/input-error';
+import { InputField, TextareaField } from '@/components/form';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -12,9 +12,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import type { Renstra, Tujuan } from '@/types';
 
 interface TujuanDialogProps {
@@ -65,30 +62,26 @@ export function TujuanDialog({
             <>
               <input type="hidden" name="renstra_id" value={renstra.id} />
 
-              <div className="grid gap-2">
-                <Label htmlFor="name">Nama Tujuan</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  placeholder="Contoh: Meningkatkan Kualitas SDM"
-                  defaultValue={tujuan?.name ?? ''}
-                  required
-                  autoFocus
-                />
-                <InputError message={errors.name} />
-              </div>
+              <InputField
+                id="name"
+                name="name"
+                label="Nama Tujuan"
+                placeholder="Contoh: Meningkatkan Kualitas SDM"
+                defaultValue={tujuan?.name ?? ''}
+                required
+                autoFocus
+                error={errors.name}
+              />
 
-              <div className="grid gap-2">
-                <Label htmlFor="description">Deskripsi</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  placeholder="Keterangan tambahan..."
-                  defaultValue={tujuan?.description ?? ''}
-                  rows={3}
-                />
-                <InputError message={errors.description} />
-              </div>
+              <TextareaField
+                id="description"
+                name="description"
+                label="Deskripsi"
+                placeholder="Keterangan tambahan..."
+                defaultValue={tujuan?.description ?? ''}
+                rows={3}
+                error={errors.description}
+              />
 
               <DialogFooter className="-mb-2">
                 <Button

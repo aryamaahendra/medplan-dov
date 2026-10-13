@@ -2,7 +2,7 @@ import { Form } from '@inertiajs/react';
 import { toast } from 'sonner';
 
 import IndicatorController from '@/actions/App/Http/Controllers/Renstra/IndicatorController';
-import InputError from '@/components/input-error';
+import { InputField, TextareaField } from '@/components/form';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -14,7 +14,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import type { Indicator, Sasaran, Tujuan } from '@/types';
 
 interface IndicatorDialogProps {
@@ -81,41 +80,35 @@ export function IndicatorDialog({
                 <input type="hidden" name="sasaran_id" value={sasaran.id} />
               )}
 
-              <div className="grid gap-2">
-                <Label htmlFor="name">Nama Indikator</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  placeholder="Contoh: Persentase Capaian Kinerja"
-                  defaultValue={indicator?.name ?? ''}
-                  required
-                  autoFocus
-                />
-                <InputError message={errors.name} />
-              </div>
+              <InputField
+                id="name"
+                name="name"
+                label="Nama Indikator"
+                placeholder="Contoh: Persentase Capaian Kinerja"
+                defaultValue={indicator?.name ?? ''}
+                required
+                autoFocus
+                error={errors.name}
+              />
 
-              <div className="grid gap-2">
-                <Label htmlFor="baseline">Baseline</Label>
-                <Input
-                  id="baseline"
-                  name="baseline"
-                  placeholder="Contoh: 75% atau 100 Dokumen"
-                  defaultValue={indicator?.baseline ?? ''}
-                />
-                <InputError message={errors.baseline} />
-              </div>
+              <InputField
+                id="baseline"
+                name="baseline"
+                label="Baseline"
+                placeholder="Contoh: 75% atau 100 Dokumen"
+                defaultValue={indicator?.baseline ?? ''}
+                error={errors.baseline}
+              />
 
-              <div className="grid gap-2">
-                <Label htmlFor="description">Deskripsi</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  placeholder="Keterangan tambahan..."
-                  defaultValue={indicator?.description ?? ''}
-                  rows={2}
-                />
-                <InputError message={errors.description} />
-              </div>
+              <TextareaField
+                id="description"
+                name="description"
+                label="Deskripsi"
+                placeholder="Keterangan tambahan..."
+                defaultValue={indicator?.description ?? ''}
+                rows={2}
+                error={errors.description}
+              />
 
               <div className="pt-2">
                 <Label className="text-sm font-semibold">Target Tahunan</Label>

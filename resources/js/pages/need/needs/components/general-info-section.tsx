@@ -1,14 +1,13 @@
+import {
+  FieldWrapper,
+  FormGrid,
+  InputField,
+  SelectField,
+  TextareaField,
+} from '@/components/form';
 import InputError from '@/components/input-error';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { TreeSelect } from '@/components/ui/tree-select';
 
@@ -62,127 +61,106 @@ export function GeneralInfoSection({
 }: GeneralInfoSectionProps) {
   return (
     <div className="space-y-5 py-6">
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        <div className="space-y-1.5">
-          <Label htmlFor="organizational_unit_id">Unit Kerja</Label>
-          <TreeSelect
-            items={organizationalUnits}
-            value={data.organizational_unit_id}
-            onValueChange={(v) => setData('organizational_unit_id', v)}
-            placeholder="Pilih unit kerja"
-            className="bg-muted/20 transition-colors hover:bg-muted/40"
-          />
-          <InputError message={errors.organizational_unit_id} />
-        </div>
+      <FormGrid cols={2} density="comfortable">
+        <FieldWrapper
+          id="organizational_unit_id"
+          label="Unit Kerja"
+          error={errors.organizational_unit_id}
+        >
+          {() => (
+            <TreeSelect
+              items={organizationalUnits}
+              value={data.organizational_unit_id}
+              onValueChange={(v) => setData('organizational_unit_id', v)}
+              placeholder="Pilih unit kerja"
+              className="bg-muted/20 transition-colors hover:bg-muted/40"
+            />
+          )}
+        </FieldWrapper>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="need_type_id">Kategori Kebutuhan</Label>
-          <Select
-            value={data.need_type_id}
-            onValueChange={(v) => setData('need_type_id', v)}
-          >
-            <SelectTrigger
-              id="need_type_id"
-              className="w-full bg-muted/20 transition-colors hover:bg-muted/40"
-            >
-              <SelectValue placeholder="Pilih kategori kebutuhan">
-                {(val) => {
-                  const found = needTypes.find(
-                    (t) => t.id.toString() === val?.toString(),
-                  );
-
-                  return found ? found.name : val;
-                }}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {needTypes.map((t) => (
-                <SelectItem key={t.id} value={t.id.toString()}>
-                  {t.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <InputError message={errors.need_type_id} />
-        </div>
-      </div>
+        <SelectField
+          id="need_type_id"
+          label="Kategori Kebutuhan"
+          value={data.need_type_id?.toString()}
+          onValueChange={(v) => setData('need_type_id', v)}
+          placeholder="Pilih kategori kebutuhan"
+          options={needTypes.map((t) => ({
+            label: t.name,
+            value: t.id.toString(),
+          }))}
+          error={errors.need_type_id}
+        />
+      </FormGrid>
 
       <div className="flex flex-col items-start gap-5 md:flex-row">
-        <div className="w-full shrink-0 space-y-1.5 md:w-32">
-          <Label htmlFor="year">Tahun</Label>
-          <Input
+        <div className="w-full shrink-0 md:w-32">
+          <InputField
             id="year"
             name="year"
             type="number"
+            label="Tahun"
             min="2000"
             max="2100"
             value={data.year}
             onChange={(e) => setData('year', e.target.value)}
             required
             className="bg-muted/20"
+            error={errors.year}
           />
-          <InputError message={errors.year} />
         </div>
 
-        <div className="w-full flex-1 space-y-1.5">
-          <Label htmlFor="title">Judul Usulan</Label>
-          <Input
+        <div className="w-full flex-1">
+          <InputField
             id="title"
             name="title"
+            label="Judul Usulan"
             placeholder="Contoh: Pengadaan Komputer untuk Bidang A"
             value={data.title}
             onChange={(e) => setData('title', e.target.value)}
             required
             className="border-primary/20 bg-muted/20 shadow-xs transition-all focus:border-primary"
+            error={errors.title}
           />
-          <InputError message={errors.title} />
         </div>
       </div>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="description">Detail Usulan</Label>
-        <Textarea
-          id="description"
-          name="description"
-          placeholder="Uraikan detail usulan kebutuhan..."
-          value={data.description}
-          onChange={(e) => setData('description', e.target.value)}
-          rows={3}
-          className="resize-none bg-muted/10"
+      <TextareaField
+        id="description"
+        name="description"
+        label="Detail Usulan"
+        placeholder="Uraikan detail usulan kebutuhan..."
+        value={data.description}
+        onChange={(e) => setData('description', e.target.value)}
+        rows={3}
+        className="resize-none bg-muted/10"
+        error={errors.description}
+      />
+
+      <FormGrid cols={2} density="comfortable">
+        <TextareaField
+          id="current_condition"
+          name="current_condition"
+          label="Kondisi Saat Ini"
+          placeholder="Apa kendala saat ini?"
+          value={data.current_condition}
+          onChange={(e) => setData('current_condition', e.target.value)}
+          rows={2}
+          className="resize-none bg-muted/5 text-sm"
+          error={errors.current_condition}
         />
-        <InputError message={errors.description} />
-      </div>
 
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        <div className="space-y-1.5">
-          <Label htmlFor="current_condition">Kondisi Saat Ini</Label>
-          <Textarea
-            id="current_condition"
-            name="current_condition"
-            placeholder="Apa kendala saat ini?"
-            value={data.current_condition}
-            onChange={(e) => setData('current_condition', e.target.value)}
-            rows={2}
-            className="resize-none bg-muted/5 text-sm"
-          />
-          <InputError message={errors.current_condition} />
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="required_condition">Kondisi Optimal</Label>
-          <Textarea
-            id="required_condition"
-            name="required_condition"
-            placeholder="Target yang diharapkan?"
-            value={data.required_condition}
-            onChange={(e) => setData('required_condition', e.target.value)}
-            rows={2}
-            className="resize-none bg-muted/5 text-sm"
-          />
-          <InputError message={errors.required_condition} />
-        </div>
-      </div>
-
+        <TextareaField
+          id="required_condition"
+          name="required_condition"
+          label="Kondisi Optimal"
+          placeholder="Target yang diharapkan?"
+          value={data.required_condition}
+          onChange={(e) => setData('required_condition', e.target.value)}
+          rows={2}
+          className="resize-none bg-muted/5 text-sm"
+          error={errors.required_condition}
+        />
+      </FormGrid>
       <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
         <div className="space-y-2">
           <Label className="text-xs font-semibold tracking-tight text-muted-foreground uppercase">

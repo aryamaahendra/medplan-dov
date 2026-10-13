@@ -1,11 +1,11 @@
 import { Form, Head } from '@inertiajs/react';
-import InputError from '@/components/input-error';
-import PasswordInput from '@/components/password-input';
+import {
+  InputField,
+  PasswordField,
+  SingleCheckboxField,
+} from '@/components/form';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
@@ -28,49 +28,49 @@ export default function Login({ status, canResetPassword }: Props) {
         {({ processing, errors }) => (
           <>
             <div className="grid gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  name="email"
-                  required
-                  autoFocus
-                  tabIndex={1}
-                  autoComplete="email"
-                  placeholder="email@example.com"
-                />
-                <InputError message={errors.email} />
-              </div>
+              <InputField
+                id="email"
+                type="email"
+                name="email"
+                label="Email address"
+                required
+                autoFocus
+                tabIndex={1}
+                autoComplete="email"
+                placeholder="email@example.com"
+                error={errors.email}
+              />
 
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  {canResetPassword && (
-                    <TextLink
-                      href={request()}
-                      className="ml-auto text-sm"
-                      tabIndex={5}
-                    >
-                      Forgot password?
-                    </TextLink>
-                  )}
-                </div>
-                <PasswordInput
-                  id="password"
-                  name="password"
-                  required
-                  tabIndex={2}
-                  autoComplete="current-password"
-                  placeholder="Password"
-                />
-                <InputError message={errors.password} />
-              </div>
+              <PasswordField
+                id="password"
+                name="password"
+                label={
+                  <div className="flex w-full items-center justify-between">
+                    <span>Password</span>
+                    {canResetPassword && (
+                      <TextLink
+                        href={request()}
+                        className="text-sm font-normal"
+                        tabIndex={5}
+                      >
+                        Forgot password?
+                      </TextLink>
+                    )}
+                  </div>
+                }
+                required
+                tabIndex={2}
+                autoComplete="current-password"
+                placeholder="Password"
+                error={errors.password}
+              />
 
-              <div className="flex items-center space-x-3">
-                <Checkbox id="remember" name="remember" tabIndex={3} />
-                <Label htmlFor="remember">Remember me</Label>
-              </div>
+              <SingleCheckboxField
+                id="remember"
+                name="remember"
+                label="Remember me"
+                tabIndex={3}
+              />
 
               <Button
                 type="submit"

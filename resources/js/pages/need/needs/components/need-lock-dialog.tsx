@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { toast } from 'sonner';
 
 import NeedLockController from '@/actions/App/Http/Controllers/Need/NeedLockController';
-import InputError from '@/components/input-error';
+import { InputField, TextareaField } from '@/components/form';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -14,9 +14,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import type { Need } from '@/types';
 
 interface NeedLockDialogProps {
@@ -141,44 +138,31 @@ export function NeedLockDialog({
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="lock_reason">
-                Alasan {isLockMode ? 'Penguncian' : 'Pembukaan / Perpanjangan'}{' '}
-                <span className="text-destructive">*</span>
-              </Label>
-              <Textarea
-                id="lock_reason"
-                placeholder={
-                  isLockMode
-                    ? 'Contoh: Pembekuan sementara untuk evaluasi perencana'
-                    : 'Contoh: Memberikan kesempatan revisi dokumen spesifikasi teknis'
-                }
-                value={data.lock_reason}
-                onChange={(e) => setData('lock_reason', e.target.value)}
-                rows={3}
-                required
-              />
-              <InputError message={errors.lock_reason} />
-            </div>
+            <TextareaField
+              id="lock_reason"
+              label={`Alasan ${isLockMode ? 'Penguncian' : 'Pembukaan / Perpanjangan'}`}
+              required
+              placeholder={
+                isLockMode
+                  ? 'Contoh: Pembekuan sementara untuk evaluasi perencana'
+                  : 'Contoh: Memberikan kesempatan revisi dokumen spesifikasi teknis'
+              }
+              value={data.lock_reason}
+              onChange={(e) => setData('lock_reason', e.target.value)}
+              rows={3}
+              error={errors.lock_reason}
+            />
 
             {!isLockMode && (
-              <div className="space-y-2">
-                <Label htmlFor="unlocked_until">
-                  Batas Waktu Perpanjangan (Opsional)
-                </Label>
-                <Input
-                  id="unlocked_until"
-                  type="datetime-local"
-                  value={data.unlocked_until}
-                  onChange={(e) => setData('unlocked_until', e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Kosongkan jika ingin membuka kunci tanpa batas waktu (override
-                  manual). Jika diisi, usulan otomatis terkunci kembali setelah
-                  waktu berakhir.
-                </p>
-                <InputError message={errors.unlocked_until} />
-              </div>
+              <InputField
+                id="unlocked_until"
+                type="datetime-local"
+                label="Batas Waktu Perpanjangan (Opsional)"
+                description="Kosongkan jika ingin membuka kunci tanpa batas waktu (override manual). Jika diisi, usulan otomatis terkunci kembali setelah waktu berakhir."
+                value={data.unlocked_until}
+                onChange={(e) => setData('unlocked_until', e.target.value)}
+                error={errors.unlocked_until}
+              />
             )}
           </div>
 

@@ -2,7 +2,12 @@ import { Form } from '@inertiajs/react';
 import { toast } from 'sonner';
 
 import RenstraController from '@/actions/App/Http/Controllers/Renstra/RenstraController';
-import InputError from '@/components/input-error';
+import {
+  FormGrid,
+  InputField,
+  SwitchField,
+  TextareaField,
+} from '@/components/form';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -12,10 +17,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
 import type { Renstra } from '@/types';
 
 interface RenstraDialogProps {
@@ -62,77 +63,63 @@ export function RenstraDialog({
         >
           {({ setData, processing, errors }: any) => (
             <>
-              <div className="grid gap-2">
-                <Label htmlFor="name">Nama Renstra</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  placeholder="Contoh: Renstra 2025-2029 (Revisi 1)"
-                  defaultValue={renstra?.name ?? ''}
+              <InputField
+                id="name"
+                name="name"
+                label="Nama Renstra"
+                placeholder="Contoh: Renstra 2025-2029 (Revisi 1)"
+                defaultValue={renstra?.name ?? ''}
+                required
+                autoFocus
+                error={errors.name}
+              />
+
+              <FormGrid cols={2}>
+                <InputField
+                  id="year_start"
+                  name="year_start"
+                  type="number"
+                  label="Tahun Mulai"
+                  min="2000"
+                  max="2100"
+                  defaultValue={renstra?.year_start ?? new Date().getFullYear()}
                   required
-                  autoFocus
+                  error={errors.year_start}
                 />
-                <InputError message={errors.name} />
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="year_start">Tahun Mulai</Label>
-                  <Input
-                    id="year_start"
-                    name="year_start"
-                    type="number"
-                    min="2000"
-                    max="2100"
-                    defaultValue={
-                      renstra?.year_start ?? new Date().getFullYear()
-                    }
-                    required
-                  />
-                  <InputError message={errors.year_start} />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="year_end">Tahun Selesai</Label>
-                  <Input
-                    id="year_end"
-                    name="year_end"
-                    type="number"
-                    min="2000"
-                    max="2100"
-                    defaultValue={
-                      renstra?.year_end ?? new Date().getFullYear() + 5
-                    }
-                    required
-                  />
-                  <InputError message={errors.year_end} />
-                </div>
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="description">Deskripsi</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  placeholder="Uraikan detail atau sasaran renstra..."
-                  defaultValue={renstra?.description ?? ''}
-                  rows={4}
+                <InputField
+                  id="year_end"
+                  name="year_end"
+                  type="number"
+                  label="Tahun Selesai"
+                  min="2000"
+                  max="2100"
+                  defaultValue={
+                    renstra?.year_end ?? new Date().getFullYear() + 5
+                  }
+                  required
+                  error={errors.year_end}
                 />
-                <InputError message={errors.description} />
-              </div>
+              </FormGrid>
 
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="is_active"
-                  checked={renstra?.is_active ?? true}
-                  onCheckedChange={(checked) => setData('is_active', checked)}
-                />
-                <Label htmlFor="is_active">Aktifkan Renstra Ini</Label>
-                <p className="ml-auto text-xs text-muted-foreground">
-                  (Hanya 1 yang bisa aktif)
-                </p>
-              </div>
-              <InputError message={errors.is_active} />
+              <TextareaField
+                id="description"
+                name="description"
+                label="Deskripsi"
+                placeholder="Uraikan detail atau sasaran renstra..."
+                defaultValue={renstra?.description ?? ''}
+                rows={4}
+                error={errors.description}
+              />
 
+              <SwitchField
+                id="is_active"
+                label="Aktifkan Renstra Ini"
+                description="(Hanya 1 yang bisa aktif)"
+                checked={renstra?.is_active ?? true}
+                onCheckedChange={(checked) => setData('is_active', checked)}
+                error={errors.is_active}
+              />
               <DialogFooter className="mb-0!">
                 <Button
                   type="button"

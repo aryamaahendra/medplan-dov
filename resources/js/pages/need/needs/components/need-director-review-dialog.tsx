@@ -1,10 +1,9 @@
 import { useForm } from '@inertiajs/react';
-import { RiCheckboxCircleLine, RiCloseCircleLine } from '@remixicon/react';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
 import NeedController from '@/actions/App/Http/Controllers/Need/NeedController';
-import InputError from '@/components/input-error';
+import { FieldWrapper, SwitchField } from '@/components/form';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -15,8 +14,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Editor } from '@/components/ui/editor';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import type { Need } from '@/types';
 
 interface NeedDirectorReviewDialogProps {
@@ -93,8 +90,11 @@ export function NeedDirectorReviewDialog({
           </DialogHeader>
 
           <div className="grid gap-6 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="notes">Catatan Review</Label>
+            <FieldWrapper
+              id="notes"
+              label="Catatan Review"
+              error={errors.notes}
+            >
               <div className="no-scrollbar max-h-[400px] overflow-auto rounded-xl border p-4">
                 <div className="min-h-[200px]">
                   <Editor
@@ -108,29 +108,17 @@ export function NeedDirectorReviewDialog({
                   />
                 </div>
               </div>
-              <InputError message={errors.notes} />
-            </div>
+            </FieldWrapper>
 
-            <div className="flex items-center justify-between rounded-lg border p-4">
-              <div className="space-y-0.5">
-                <Label className="text-base">Persetujuan Direktur</Label>
-                <p className="text-sm text-muted-foreground">
-                  Tandai usulan ini sebagai telah disetujui oleh direktur.
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                {data.is_approved ? (
-                  <RiCheckboxCircleLine className="h-5 w-5 text-primary" />
-                ) : (
-                  <RiCloseCircleLine className="h-5 w-5 text-muted-foreground/50" />
-                )}
-                <Switch
-                  checked={data.is_approved}
-                  onCheckedChange={(val) => setData('is_approved', val)}
-                />
-              </div>
-            </div>
-            <InputError message={errors.is_approved} className="mt-0" />
+            <SwitchField
+              id="is_approved"
+              label="Persetujuan Direktur"
+              description="Tandai usulan ini sebagai telah disetujui oleh direktur."
+              variant="choice-card"
+              checked={data.is_approved}
+              onCheckedChange={(val) => setData('is_approved', val)}
+              error={errors.is_approved}
+            />
           </div>
 
           <DialogFooter>

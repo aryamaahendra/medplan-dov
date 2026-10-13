@@ -2,10 +2,8 @@ import { Transition } from '@headlessui/react';
 import { Form } from '@inertiajs/react';
 import { useRef } from 'react';
 import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController';
-import InputError from '@/components/input-error';
-import PasswordInput from '@/components/password-input';
+import { PasswordField } from '@/components/form';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 
 export function UpdatePasswordForm() {
   const passwordInput = useRef<HTMLInputElement>(null);
@@ -32,48 +30,35 @@ export function UpdatePasswordForm() {
     >
       {({ errors, processing, recentlySuccessful }) => (
         <>
-          <div className="grid gap-2">
-            <Label htmlFor="current_password">Current password</Label>
-
-            <PasswordInput
+          <div className="space-y-6">
+            <PasswordField
               id="current_password"
-              ref={currentPasswordInput}
+              inputRef={currentPasswordInput}
               name="current_password"
-              className="mt-1 block w-full"
+              label="Current password"
               autoComplete="current-password"
               placeholder="Current password"
+              error={errors.current_password}
             />
 
-            <InputError message={errors.current_password} />
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="password">New password</Label>
-
-            <PasswordInput
+            <PasswordField
               id="password"
-              ref={passwordInput}
+              inputRef={passwordInput}
               name="password"
-              className="mt-1 block w-full"
+              label="New password"
               autoComplete="new-password"
               placeholder="New password"
+              error={errors.password}
             />
 
-            <InputError message={errors.password} />
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="password_confirmation">Confirm password</Label>
-
-            <PasswordInput
+            <PasswordField
               id="password_confirmation"
               name="password_confirmation"
-              className="mt-1 block w-full"
+              label="Confirm password"
               autoComplete="new-password"
               placeholder="Confirm password"
+              error={errors.password_confirmation}
             />
-
-            <InputError message={errors.password_confirmation} />
           </div>
 
           <div className="flex items-center gap-4">

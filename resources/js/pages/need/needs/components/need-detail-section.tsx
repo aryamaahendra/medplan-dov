@@ -1,14 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import type { MutableRefObject } from 'react';
-import InputError from '@/components/input-error';
+import { SelectField } from '@/components/form';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { getFormattedCost } from '@/lib/formatters';
 import type { Attachment } from '@/types';
 import { DetailFieldItem } from './detail-field-item';
@@ -180,104 +173,56 @@ export function NeedDetailSection({
           </div>
 
           <div className="space-y-4 px-4">
-            <div className="space-y-2">
-              <Label className="text-xs text-muted-foreground">
-                a. K/L/D/I
-              </Label>
-              <Select
-                value={kldi}
-                onValueChange={(val) => {
-                  setKldi(val);
-                  handleChange('kldi', val);
-                }}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Pilih K/L/D/I">
-                    {(val) => {
-                      const found = kldiOptions?.find(
-                        (opt) => opt.value === val,
-                      );
+            <SelectField
+              id="kldi"
+              label="a. K/L/D/I"
+              labelProps={{ className: 'text-xs text-muted-foreground' }}
+              value={kldi}
+              onValueChange={(val) => {
+                setKldi(val);
+                handleChange('kldi', val);
+              }}
+              placeholder="Pilih K/L/D/I"
+              options={(kldiOptions || []).map((opt) => ({
+                label: opt.name,
+                value: opt.value,
+              }))}
+              error={errors['detail.kldi']}
+            />
 
-                      return found ? found.name : val;
-                    }}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {kldiOptions.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      <span>{opt.name}</span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <InputError message={errors['detail.kldi']} />
-            </div>
+            <SelectField
+              id="satker_skpd"
+              label="b. Satker/SKPD"
+              labelProps={{ className: 'text-xs text-muted-foreground' }}
+              value={satker}
+              onValueChange={(val) => {
+                setSatker(val);
+                handleChange('satker_skpd', val);
+              }}
+              placeholder="Pilih Satker/SKPD"
+              options={(satkerOptions || []).map((opt) => ({
+                label: opt.name,
+                value: opt.value,
+              }))}
+              error={errors['detail.satker_skpd']}
+            />
 
-            <div className="space-y-2">
-              <Label className="text-xs text-muted-foreground">
-                b. Satker/SKPD
-              </Label>
-              <Select
-                value={satker}
-                onValueChange={(val) => {
-                  setSatker(val);
-                  handleChange('satker_skpd', val);
-                }}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Pilih Satker/SKPD">
-                    {(val) => {
-                      const found = satkerOptions?.find(
-                        (opt) => opt.value === val,
-                      );
-
-                      return found ? found.name : val;
-                    }}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {satkerOptions.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      <span>{opt.name}</span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <InputError message={errors['detail.satker_skpd']} />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-xs text-muted-foreground">c. KPA</Label>
-              <Select
-                value={kpaId.toString()}
-                onValueChange={(val) => {
-                  setKpaId(val);
-                  handleChange('kpa_id', val);
-                }}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Pilih KPA">
-                    {(val) => {
-                      const found = users?.find(
-                        (u) => u.id.toString() === val?.toString(),
-                      );
-
-                      return found
-                        ? `${found.name}${found.nip ? ` (NIP: ${found.nip})` : ''}`
-                        : val;
-                    }}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {users.map((u) => (
-                    <SelectItem key={u.id} value={u.id.toString()}>
-                      <span>{`${u.name}${u.nip ? ` (NIP: ${u.nip})` : ''}`}</span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <InputError message={errors['detail.kpa_id']} />
-            </div>
+            <SelectField
+              id="kpa_id"
+              label="c. KPA"
+              labelProps={{ className: 'text-xs text-muted-foreground' }}
+              value={kpaId.toString()}
+              onValueChange={(val) => {
+                setKpaId(val);
+                handleChange('kpa_id', val);
+              }}
+              placeholder="Pilih KPA"
+              options={(users || []).map((u) => ({
+                label: `${u.name}${u.nip ? ` (NIP: ${u.nip})` : ''}`,
+                value: u.id.toString(),
+              }))}
+              error={errors['detail.kpa_id']}
+            />
           </div>
 
           <Label className="mb-0 block border-b bg-muted/40 px-4 py-3 text-xs text-muted-foreground italic">

@@ -49,6 +49,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'create org-units' => 'Menambah unit organisasi baru',
             'update org-units' => 'Mengubah data unit organisasi',
             'delete org-units' => 'Menghapus unit organisasi',
+            'restore org-units' => 'Memulihkan unit organisasi yang dihapus',
+            'force-delete org-units' => 'Menghapus permanen unit organisasi',
 
             // Needs
             'view any needs' => 'Melihat daftar semua usulan kebutuhan',

@@ -60,7 +60,7 @@ final class OrganizationalUnitPolicy
      */
     public function restore(User $user, OrganizationalUnit $organizationalUnit): bool
     {
-        return false;
+        return $user->hasPermissionTo('restore org-units');
     }
 
     /**
@@ -68,6 +68,6 @@ final class OrganizationalUnitPolicy
      */
     public function forceDelete(User $user, OrganizationalUnit $organizationalUnit): bool
     {
-        return false;
+        return $user->hasPermissionTo('force-delete org-units');
     }
 }

@@ -11,6 +11,7 @@ use App\Models\OrganizationalUnit;
 use App\Traits\HasDataTable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -67,6 +68,19 @@ final class OrganizationalUnitController extends Controller
     public function destroy(OrganizationalUnit $organizationalUnit): RedirectResponse
     {
         $this->authorize('delete', $organizationalUnit);
+
+        if ($organizationalUnit->children()->exists()) {
+            throw ValidationException::withMessages([
+                'error' => 'Unit organisasi tidak dapat dihapus karena masih memiliki unit bawahan aktif.',
+            ]);
+        }
+
+        if ($organizationalUnit->users()->exists()) {
+            throw ValidationException::withMessages([
+                'error' => 'Unit organisasi tidak dapat dihapus karena masih memiliki pengguna aktif yang terdaftar.',
+            ]);
+        }
+
         $organizationalUnit->delete();
 
         return redirect()->route('organizational-units.index')

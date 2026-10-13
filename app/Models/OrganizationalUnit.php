@@ -62,6 +62,16 @@ class OrganizationalUnit extends Model
     }
 
     /**
+     * Get users assigned to this unit.
+     *
+     * @return HasMany<User, $this>
+     */
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class, 'organizational_unit_id');
+    }
+
+    /**
      * Check if this unit is a descendant of the given unit ID.
      */
     public function isDescendantOf(int $parentId): bool

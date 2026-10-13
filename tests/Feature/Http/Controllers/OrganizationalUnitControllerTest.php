@@ -110,3 +110,27 @@ test('destroy deletes an organizational unit', function () {
 
     $this->assertSoftDeleted($unit);
 });
+
+test('destroy fails with error when organizational unit has child units', function () {
+    $parent = OrganizationalUnit::factory()->create();
+    OrganizationalUnit::factory()->create(['parent_id' => $parent->id]);
+
+    $this->from(route('organizational-units.index'))
+        ->delete(route('organizational-units.destroy', $parent))
+        ->assertRedirect(route('organizational-units.index'))
+        ->assertSessionHasErrors(['error']);
+
+    $this->assertNotSoftDeleted($parent);
+});
+
+test('destroy fails with error when organizational unit has users', function () {
+    $unit = OrganizationalUnit::factory()->create();
+    User::factory()->create(['organizational_unit_id' => $unit->id]);
+
+    $this->from(route('organizational-units.index'))
+        ->delete(route('organizational-units.destroy', $unit))
+        ->assertRedirect(route('organizational-units.index'))
+        ->assertSessionHasErrors(['error']);
+
+    $this->assertNotSoftDeleted($unit);
+});

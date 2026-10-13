@@ -14,6 +14,7 @@ import {
   RiShieldUserLine,
   RiKey2Line,
   RiLineChartLine,
+  RiCodeSSlashLine,
 } from '@remixicon/react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
@@ -130,8 +131,9 @@ const masterNavItems: NavItem[] = [
 
 export function AppSidebar() {
   const { hasPermission } = usePermission();
-  const { activeNeedGroups } = usePage<{
-    activeNeedGroups: { id: number; name: string; year: number }[];
+  const { activeNeedGroups, enableDevTools } = usePage<{
+    activeNeedGroups?: { id: number; name: string; year: number }[];
+    enableDevTools?: boolean;
   }>().props;
 
   const dynamicNeedNavItems: NavItem[] = hasPermission('view any needs')
@@ -209,6 +211,18 @@ export function AppSidebar() {
         )}
         {filteredUserRole.length > 0 && (
           <NavMain items={filteredUserRole} title="User & Role" />
+        )}
+        {enableDevTools && (
+          <NavMain
+            items={[
+              {
+                title: 'Form Components',
+                href: '/dev/form-components',
+                icon: RiCodeSSlashLine,
+              },
+            ]}
+            title="Development"
+          />
         )}
       </SidebarContent>
 

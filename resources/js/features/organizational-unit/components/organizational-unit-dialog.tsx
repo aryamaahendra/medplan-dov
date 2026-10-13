@@ -124,8 +124,8 @@ export function OrganizationalUnitDialog({
                 <SelectValue placeholder="Pilih unit induk (opsional)">
                   {(val) => {
                     if (!val || val === '0') {
-return 'Tanpa Induk (Root)';
-}
+                      return 'Tanpa Induk (Root)';
+                    }
 
                     const found = allUnits.find((u) => u.id.toString() === val);
 

@@ -65,8 +65,8 @@ export function ActivityInfoCard({
                 <SelectValue placeholder="Pilih induk (opsional)">
                   {(val) => {
                     if (!val || val === 'none') {
-return 'Tanpa Induk';
-}
+                      return 'Tanpa Induk';
+                    }
 
                     const found = parents.find((p) => p.id.toString() === val);
 

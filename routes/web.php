@@ -137,6 +137,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 });
         });
     });
+
+    // Developer & Design System Showcase (prefixed with dev/)
+    Route::prefix('dev')->name('dev.')->group(function () {
+        Route::inertia('form-components', 'dev/form-components')->name('form-components');
+    });
 });
 
 require __DIR__.'/settings.php';

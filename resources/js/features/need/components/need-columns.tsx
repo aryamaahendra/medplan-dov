@@ -56,11 +56,14 @@ export const getNeedColumns = (
       const unit = need.organizational_unit;
 
       const path: string[] = [];
-      let current: typeof unit | null | undefined = unit;
 
-      while (current) {
-        path.unshift(current.name);
-        current = current.parents_recursive ?? undefined;
+      if (unit) {
+        let current: typeof unit | null | undefined = unit;
+
+        while (current) {
+          path.unshift(current.name);
+          current = current.parents_recursive ?? undefined;
+        }
       }
 
       return (

@@ -303,3 +303,40 @@ test('filtering by active unit excludes orphaned proposals', function () {
             ->where('needs.data.0.id', $activeNeed->id)
         );
 });
+
+test('general proposal stage and attention counters accurately reflect proposals whose unit is soft-deleted', function () {
+    $trashedUnit = OrganizationalUnit::factory()->create(['name' => 'Unit Terhapus']);
+    $activeUnit = OrganizationalUnit::factory()->create(['name' => 'Unit Aktif']);
+
+    Need::factory()->create([
+        'need_group_id' => $this->group->id,
+        'organizational_unit_id' => $trashedUnit->id,
+        'need_type_id' => $this->needType->id,
+        'status' => 'draft',
+        'is_priority' => true,
+        'notes' => 'Catatan penting',
+        'title' => 'Usulan Terhapus Prioritas',
+    ]);
+
+    Need::factory()->create([
+        'need_group_id' => $this->group->id,
+        'organizational_unit_id' => $activeUnit->id,
+        'need_type_id' => $this->needType->id,
+        'status' => 'draft',
+        'is_priority' => false,
+        'title' => 'Usulan Aktif Biasa',
+    ]);
+
+    $trashedUnit->delete();
+
+    $response = $this->actingAs($this->superAdmin)
+        ->get(route('needs.index', ['need_group_id' => $this->group->id]));
+
+    $response->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('stageCounts.all', 2)
+            ->where('stageCounts.draft', 2)
+            ->where('attentionCounts.priority_only', 1)
+            ->where('attentionCounts.has_notes', 1)
+        );
+});

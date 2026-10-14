@@ -151,11 +151,13 @@ export function NeedsTableToolbar({
   );
 
   const unitOptions = useMemo(
-    () =>
-      organizationalUnits.map((unit) => ({
+    () => [
+      ...organizationalUnits.map((unit) => ({
         label: unit.name,
         value: unit.id.toString(),
       })),
+      { label: 'Unit Terhapus / Tidak Aktif', value: 'trashed' },
+    ],
     [organizationalUnits],
   );
 

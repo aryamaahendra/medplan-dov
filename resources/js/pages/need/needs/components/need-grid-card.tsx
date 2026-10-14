@@ -111,7 +111,7 @@ export function NeedGridCard({
           </div>
 
           {/* Title */}
-          <div className="px-3 pb-1">
+          <div className={cn('px-3 pb-1', unitPath.length === 0 && 'pb-3')}>
             <Link
               href={needRoutes.show.url({ need: need.id })}
               className="line-clamp-2 text-sm leading-snug font-semibold hover:underline"

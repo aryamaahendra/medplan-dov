@@ -146,6 +146,7 @@ final class NeedController extends Controller
         return Inertia::render('need/needs/edit', [
             'need' => NeedResource::make($need->load([
                 'needGroup',
+                'organizationalUnit:id,name,parent_id',
                 'sasarans:id',
                 'indicators:id',
                 'kpiIndicators:id',

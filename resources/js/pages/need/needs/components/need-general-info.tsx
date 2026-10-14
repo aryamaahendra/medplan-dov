@@ -63,6 +63,14 @@ export function NeedGeneralInfo({ need }: NeedGeneralInfoProps) {
               };
 
               if (!need.organizational_unit) {
+                if (need.organizational_unit_id) {
+                  return (
+                    <p className="text-sm font-medium text-destructive">
+                      Unit Tidak Aktif
+                    </p>
+                  );
+                }
+
                 return <p className="text-sm">-</p>;
               }
 

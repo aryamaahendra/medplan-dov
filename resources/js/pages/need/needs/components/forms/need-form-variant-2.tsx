@@ -1,3 +1,4 @@
+import { RiAlertLine } from '@remixicon/react';
 import {
   RiArrowLeftLine,
   RiArrowRightLine,
@@ -16,6 +17,7 @@ import {
 } from '@remixicon/react';
 import React, { useMemo, useState } from 'react';
 
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -47,6 +49,7 @@ export interface FormVariantProps {
   isLocked: boolean;
   currentGroup?: { id: number; name: string; year: number } | null;
   need?: Need | null;
+  isOrphaned?: boolean;
   organizationalUnits: { id: number; name: string; parent_id: number | null }[];
   needTypes: { id: number; name: string }[];
   tujuans: Tujuan[];
@@ -77,6 +80,7 @@ export function NeedFormVariant2({
   isEditing,
   isLocked,
   need,
+  isOrphaned = false,
   organizationalUnits,
   needTypes,
   tujuans,
@@ -314,7 +318,7 @@ export function NeedFormVariant2({
                   <Button
                     type="submit"
                     size="sm"
-                    disabled={processing}
+                    disabled={processing || isOrphaned}
                     className="flex-1 gap-1 text-xs font-semibold"
                   >
                     <RiSaveLine className="h-3.5 w-3.5" />
@@ -358,6 +362,22 @@ export function NeedFormVariant2({
 
             {/* Active Content - Sections kept mounted in DOM */}
             <CardContent className="p-4 md:p-6">
+              {isOrphaned && (
+                <div className="mb-4">
+                  <Alert variant="destructive">
+                    <RiAlertLine className="h-4 w-4" />
+                    <AlertTitle className="font-semibold">
+                      Unit Kerja Tidak Aktif
+                    </AlertTitle>
+                    <AlertDescription className="text-sm">
+                      Unit kerja sebelumnya telah dihapus atau tidak aktif.
+                      Silakan pilih unit kerja aktif untuk melanjutkan pembaruan
+                      usulan.
+                    </AlertDescription>
+                  </Alert>
+                </div>
+              )}
+
               <fieldset
                 disabled={isLocked}
                 className="contents disabled:pointer-events-none disabled:opacity-80"
@@ -535,7 +555,7 @@ export function NeedFormVariant2({
                     <Button
                       type="submit"
                       size="sm"
-                      disabled={processing}
+                      disabled={processing || isOrphaned}
                       className="gap-1.5 text-xs font-semibold"
                     >
                       <RiSaveLine className="h-3.5 w-3.5" />

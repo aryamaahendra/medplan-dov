@@ -1,4 +1,6 @@
 import { Head } from '@inertiajs/react';
+import { RiAlertLine } from '@remixicon/react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import needRoutes from '@/routes/needs';
 import type { Need, PlanningActivityVersion, Tujuan } from '@/types';
 
@@ -48,6 +50,18 @@ export default function Edit({
 
         <NeedLockBanner need={need} />
 
+        {Boolean(need.organizational_unit_id && !need.organizational_unit) && (
+          <Alert variant="destructive">
+            <RiAlertLine className="h-4 w-4" />
+            <AlertTitle className="font-semibold">
+              Unit Kerja Tidak Aktif
+            </AlertTitle>
+            <AlertDescription className="text-sm">
+              Unit kerja sebelumnya telah dihapus atau tidak aktif. Silakan
+              pilih unit kerja aktif untuk melanjutkan pembaruan usulan.
+            </AlertDescription>
+          </Alert>
+        )}
         <div className="flex-1">
           <NeedForm
             need={need}

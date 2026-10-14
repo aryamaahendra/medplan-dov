@@ -25,6 +25,33 @@ export interface OrganizationalUnitsIndexProps {
   allUnits: { id: number; name: string }[];
   filters: DataTableFilters;
 }
+export interface OrganizationalUnitsIndexState {
+  dialogOpen: boolean;
+  editingUnit: OrganizationalUnit | null;
+  deletingUnit: OrganizationalUnit | null;
+  isDeleting: boolean;
+  restoringUnit: OrganizationalUnit | null;
+  isRestoring: boolean;
+  forceDeletingUnit: OrganizationalUnit | null;
+  isForceDeleting: boolean;
+  isTrash: boolean;
+}
+
+export interface OrganizationalUnitsIndexHandlers {
+  onEdit: (unit: OrganizationalUnit) => void;
+  onCreate: () => void;
+  onDelete: (unit: OrganizationalUnit) => void;
+  onRestore: (unit: OrganizationalUnit) => void;
+  onForceDelete: (unit: OrganizationalUnit) => void;
+  handleConfirmDelete: () => void;
+  handleConfirmRestore: () => void;
+  handleConfirmForceDelete: () => void;
+  setDialogOpen: (open: boolean) => void;
+  setDeletingUnit: (unit: OrganizationalUnit | null) => void;
+  setRestoringUnit: (unit: OrganizationalUnit | null) => void;
+  setForceDeletingUnit: (unit: OrganizationalUnit | null) => void;
+  onToggleTrash: (checked: boolean) => void;
+}
 
 export function useOrganizationalUnitsIndex(
   props: OrganizationalUnitsIndexProps,

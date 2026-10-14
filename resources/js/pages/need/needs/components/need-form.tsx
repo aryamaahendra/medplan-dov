@@ -100,15 +100,19 @@ export function NeedForm({
           (unit) => unit.id === user.organizational_unit_id,
         )
       : organizationalUnits;
+  const initialIsOrphaned = Boolean(
+    isEditing && need?.organizational_unit_id && !need?.organizational_unit,
+  );
 
   const { data, setData, post, processing, errors, transform } = useForm({
     need_group_id:
       need?.need_group_id?.toString() ?? currentGroup?.id?.toString() ?? '',
     source_need_id: (need as any)?.source_need_id?.toString() ?? '',
-    organizational_unit_id:
-      need?.organizational_unit_id?.toString() ??
-      (isRestricted ? user?.organizational_unit_id?.toString() : '') ??
-      '',
+    organizational_unit_id: initialIsOrphaned
+      ? ''
+      : (need?.organizational_unit_id?.toString() ??
+        (isRestricted ? user?.organizational_unit_id?.toString() : '') ??
+        ''),
     need_type_id: need?.need_type_id?.toString() ?? '',
     year:
       need?.year?.toString() ??
@@ -164,6 +168,14 @@ export function NeedForm({
     technical_specification_attachment_names: [] as string[],
     deleted_attachment_ids: [] as number[],
   });
+
+  const isOrphanedWithoutActiveSelection = Boolean(
+    initialIsOrphaned &&
+    (!data.organizational_unit_id ||
+      !filteredOrganizationalUnits.some(
+        (u) => u.id.toString() === data.organizational_unit_id?.toString(),
+      )),
+  );
 
   const detailValuesRef = useRef(data.detail);
 
@@ -305,6 +317,12 @@ export function NeedForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (isOrphanedWithoutActiveSelection) {
+      toast.error('Unit kerja aktif wajib dipilih sebelum menyimpan usulan.');
+
+      return;
+    }
+
     const options = {
       onSuccess: () => {
         toast.success(
@@ -429,6 +447,8 @@ export function NeedForm({
     isLocked,
     currentGroup,
     need,
+    isOrphaned: isOrphanedWithoutActiveSelection,
+    initialIsOrphaned,
     organizationalUnits: filteredOrganizationalUnits,
     needTypes,
     tujuans,

@@ -340,3 +340,93 @@ test('general proposal stage and attention counters accurately reflect proposals
             ->where('attentionCounts.has_notes', 1)
         );
 });
+
+test('need show view delivers null organizational_unit and non-null organizational_unit_id for orphaned proposal', function () {
+    $trashedUnit = OrganizationalUnit::factory()->create(['name' => 'Unit Nonaktif']);
+    $orphanedNeed = Need::factory()->create([
+        'need_group_id' => $this->group->id,
+        'organizational_unit_id' => $trashedUnit->id,
+        'need_type_id' => $this->needType->id,
+        'title' => 'Detail Usulan Unit Nonaktif',
+    ]);
+
+    $trashedUnit->delete();
+
+    $response = $this->actingAs($this->superAdmin)
+        ->get(route('needs.show', $orphanedNeed));
+
+    $response->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('need/needs/show')
+            ->where('need.id', $orphanedNeed->id)
+            ->where('need.organizational_unit_id', $trashedUnit->id)
+            ->where('need.organizational_unit', null)
+        );
+});
+
+test('need edit view delivers null organizational_unit and only active units in organizationalUnits prop', function () {
+    $trashedUnit = OrganizationalUnit::factory()->create(['name' => 'Unit Terhapus']);
+    $activeUnit = OrganizationalUnit::factory()->create(['name' => 'Unit Aktif']);
+
+    $orphanedNeed = Need::factory()->create([
+        'need_group_id' => $this->group->id,
+        'organizational_unit_id' => $trashedUnit->id,
+        'need_type_id' => $this->needType->id,
+        'title' => 'Edit Usulan Unit Terhapus',
+    ]);
+
+    $trashedUnit->delete();
+
+    $response = $this->actingAs($this->superAdmin)
+        ->get(route('needs.edit', $orphanedNeed));
+
+    $response->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('need/needs/edit')
+            ->where('need.id', $orphanedNeed->id)
+            ->where('need.organizational_unit_id', $trashedUnit->id)
+            ->where('need.organizational_unit', null)
+            ->has('organizationalUnits', fn (Assert $units) => $units
+                ->each(fn (Assert $u) => $u->whereNot('id', $trashedUnit->id)->etc())
+            )
+        );
+});
+
+test('updating an orphaned proposal with a newly chosen active unit persists successfully and clears orphaned state', function () {
+    $trashedUnit = OrganizationalUnit::factory()->create(['name' => 'Unit Terhapus']);
+    $activeUnit = OrganizationalUnit::factory()->create(['name' => 'Unit Aktif Baru']);
+
+    $orphanedNeed = Need::factory()->create([
+        'need_group_id' => $this->group->id,
+        'organizational_unit_id' => $trashedUnit->id,
+        'need_type_id' => $this->needType->id,
+        'title' => 'Usulan Reassignment',
+    ]);
+
+    $trashedUnit->delete();
+
+    $payload = [
+        'need_group_id' => $this->group->id,
+        'organizational_unit_id' => $activeUnit->id,
+        'need_type_id' => $this->needType->id,
+        'year' => 2025,
+        'title' => 'Usulan Reassignment Selesai',
+        'volume' => 1,
+        'unit' => 'unit',
+        'unit_price' => 10000000,
+        'total_price' => 10000000,
+        'urgency' => 'medium',
+        'impact' => 'medium',
+    ];
+
+    $response = $this->actingAs($this->superAdmin)
+        ->put(route('needs.update', $orphanedNeed), $payload);
+
+    $response->assertRedirect(route('needs.index', ['need_group_id' => $this->group->id]));
+    $response->assertSessionHas('success');
+
+    $updated = $orphanedNeed->fresh();
+    expect($updated->organizational_unit_id)->toBe($activeUnit->id)
+        ->and($updated->organizationalUnit)->not->toBeNull()
+        ->and($updated->organizationalUnit->name)->toBe('Unit Aktif Baru');
+});

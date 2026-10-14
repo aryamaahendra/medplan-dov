@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import {
+  RiAlertLine,
   RiArrowLeftLine,
   RiArrowRightLine,
   RiAttachmentLine,
@@ -27,6 +28,7 @@ import {
   UrgencyImpactBadge,
 } from '@/components/badges';
 import { ChecklistForm } from '@/components/needs/checklist-form';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -208,11 +210,27 @@ export function NeedShowVariant1({
     }
   };
 
+  const isOrphaned = Boolean(
+    need.organizational_unit_id && !need.organizational_unit,
+  );
+
   return (
     <div className="space-y-6">
       {/* Lock Banner */}
       <NeedLockBanner need={need} />
 
+      {/* Inactive Unit Alert Banner */}
+      {isOrphaned && (
+        <Alert variant="destructive">
+          <RiAlertLine className="h-4 w-4" />
+          <AlertTitle className="font-semibold">
+            Unit Kerja Tidak Aktif
+          </AlertTitle>
+          <AlertDescription className="text-sm">
+            Unit kerja sebelumnya telah dihapus atau tidak aktif.
+          </AlertDescription>
+        </Alert>
+      )}
       {/* Breadcrumb & Quick Action Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
@@ -238,7 +256,10 @@ export function NeedShowVariant1({
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span>Kelompok Usulan {need.year}</span>
               <span>/</span>
-              <span>{need.organizational_unit?.name || 'Unit Kerja'}</span>
+              <span>
+                {need.organizational_unit?.name ||
+                  (isOrphaned ? 'Unit Tidak Aktif' : 'Unit Kerja')}
+              </span>
             </div>
             <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
               {need.title}

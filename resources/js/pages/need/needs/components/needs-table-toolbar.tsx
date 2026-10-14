@@ -18,10 +18,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { Switch } from '@/components/ui/switch';
+import type {
+  AttentionCounts,
+  AttentionFilterKey,
+} from '@/features/need/types/need.types';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import { cn } from '@/lib/utils';
-import type { AttentionCounts } from '@/types';
-import type { AttentionFilterKey } from './needs-attention-strip';
 export type { AttentionFilterKey };
 
 interface NeedsTableToolbarProps {

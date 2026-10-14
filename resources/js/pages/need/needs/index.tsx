@@ -3,27 +3,17 @@ import { Head } from '@inertiajs/react';
 import { NeedIndexDialogs } from '@/features/need/components/need-index-dialogs';
 import { NeedsTableSection } from '@/features/need/components/needs-table-section';
 import { useNeedsIndex } from '@/features/need/hooks/use-needs-index';
-import type { DataTableFilters } from '@/hooks/use-data-table';
+import type {
+  AttentionCounts,
+  NeedsIndexFilters,
+  PaginatedNeeds,
+  StageCounts,
+} from '@/features/need/types/need.types';
 import needRoutes from '@/routes/needs';
-import type { AttentionCounts, PaginatedNeeds, StageCounts } from '@/types';
 
 import { NeedsHeader } from './components/needs-header';
 
-export interface NeedsIndexFilters extends DataTableFilters {
-  year?: string | string[];
-  status?: string | string[];
-  need_type_id?: string | string[];
-  organizational_unit_id?: string | string[];
-  urgency?: string | string[];
-  impact?: string | string[];
-  is_priority?: string | string[];
-  is_approved_by_director?: string | string[];
-  min_checklist_score?: string | string[];
-  stage?: string | string[];
-  need_group_id?: string | string[];
-  attention?: string | string[];
-  include_descendants?: boolean | string;
-}
+export type { NeedsIndexFilters };
 
 export interface NeedsIndexProps {
   needs: PaginatedNeeds;

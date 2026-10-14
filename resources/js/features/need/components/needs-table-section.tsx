@@ -1,16 +1,19 @@
 import { DataTable } from '@/components/data-table/data-table';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { UseDataTableReturn } from '@/hooks/use-data-table';
-import type { NeedsIndexFilters } from '@/pages/need/needs';
 import { NeedGridView } from '@/pages/need/needs/components/need-grid-view';
 import { NeedListView } from '@/pages/need/needs/components/need-list-view';
 import { NeedsStageTabs } from '@/pages/need/needs/components/needs-stage-tabs';
 import { NeedsTableToolbar } from '@/pages/need/needs/components/needs-table-toolbar';
-import type { AttentionCounts, PaginatedNeeds } from '@/types';
 import type {
   UseNeedsIndexActions,
   UseNeedsIndexState,
 } from '../hooks/use-needs-index';
+import type {
+  AttentionCounts,
+  NeedsIndexFilters,
+  PaginatedNeeds,
+} from '../types/need.types';
 
 interface NeedsTableSectionProps {
   needs: PaginatedNeeds;

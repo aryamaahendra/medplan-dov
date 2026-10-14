@@ -7,26 +7,21 @@ import needExportActions from '@/actions/App/Http/Controllers/Need/NeedExportCon
 import type { UseDataTableReturn } from '@/hooks/use-data-table';
 import { useDataTable } from '@/hooks/use-data-table';
 import { useViewMode } from '@/hooks/use-view-mode';
-import type { NeedsIndexFilters } from '@/pages/need/needs';
 import needRoutes from '@/routes/needs';
+import { getNeedColumns } from '../components/need-columns';
 import type {
   AttentionCounts,
+  AttentionFilterKey,
   Need,
+  NeedsIndexFilters,
   PaginatedNeeds,
   StageCounts,
-} from '@/types';
-import { getNeedColumns } from '../components/need-columns';
+} from '../types/need.types';
 
 export type StageTabKey =
   'all' | 'draft' | 'under_review' | 'approved' | 'rejected' | 'locked';
 
-export type AttentionFilterKey =
-  | 'low_checklist'
-  | 'revision_closing'
-  | 'submission_closing'
-  | 'has_notes'
-  | 'priority_only';
-
+export type { AttentionFilterKey };
 export interface UseNeedsIndexProps {
   needs: PaginatedNeeds;
   currentGroup: { id: number; name: string; year?: number };
@@ -46,6 +41,7 @@ export interface UseNeedsIndexState {
   lockDialogMode: 'lock' | 'unlock';
   isLockDialogOpen: boolean;
   stageCounts: StageCounts;
+  attentionCounts?: AttentionCounts;
   processedNeeds: Need[];
   columns: ColumnDef<Need, unknown>[];
 }
@@ -76,6 +72,7 @@ export function useNeedsIndex({
   needs,
   currentGroup,
   stageCounts: serverStageCounts,
+  attentionCounts,
   filters,
 }: UseNeedsIndexProps): UseNeedsIndexReturn {
   const [viewMode, setViewMode] = useViewMode();
@@ -215,6 +212,7 @@ export function useNeedsIndex({
       lockDialogMode,
       isLockDialogOpen,
       stageCounts,
+      attentionCounts,
       processedNeeds,
       columns,
     },

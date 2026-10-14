@@ -1,10 +1,24 @@
+import { useState } from 'react';
 import { ConfirmDialog } from '@/components/confirm-dialog';
+import { InputField } from '@/components/form/input-field';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { buttonVariants } from '@/components/ui/button';
 import { OrganizationalUnitDialog } from '@/features/organizational-unit/components/organizational-unit-dialog';
 import type {
   OrganizationalUnitsIndexHandlers,
   OrganizationalUnitsIndexState,
 } from '@/features/organizational-unit/hooks/use-organizational-units-index';
-
+import { cn } from '@/lib/utils';
+import type { OrganizationalUnit } from '@/types';
 interface OrganizationalUnitModalsProps {
   state: OrganizationalUnitsIndexState;
   handlers: OrganizationalUnitsIndexHandlers;
@@ -48,16 +62,77 @@ export function OrganizationalUnitModals({
         loading={state.isRestoring}
       />
 
-      <ConfirmDialog
-        open={!!state.forceDeletingUnit}
-        onOpenChange={(open) => !open && handlers.setForceDeletingUnit(null)}
-        onConfirm={handlers.handleConfirmForceDelete}
-        title="Hapus Permanen Unit Organisasi"
-        description={`Apakah Anda yakin ingin menghapus permanen "${state.forceDeletingUnit?.name}"? Tindakan ini bersifat destruktif dan data tidak dapat dikembalikan lagi.`}
-        confirmText="Hapus Permanen"
-        variant="destructive"
-        loading={state.isForceDeleting}
-      />
+      {state.forceDeletingUnit && (
+        <ForceDeleteConfirmDialog
+          key={state.forceDeletingUnit.id}
+          open={true}
+          unit={state.forceDeletingUnit}
+          onOpenChange={(open) => !open && handlers.setForceDeletingUnit(null)}
+          onConfirm={handlers.handleConfirmForceDelete}
+          loading={state.isForceDeleting}
+        />
+      )}
     </>
+  );
+}
+
+interface ForceDeleteConfirmDialogProps {
+  open: boolean;
+  unit: OrganizationalUnit;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
+  loading: boolean;
+}
+
+function ForceDeleteConfirmDialog({
+  open,
+  unit,
+  onOpenChange,
+  onConfirm,
+  loading,
+}: ForceDeleteConfirmDialogProps) {
+  const [confirmName, setConfirmName] = useState('');
+
+  const isTypedMatch =
+    Boolean(unit.name) &&
+    confirmName.trim().toLowerCase() === unit.name.trim().toLowerCase();
+
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Hapus Permanen Unit Organisasi</AlertDialogTitle>
+          <AlertDialogDescription>
+            Tindakan ini bersifat destruktif dan tidak dapat dibatalkan. Ketik{' '}
+            <span className="font-semibold text-foreground">{unit.name}</span>{' '}
+            untuk mengonfirmasi penghapusan permanen.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+
+        <div className="py-2">
+          <InputField
+            label="Ketik nama unit"
+            placeholder={unit.name}
+            value={confirmName}
+            onChange={(e) => setConfirmName(e.target.value)}
+            autoFocus
+          />
+        </div>
+
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={loading}>Batal</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(e) => {
+              e.preventDefault();
+              onConfirm();
+            }}
+            disabled={!isTypedMatch || loading}
+            className={cn(buttonVariants({ variant: 'destructive' }))}
+          >
+            {loading ? 'Memproses...' : 'Hapus Permanen'}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

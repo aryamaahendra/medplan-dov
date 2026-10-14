@@ -25,6 +25,7 @@ use App\Models\NeedType;
 use App\Models\OrganizationalUnit;
 use App\Models\User;
 use App\Traits\HasDataTable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -99,7 +100,7 @@ final class NeedController extends Controller
             'currentGroup' => $currentGroup,
             'stageCounts' => $counts['stageCounts'],
             'attentionCounts' => $counts['attentionCounts'],
-            'organizationalUnits' => OrganizationalUnit::query()->whereNull('deleted_at')->select(['id', 'name', 'parent_id'])->get(),
+            'organizationalUnits' => $this->activeOrganizationalUnits(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
             'filters' => array_merge($this->dataTableFilters($request), $filters),
         ]);
@@ -129,7 +130,7 @@ final class NeedController extends Controller
 
         return Inertia::render('need/needs/create', [
             'currentGroup' => $currentGroup,
-            'organizationalUnits' => OrganizationalUnit::query()->whereNull('deleted_at')->select(['id', 'name', 'parent_id'])->get(),
+            'organizationalUnits' => $this->activeOrganizationalUnits(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
             ...$alignmentEngine->loadFormOptions(),
             'fundingSources' => FundingSource::query()->select(['id', 'name'])->orderBy('name')->get(),
@@ -158,7 +159,7 @@ final class NeedController extends Controller
                 'attachments',
             ]))->resolve(),
             'currentGroup' => $need->needGroup,
-            'organizationalUnits' => OrganizationalUnit::query()->whereNull('deleted_at')->select(['id', 'name', 'parent_id'])->get(),
+            'organizationalUnits' => $this->activeOrganizationalUnits(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
             ...$alignmentEngine->loadFormOptions(),
             'fundingSources' => FundingSource::query()->select(['id', 'name'])->orderBy('name')->get(),
@@ -256,5 +257,18 @@ final class NeedController extends Controller
         }
 
         return back()->with('success', 'Review direktur berhasil diperbarui.');
+    }
+
+    /**
+     * Get active organizational units for form dropdowns.
+     *
+     * @return Collection<int, OrganizationalUnit>
+     */
+    private function activeOrganizationalUnits()
+    {
+        return OrganizationalUnit::query()
+            ->whereNull('deleted_at')
+            ->select(['id', 'name', 'parent_id'])
+            ->get();
     }
 }

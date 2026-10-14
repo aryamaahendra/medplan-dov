@@ -239,38 +239,43 @@ test('E9 detects both expiring unlock windows and locked drafts with low checkli
 });
 
 test('multi-key attention filtering works via OR conjunction without time corruption', function () {
-    $e2Need = Need::factory()->create([
-        'need_group_id' => $this->group->id,
-        'organizational_unit_id' => $this->unit->id,
-        'status' => 'draft',
-        'updated_at' => $this->now->subDays(10),
-    ]);
+    CarbonImmutable::setTestNow($this->now);
 
-    $e7Need = Need::factory()->create([
-        'need_group_id' => $this->group->id,
-        'organizational_unit_id' => $this->unit->id,
-        'status' => 'rejected',
-        'updated_at' => $this->now->subDays(12),
-    ]);
+    try {
+        $e2Need = Need::factory()->create([
+            'need_group_id' => $this->group->id,
+            'organizational_unit_id' => $this->unit->id,
+            'status' => 'draft',
+            'updated_at' => $this->now->subDays(10),
+        ]);
 
-    $healthyDraft = Need::factory()->create([
-        'need_group_id' => $this->group->id,
-        'organizational_unit_id' => $this->unit->id,
-        'status' => 'draft',
-        'updated_at' => $this->now->subDay(),
-    ]);
+        $e7Need = Need::factory()->create([
+            'need_group_id' => $this->group->id,
+            'organizational_unit_id' => $this->unit->id,
+            'status' => 'rejected',
+            'updated_at' => $this->now->subDays(12),
+        ]);
 
-    $filteredQuery = app(GetFilteredNeedsAction::class)->execute([
-        'attention' => ['E2', 'E7'],
-        'need_group_id' => $this->group->id,
-    ], $this->admin);
+        $healthyDraft = Need::factory()->create([
+            'need_group_id' => $this->group->id,
+            'organizational_unit_id' => $this->unit->id,
+            'status' => 'draft',
+            'updated_at' => $this->now->subDay(),
+        ]);
 
-    $ids = $filteredQuery->pluck('id')->all();
-    expect($ids)->toContain($e2Need->id)
-        ->and($ids)->toContain($e7Need->id)
-        ->and($ids)->not->toContain($healthyDraft->id);
+        $filteredQuery = app(GetFilteredNeedsAction::class)->execute([
+            'attention' => ['E2', 'E7'],
+            'need_group_id' => $this->group->id,
+        ], $this->admin);
+
+        $ids = $filteredQuery->pluck('id')->all();
+        expect($ids)->toContain($e2Need->id)
+            ->and($ids)->toContain($e7Need->id)
+            ->and($ids)->not->toContain($healthyDraft->id);
+    } finally {
+        CarbonImmutable::setTestNow();
+    }
 });
-
 test('GetNeedDashboardStatsAction and GetFilteredNeedsAction are in lockstep for exception filters', function () {
     Need::factory()->create([
         'need_group_id' => $this->group->id,

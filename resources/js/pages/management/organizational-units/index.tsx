@@ -40,15 +40,12 @@ export default function OrganizationalUnitsIndex(
         </div>
 
         {state.isTrash && (
-          <Alert
-            variant="default"
-            className="border-warning/40 bg-warning/10 text-warning-foreground dark:border-warning/30 dark:bg-warning/20"
-          >
-            <RiAlertLine className="text-warning" />
-            <AlertTitle className="font-semibold text-warning-foreground">
+          <Alert>
+            <RiAlertLine />
+            <AlertTitle className="font-semibold">
               Mode Tempat Sampah
             </AlertTitle>
-            <AlertDescription className="text-sm text-warning-foreground/90">
+            <AlertDescription className="text-sm">
               Anda sedang melihat unit organisasi yang telah dihapus (soft
               delete). Data di sini tidak aktif dalam operasional sistem.
             </AlertDescription>

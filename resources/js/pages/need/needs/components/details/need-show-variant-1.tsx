@@ -255,11 +255,12 @@ export function NeedShowVariant1({
           <div>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span>Kelompok Usulan {need.year}</span>
-              <span>/</span>
-              <span>
-                {need.organizational_unit?.name ||
-                  (isOrphaned ? 'Unit Tidak Aktif' : 'Unit Kerja')}
-              </span>
+              {need.organizational_unit?.name && (
+                <>
+                  <span>/</span>
+                  <span>{need.organizational_unit.name}</span>
+                </>
+              )}
             </div>
             <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
               {need.title}

@@ -318,7 +318,7 @@ export function NeedFormVariant2({
                   <Button
                     type="submit"
                     size="sm"
-                    disabled={processing || isOrphaned}
+                    disabled={processing}
                     className="flex-1 gap-1 text-xs font-semibold"
                   >
                     <RiSaveLine className="h-3.5 w-3.5" />
@@ -365,7 +365,7 @@ export function NeedFormVariant2({
               {isOrphaned && (
                 <div className="mb-4">
                   <Alert variant="destructive">
-                    <RiAlertLine className="h-4 w-4" />
+                    <RiAlertLine />
                     <AlertTitle className="font-semibold">
                       Unit Kerja Tidak Aktif
                     </AlertTitle>
@@ -555,7 +555,7 @@ export function NeedFormVariant2({
                     <Button
                       type="submit"
                       size="sm"
-                      disabled={processing || isOrphaned}
+                      disabled={processing}
                       className="gap-1.5 text-xs font-semibold"
                     >
                       <RiSaveLine className="h-3.5 w-3.5" />

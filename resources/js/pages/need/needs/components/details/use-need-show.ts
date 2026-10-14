@@ -1,18 +1,24 @@
 import {
   RiAttachmentLine,
-  RiBarChartLine,
-  RiBriefcaseLine,
   RiCalendarLine,
   RiCheckLine,
   RiCompass3Line,
   RiFileTextLine,
-  RiFireLine,
   RiInformationLine,
 } from '@remixicon/react';
 import { useMemo, useState } from 'react';
 
 import { usePermission } from '@/hooks/use-permission';
 import type { ChecklistAnswer, Need, Sasaran, Tujuan } from '@/types';
+
+export interface NeedSection {
+  value: string;
+  label: string;
+  subtitle: string;
+  icon: any;
+  permission: string;
+  count: string;
+}
 
 export interface UseNeedShowProps {
   need: Need;
@@ -66,7 +72,17 @@ export function useNeedShow({ need, existingAnswers }: UseNeedShowProps) {
   }, [need]);
 
   const sections = useMemo(() => {
-    return [
+    const canSeeStrategic =
+      hasPermission('view need tab strategic') ||
+      hasPermission('view need tab ikk') ||
+      hasPermission('view need tab rls');
+
+    const strategicCount =
+      (need.sasarans?.length || 0) +
+      (need.kpi_indicators?.length || 0) +
+      (need.strategic_service_plans?.length || 0);
+
+    const allSections = [
       {
         value: 'usulan',
         label: 'Data Usulan',
@@ -75,38 +91,16 @@ export function useNeedShow({ need, existingAnswers }: UseNeedShowProps) {
         permission: 'view need tab general',
         count: `${need.volume} ${need.unit}`,
       },
-      {
-        value: 'urgency',
-        label: 'Urgensi & Status',
-        subtitle: 'Tingkat urgensi & prioritas',
-        icon: RiFireLine,
-        permission: 'view need tab urgency',
-        count: need.urgency,
-      },
-      {
-        value: 'renstra',
-        label: 'Renstra',
-        subtitle: 'Tujuan & sasaran strategis',
-        icon: RiCompass3Line,
-        permission: 'view need tab strategic',
-        count: `${need.sasarans?.length || 0} sasaran`,
-      },
-      {
-        value: 'ikk',
-        label: 'IKK',
-        subtitle: 'Indikator kinerja kunci',
-        icon: RiBarChartLine,
-        permission: 'view need tab ikk',
-        count: `${need.kpi_indicators?.length || 0} indikator`,
-      },
-      {
-        value: 'rls',
-        label: 'RLS',
-        subtitle: 'Rencana layanan strategis',
-        icon: RiBriefcaseLine,
-        permission: 'view need tab rls',
-        count: `${need.strategic_service_plans?.length || 0} layanan`,
-      },
+      canSeeStrategic
+        ? {
+            value: 'strategis',
+            label: 'Renstra, IKK & RLS',
+            subtitle: 'Keselarasan rencana strategis, IKK & layanan',
+            icon: RiCompass3Line,
+            permission: '',
+            count: `${strategicCount} item`,
+          }
+        : null,
       {
         value: 'perencanaan',
         label: 'Perencanaan',
@@ -139,7 +133,11 @@ export function useNeedShow({ need, existingAnswers }: UseNeedShowProps) {
         permission: 'view need tab checklist',
         count: `${checklistAnswers.length} terjawab`,
       },
-    ].filter((s) => hasPermission(s.permission));
+    ].filter((s): s is NonNullable<typeof s> => Boolean(s));
+
+    return allSections.filter(
+      (s) => !s.permission || hasPermission(s.permission),
+    );
   }, [need, checklistAnswers, hasPermission]);
 
   const [activeSection, setActiveSection] = useState<string>(

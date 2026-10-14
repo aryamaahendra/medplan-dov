@@ -3,12 +3,10 @@ import { Head } from '@inertiajs/react';
 import needRoutes from '@/routes/needs';
 import type { ChecklistAnswer, ChecklistQuestion, Need } from '@/types';
 
-import { NeedShowBanners } from './components/details/need-show-banners';
-import { NeedShowCanvas } from './components/details/need-show-canvas';
 import { NeedShowCompactStats } from './components/details/need-show-compact-stats';
 import { NeedShowDialogs } from './components/details/need-show-dialogs';
 import { NeedShowHeader } from './components/details/need-show-header';
-import { NeedShowNav } from './components/details/need-show-nav';
+import { NeedShowLayout } from './components/details/need-show-layout';
 import { useNeedShow } from './components/details/use-need-show';
 
 interface NeedShowProps {
@@ -34,36 +32,13 @@ export default function NeedShow({
         <NeedShowHeader need={need} users={users} showState={showState} />
         <NeedShowCompactStats need={need} />
 
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-          <aside className="w-full shrink-0 lg:w-72">
-            <NeedShowNav
-              sections={showState.sections}
-              activeSection={showState.activeSection}
-              onSelectSection={showState.setActiveSection}
-              currentIndex={showState.currentIndex}
-            />
-          </aside>
-
-          <main className="min-w-0 flex-1 space-y-6">
-            <NeedShowCanvas
-              need={need}
-              users={users}
-              activeSection={showState.activeSection}
-              currentSection={showState.currentSectionData}
-              currentIndex={showState.currentIndex}
-              totalSections={showState.sections.length}
-              onPrev={showState.goPrev}
-              onNext={showState.goNext}
-              groupedRenstra={showState.groupedRenstra}
-              checklistQuestions={checklistQuestions}
-              checklistAnswers={showState.checklistAnswers}
-              isLocked={showState.isLocked}
-            />
-
-            {/* All banners under Right Active Section Canvas */}
-            <NeedShowBanners need={need} isOrphaned={showState.isOrphaned} />
-          </main>
-        </div>
+        <NeedShowLayout
+          need={need}
+          users={users}
+          showState={showState}
+          checklistQuestions={checklistQuestions}
+          checklistAnswers={existingAnswers}
+        />
       </div>
 
       <NeedShowDialogs need={need} showState={showState} />

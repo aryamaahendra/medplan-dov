@@ -1,13 +1,10 @@
 import { Head } from '@inertiajs/react';
-import { RiAddLine } from '@remixicon/react';
 
-import { KpiIndicatorTree } from '@/components/kpis/kpi-indicator-tree';
-import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { KpiGroupInfo } from '@/features/kpi-group/components/kpi-group-info';
 import { KpiIndicatorDialog } from '@/features/kpi-group/components/kpi-indicator-dialog';
+import { KpiIndicatorsSection } from '@/features/kpi-group/components/kpi-indicators-section';
 import { useKpiGroupShow } from '@/features/kpi-group/hooks/use-kpi-group-show';
-import { usePermission } from '@/hooks/use-permission';
 import groupRoutes from '@/routes/kpis/groups';
 import type { KpiGroup } from '@/types';
 
@@ -16,9 +13,7 @@ interface KpiGroupShowProps {
 }
 
 export default function KpiGroupShow({ group }: KpiGroupShowProps) {
-  const { hasPermission } = usePermission();
   const { state, handlers } = useKpiGroupShow();
-
   const indicators = group.indicators || [];
 
   return (
@@ -41,46 +36,15 @@ export default function KpiGroupShow({ group }: KpiGroupShowProps) {
 
         <Separator />
 
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between px-0.5">
-            <div>
-              <h2 className="text-lg font-semibold tracking-tight">
-                Struktur Indikator
-              </h2>
-              <p className="text-xs text-muted-foreground italic">
-                {indicators.length} indikator/kategori ditemukan.
-              </p>
-            </div>
-            {hasPermission('create kpi-indicators') && (
-              <Button onClick={handlers.onCreateIndicator}>
-                <RiAddLine data-icon="inline-start" />
-                Tambah Indikator Utama
-              </Button>
-            )}
-          </div>
-
-          <KpiIndicatorTree
-            indicators={indicators}
-            yearStart={group.start_year}
-            yearEnd={group.end_year}
-            onEdit={
-              hasPermission('update kpi-indicators')
-                ? handlers.onEditIndicator
-                : undefined
-            }
-            onCreateChild={
-              hasPermission('create kpi-indicators')
-                ? handlers.onCreateChildIndicator
-                : undefined
-            }
-            onCreateFirst={
-              hasPermission('create kpi-indicators')
-                ? handlers.onCreateIndicator
-                : undefined
-            }
-            emptyMessage="Belum ada indikator atau kategori untuk periode ini."
-          />
-        </div>
+        <KpiIndicatorsSection
+          group={group}
+          indicators={indicators}
+          view={state.view}
+          onViewChange={handlers.setView}
+          onCreateIndicator={handlers.onCreateIndicator}
+          onEditIndicator={handlers.onEditIndicator}
+          onCreateChildIndicator={handlers.onCreateChildIndicator}
+        />
       </div>
 
       <KpiIndicatorDialog

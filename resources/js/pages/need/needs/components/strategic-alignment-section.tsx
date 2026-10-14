@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 
 import type { Sasaran, Tujuan } from '@/types';
-import { TujuanAlignmentCard } from './tujuan-alignment-card';
+import { NeedRenstraTable } from './details/need-renstra-table';
 
 interface StrategicAlignmentSectionProps {
   groupedRenstra: (Tujuan & { sasarans: Sasaran[] })[];
@@ -22,11 +22,7 @@ export function StrategicAlignmentSection({
 
       <div className="mt-6 space-y-4">
         {groupedRenstra.length > 0 ? (
-          <div className="space-y-4">
-            {groupedRenstra.map((tujuan) => (
-              <TujuanAlignmentCard key={tujuan.id} tujuan={tujuan} />
-            ))}
-          </div>
+          <NeedRenstraTable groupedRenstra={groupedRenstra} />
         ) : (
           <Card className="border-dashed">
             <CardContent className="flex flex-col items-center justify-center py-12 text-center">

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { KpiIndicator } from '@/types';
 
 export function useKpiGroupShow() {
+  const [view, setView] = useState<'card' | 'table'>('table');
   const [indicatorDialogOpen, setIndicatorDialogOpen] = useState(false);
   const [editingIndicator, setEditingIndicator] = useState<KpiIndicator | null>(
     null,
@@ -10,7 +11,6 @@ export function useKpiGroupShow() {
   const [parentIndicator, setParentIndicator] = useState<KpiIndicator | null>(
     null,
   );
-
   const onCreateIndicator = () => {
     setParentIndicator(null);
     setEditingIndicator(null);
@@ -31,11 +31,13 @@ export function useKpiGroupShow() {
 
   return {
     state: {
+      view,
       indicatorDialogOpen,
       editingIndicator,
       parentIndicator,
     },
     handlers: {
+      setView,
       setIndicatorDialogOpen,
       onCreateIndicator,
       onCreateChildIndicator,

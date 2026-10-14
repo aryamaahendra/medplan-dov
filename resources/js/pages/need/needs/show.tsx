@@ -28,8 +28,9 @@ export default function NeedShow({
     <>
       <Head title={`Detail Usulan: ${need.title}`} />
 
-      <div className="flex flex-col gap-6 p-4 md:p-8">
+      <div className="flex flex-col gap-6 p-4 md:p-6">
         <NeedShowHeader need={need} users={users} showState={showState} />
+
         <NeedShowCompactStats need={need} />
 
         <NeedShowLayout

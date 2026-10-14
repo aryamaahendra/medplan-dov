@@ -23,6 +23,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { usePermission } from '@/hooks/use-permission';
+import { cn } from '@/lib/utils';
 import type { KpiIndicator } from '@/types';
 
 interface IndicatorTableProps {
@@ -47,11 +48,11 @@ export function IndicatorTable({
     useState<KpiIndicator | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const currentYear = new Date().getFullYear();
   const years =
     yearStart && yearEnd
       ? Array.from({ length: yearEnd - yearStart + 1 }, (_, i) => yearStart + i)
       : [];
-
   const handleDelete = () => {
     if (!deletingIndicator) {
       return;
@@ -124,11 +125,29 @@ export function IndicatorTable({
               </TableRow>
               {years.length > 0 && (
                 <TableRow className="hover:bg-background">
-                  {years.map((year) => (
-                    <TableHead key={year} className="w-1 border-r text-center">
-                      {year}
-                    </TableHead>
-                  ))}
+                  {years.map((year) => {
+                    const isCurrent = year === currentYear;
+
+                    return (
+                      <TableHead
+                        key={year}
+                        className={cn(
+                          'w-1 border-r text-center transition-colors',
+                          isCurrent &&
+                            'bg-primary/15 font-bold text-primary ring-1 ring-primary/30 ring-inset',
+                        )}
+                      >
+                        <div className="flex flex-col items-center gap-0.5">
+                          <span>{year}</span>
+                          {isCurrent && (
+                            <span className="py-0.2 rounded-full bg-primary/20 px-1 text-[9px] font-semibold text-primary">
+                              Saat ini
+                            </span>
+                          )}
+                        </div>
+                      </TableHead>
+                    );
+                  })}
                 </TableRow>
               )}
             </TableHeader>
@@ -174,13 +193,29 @@ export function IndicatorTable({
                     const target = indicator.annual_targets?.find(
                       (t) => t.year === year,
                     );
+                    const isCurrent = year === currentYear;
 
                     return (
                       <TableCell
                         key={year}
-                        className="border-r py-2 text-center font-mono text-sm"
+                        className={cn(
+                          'border-r py-2 text-center font-mono text-sm transition-colors',
+                          isCurrent &&
+                            'bg-primary/10 font-bold text-primary ring-1 ring-primary/20 ring-inset',
+                        )}
                       >
-                        {target?.target_value || '-'}
+                        {target?.target_value ? (
+                          <span
+                            className={cn(
+                              isCurrent &&
+                                'inline-block rounded bg-primary/20 px-1.5 py-0.5 font-semibold text-primary',
+                            )}
+                          >
+                            {target.target_value}
+                          </span>
+                        ) : (
+                          '-'
+                        )}
                       </TableCell>
                     );
                   })}

@@ -16,6 +16,7 @@ export function NeedChecklistVariant({
   questions,
   existingAnswers,
   isLocked,
+  variant,
 }: NeedChecklistVariantProps) {
   const readonly = !need.can?.performChecklist || isLocked;
 
@@ -46,6 +47,9 @@ export function NeedChecklistVariant({
           questions={questions}
           existingAnswers={existingAnswers}
           readonly={readonly}
+          initialVariant={
+            variant === 'table' || variant === 'board' ? variant : 'card'
+          }
         />
       </div>
     </div>

@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 import type { Renstra, Tujuan, Indicator } from '@/types';
 
 interface RenstraTableProps {
@@ -14,6 +15,7 @@ interface RenstraTableProps {
 }
 
 export function RenstraTable({ renstra }: RenstraTableProps) {
+  const currentYear = new Date().getFullYear();
   const years = Array.from(
     { length: renstra.year_end - renstra.year_start },
     (_, i) => renstra.year_start + 1 + i,
@@ -29,8 +31,22 @@ export function RenstraTable({ renstra }: RenstraTableProps) {
                 <TableHead rowSpan={2}>Tujuan</TableHead>
                 <TableHead rowSpan={2}>Sasaran</TableHead>
                 <TableHead rowSpan={2}>Indikator</TableHead>
-                <TableHead rowSpan={2} className="text-center">
-                  Baseline ({renstra.year_start})
+                <TableHead
+                  rowSpan={2}
+                  className={cn(
+                    'text-center',
+                    renstra.year_start === currentYear &&
+                      'bg-primary/15 font-bold text-primary ring-1 ring-primary/30 ring-inset',
+                  )}
+                >
+                  <div className="flex flex-col items-center gap-0.5">
+                    <span>Baseline ({renstra.year_start})</span>
+                    {renstra.year_start === currentYear && (
+                      <span className="rounded-full bg-primary/20 px-1.5 py-0.5 text-[9px] font-semibold text-primary">
+                        Saat ini
+                      </span>
+                    )}
+                  </div>
                 </TableHead>
                 <TableHead colSpan={years.length} className="text-center">
                   Target Tahunan
@@ -38,16 +54,39 @@ export function RenstraTable({ renstra }: RenstraTableProps) {
                 <TableHead rowSpan={2}>Keterangan</TableHead>
               </TableRow>
               <TableRow>
-                {years.map((year) => (
-                  <TableHead key={year} className="w-1 text-center">
-                    {year}
-                  </TableHead>
-                ))}
+                {years.map((year) => {
+                  const isCurrent = year === currentYear;
+
+                  return (
+                    <TableHead
+                      key={year}
+                      className={cn(
+                        'w-1 text-center transition-colors',
+                        isCurrent &&
+                          'bg-primary/15 font-bold text-primary ring-1 ring-primary/30 ring-inset',
+                      )}
+                    >
+                      <div className="flex flex-col items-center gap-0.5">
+                        <span>{year}</span>
+                        {isCurrent && (
+                          <span className="rounded-full bg-primary/20 px-1.5 py-0.5 text-[9px] font-semibold text-primary">
+                            Saat ini
+                          </span>
+                        )}
+                      </div>
+                    </TableHead>
+                  );
+                })}
               </TableRow>
             </TableHeader>
             <TableBody>
               {renstra.tujuans?.map((tujuan) => (
-                <TujuanRows key={tujuan.id} tujuan={tujuan} years={years} />
+                <TujuanRows
+                  key={tujuan.id}
+                  tujuan={tujuan}
+                  years={years}
+                  currentYear={currentYear}
+                />
               ))}
               {!renstra.tujuans?.length && (
                 <TableRow>
@@ -67,7 +106,15 @@ export function RenstraTable({ renstra }: RenstraTableProps) {
   );
 }
 
-function TujuanRows({ tujuan, years }: { tujuan: Tujuan; years: number[] }) {
+function TujuanRows({
+  tujuan,
+  years,
+  currentYear,
+}: {
+  tujuan: Tujuan;
+  years: number[];
+  currentYear: number;
+}) {
   // Direct indicators of Tujuan
   const directIndicators = tujuan.indicators || [];
   // Indicators from sasarans
@@ -106,7 +153,11 @@ function TujuanRows({ tujuan, years }: { tujuan: Tujuan; years: number[] }) {
         <TableCell className="bg-muted/10 text-muted-foreground italic">
           -
         </TableCell>
-        <IndicatorColumns indicator={indicator} years={years} />
+        <IndicatorColumns
+          indicator={indicator}
+          years={years}
+          currentYear={currentYear}
+        />
       </TableRow>,
     );
   });
@@ -131,7 +182,10 @@ function TujuanRows({ tujuan, years }: { tujuan: Tujuan; years: number[] }) {
           {years.map((y) => (
             <TableCell
               key={y}
-              className="text-center text-muted-foreground italic"
+              className={cn(
+                'text-center text-muted-foreground italic',
+                y === currentYear && 'bg-primary/10 text-primary',
+              )}
             >
               -
             </TableCell>
@@ -152,7 +206,11 @@ function TujuanRows({ tujuan, years }: { tujuan: Tujuan; years: number[] }) {
                 <p className="w-[45ch] whitespace-normal">{sasaran.name}</p>
               </TableCell>
             )}
-            <IndicatorColumns indicator={indicator} years={years} />
+            <IndicatorColumns
+              indicator={indicator}
+              years={years}
+              currentYear={currentYear}
+            />
           </TableRow>,
         );
       });
@@ -170,7 +228,10 @@ function TujuanRows({ tujuan, years }: { tujuan: Tujuan; years: number[] }) {
         {years.map((y) => (
           <TableCell
             key={y}
-            className="text-center text-muted-foreground italic"
+            className={cn(
+              'text-center text-muted-foreground italic',
+              y === currentYear && 'bg-primary/10 text-primary',
+            )}
           >
             -
           </TableCell>
@@ -186,9 +247,11 @@ function TujuanRows({ tujuan, years }: { tujuan: Tujuan; years: number[] }) {
 function IndicatorColumns({
   indicator,
   years,
+  currentYear,
 }: {
   indicator: Indicator;
   years: number[];
+  currentYear: number;
 }) {
   return (
     <>
@@ -200,13 +263,29 @@ function IndicatorColumns({
       </TableCell>
       {years.map((year) => {
         const target = indicator.targets?.find((t) => t.year === year);
+        const isCurrent = year === currentYear;
 
         return (
           <TableCell
             key={year}
-            className="text-center font-mono whitespace-nowrap"
+            className={cn(
+              'text-center font-mono whitespace-nowrap transition-colors',
+              isCurrent &&
+                'bg-primary/10 font-bold text-primary ring-1 ring-primary/20 ring-inset',
+            )}
           >
-            {target?.target || '-'}
+            {target?.target ? (
+              <span
+                className={cn(
+                  isCurrent &&
+                    'inline-block rounded bg-primary/20 px-1.5 py-0.5 font-semibold text-primary',
+                )}
+              >
+                {target.target}
+              </span>
+            ) : (
+              '-'
+            )}
           </TableCell>
         );
       })}

@@ -30,7 +30,7 @@ export function useRenstraShow() {
   const [deletingTujuan, setDeletingTujuan] = useState<Tujuan | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const [view, setView] = useState<'card' | 'table'>('card');
+  const [view, setView] = useState<'card' | 'table'>('table');
 
   // Tujuan Handlers
   const onCreateTujuan = useCallback(() => {

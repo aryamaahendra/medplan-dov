@@ -1,24 +1,41 @@
 import { useForm } from '@inertiajs/react';
-import { RiClipboardLine, RiLoaderLine } from '@remixicon/react';
-import { useRef } from 'react';
+import {
+  RiCheckDoubleLine,
+  RiCheckLine,
+  RiClipboardLine,
+  RiCloseLine,
+  RiKanbanView,
+  RiLayoutGridLine,
+  RiLoaderLine,
+  RiSubtractLine,
+  RiTableLine,
+} from '@remixicon/react';
+import { useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import NeedChecklistAnswerController from '@/actions/App/Http/Controllers/Need/NeedChecklistAnswerController';
+import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardContent,
   CardDescription,
   CardTitle,
 } from '@/components/ui/card';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import type { ChecklistAnswer, ChecklistQuestion } from '@/types';
 
-import { ChecklistItem } from './checklist-item';
+import { ChecklistBoardView } from './checklist-board-view';
+import { ChecklistCardView } from './checklist-card-view';
+import { ChecklistTableView } from './checklist-table-view';
+
+export type ChecklistVariant = 'card' | 'table' | 'board';
 
 interface ChecklistFormProps {
   needId: number;
   questions: ChecklistQuestion[];
   existingAnswers: ChecklistAnswer[];
   readonly?: boolean;
+  initialVariant?: ChecklistVariant;
 }
 
 export function ChecklistForm({
@@ -26,7 +43,11 @@ export function ChecklistForm({
   questions,
   existingAnswers,
   readonly = false,
+  initialVariant = 'table',
 }: ChecklistFormProps) {
+  const [activeVariant, setActiveVariant] =
+    useState<ChecklistVariant>(initialVariant);
+
   const { data, setData, post, processing } = useForm({
     answers: questions.map((q) => {
       const existing = existingAnswers.find(
@@ -78,7 +99,6 @@ export function ChecklistForm({
       },
       onError: () => {
         toast.error('Gagal menyimpan pembaruan checklist');
-        // Rollback local state to match server props
         setData(
           'answers',
           questions.map((q) => {
@@ -123,6 +143,37 @@ export function ChecklistForm({
     updateAnswers(nextAnswers);
   };
 
+  // Evaluation summary stats
+  const stats = useMemo(() => {
+    let yesCount = 0;
+    let noCount = 0;
+    let skipCount = 0;
+
+    data.answers.forEach((ans) => {
+      if (ans.answer === 'yes') {
+        yesCount += 1;
+      } else if (ans.answer === 'no') {
+        noCount += 1;
+      } else {
+        skipCount += 1;
+      }
+    });
+
+    const evaluatedCount = yesCount + noCount;
+    const totalCount = questions.length;
+    const progressPercent =
+      totalCount > 0 ? Math.round((evaluatedCount / totalCount) * 100) : 0;
+
+    return {
+      yesCount,
+      noCount,
+      skipCount,
+      evaluatedCount,
+      totalCount,
+      progressPercent,
+    };
+  }, [data.answers, questions.length]);
+
   if (questions.length === 0) {
     return (
       <Card className="border-dashed">
@@ -144,41 +195,144 @@ export function ChecklistForm({
 
   return (
     <div className="mt-4 space-y-6">
-      <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-2">
-          <h2 className="text-xl font-semibold tracking-tight">
-            Checklist Kelayakan
-          </h2>
-          {processing && (
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <RiLoaderLine className="h-3 w-3 animate-spin" />
-              <span>Menyimpan...</span>
+      {/* Header and Toolbar with Variant Switcher */}
+      <div className="flex flex-col gap-4 rounded-xl border border-border/70 bg-card p-4 shadow-2xs">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-bold tracking-tight text-foreground sm:text-xl">
+                Checklist Kelayakan
+              </h2>
+              {processing && (
+                <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                  <RiLoaderLine className="h-3 w-3 animate-spin" />
+                  <span>Menyimpan...</span>
+                </div>
+              )}
             </div>
-          )}
+            <p className="text-xs text-muted-foreground sm:text-sm">
+              Lengkapi instrumen evaluasi untuk menilai kelayakan teknis usulan.
+            </p>
+          </div>
+
+          {/* 3 Variant Switcher Buttons */}
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <span className="text-xs font-medium text-muted-foreground">
+              Tampilan:
+            </span>
+            <ToggleGroup
+              value={[activeVariant]}
+              onValueChange={(val) => {
+                if (val[0]) {
+                  setActiveVariant(val[0] as ChecklistVariant);
+                }
+              }}
+              variant="outline"
+              size="sm"
+            >
+              <ToggleGroupItem
+                value="card"
+                aria-label="Tampilan Kartu"
+                title="Tampilan Kartu Rinci"
+                className="gap-1.5 text-xs"
+              >
+                <RiLayoutGridLine className="h-3.5 w-3.5" />
+                <span>Kartu</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="table"
+                aria-label="Tampilan Tabel"
+                title="Tampilan Matriks Tabel"
+                className="gap-1.5 text-xs"
+              >
+                <RiTableLine className="h-3.5 w-3.5" />
+                <span>Tabel</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="board"
+                aria-label="Tampilan Papan Status"
+                title="Tampilan Papan Status Terkelompok"
+                className="gap-1.5 text-xs"
+              >
+                <RiKanbanView className="h-3.5 w-3.5" />
+                <span>Papan</span>
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Lengkapi checklist di bawah ini untuk menilai kelayakan usulan. Sistem
-          akan menyimpan perubahan secara otomatis.
-        </p>
+
+        {/* Evaluation Metrics / Summary Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-3">
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <Badge
+              variant="outline"
+              className="gap-1 border-emerald-500/40 bg-emerald-500/10 font-semibold text-emerald-700 dark:text-emerald-300"
+            >
+              <RiCheckLine className="h-3 w-3" />
+              <span>Memenuhi: {stats.yesCount}</span>
+            </Badge>
+
+            <Badge
+              variant="outline"
+              className="gap-1 border-rose-500/40 bg-rose-500/10 font-semibold text-rose-700 dark:text-rose-300"
+            >
+              <RiCloseLine className="h-3 w-3" />
+              <span>Belum Memenuhi: {stats.noCount}</span>
+            </Badge>
+
+            <Badge
+              variant="outline"
+              className="gap-1 border-border bg-muted/50 font-medium text-muted-foreground"
+            >
+              <RiSubtractLine className="h-3 w-3" />
+              <span>Dilewati: {stats.skipCount}</span>
+            </Badge>
+
+            <span className="font-mono text-xs text-muted-foreground">
+              ({stats.evaluatedCount}/{stats.totalCount} terisi)
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <RiCheckDoubleLine className="h-4 w-4 text-primary" />
+            <span className="font-semibold text-foreground">
+              {stats.progressPercent}%
+            </span>
+            <span>selesai</span>
+          </div>
+        </div>
       </div>
 
-      <Card>
-        <CardContent className="divide-y p-0">
-          {questions.map((q, index) => (
-            <ChecklistItem
-              key={q.id}
-              index={index}
-              question={q}
-              answer={data.answers.find(
-                (a) => a.checklist_question_id === q.id,
-              )}
-              onAnswerChange={(val) => !readonly && updateAnswer(q.id, val)}
-              onNotesChange={(val) => !readonly && updateNotes(q.id, val)}
-              readonly={readonly}
-            />
-          ))}
-        </CardContent>
-      </Card>
+      {/* Render Active Variant */}
+      {activeVariant === 'card' && (
+        <ChecklistCardView
+          questions={questions}
+          answers={data.answers}
+          onAnswerChange={updateAnswer}
+          onNotesChange={updateNotes}
+          readonly={readonly}
+        />
+      )}
+
+      {activeVariant === 'table' && (
+        <ChecklistTableView
+          questions={questions}
+          answers={data.answers}
+          onAnswerChange={updateAnswer}
+          onNotesChange={updateNotes}
+          readonly={readonly}
+        />
+      )}
+
+      {activeVariant === 'board' && (
+        <ChecklistBoardView
+          questions={questions}
+          answers={data.answers}
+          onAnswerChange={updateAnswer}
+          onNotesChange={updateNotes}
+          readonly={readonly}
+        />
+      )}
     </div>
   );
 }

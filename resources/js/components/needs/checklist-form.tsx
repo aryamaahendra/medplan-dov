@@ -1,17 +1,9 @@
 import { useForm } from '@inertiajs/react';
-import {
-  RiCheckDoubleLine,
-  RiCheckLine,
-  RiClipboardLine,
-  RiCloseLine,
-  RiLoaderLine,
-  RiSubtractLine,
-} from '@remixicon/react';
-import { useMemo, useRef } from 'react';
+import { RiClipboardLine } from '@remixicon/react';
+import { useRef } from 'react';
 import { toast } from 'sonner';
 
 import NeedChecklistAnswerController from '@/actions/App/Http/Controllers/Need/NeedChecklistAnswerController';
-import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardContent,
@@ -37,7 +29,7 @@ export function ChecklistForm({
   existingAnswers,
   readonly = false,
 }: ChecklistFormProps) {
-  const { data, setData, post, processing } = useForm({
+  const { data, setData, post } = useForm({
     answers: questions.map((q) => {
       const existing = existingAnswers.find(
         (a) => a.checklist_question_id === q.id,
@@ -132,37 +124,6 @@ export function ChecklistForm({
     updateAnswers(nextAnswers);
   };
 
-  // Evaluation summary stats
-  const stats = useMemo(() => {
-    let yesCount = 0;
-    let noCount = 0;
-    let skipCount = 0;
-
-    data.answers.forEach((ans) => {
-      if (ans.answer === 'yes') {
-        yesCount += 1;
-      } else if (ans.answer === 'no') {
-        noCount += 1;
-      } else {
-        skipCount += 1;
-      }
-    });
-
-    const evaluatedCount = yesCount + noCount;
-    const totalCount = questions.length;
-    const progressPercent =
-      totalCount > 0 ? Math.round((evaluatedCount / totalCount) * 100) : 0;
-
-    return {
-      yesCount,
-      noCount,
-      skipCount,
-      evaluatedCount,
-      totalCount,
-      progressPercent,
-    };
-  }, [data.answers, questions.length]);
-
   if (questions.length === 0) {
     return (
       <Card className="border-dashed">
@@ -184,68 +145,6 @@ export function ChecklistForm({
 
   return (
     <div className="mt-4 space-y-6">
-      {/* Header and Toolbar with Variant Switcher */}
-      <div className="flex flex-col gap-4 rounded-xl border border-border/70 bg-card p-4 shadow-2xs">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold tracking-tight text-foreground sm:text-xl">
-                Checklist Kelayakan
-              </h2>
-              {processing && (
-                <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                  <RiLoaderLine className="h-3 w-3 animate-spin" />
-                  <span>Menyimpan...</span>
-                </div>
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground sm:text-sm">
-              Lengkapi instrumen evaluasi untuk menilai kelayakan teknis usulan.
-            </p>
-          </div>
-        </div>
-
-        {/* Evaluation Metrics / Summary Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-3">
-          <div className="flex flex-wrap items-center gap-2 text-xs">
-            <Badge
-              variant="outline"
-              className="gap-1 border-emerald-500/40 bg-emerald-500/10 font-semibold text-emerald-700 dark:text-emerald-300"
-            >
-              <RiCheckLine className="h-3 w-3" />
-              <span>Memenuhi: {stats.yesCount}</span>
-            </Badge>
-
-            <Badge
-              variant="outline"
-              className="gap-1 border-rose-500/40 bg-rose-500/10 font-semibold text-rose-700 dark:text-rose-300"
-            >
-              <RiCloseLine className="h-3 w-3" />
-              <span>Belum Memenuhi: {stats.noCount}</span>
-            </Badge>
-
-            <Badge
-              variant="outline"
-              className="gap-1 border-border bg-muted/50 font-medium text-muted-foreground"
-            >
-              <RiSubtractLine className="h-3 w-3" />
-              <span>Dilewati: {stats.skipCount}</span>
-            </Badge>
-
-            <span className="font-mono text-xs text-muted-foreground">
-              ({stats.evaluatedCount}/{stats.totalCount} terisi)
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <RiCheckDoubleLine className="h-4 w-4 text-primary" />
-            <span className="font-semibold text-foreground">
-              {stats.progressPercent}%
-            </span>
-            <span>selesai</span>
-          </div>
-        </div>
-      </div>
       {/* Render Active Variant */}
       <ChecklistCardView
         questions={questions}

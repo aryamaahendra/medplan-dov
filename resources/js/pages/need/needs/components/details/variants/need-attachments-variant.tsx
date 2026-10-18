@@ -31,17 +31,10 @@ export function NeedAttachmentsVariant({ need }: NeedAttachmentsVariantProps) {
       {/* Header Bar */}
       <div className="flex flex-col gap-3 border-b border-border/60 pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-primary uppercase">
-            <RiAttachmentLine className="h-4 w-4" />
-            <span>Berkas Pendukung Administrasi</span>
-            <span className="font-mono text-xs">
-              ({supportingAttachments.length} Berkas)
-            </span>
-          </div>
           <h3 className="mt-1 text-xl font-bold tracking-tight text-foreground sm:text-2xl">
             Dokumen Lampiran Pengadaan
           </h3>
-          <p className="text-xs text-muted-foreground sm:text-sm">
+          <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
             Berkas bukti dukung administrasi dan kelayakan usulan kebutuhan.
           </p>
         </div>

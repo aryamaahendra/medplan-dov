@@ -89,7 +89,7 @@ export function useNeedShow({ need, existingAnswers }: UseNeedShowProps) {
         subtitle: 'Informasi pokok, volume & pagu',
         icon: RiInformationLine,
         permission: 'view need tab general',
-        count: `${need.volume} ${need.unit}`,
+        count: `${Number(need.volume).toLocaleString('id-ID', { maximumFractionDigits: 4 })} ${need.unit}`,
       },
       canSeeStrategic
         ? {

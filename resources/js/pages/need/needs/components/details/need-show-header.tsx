@@ -37,7 +37,7 @@ export function NeedShowHeader({
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center gap-3">
-        <div>
+        <div className="space-y-1">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span>Kelompok Usulan {need.year}</span>
             {need.organizational_unit?.name && (
@@ -47,7 +47,7 @@ export function NeedShowHeader({
               </>
             )}
           </div>
-          <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+          <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
             {need.title}
           </h1>
         </div>

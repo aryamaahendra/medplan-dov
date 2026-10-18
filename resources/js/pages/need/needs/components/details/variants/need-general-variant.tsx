@@ -10,19 +10,25 @@ interface NeedGeneralVariantProps {
 }
 
 export function NeedGeneralVariant({ need, variant }: NeedGeneralVariantProps) {
+  const formattedVolume = Number(need.volume).toLocaleString('id-ID', {
+    maximumFractionDigits: 4,
+  });
+
   switch (variant) {
     case 'blueprint':
-      return <BlueprintGeneral need={need} />;
+      return <BlueprintGeneral need={need} formattedVolume={formattedVolume} />;
     case 'matrix':
-      return <MatrixGeneral need={need} />;
+      return <MatrixGeneral need={need} formattedVolume={formattedVolume} />;
     case 'datasheet':
-      return <DatasheetGeneral need={need} />;
+      return <DatasheetGeneral need={need} formattedVolume={formattedVolume} />;
     case 'parametric':
-      return <ParametricGeneral need={need} />;
+      return (
+        <ParametricGeneral need={need} formattedVolume={formattedVolume} />
+      );
     case 'tree':
-      return <TreeGeneral need={need} />;
+      return <TreeGeneral need={need} formattedVolume={formattedVolume} />;
     default:
-      return <BlueprintGeneral need={need} />;
+      return <BlueprintGeneral need={need} formattedVolume={formattedVolume} />;
   }
 }
 
@@ -31,7 +37,13 @@ export function NeedGeneralVariant({ need, variant }: NeedGeneralVariantProps) {
  * Dotted leader lines connecting sans labels to values.
  * Monospace strictly for numbers, prices, volumes, and years.
  */
-function BlueprintGeneral({ need }: { need: Need }) {
+function BlueprintGeneral({
+  need,
+  formattedVolume,
+}: {
+  need: Need;
+  formattedVolume: string;
+}) {
   return (
     <div className="space-y-6">
       {/* Spec Header */}
@@ -70,7 +82,7 @@ function BlueprintGeneral({ need }: { need: Need }) {
         />
         <BlueprintRow
           label="Volume Pengadaan"
-          value={`${need.volume} ${need.unit}`}
+          value={`${formattedVolume} ${need.unit}`}
           isNumeric
         />
         <BlueprintRow
@@ -161,7 +173,13 @@ function BlueprintRow({
  * 2. Technical Matrix:
  * Asymmetric 2-column bilateral split with vertical technical guide lines.
  */
-function MatrixGeneral({ need }: { need: Need }) {
+function MatrixGeneral({
+  need,
+  formattedVolume,
+}: {
+  need: Need;
+  formattedVolume: string;
+}) {
   return (
     <div className="space-y-6">
       {/* Title Bar */}
@@ -207,7 +225,7 @@ function MatrixGeneral({ need }: { need: Need }) {
           </div>
           <MatrixItem
             label="Volume Kebutuhan"
-            value={`${need.volume} ${need.unit}`}
+            value={`${formattedVolume} ${need.unit}`}
             isNumeric
           />
           <MatrixItem
@@ -290,25 +308,20 @@ function MatrixItem({
  * 3. Industrial Datasheet:
  * Clean horizontal technical strips, high contrast, sans text with mono numbers.
  */
-function DatasheetGeneral({ need }: { need: Need }) {
+function DatasheetGeneral({
+  need,
+  formattedVolume,
+}: {
+  need: Need;
+  formattedVolume: string;
+}) {
   return (
     <div className="space-y-6">
       {/* Datasheet Header Strip */}
-      <div className="flex flex-wrap items-baseline justify-between gap-4 border-b-2 border-foreground/80 pb-3">
-        <div>
-          <span className="text-xs font-semibold text-muted-foreground uppercase">
-            Lembar Data Usulan Pengadaan
-          </span>
-          <h3 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-            {need.title}
-          </h3>
-        </div>
-        <div className="text-right">
-          <div className="text-xs text-muted-foreground">Total Anggaran</div>
-          <div className="font-mono text-lg font-black text-primary sm:text-xl">
-            {formatIDR(need.total_price)}
-          </div>
-        </div>
+      <div>
+        <h3 className="text-xl font-medium tracking-tight text-foreground sm:text-2xl">
+          {need.title}
+        </h3>
       </div>
 
       {/* Horizontal Data Strip Rows */}
@@ -332,12 +345,17 @@ function DatasheetGeneral({ need }: { need: Need }) {
         />
         <DatasheetRow
           label="Volume Kuantitas"
-          value={`${need.volume} ${need.unit}`}
+          value={`${formattedVolume} ${need.unit}`}
           isNumeric
         />
         <DatasheetRow
           label="Estimasi Harga Satuan"
           value={formatIDR(need.unit_price)}
+          isNumeric
+        />
+        <DatasheetRow
+          label="Estimasi Harga Total"
+          value={formatIDR(need.total_price)}
           isNumeric
         />
         <DatasheetRow
@@ -398,7 +416,13 @@ function DatasheetRow({
  * 4. Parametric Table:
  * Open borderless tabular ledger: Parameter | Keterangan | Nilai.
  */
-function ParametricGeneral({ need }: { need: Need }) {
+function ParametricGeneral({
+  need,
+  formattedVolume,
+}: {
+  need: Need;
+  formattedVolume: string;
+}) {
   const rows = [
     {
       param: 'Kelompok Usulan',
@@ -427,7 +451,7 @@ function ParametricGeneral({ need }: { need: Need }) {
     {
       param: 'Volume & Satuan',
       detail: 'Banyak kuantitas kebutuhan',
-      val: `${need.volume} ${need.unit}`,
+      val: `${formattedVolume} ${need.unit}`,
       isNum: true,
     },
     {
@@ -519,7 +543,13 @@ function ParametricGeneral({ need }: { need: Need }) {
  * 5. Hierarchy Tree:
  * Structural breakdown with clean branch guide lines.
  */
-function TreeGeneral({ need }: { need: Need }) {
+function TreeGeneral({
+  need,
+  formattedVolume,
+}: {
+  need: Need;
+  formattedVolume: string;
+}) {
   return (
     <div className="space-y-6">
       <div className="border-b border-border/80 pb-3">
@@ -575,7 +605,7 @@ function TreeGeneral({ need }: { need: Need }) {
           <div className="space-y-2 border-l-2 border-primary/70 pl-6 text-xs sm:text-sm">
             <TreeItem
               label="Volume Pengadaan"
-              value={`${need.volume} ${need.unit}`}
+              value={`${formattedVolume} ${need.unit}`}
               isNumeric
             />
             <TreeItem

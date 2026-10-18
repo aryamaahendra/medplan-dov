@@ -175,7 +175,7 @@ function BlueprintKak({
                 Estimasi Total Biaya
               </span>
               <span className="grow border-b border-dotted border-border/70" />
-              <span className="font-mono text-xs font-semibold text-primary">
+              <span className="font-mono text-xs font-semibold">
                 {detail.estimated_cost || '-'}
               </span>
             </div>
@@ -298,7 +298,7 @@ function MatrixKak({
                 Sumber Dana:{' '}
                 {detail.funding_sources?.map((s) => s.name).join(', ') || '-'}
               </div>
-              <div className="font-mono text-xs font-bold text-primary">
+              <div className="font-mono text-xs font-semibold">
                 Total Biaya: {detail.estimated_cost || '-'}
               </div>
             </div>
@@ -422,7 +422,7 @@ function DatasheetKak({
               Sumber Dana:{' '}
               {detail.funding_sources?.map((s) => s.name).join(', ') || '-'}
             </div>
-            <div className="font-mono text-xs font-bold text-primary">
+            <div className="font-mono text-xs font-semibold">
               Estimasi: {detail.estimated_cost || '-'}
             </div>
           </div>
@@ -536,7 +536,7 @@ function ParametricKak({
               Sumber Dana:{' '}
               {detail.funding_sources?.map((s) => s.name).join(', ') || '-'}
             </div>
-            <div className="font-mono text-xs font-bold text-primary">
+            <div className="font-mono text-xs font-semibold">
               Estimasi Biaya: {detail.estimated_cost || '-'}
             </div>
           </div>

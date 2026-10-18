@@ -1,5 +1,3 @@
-import { RiCheckDoubleLine } from '@remixicon/react';
-
 import { ChecklistForm } from '@/components/needs/checklist-form';
 import type { ChecklistAnswer, ChecklistQuestion, Need } from '@/types';
 
@@ -8,7 +6,6 @@ interface NeedChecklistVariantProps {
   questions: ChecklistQuestion[];
   existingAnswers: ChecklistAnswer[];
   isLocked: boolean;
-  variant?: string;
 }
 
 export function NeedChecklistVariant({
@@ -16,7 +13,6 @@ export function NeedChecklistVariant({
   questions,
   existingAnswers,
   isLocked,
-  variant,
 }: NeedChecklistVariantProps) {
   const readonly = !need.can?.performChecklist || isLocked;
 
@@ -24,17 +20,10 @@ export function NeedChecklistVariant({
     <div className="space-y-6">
       {/* Header Bar */}
       <div className="border-b border-border/80 pb-4">
-        <div className="flex items-center gap-2 text-xs font-semibold tracking-wider text-primary uppercase">
-          <RiCheckDoubleLine className="h-4 w-4" />
-          <span>Verifikasi & Kelayakan Teknis</span>
-          <span className="font-mono text-xs">
-            ({questions.length} Parameter)
-          </span>
-        </div>
         <h3 className="mt-1 text-xl font-bold tracking-tight text-foreground sm:text-2xl">
           Lembar Evaluasi Kesiapan KAK
         </h3>
-        <p className="text-xs text-muted-foreground sm:text-sm">
+        <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
           Instrumen verifikasi kelengkapan dan kesiapan Kerangka Acuan Kerja
           (KAK) sebelum penetapan persetujuan.
         </p>
@@ -47,9 +36,7 @@ export function NeedChecklistVariant({
           questions={questions}
           existingAnswers={existingAnswers}
           readonly={readonly}
-          initialVariant={
-            variant === 'table' || variant === 'board' ? variant : 'card'
-          }
+          initialVariant="card"
         />
       </div>
     </div>

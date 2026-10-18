@@ -65,7 +65,7 @@ export function NeedShowLayout({
     }, 800);
   };
 
-  const { sections, activeSection, setActiveSection } = showState;
+  const { sections, setActiveSection } = showState;
 
   // Dynamic active section based on scroll position
   useEffect(() => {
@@ -82,9 +82,7 @@ export function NeedShowLayout({
 
       // Check top of the document
       if (window.scrollY < 120) {
-        if (activeSection !== sectionValues[0]) {
-          setActiveSection(sectionValues[0]);
-        }
+        setActiveSection(sectionValues[0]);
 
         return;
       }
@@ -95,10 +93,7 @@ export function NeedShowLayout({
 
       if (scrollBottom >= documentHeight - 60) {
         const lastSection = sectionValues[sectionValues.length - 1];
-
-        if (activeSection !== lastSection) {
-          setActiveSection(lastSection);
-        }
+        setActiveSection(lastSection);
 
         return;
       }
@@ -121,7 +116,7 @@ export function NeedShowLayout({
         }
       }
 
-      if (currentActive && currentActive !== activeSection) {
+      if (currentActive) {
         setActiveSection(currentActive);
       }
     };
@@ -136,79 +131,51 @@ export function NeedShowLayout({
         window.clearTimeout(manualScrollTimeoutRef.current);
       }
     };
-  }, [sections, activeSection, setActiveSection]);
+  }, [sections, setActiveSection]);
 
   return (
-    <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+    <div className="flex flex-col gap-12 pt-8 lg:flex-row lg:items-start">
       {/* Continuous Stream of All Sections */}
       <main className="max-w-3xl min-w-0 space-y-12">
         <NeedShowBanners need={need} isOrphaned={showState.isOrphaned} />
 
         {/* Section 01: Identifikasi Usulan */}
-        <section
+        <NeedShowSection
           id="section-usulan"
-          className="scroll-mt-24 space-y-4 border-b border-border/80 pb-12"
+          code="SEKSI 01 // IDENTIFIKASI USULAN"
+          subtitle=""
         >
-          <div className="flex items-center justify-between border-b border-border/60 pb-2">
-            <span className="font-mono text-xs font-bold text-primary uppercase">
-              [ SEKSI 01 // IDENTIFIKASI USULAN ]
-            </span>
-            <span className="text-xs text-muted-foreground">
-              Parameter Pokok
-            </span>
-          </div>
           <NeedGeneralVariant need={need} variant="datasheet" />
-        </section>
+        </NeedShowSection>
 
         {/* Section 02: Keselarasan Strategis */}
-        <section
+        <NeedShowSection
           id="section-strategis"
-          className="scroll-mt-24 space-y-4 border-b border-border/80 pb-12"
+          code="SEKSI 02 // KESELARASAN STRATEGIS"
+          subtitle="Renstra, IKK & RLS"
         >
-          <div className="flex items-center justify-between border-b border-border/60 pb-2">
-            <span className="font-mono text-xs font-bold text-primary uppercase">
-              [ SEKSI 02 // KESELARASAN STRATEGIS ]
-            </span>
-            <span className="text-xs text-muted-foreground">
-              Renstra, IKK & RLS
-            </span>
-          </div>
           <NeedStrategicVariant
             need={need}
             groupedRenstra={showState.groupedRenstra}
             variant="datasheet"
           />
-        </section>
+        </NeedShowSection>
 
         {/* Section 03: Rincian Kegiatan */}
-        <section
+        <NeedShowSection
           id="section-perencanaan"
-          className="scroll-mt-24 space-y-4 border-b border-border/80 pb-12"
+          code="SEKSI 03 // RINCIAN KEGIATAN"
+          subtitle="Versi Perencanaan & Anggaran"
         >
-          <div className="flex items-center justify-between border-b border-border/60 pb-2">
-            <span className="font-mono text-xs font-bold text-primary uppercase">
-              [ SEKSI 03 // RINCIAN KEGIATAN ]
-            </span>
-            <span className="text-xs text-muted-foreground">
-              Versi Perencanaan & Anggaran
-            </span>
-          </div>
           <NeedPlanningVariant need={need} variant="datasheet" />
-        </section>
+        </NeedShowSection>
 
         {/* Section 04: KAK */}
-        <section
+        <NeedShowSection
           id="section-detail"
-          className="scroll-mt-24 space-y-4 border-b border-border/80 pb-12"
+          code="SEKSI 04 // SPESIFIKASI KAK"
+          subtitle="Kerangka Acuan Kerja"
         >
-          <div className="flex items-center justify-between border-b border-border/60 pb-2">
-            <span className="font-mono text-xs font-bold text-primary uppercase">
-              [ SEKSI 04 // SPESIFIKASI KAK ]
-            </span>
-            <span className="text-xs text-muted-foreground">
-              Kerangka Acuan Kerja
-            </span>
-          </div>
           <NeedDetailKakVariant
             needId={need.id}
             detail={need.detail}
@@ -216,46 +183,35 @@ export function NeedShowLayout({
             users={users}
             variant="datasheet"
           />
-        </section>
+        </NeedShowSection>
 
         {/* Section 05: Lampiran */}
-        <section
+        <NeedShowSection
           id="section-lampiran"
-          className="scroll-mt-24 space-y-4 border-b border-border/80 pb-12"
+          code="SEKSI 05 // DOKUMEN LAMPIRAN"
+          subtitle="Bukti Dukung Administrasi"
         >
-          <div className="flex items-center justify-between border-b border-border/60 pb-2">
-            <span className="font-mono text-xs font-bold text-primary uppercase">
-              [ SEKSI 05 // DOKUMEN LAMPIRAN ]
-            </span>
-            <span className="text-xs text-muted-foreground">
-              Bukti Dukung Administrasi
-            </span>
-          </div>
           <NeedAttachmentsVariant need={need} variant="datasheet" />
-        </section>
+        </NeedShowSection>
 
         {/* Section 06: Checklist KAK */}
-        <section id="section-checklist" className="scroll-mt-24 space-y-4 pb-8">
-          <div className="flex items-center justify-between border-b border-border/60 pb-2">
-            <span className="font-mono text-xs font-bold text-primary uppercase">
-              [ SEKSI 06 // EVALUASI KESIAPAN KAK ]
-            </span>
-            <span className="text-xs text-muted-foreground">
-              Instrumen Verifikasi
-            </span>
-          </div>
+        <NeedShowSection
+          id="section-checklist"
+          code="SEKSI 06 // EVALUASI KESIAPAN KAK"
+          subtitle="Instrumen Verifikasi"
+          isLast
+        >
           <NeedChecklistVariant
             need={need}
             questions={checklistQuestions.data}
             existingAnswers={checklistAnswers.data}
             isLocked={showState.isLocked}
-            variant="table"
           />
-        </section>
+        </NeedShowSection>
       </main>
 
       {/* Sticky Mini-Map HUD on Right */}
-      <aside className="w-full shrink-0 lg:sticky lg:top-6 lg:z-20 lg:w-64 lg:self-start">
+      <aside className="w-full shrink-0 lg:sticky lg:top-6 lg:z-20 lg:w-56 lg:self-start">
         <NeedShowStreamHud
           sections={showState.sections}
           activeSection={showState.activeSection}
@@ -263,5 +219,39 @@ export function NeedShowLayout({
         />
       </aside>
     </div>
+  );
+}
+interface NeedShowSectionProps {
+  id: string;
+  code: string;
+  subtitle: string;
+  children: React.ReactNode;
+  isLast?: boolean;
+}
+
+function NeedShowSection({
+  id,
+  code,
+  subtitle,
+  children,
+  isLast = false,
+}: NeedShowSectionProps) {
+  return (
+    <section
+      id={id}
+      className={
+        isLast
+          ? 'scroll-mt-24 space-y-4 pb-8'
+          : 'scroll-mt-24 space-y-4 border-b border-border/80 pb-12'
+      }
+    >
+      <div className="flex items-center justify-between border-b border-border/60 pb-2">
+        <span className="font-mono text-xs font-medium text-foreground/50 uppercase">
+          [ {code} ]
+        </span>
+        <span className="text-xs text-foreground/50 uppercase">{subtitle}</span>
+      </div>
+      {children}
+    </section>
   );
 }

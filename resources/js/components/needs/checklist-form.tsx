@@ -4,13 +4,10 @@ import {
   RiCheckLine,
   RiClipboardLine,
   RiCloseLine,
-  RiKanbanView,
-  RiLayoutGridLine,
   RiLoaderLine,
   RiSubtractLine,
-  RiTableLine,
 } from '@remixicon/react';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import { toast } from 'sonner';
 
 import NeedChecklistAnswerController from '@/actions/App/Http/Controllers/Need/NeedChecklistAnswerController';
@@ -21,15 +18,11 @@ import {
   CardDescription,
   CardTitle,
 } from '@/components/ui/card';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import type { ChecklistAnswer, ChecklistQuestion } from '@/types';
 
-import { ChecklistBoardView } from './checklist-board-view';
 import { ChecklistCardView } from './checklist-card-view';
-import { ChecklistTableView } from './checklist-table-view';
 
-export type ChecklistVariant = 'card' | 'table' | 'board';
-
+export type ChecklistVariant = 'card';
 interface ChecklistFormProps {
   needId: number;
   questions: ChecklistQuestion[];
@@ -43,11 +36,7 @@ export function ChecklistForm({
   questions,
   existingAnswers,
   readonly = false,
-  initialVariant = 'table',
 }: ChecklistFormProps) {
-  const [activeVariant, setActiveVariant] =
-    useState<ChecklistVariant>(initialVariant);
-
   const { data, setData, post, processing } = useForm({
     answers: questions.map((q) => {
       const existing = existingAnswers.find(
@@ -214,51 +203,6 @@ export function ChecklistForm({
               Lengkapi instrumen evaluasi untuk menilai kelayakan teknis usulan.
             </p>
           </div>
-
-          {/* 3 Variant Switcher Buttons */}
-          <div className="flex items-center gap-2 self-start sm:self-auto">
-            <span className="text-xs font-medium text-muted-foreground">
-              Tampilan:
-            </span>
-            <ToggleGroup
-              value={[activeVariant]}
-              onValueChange={(val) => {
-                if (val[0]) {
-                  setActiveVariant(val[0] as ChecklistVariant);
-                }
-              }}
-              variant="outline"
-              size="sm"
-            >
-              <ToggleGroupItem
-                value="card"
-                aria-label="Tampilan Kartu"
-                title="Tampilan Kartu Rinci"
-                className="gap-1.5 text-xs"
-              >
-                <RiLayoutGridLine className="h-3.5 w-3.5" />
-                <span>Kartu</span>
-              </ToggleGroupItem>
-              <ToggleGroupItem
-                value="table"
-                aria-label="Tampilan Tabel"
-                title="Tampilan Matriks Tabel"
-                className="gap-1.5 text-xs"
-              >
-                <RiTableLine className="h-3.5 w-3.5" />
-                <span>Tabel</span>
-              </ToggleGroupItem>
-              <ToggleGroupItem
-                value="board"
-                aria-label="Tampilan Papan Status"
-                title="Tampilan Papan Status Terkelompok"
-                className="gap-1.5 text-xs"
-              >
-                <RiKanbanView className="h-3.5 w-3.5" />
-                <span>Papan</span>
-              </ToggleGroupItem>
-            </ToggleGroup>
-          </div>
         </div>
 
         {/* Evaluation Metrics / Summary Bar */}
@@ -302,37 +246,14 @@ export function ChecklistForm({
           </div>
         </div>
       </div>
-
       {/* Render Active Variant */}
-      {activeVariant === 'card' && (
-        <ChecklistCardView
-          questions={questions}
-          answers={data.answers}
-          onAnswerChange={updateAnswer}
-          onNotesChange={updateNotes}
-          readonly={readonly}
-        />
-      )}
-
-      {activeVariant === 'table' && (
-        <ChecklistTableView
-          questions={questions}
-          answers={data.answers}
-          onAnswerChange={updateAnswer}
-          onNotesChange={updateNotes}
-          readonly={readonly}
-        />
-      )}
-
-      {activeVariant === 'board' && (
-        <ChecklistBoardView
-          questions={questions}
-          answers={data.answers}
-          onAnswerChange={updateAnswer}
-          onNotesChange={updateNotes}
-          readonly={readonly}
-        />
-      )}
+      <ChecklistCardView
+        questions={questions}
+        answers={data.answers}
+        onAnswerChange={updateAnswer}
+        onNotesChange={updateNotes}
+        readonly={readonly}
+      />
     </div>
   );
 }

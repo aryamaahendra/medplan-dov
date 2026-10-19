@@ -272,17 +272,29 @@ final class NeedController extends Controller
 
         $validated = $request->validated();
 
-        $needGroup = $need->loadMissing('needGroup')->needGroup;
-        $isGroupOpen = $needGroup ? $needGroup->isOpenForSubmission() : true;
+        $decision = $validated['decision'];
 
-        if ($validated['is_approved']) {
-            $lifecycle->approveByDirector($need, $validated['notes'], $request->user());
+        if ($decision === Need::STATUS_APPROVED) {
+            $lifecycle->approveByDirector(
+                need: $need,
+                notes: $validated['notes'] ?? null,
+                approver: $request->user(),
+                approvedVolume: isset($validated['approved_volume']) ? (float) $validated['approved_volume'] : null,
+                approvedUnitPrice: isset($validated['approved_unit_price']) ? (float) $validated['approved_unit_price'] : null,
+                isRecommendedForNextCycle: (bool) ($validated['is_recommended_for_next_cycle'] ?? false),
+            );
+        } elseif ($decision === Need::STATUS_REJECTED) {
+            $lifecycle->rejectByDirector(
+                need: $need,
+                notes: $validated['notes'] ?? null,
+                actor: $request->user(),
+                isRecommendedForNextCycle: (bool) ($validated['is_recommended_for_next_cycle'] ?? false),
+            );
         } else {
-            $hasActiveExtension = $need->unlocked_until !== null && $need->unlocked_until->isFuture();
-            $lifecycle->rejectDirectorApproval(
-                $need,
-                $validated['notes'],
-                $isGroupOpen || $hasActiveExtension
+            $lifecycle->revisionByDirector(
+                need: $need,
+                notes: (string) $validated['notes'],
+                actor: $request->user(),
             );
         }
 

@@ -16,7 +16,9 @@ use Illuminate\Validation\ValidationException;
  * Interface:
  *   lock(Need, string, ?User): Need
  *   unlock(Need, ?string, ?User, DateTimeInterface|string|null, bool): Need
- *   approveByDirector(Need, ?string, ?User): Need
+ *   approveByDirector(Need, ?string, ?User, ?float, ?float, bool): Need
+ *   rejectByDirector(Need, ?string, ?User, bool): Need
+ *   revisionByDirector(Need, string, ?User): Need
  *   rejectDirectorApproval(Need, ?string, bool): Need
  *   submit(Need, ?User): Need
  *   lockForExecutiveReview(Need, ?User): Need
@@ -116,14 +118,93 @@ class NeedLockLifecycle
      * Record Director approval and freeze the need.
      * Sets approved_by_director_at, is_locked = true, locked_at, locked_by_user_id.
      */
-    public function approveByDirector(Need $need, ?string $notes, ?User $approver = null): Need
-    {
+    public function approveByDirector(
+        Need $need,
+        ?string $notes = null,
+        ?User $approver = null,
+        ?float $approvedVolume = null,
+        ?float $approvedUnitPrice = null,
+        bool $isRecommendedForNextCycle = false,
+    ): Need {
+        $volume = (float) $need->volume;
+        $finalApprovedVolume = $approvedVolume !== null ? $approvedVolume : $volume;
+        $finalApprovedUnitPrice = $approvedUnitPrice !== null ? $approvedUnitPrice : (float) $need->unit_price;
+        $finalApprovedTotalPrice = round($finalApprovedVolume * $finalApprovedUnitPrice, 2);
+
+        $hasResidual = $isRecommendedForNextCycle && ($finalApprovedVolume < $volume);
+        $recommendedVolume = $hasResidual ? round($volume - $finalApprovedVolume, 4) : null;
+
         $need->update([
+            'status' => Need::STATUS_APPROVED,
             'notes' => $notes,
             'approved_by_director_at' => now(),
+            'approved_volume' => $finalApprovedVolume,
+            'approved_unit_price' => $finalApprovedUnitPrice,
+            'approved_total_price' => $finalApprovedTotalPrice,
+            'is_recommended_for_next_cycle' => $hasResidual,
+            'recommended_volume' => $recommendedVolume,
             'is_locked' => true,
             'locked_at' => now(),
             'locked_by_user_id' => $approver?->id,
+            'lock_reason' => self::LOCK_REASON_EXECUTIVE_REVIEW,
+            'unlocked_until' => null,
+        ]);
+
+        return $need;
+    }
+
+    /**
+     * Record Director rejection, freeze the proposal, and set full volume as recommended volume if requested.
+     */
+    public function rejectByDirector(
+        Need $need,
+        ?string $notes = null,
+        ?User $actor = null,
+        bool $isRecommendedForNextCycle = false,
+    ): Need {
+        $recommendedVolume = $isRecommendedForNextCycle ? (float) $need->volume : null;
+
+        $need->update([
+            'status' => Need::STATUS_REJECTED,
+            'notes' => $notes,
+            'approved_by_director_at' => null,
+            'approved_volume' => null,
+            'approved_unit_price' => null,
+            'approved_total_price' => null,
+            'is_recommended_for_next_cycle' => $isRecommendedForNextCycle,
+            'recommended_volume' => $recommendedVolume,
+            'is_locked' => true,
+            'locked_at' => now(),
+            'locked_by_user_id' => $actor?->id,
+            'lock_reason' => self::LOCK_REASON_EXECUTIVE_REVIEW,
+            'unlocked_until' => null,
+        ]);
+
+        return $need;
+    }
+
+    /**
+     * Request revision by Director, record mandatory notes, and unlock proposal for submitting unit.
+     */
+    public function revisionByDirector(
+        Need $need,
+        string $notes,
+        ?User $actor = null,
+    ): Need {
+        $need->update([
+            'status' => Need::STATUS_REVISION,
+            'notes' => $notes,
+            'approved_by_director_at' => null,
+            'approved_volume' => null,
+            'approved_unit_price' => null,
+            'approved_total_price' => null,
+            'is_recommended_for_next_cycle' => false,
+            'recommended_volume' => null,
+            'is_locked' => null,
+            'locked_at' => null,
+            'locked_by_user_id' => null,
+            'lock_reason' => null,
+            'unlocked_until' => null,
         ]);
 
         return $need;

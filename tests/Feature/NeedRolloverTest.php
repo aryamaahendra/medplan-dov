@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Actions\Need\RolloverNeedAction;
 use App\Models\Need;
 use App\Models\NeedDetail;
 use App\Models\NeedGroup;
@@ -246,4 +247,78 @@ it('can rollover unapproved needs during need group creation', function () {
         'year' => 2027,
         'status' => Need::STATUS_DRAFT,
     ]);
+});
+
+it('unapproved candidates query includes partially approved needs with residual recommendation', function () {
+    $this->be($this->admin);
+
+    $partiallyApprovedWithResidual = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'status' => Need::STATUS_APPROVED,
+        'approved_by_director_at' => now(),
+        'volume' => 10,
+        'approved_volume' => 6,
+        'is_recommended_for_next_cycle' => true,
+        'recommended_volume' => 4,
+    ]);
+
+    $fullyApprovedWithoutResidual = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'status' => Need::STATUS_APPROVED,
+        'approved_by_director_at' => now(),
+        'volume' => 10,
+        'approved_volume' => 10,
+        'is_recommended_for_next_cycle' => false,
+        'recommended_volume' => null,
+    ]);
+
+    $response = $this->getJson(route('needs.unapproved-candidates', [
+        'target_need_group_id' => $this->group2->id,
+    ]));
+
+    $response->assertOk();
+    $ids = collect($response->json('data'))->pluck('id')->all();
+    expect($ids)->toContain($partiallyApprovedWithResidual->id)
+        ->and($ids)->not->toContain($fullyApprovedWithoutResidual->id);
+});
+
+it('clones partially approved need with requested volume set to residual recommended volume', function () {
+    $this->be($this->admin);
+
+    $sourceNeed = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'status' => Need::STATUS_APPROVED,
+        'approved_by_director_at' => now(),
+        'volume' => 10,
+        'unit_price' => 25000,
+        'total_price' => 250000,
+        'approved_volume' => 6,
+        'approved_unit_price' => 25000,
+        'approved_total_price' => 150000,
+        'is_recommended_for_next_cycle' => true,
+        'recommended_volume' => 4,
+        'is_locked' => true,
+    ]);
+
+    $action = app(RolloverNeedAction::class);
+    $clonedNeed = $action->execute($sourceNeed, $this->group2, $this->admin);
+
+    expect((float) $clonedNeed->volume)->toBe(4.0)
+        ->and((float) $clonedNeed->unit_price)->toBe(25000.0)
+        ->and((float) $clonedNeed->total_price)->toBe(100000.0)
+        ->and($clonedNeed->status)->toBe(Need::STATUS_DRAFT)
+        ->and($clonedNeed->approved_by_director_at)->toBeNull()
+        ->and($clonedNeed->approved_volume)->toBeNull()
+        ->and($clonedNeed->approved_unit_price)->toBeNull()
+        ->and($clonedNeed->approved_total_price)->toBeNull()
+        ->and($clonedNeed->is_recommended_for_next_cycle)->toBeFalse()
+        ->and($clonedNeed->recommended_volume)->toBeNull()
+        ->and($clonedNeed->is_locked)->toBeNull()
+        ->and($clonedNeed->source_need_id)->toBe($sourceNeed->id);
 });

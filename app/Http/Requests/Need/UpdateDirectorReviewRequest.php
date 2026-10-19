@@ -6,6 +6,7 @@ namespace App\Http\Requests\Need;
 
 use App\Models\Need;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 final class UpdateDirectorReviewRequest extends FormRequest
 {
@@ -24,15 +25,70 @@ final class UpdateDirectorReviewRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        /** @var Need|int|string|null $need */
+        $need = $this->route('need');
+        if (! ($need instanceof Need) && is_numeric($need)) {
+            $need = Need::query()->find($need);
+        }
+
+        // Backward compatibility for legacy callers passing is_approved
+        if (! $this->has('decision') && $this->has('is_approved')) {
+            $isApproved = $this->boolean('is_approved');
+            $this->merge([
+                'decision' => $isApproved ? Need::STATUS_APPROVED : Need::STATUS_REVISION,
+                'approved_volume' => $this->input('approved_volume', $need?->volume),
+                'approved_unit_price' => $this->input('approved_unit_price', $need?->unit_price),
+            ]);
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, array<int, string>>
+     * @return array<string, array<int, mixed>>
      */
     public function rules(): array
     {
+        /** @var Need|int|string|null $need */
+        $need = $this->route('need');
+        if (! ($need instanceof Need) && is_numeric($need)) {
+            $need = Need::query()->find($need);
+        }
+
+        $maxVolume = $need ? (float) $need->volume : null;
+
         return [
-            'notes' => ['nullable', 'string'],
-            'is_approved' => ['required', 'boolean'],
+            'decision' => [
+                'required',
+                'string',
+                Rule::in([Need::STATUS_APPROVED, Need::STATUS_REJECTED, Need::STATUS_REVISION]),
+            ],
+            'notes' => [
+                Rule::requiredIf(fn () => $this->input('decision') === Need::STATUS_REVISION),
+                'nullable',
+                'string',
+            ],
+            'approved_volume' => [
+                Rule::requiredIf(fn () => $this->input('decision') === Need::STATUS_APPROVED),
+                'nullable',
+                'numeric',
+                'gt:0',
+                ...($maxVolume !== null ? ["lte:{$maxVolume}"] : []),
+            ],
+            'approved_unit_price' => [
+                Rule::requiredIf(fn () => $this->input('decision') === Need::STATUS_APPROVED),
+                'nullable',
+                'numeric',
+                'gt:0',
+            ],
+            'is_recommended_for_next_cycle' => [
+                'nullable',
+                'boolean',
+            ],
         ];
     }
 }

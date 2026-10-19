@@ -45,6 +45,14 @@ class RolloverNeedAction
             ]);
 
             // Create cloned Need record
+            $targetVolume = ($sourceNeed->is_recommended_for_next_cycle && $sourceNeed->recommended_volume !== null && (float) $sourceNeed->recommended_volume > 0)
+                ? (float) $sourceNeed->recommended_volume
+                : (float) $sourceNeed->volume;
+
+            $unitPrice = (float) $sourceNeed->unit_price;
+            $targetTotalPrice = round($targetVolume * $unitPrice, 2);
+
+            // Create cloned Need record
             /** @var Need $newNeed */
             $newNeed = Need::query()->create([
                 'need_group_id' => $targetGroup->id,
@@ -56,10 +64,10 @@ class RolloverNeedAction
                 'description' => $sourceNeed->description,
                 'current_condition' => $sourceNeed->current_condition,
                 'required_condition' => $sourceNeed->required_condition,
-                'volume' => $sourceNeed->volume,
+                'volume' => $targetVolume,
                 'unit' => $sourceNeed->unit,
-                'unit_price' => $sourceNeed->unit_price,
-                'total_price' => $sourceNeed->total_price,
+                'unit_price' => $unitPrice,
+                'total_price' => $targetTotalPrice,
                 'urgency' => $sourceNeed->urgency,
                 'impact' => $sourceNeed->impact,
                 'is_priority' => $sourceNeed->is_priority,
@@ -67,6 +75,11 @@ class RolloverNeedAction
                 'checklist_percentage' => 0,
                 'notes' => null,
                 'approved_by_director_at' => null,
+                'approved_volume' => null,
+                'approved_unit_price' => null,
+                'approved_total_price' => null,
+                'is_recommended_for_next_cycle' => false,
+                'recommended_volume' => null,
                 'is_locked' => null,
                 'locked_at' => null,
                 'locked_by_user_id' => null,
@@ -132,7 +145,13 @@ class RolloverNeedAction
     {
         $needs = Need::query()
             ->whereIn('id', $sourceNeedIds)
-            ->whereNull('approved_by_director_at')
+            ->where(function ($q) {
+                $q->whereNull('approved_by_director_at')
+                    ->orWhere(function ($sub) {
+                        $sub->where('is_recommended_for_next_cycle', true)
+                            ->where('recommended_volume', '>', 0);
+                    });
+            })
             ->where('need_group_id', '!=', $targetGroup->id)
             ->whereDoesntHave('rolloverNeeds', fn ($q) => $q->where('need_group_id', $targetGroup->id))
             ->get();

@@ -173,6 +173,12 @@ class Need extends Model
                 'reason' => $this->lock_reason ?: 'Usulan sedang dalam proses review eksekutif.',
             ];
         }
+        if ($this->status === self::STATUS_REJECTED) {
+            return [
+                'is_locked' => true,
+                'reason' => $this->lock_reason ?: 'Usulan telah ditolak oleh Direktur.',
+            ];
+        }
 
         if ($this->is_locked === true) {
             return [
@@ -345,7 +351,13 @@ class Need extends Model
      */
     public function scopeUnapprovedCandidates(Builder $query, ?int $targetGroupId, User $user): Builder
     {
-        $query->whereNull('approved_by_director_at');
+        $query->where(function (Builder $q): void {
+            $q->whereNull('approved_by_director_at')
+                ->orWhere(function (Builder $sub): void {
+                    $sub->where('is_recommended_for_next_cycle', true)
+                        ->where('recommended_volume', '>', 0);
+                });
+        });
 
         if ($targetGroupId !== null && $targetGroupId > 0) {
             $query->where('need_group_id', '!=', $targetGroupId)

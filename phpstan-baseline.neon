@@ -79,18 +79,6 @@ parameters:
 			path: app/Http/Controllers/Need/NeedController.php
 
 		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:isOpenForSubmission\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Http/Controllers/Need/NeedController.php
-
-		-
-			message: '#^Cannot call method isFuture\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Http/Controllers/Need/NeedController.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$description\.$#'
 			identifier: property.notFound
 			count: 1

@@ -1,6 +1,4 @@
 import { Head } from '@inertiajs/react';
-import { RiAlertLine } from '@remixicon/react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import needRoutes from '@/routes/needs';
 import type {
   KpiGroup,
@@ -11,8 +9,6 @@ import type {
 } from '@/types';
 
 import { NeedForm } from './components/need-form';
-import { NeedLockBanner } from './components/need-lock-banner';
-
 interface EditProps {
   need: Need;
   currentGroup: { id: number; name: string; year: number };
@@ -45,9 +41,9 @@ export default function Edit({
   return (
     <>
       <Head title={`${currentGroup.name}: Edit Usulan`} />
-      <div className="flex h-full flex-1 flex-col gap-4 p-4 md:p-8">
+      <div className="flex h-full flex-1 flex-col gap-4 p-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold tracking-tight">
+          <h1 className="text-2xl font-semibold tracking-tight">
             Edit Usulan: {currentGroup.name}
           </h1>
           <p className="text-muted-foreground">
@@ -55,20 +51,6 @@ export default function Edit({
           </p>
         </div>
 
-        <NeedLockBanner need={need} />
-
-        {Boolean(need.organizational_unit_id && !need.organizational_unit) && (
-          <Alert variant="destructive">
-            <RiAlertLine className="h-4 w-4" />
-            <AlertTitle className="font-semibold">
-              Unit Kerja Tidak Aktif
-            </AlertTitle>
-            <AlertDescription className="text-sm">
-              Unit kerja sebelumnya telah dihapus atau tidak aktif. Silakan
-              pilih unit kerja aktif untuk melanjutkan pembaruan usulan.
-            </AlertDescription>
-          </Alert>
-        )}
         <div className="flex-1">
           <NeedForm
             need={need}

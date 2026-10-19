@@ -75,27 +75,23 @@ export function NeedLockBanner({ need, className }: NeedLockBannerProps) {
     return (
       <Alert
         className={cn(
-          'border-warning/40 bg-warning/10 text-warning-foreground dark:border-warning/30 dark:bg-warning/20',
+          'border-warning/40 bg-warning/10 p-2.5 text-warning-foreground dark:border-warning/30 dark:bg-warning/20',
           className,
         )}
       >
-        <RiTimeLine className="text-warning" />
-        <AlertTitle className="font-semibold text-warning-foreground">
+        <RiTimeLine className="h-4 w-4 text-warning" />
+        <AlertTitle className="text-xs font-semibold text-warning-foreground">
           Perpanjangan Waktu Aktif
         </AlertTitle>
-        <AlertDescription className="space-y-1 text-sm text-warning-foreground/90">
-          <p>
-            Usulan ini sedang dalam masa perpanjangan pengajuan. Anda dapat
-            melakukan perubahan sebelum batas waktu berakhir.
-          </p>
+        <AlertDescription className="space-y-0.5 text-xs text-warning-foreground/90">
+          <p>Dapat diperbarui sebelum batas waktu berakhir.</p>
           {timeLeft && (
             <p className="font-medium">
-              Sisa waktu perpanjangan:{' '}
-              <span className="font-mono">{timeLeft}</span>
+              Sisa waktu: <span className="font-mono">{timeLeft}</span>
             </p>
           )}
           {need.lock_reason && (
-            <p className="text-xs text-warning-foreground/80 italic">
+            <p className="text-[11px] text-warning-foreground/80 italic">
               Alasan: {need.lock_reason}
             </p>
           )}
@@ -110,25 +106,24 @@ export function NeedLockBanner({ need, className }: NeedLockBannerProps) {
   }
 
   return (
-    <Alert variant="destructive" className={className}>
-      <RiLockLine />
-      <AlertTitle className="font-semibold">
+    <Alert variant="destructive" className={cn('p-2.5', className)}>
+      <RiLockLine className="h-4 w-4" />
+      <AlertTitle className="text-xs font-semibold">
         Usulan Kebutuhan Terkunci
       </AlertTitle>
-      <AlertDescription className="space-y-1 text-sm">
+      <AlertDescription className="space-y-0.5 text-xs">
         <p>
           {need.lock_reason ||
-            'Usulan kebutuhan ini telah dikunci sehingga tidak dapat diubah atau dihapus.'}
+            'Usulan ini dikunci sehingga tidak dapat diubah atau dihapus.'}
         </p>
         {need.group_submission_end_at && (
-          <p className="text-xs opacity-80">
-            Batas akhir pengajuan kelompok:{' '}
-            {formatDateTime(need.group_submission_end_at)}
+          <p className="text-[11px] opacity-80">
+            Batas akhir: {formatDateTime(need.group_submission_end_at)}
           </p>
         )}
         {need.locked_at && (
-          <p className="text-xs opacity-80">
-            Waktu penguncian: {formatDateTime(need.locked_at)}
+          <p className="text-[11px] opacity-80">
+            Waktu kunci: {formatDateTime(need.locked_at)}
           </p>
         )}
       </AlertDescription>

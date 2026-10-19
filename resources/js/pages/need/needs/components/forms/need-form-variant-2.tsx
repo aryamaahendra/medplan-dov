@@ -34,6 +34,7 @@ import { FileSection } from '../file-section';
 import { GeneralInfoSection } from '../general-info-section';
 import { IkkAlignmentSection } from '../ikk-alignment-section';
 import { NeedDetailSection } from '../need-detail-section';
+import { NeedLockBanner } from '../need-lock-banner';
 import { PlanningAlignmentSection } from '../planning-alignment-section';
 import { PriorityStatusSection } from '../priority-status-section';
 import { RenstraAlignmentSection } from '../renstra-alignment-section';
@@ -187,149 +188,7 @@ export function NeedFormVariant2({
   return (
     <form onSubmit={handleSubmit} className={cn('w-full', className)}>
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
-        {/* Left Navigation Rail (4 cols on lg) */}
-        <div className="space-y-4 lg:col-span-4">
-          <div className="space-y-4">
-            <div className="border-b border-border/60 pb-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">
-                  Navigasi Formulir
-                </span>
-                <span className="font-mono text-[10px] text-muted-foreground">
-                  {sections.length} Bagian
-                </span>
-              </div>
-
-              {!isEditing && (
-                <div className="mt-3">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPickerOpen(true)}
-                    className="w-full gap-1.5 text-xs"
-                  >
-                    <RiHistoryLine className="h-3.5 w-3.5" />
-                    Salin Usulan Sebelumnya
-                  </Button>
-                </div>
-              )}
-
-              {sourceTitle && (
-                <div className="mt-2 flex items-center justify-between rounded-md border border-primary/20 bg-primary/5 px-2.5 py-1.5 text-xs text-primary">
-                  <span className="line-clamp-1 text-[11px]">
-                    Draf: <strong>{sourceTitle}</strong>
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleResetSource}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    <RiCloseLine className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Section List */}
-            <div className="divide-y divide-border/40 py-1">
-              {sections.map((section) => {
-                const isSelected = section.value === activeSection;
-                const errCount = getTabErrors(section.value).length;
-                const IconComp = section.icon;
-
-                return (
-                  <button
-                    key={section.value}
-                    type="button"
-                    onClick={() => setActiveSection(section.value)}
-                    className={cn(
-                      'group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all',
-                      isSelected
-                        ? 'bg-primary/10 font-medium text-primary dark:bg-primary/15'
-                        : 'text-foreground/80 hover:bg-muted/60 hover:text-foreground',
-                    )}
-                  >
-                    <div
-                      className={cn(
-                        'flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs transition-colors',
-                        isSelected
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted text-muted-foreground group-hover:text-foreground',
-                      )}
-                    >
-                      <IconComp className="h-4 w-4" />
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-1">
-                        <span className="text-xs font-semibold">
-                          {section.label}
-                        </span>
-                        {errCount > 0 ? (
-                          <Badge
-                            variant="destructive"
-                            className="h-4 px-1 text-[9px] font-bold"
-                          >
-                            {errCount}
-                          </Badge>
-                        ) : section.isFilled ? (
-                          <RiCheckLine className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-                        ) : null}
-                      </div>
-                      <p className="line-clamp-1 text-[10px] text-muted-foreground">
-                        {section.subtitle}
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Sidebar Summary & Save Card */}
-            <div className="border-t border-border/60 pt-4">
-              <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-                <span className="text-[11px] font-medium text-muted-foreground">
-                  Total Estimasi Biaya
-                </span>
-                <div className="mt-0.5 text-lg font-bold text-primary">
-                  {totalPriceFormatted}
-                </div>
-                <div className="mt-1 text-[11px] text-muted-foreground">
-                  {data.volume
-                    ? `${data.volume} ${data.unit || 'unit'}`
-                    : 'Volume belum diisi'}
-                </div>
-              </div>
-
-              <div className="mt-3 flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={onCancel}
-                  className="flex-1 text-xs"
-                >
-                  {isLocked ? 'Kembali' : 'Batal'}
-                </Button>
-
-                {!isLocked && (
-                  <Button
-                    type="submit"
-                    size="sm"
-                    disabled={processing}
-                    className="flex-1 gap-1 text-xs font-semibold"
-                  >
-                    <RiSaveLine className="h-3.5 w-3.5" />
-                    {isEditing ? 'Simpan' : 'Tambah'}
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Main Content Canvas (8 cols on lg) */}
+        {/* Left Main Content Canvas (8 cols on lg) */}
         <div className="space-y-4 lg:col-span-8">
           <div>
             {/* Header of Active Section */}
@@ -361,22 +220,6 @@ export function NeedFormVariant2({
 
             {/* Active Content - Sections kept mounted in DOM */}
             <div className="pt-4 md:pt-6">
-              {isOrphaned && (
-                <div className="mb-4">
-                  <Alert variant="destructive">
-                    <RiAlertLine />
-                    <AlertTitle className="font-semibold">
-                      Unit Kerja Tidak Aktif
-                    </AlertTitle>
-                    <AlertDescription className="text-sm">
-                      Unit kerja sebelumnya telah dihapus atau tidak aktif.
-                      Silakan pilih unit kerja aktif untuk melanjutkan pembaruan
-                      usulan.
-                    </AlertDescription>
-                  </Alert>
-                </div>
-              )}
-
               <fieldset
                 disabled={isLocked}
                 className="contents disabled:pointer-events-none disabled:opacity-80"
@@ -561,6 +404,162 @@ export function NeedFormVariant2({
                       {isEditing ? 'Simpan Usulan' : 'Tambah Usulan'}
                     </Button>
                   )
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Right Sticky Navigation Rail (4 cols on lg) */}
+        <div className="space-y-4 lg:sticky lg:top-4 lg:z-10 lg:col-span-4">
+          {need && <NeedLockBanner need={need} />}
+
+          {isOrphaned && (
+            <Alert variant="destructive" className="p-2.5">
+              <RiAlertLine className="h-4 w-4" />
+              <AlertTitle className="text-xs font-semibold">
+                Unit Kerja Tidak Aktif
+              </AlertTitle>
+              <AlertDescription className="text-xs">
+                Unit kerja sebelumnya tidak aktif. Silakan pilih unit kerja
+                aktif.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <div className="space-y-4">
+            <div className="border-b border-border/60 pb-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-muted-foreground uppercase">
+                  Navigasi Formulir
+                </span>
+                <span className="font-mono text-[10px] text-muted-foreground">
+                  {sections.length} Bagian
+                </span>
+              </div>
+
+              {!isEditing && (
+                <div className="mt-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPickerOpen(true)}
+                    className="w-full gap-1.5 text-xs"
+                  >
+                    <RiHistoryLine className="h-3.5 w-3.5" />
+                    Salin Usulan Sebelumnya
+                  </Button>
+                </div>
+              )}
+
+              {sourceTitle && (
+                <div className="mt-2 flex items-center justify-between rounded-md border border-primary/20 bg-primary/5 px-2.5 py-1.5 text-xs text-primary">
+                  <span className="line-clamp-1 text-[11px]">
+                    Draf: <strong>{sourceTitle}</strong>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleResetSource}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <RiCloseLine className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Section List */}
+            <div className="divide-y divide-border/40 py-1">
+              {sections.map((section) => {
+                const isSelected = section.value === activeSection;
+                const errCount = getTabErrors(section.value).length;
+                const IconComp = section.icon;
+
+                return (
+                  <button
+                    key={section.value}
+                    type="button"
+                    onClick={() => setActiveSection(section.value)}
+                    className={cn(
+                      'group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all',
+                      isSelected
+                        ? 'bg-primary/10 font-medium text-primary dark:bg-primary/15'
+                        : 'text-foreground/80 hover:bg-muted/60 hover:text-foreground',
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        'flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs transition-colors',
+                        isSelected
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted text-muted-foreground group-hover:text-foreground',
+                      )}
+                    >
+                      <IconComp className="h-4 w-4" />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="text-xs font-semibold">
+                          {section.label}
+                        </span>
+                        {errCount > 0 ? (
+                          <Badge
+                            variant="destructive"
+                            className="h-4 px-1 text-[9px] font-bold"
+                          >
+                            {errCount}
+                          </Badge>
+                        ) : section.isFilled ? (
+                          <RiCheckLine className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                        ) : null}
+                      </div>
+                      <p className="line-clamp-1 text-[10px] text-muted-foreground">
+                        {section.subtitle}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Sidebar Summary & Save Card */}
+            <div className="border-t border-border/60 pt-4">
+              <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
+                <span className="text-[11px] font-medium text-muted-foreground">
+                  Total Estimasi Biaya
+                </span>
+                <div className="mt-0.5 text-lg font-bold text-primary">
+                  {totalPriceFormatted}
+                </div>
+                <div className="mt-1 text-[11px] text-muted-foreground">
+                  {data.volume
+                    ? `${data.volume} ${data.unit || 'unit'}`
+                    : 'Volume belum diisi'}
+                </div>
+              </div>
+
+              <div className="mt-3 flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={onCancel}
+                  className="flex-1 text-xs"
+                >
+                  {isLocked ? 'Kembali' : 'Batal'}
+                </Button>
+
+                {!isLocked && (
+                  <Button
+                    type="submit"
+                    size="sm"
+                    disabled={processing}
+                    className="flex-1 gap-1 text-xs font-semibold"
+                  >
+                    <RiSaveLine className="h-3.5 w-3.5" />
+                    {isEditing ? 'Simpan' : 'Tambah'}
+                  </Button>
                 )}
               </div>
             </div>

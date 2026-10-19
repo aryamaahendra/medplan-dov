@@ -11,18 +11,16 @@ import type { Need, Sasaran, StrategicServicePlan, Tujuan } from '@/types';
 
 import { NeedIkkTable } from '../need-ikk-table';
 import { NeedRenstraTable } from '../need-renstra-table';
-import type { NeedUiVariant } from '../need-show-variants';
 
-interface NeedStrategicVariantProps {
+interface NeedStrategicSectionProps {
   need: Need;
   groupedRenstra: (Tujuan & { sasarans: Sasaran[] })[];
-  variant?: NeedUiVariant;
 }
 
-export function NeedStrategicVariant({
+export function NeedStrategicSection({
   need,
   groupedRenstra,
-}: NeedStrategicVariantProps) {
+}: NeedStrategicSectionProps) {
   const kpiIndicators = need.kpi_indicators || [];
   const rlsPlans = need.strategic_service_plans || [];
 

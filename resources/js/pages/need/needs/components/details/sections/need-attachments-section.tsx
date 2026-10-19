@@ -7,12 +7,12 @@ import { usePermission } from '@/hooks/use-permission';
 import type { Need } from '@/types';
 
 import { AttachmentList } from '../../attachment-list';
-interface NeedAttachmentsVariantProps {
+
+interface NeedAttachmentsSectionProps {
   need: Need;
-  variant?: string;
 }
 
-export function NeedAttachmentsVariant({ need }: NeedAttachmentsVariantProps) {
+export function NeedAttachmentsSection({ need }: NeedAttachmentsSectionProps) {
   const { hasPermission } = usePermission();
 
   const canManageLampiran =

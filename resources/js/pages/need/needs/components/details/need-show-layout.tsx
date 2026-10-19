@@ -3,13 +3,13 @@ import type { ChecklistAnswer, ChecklistQuestion, Need } from '@/types';
 
 import { NeedShowBanners } from './need-show-banners';
 import { NeedShowStreamHud } from './need-show-stream-hud';
+import { NeedAttachmentsSection } from './sections/need-attachments-section';
+import { NeedChecklistSection } from './sections/need-checklist-section';
+import { NeedDetailKakSection } from './sections/need-detail-kak-section';
+import { NeedGeneralSection } from './sections/need-general-section';
+import { NeedPlanningSection } from './sections/need-planning-section';
+import { NeedStrategicSection } from './sections/need-strategic-section';
 import type { useNeedShow } from './use-need-show';
-import { NeedAttachmentsVariant } from './variants/need-attachments-variant';
-import { NeedChecklistVariant } from './variants/need-checklist-variant';
-import { NeedDetailKakVariant } from './variants/need-detail-kak-variant';
-import { NeedGeneralVariant } from './variants/need-general-variant';
-import { NeedPlanningVariant } from './variants/need-planning-variant';
-import { NeedStrategicVariant } from './variants/need-strategic-variant';
 interface NeedShowLayoutProps {
   need: Need;
   users: { id: number; name: string; nip: string | null }[];
@@ -145,7 +145,7 @@ export function NeedShowLayout({
           code="SEKSI 01 // IDENTIFIKASI USULAN"
           subtitle=""
         >
-          <NeedGeneralVariant need={need} variant="datasheet" />
+          <NeedGeneralSection need={need} />
         </NeedShowSection>
 
         {/* Section 02: Keselarasan Strategis */}
@@ -154,10 +154,9 @@ export function NeedShowLayout({
           code="SEKSI 02 // KESELARASAN STRATEGIS"
           subtitle="Renstra, IKK & RLS"
         >
-          <NeedStrategicVariant
+          <NeedStrategicSection
             need={need}
             groupedRenstra={showState.groupedRenstra}
-            variant="datasheet"
           />
         </NeedShowSection>
 
@@ -167,7 +166,7 @@ export function NeedShowLayout({
           code="SEKSI 03 // RINCIAN KEGIATAN"
           subtitle="Versi Perencanaan & Anggaran"
         >
-          <NeedPlanningVariant need={need} variant="datasheet" />
+          <NeedPlanningSection need={need} />
         </NeedShowSection>
 
         {/* Section 04: KAK */}
@@ -176,12 +175,11 @@ export function NeedShowLayout({
           code="SEKSI 04 // SPESIFIKASI KAK"
           subtitle="Kerangka Acuan Kerja"
         >
-          <NeedDetailKakVariant
+          <NeedDetailKakSection
             needId={need.id}
             detail={need.detail}
             attachments={technicalAttachments}
             users={users}
-            variant="datasheet"
           />
         </NeedShowSection>
 
@@ -191,7 +189,7 @@ export function NeedShowLayout({
           code="SEKSI 05 // DOKUMEN LAMPIRAN"
           subtitle="Bukti Dukung Administrasi"
         >
-          <NeedAttachmentsVariant need={need} variant="datasheet" />
+          <NeedAttachmentsSection need={need} />
         </NeedShowSection>
 
         {/* Section 06: Checklist KAK */}
@@ -201,7 +199,7 @@ export function NeedShowLayout({
           subtitle="Instrumen Verifikasi"
           isLast
         >
-          <NeedChecklistVariant
+          <NeedChecklistSection
             need={need}
             questions={checklistQuestions.data}
             existingAnswers={checklistAnswers.data}

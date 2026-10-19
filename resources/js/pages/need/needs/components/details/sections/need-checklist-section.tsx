@@ -10,19 +10,19 @@ import { ChecklistForm } from '@/components/needs/checklist-form';
 import { Card, CardContent } from '@/components/ui/card';
 import type { ChecklistAnswer, ChecklistQuestion, Need } from '@/types';
 
-interface NeedChecklistVariantProps {
+interface NeedChecklistSectionProps {
   need: Need;
   questions: ChecklistQuestion[];
   existingAnswers: ChecklistAnswer[];
   isLocked: boolean;
 }
 
-export function NeedChecklistVariant({
+export function NeedChecklistSection({
   need,
   questions,
   existingAnswers,
   isLocked,
-}: NeedChecklistVariantProps) {
+}: NeedChecklistSectionProps) {
   const readonly = !need.can?.performChecklist || isLocked;
 
   const stats = useMemo(() => {

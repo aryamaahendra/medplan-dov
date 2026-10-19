@@ -1,4 +1,25 @@
+import {
+  RiAlertLine,
+  RiAttachmentLine,
+  RiBarChartLine,
+  RiBriefcaseLine,
+  RiCalendarLine,
+  RiCheckLine,
+  RiCloseLine,
+  RiCompass3Line,
+  RiFileTextLine,
+  RiFireLine,
+  RiHistoryLine,
+  RiInformationLine,
+} from '@remixicon/react';
+import React, { useMemo, useState } from 'react';
+
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useNeedForm } from '@/features/need/hooks/use-need-form';
+import { usePermission } from '@/hooks/use-permission';
+import { cn } from '@/lib/utils';
 import type {
   KpiGroup,
   Need,
@@ -7,10 +28,18 @@ import type {
   Tujuan,
 } from '@/types';
 
-import { NeedFormVariant2 } from './forms/need-form-variant-2';
+import { FileSection } from './file-section';
+import { GeneralInfoSection } from './general-info-section';
+import { IkkAlignmentSection } from './ikk-alignment-section';
+import { NeedDetailSection } from './need-detail-section';
+import { NeedLockBanner } from './need-lock-banner';
+import { PlanningAlignmentSection } from './planning-alignment-section';
+import { PriorityStatusSection } from './priority-status-section';
+import { RenstraAlignmentSection } from './renstra-alignment-section';
+import { RlsAlignmentSection } from './rls-alignment-section';
 import { UnapprovedNeedPickerDialog } from './unapproved-need-picker-dialog';
 
-interface NeedFormProps {
+export interface NeedFormProps {
   need?: Need | null;
   currentGroup?: { id: number; name: string; year: number } | null;
   organizationalUnits: { id: number; name: string; parent_id: number | null }[];
@@ -41,6 +70,8 @@ export function NeedForm({
   satkerOptions,
   className,
 }: NeedFormProps) {
+  const { hasPermission } = usePermission();
+
   const { form, state, handlers } = useNeedForm({
     need,
     currentGroup,
@@ -61,7 +92,6 @@ export function NeedForm({
     isEditing,
     isLocked,
     isOrphaned,
-    initialIsOrphaned,
     filteredOrganizationalUnits,
     visibleTabs,
     detailValuesRef,
@@ -79,43 +109,424 @@ export function NeedForm({
     onCancel,
   } = handlers;
 
-  const variantProps = {
-    data,
-    setData,
-    errors,
-    processing,
-    isEditing,
-    isLocked,
-    currentGroup,
-    need,
-    isOrphaned,
-    initialIsOrphaned,
-    organizationalUnits: filteredOrganizationalUnits,
-    needTypes,
-    tujuans,
-    kpiGroups,
-    strategicServicePlans,
-    planningActivities,
-    fundingSources,
-    users,
-    kldiOptions,
-    satkerOptions,
-    handleVolumeChange,
-    handleUnitPriceChange,
-    detailValuesRef,
-    getTabErrors,
-    visibleTabs,
-    sourceTitle,
-    handleResetSource,
-    setPickerOpen,
-    handleSubmit,
-    onCancel,
-    className,
-  };
+  const [activeSection, setActiveSection] = useState<string>(
+    visibleTabs[0]?.value ?? 'usulan',
+  );
+
+  const sections = useMemo(() => {
+    return [
+      {
+        value: 'usulan',
+        label: 'Data Usulan',
+        subtitle: 'Judul, unit, volume, harga',
+        icon: RiInformationLine,
+        permission: 'update need tab general',
+        isFilled: !!data.title && !!data.unit_price,
+      },
+      {
+        value: 'urgency',
+        label: 'Urgensi & Status',
+        subtitle: 'Tingkat urgensi & prioritas',
+        icon: RiFireLine,
+        permission: 'update need tab urgency',
+        isFilled: !!data.urgency,
+      },
+      {
+        value: 'renstra',
+        label: 'Renstra',
+        subtitle: 'Sasaran & indikator renstra',
+        icon: RiCompass3Line,
+        permission: 'update need tab strategic',
+        isFilled: (data.sasaran_ids?.length ?? 0) > 0,
+      },
+      {
+        value: 'ikk',
+        label: 'IKK',
+        subtitle: 'Indikator kinerja kunci',
+        icon: RiBarChartLine,
+        permission: 'update need tab ikk',
+        isFilled: (data.kpi_indicator_ids?.length ?? 0) > 0,
+      },
+      {
+        value: 'rls',
+        label: 'RLS',
+        subtitle: 'Rencana layanan strategis',
+        icon: RiBriefcaseLine,
+        permission: 'update need tab rls',
+        isFilled: (data.strategic_service_plan_ids?.length ?? 0) > 0,
+      },
+      {
+        value: 'perencanaan',
+        label: 'Perencanaan',
+        subtitle: 'Program & sub-kegiatan',
+        icon: RiCalendarLine,
+        permission: 'update need tab planning',
+        isFilled: (data.planning_activity_version_ids?.length ?? 0) > 0,
+      },
+      {
+        value: 'detail',
+        label: 'Kerangka Acuan Kerja (KAK)',
+        subtitle: 'Spesifikasi teknis & uraian KAK',
+        icon: RiFileTextLine,
+        permission: 'update need tab detail',
+        isFilled:
+          !!data.detail?.background || !!data.detail?.purpose_and_objectives,
+      },
+      {
+        value: 'lampiran',
+        label: 'Lampiran',
+        subtitle: 'Berkas bukti pendukung',
+        icon: RiAttachmentLine,
+        permission: 'update need tab lampiran',
+        isFilled: (data.attachments?.length ?? 0) > 0,
+      },
+    ].filter((s) => hasPermission(s.permission));
+  }, [data, hasPermission]);
+
+  const activeIndex = sections.findIndex((s) => s.value === activeSection);
+  const currentSectionMeta = sections[activeIndex] ?? sections[0];
 
   return (
     <>
-      <NeedFormVariant2 {...variantProps} />
+      <form onSubmit={handleSubmit} className={cn('w-full', className)}>
+        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
+          {/* Left Main Content Canvas (8 cols on lg) */}
+          <div className="space-y-4 lg:col-span-8">
+            <div>
+              {/* Header of Active Section */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-bold tracking-tight text-foreground md:text-xl">
+                    {currentSectionMeta?.label}
+                  </h2>
+                  <p className="mt-1 text-xs text-muted-foreground uppercase">
+                    {currentSectionMeta?.subtitle}
+                  </p>
+                </div>
+
+                {getTabErrors(activeSection).length > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="h-5 gap-1 px-2 text-xs"
+                  >
+                    Ada {getTabErrors(activeSection).length} field perlu
+                    diperbaiki
+                  </Badge>
+                )}
+              </div>
+
+              {/* Active Content - Sections kept mounted in DOM */}
+              <div className="pt-4 md:pt-6">
+                <fieldset
+                  disabled={isLocked}
+                  className="contents disabled:pointer-events-none disabled:opacity-80"
+                >
+                  <div className={cn(activeSection !== 'usulan' && 'hidden')}>
+                    {hasPermission('update need tab general') && (
+                      <GeneralInfoSection
+                        data={data}
+                        setData={setData}
+                        errors={errors}
+                        organizationalUnits={filteredOrganizationalUnits}
+                        needTypes={needTypes}
+                        handleVolumeChange={handleVolumeChange}
+                        handleUnitPriceChange={handleUnitPriceChange}
+                      />
+                    )}
+                  </div>
+
+                  <div className={cn(activeSection !== 'urgency' && 'hidden')}>
+                    {hasPermission('update need tab urgency') && (
+                      <PriorityStatusSection
+                        data={data}
+                        setData={setData}
+                        errors={errors}
+                      />
+                    )}
+                  </div>
+
+                  <div className={cn(activeSection !== 'renstra' && 'hidden')}>
+                    {hasPermission('update need tab strategic') && (
+                      <RenstraAlignmentSection
+                        data={data}
+                        setData={setData}
+                        errors={errors}
+                        tujuans={tujuans}
+                        year={parseInt(data.year)}
+                      />
+                    )}
+                  </div>
+
+                  <div className={cn(activeSection !== 'ikk' && 'hidden')}>
+                    {hasPermission('update need tab ikk') && (
+                      <IkkAlignmentSection
+                        data={data}
+                        setData={setData}
+                        errors={errors}
+                        kpiGroups={kpiGroups}
+                        year={parseInt(data.year)}
+                      />
+                    )}
+                  </div>
+
+                  <div className={cn(activeSection !== 'rls' && 'hidden')}>
+                    {hasPermission('update need tab rls') && (
+                      <RlsAlignmentSection
+                        data={data}
+                        setData={setData}
+                        errors={errors}
+                        strategicServicePlans={strategicServicePlans}
+                      />
+                    )}
+                  </div>
+
+                  <div
+                    className={cn(activeSection !== 'perencanaan' && 'hidden')}
+                  >
+                    {hasPermission('update need tab planning') && (
+                      <PlanningAlignmentSection
+                        data={data}
+                        setData={setData}
+                        errors={errors}
+                        planningActivities={planningActivities}
+                        year={parseInt(data.year)}
+                      />
+                    )}
+                  </div>
+
+                  <div className={cn(activeSection !== 'detail' && 'hidden')}>
+                    {hasPermission('update need tab detail') && (
+                      <NeedDetailSection
+                        initialValues={data.detail}
+                        detailValuesRef={detailValuesRef}
+                        errors={errors}
+                        technicalSpecificationAttachments={
+                          data.technical_specification_attachments
+                        }
+                        technicalSpecificationAttachmentNames={
+                          data.technical_specification_attachment_names
+                        }
+                        setTechnicalSpecificationAttachments={(files) =>
+                          setData('technical_specification_attachments', files)
+                        }
+                        setTechnicalSpecificationAttachmentNames={(names) =>
+                          setData(
+                            'technical_specification_attachment_names',
+                            names,
+                          )
+                        }
+                        existingTechnicalSpecificationAttachments={
+                          need?.attachments?.filter(
+                            (a) => a.category === 'technical_specifications',
+                          ) ?? []
+                        }
+                        deletedAttachmentIds={data.deleted_attachment_ids}
+                        setDeletedAttachmentIds={(ids) =>
+                          setData('deleted_attachment_ids', ids)
+                        }
+                        fundingSources={fundingSources}
+                        users={users}
+                        kldiOptions={kldiOptions}
+                        satkerOptions={satkerOptions}
+                        totalPrice={data.total_price}
+                      />
+                    )}
+                  </div>
+
+                  <div className={cn(activeSection !== 'lampiran' && 'hidden')}>
+                    {hasPermission('update need tab lampiran') && (
+                      <FileSection
+                        files={data.attachments}
+                        fileNames={data.attachment_names}
+                        setFiles={(files) => setData('attachments', files)}
+                        setFileNames={(names) =>
+                          setData('attachment_names', names)
+                        }
+                        existingAttachments={
+                          need?.attachments?.filter(
+                            (a) => a.category === 'general',
+                          ) ?? []
+                        }
+                        deletedAttachmentIds={data.deleted_attachment_ids}
+                        setDeletedAttachmentIds={(ids) =>
+                          setData('deleted_attachment_ids', ids)
+                        }
+                        errors={errors}
+                      />
+                    )}
+                  </div>
+                </fieldset>
+
+                {/* Step Navigation Glide Buttons */}
+                <div className="flex items-center justify-between pt-6">
+                  {activeIndex > 0 ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() =>
+                        setActiveSection(sections[activeIndex - 1].value)
+                      }
+                    >
+                      <span>Ke: {sections[activeIndex - 1]?.label}</span>
+                    </Button>
+                  ) : (
+                    <div />
+                  )}
+
+                  {activeIndex < sections.length - 1 ? (
+                    <Button
+                      type="button"
+                      variant="default"
+                      onClick={() =>
+                        setActiveSection(sections[activeIndex + 1].value)
+                      }
+                    >
+                      <span>Lanjut ke: {sections[activeIndex + 1]?.label}</span>
+                    </Button>
+                  ) : (
+                    !isLocked && (
+                      <Button type="submit" disabled={processing}>
+                        {isEditing ? 'Simpan Usulan' : 'Tambah Usulan'}
+                      </Button>
+                    )
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Sticky Navigation Rail (4 cols on lg) */}
+          <div className="space-y-4 lg:sticky lg:top-4 lg:z-10 lg:col-span-4">
+            {need && <NeedLockBanner need={need} />}
+
+            {isOrphaned && (
+              <Alert variant="destructive" className="p-2.5">
+                <RiAlertLine className="h-4 w-4" />
+                <AlertTitle className="text-xs font-semibold">
+                  Unit Kerja Tidak Aktif
+                </AlertTitle>
+                <AlertDescription className="text-xs">
+                  Unit kerja sebelumnya tidak aktif. Silakan pilih unit kerja
+                  aktif.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <div className="space-y-4">
+              {/* Sidebar Summary & Save Card */}
+              <div>
+                <div className="mt-3 flex items-center gap-1">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={onCancel}
+                    className="flex-1 text-xs"
+                  >
+                    {isLocked ? 'KEMBALI' : 'BATAL'}
+                  </Button>
+
+                  {!isLocked && (
+                    <Button
+                      type="submit"
+                      disabled={processing}
+                      className="min-w-2/3 flex-1 gap-1 text-xs font-semibold"
+                    >
+                      {isEditing ? 'SIMPAN' : 'TAMBAH'}
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                {!isEditing && (
+                  <div className="mt-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPickerOpen(true)}
+                      className="w-full gap-1.5 text-xs"
+                    >
+                      <RiHistoryLine className="h-3.5 w-3.5" />
+                      Salin Usulan Sebelumnya
+                    </Button>
+                  </div>
+                )}
+
+                {sourceTitle && (
+                  <div className="mt-2 flex items-center justify-between rounded-md border border-primary/20 bg-primary/5 px-2.5 py-1.5 text-xs text-primary">
+                    <span className="line-clamp-1 text-[11px]">
+                      Draf: <strong>{sourceTitle}</strong>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleResetSource}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      <RiCloseLine className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Section List */}
+              <div className="space-y-1 py-1">
+                {sections.map((section) => {
+                  const isSelected = section.value === activeSection;
+                  const errCount = getTabErrors(section.value).length;
+                  const IconComp = section.icon;
+
+                  return (
+                    <button
+                      key={section.value}
+                      type="button"
+                      onClick={() => setActiveSection(section.value)}
+                      className={cn(
+                        'group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all',
+                        isSelected
+                          ? 'bg-muted font-medium text-primary dark:bg-muted'
+                          : 'text-foreground/80 hover:bg-muted/60 hover:text-foreground',
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          'flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs transition-colors',
+                          isSelected
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted text-muted-foreground group-hover:text-foreground',
+                        )}
+                      >
+                        <IconComp className="h-4 w-4" />
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="text-xs font-semibold uppercase">
+                            {section.label}
+                          </span>
+                          {errCount > 0 ? (
+                            <Badge
+                              variant="destructive"
+                              className="h-4 px-1 text-[9px] font-bold"
+                            >
+                              {errCount}
+                            </Badge>
+                          ) : section.isFilled ? (
+                            <RiCheckLine className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                          ) : null}
+                        </div>
+                        <p className="line-clamp-1 text-xs text-muted-foreground">
+                          {section.subtitle}
+                        </p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
 
       {!isEditing && currentGroup && (
         <UnapprovedNeedPickerDialog

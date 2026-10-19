@@ -2,18 +2,25 @@ import { Head } from '@inertiajs/react';
 import { RiAlertLine } from '@remixicon/react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import needRoutes from '@/routes/needs';
-import type { Need, PlanningActivityVersion, Tujuan } from '@/types';
+import type {
+  KpiGroup,
+  Need,
+  PlanningActivityVersion,
+  StrategicServicePlan,
+  Tujuan,
+} from '@/types';
 
 import { NeedForm } from './components/need-form';
 import { NeedLockBanner } from './components/need-lock-banner';
+
 interface EditProps {
   need: Need;
   currentGroup: { id: number; name: string; year: number };
   organizationalUnits: { id: number; name: string; parent_id: number | null }[];
   needTypes: { id: number; name: string }[];
   tujuans: Tujuan[];
-  kpiGroups: any[];
-  strategicServicePlans: any[];
+  kpiGroups: KpiGroup[];
+  strategicServicePlans: StrategicServicePlan[];
   planningActivities: PlanningActivityVersion[];
   fundingSources: { id: number; name: string }[];
   users: { id: number; name: string; nip: string | null }[];

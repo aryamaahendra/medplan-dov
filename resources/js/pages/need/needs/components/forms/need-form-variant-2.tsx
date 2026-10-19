@@ -20,7 +20,6 @@ import React, { useMemo, useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { usePermission } from '@/hooks/use-permission';
 import { formatIDR } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
@@ -190,8 +189,8 @@ export function NeedFormVariant2({
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
         {/* Left Navigation Rail (4 cols on lg) */}
         <div className="space-y-4 lg:col-span-4">
-          <Card className="overflow-hidden border-border/80 shadow-xs">
-            <div className="border-b border-border/60 bg-muted/30 p-4">
+          <div className="space-y-4">
+            <div className="border-b border-border/60 pb-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-muted-foreground uppercase">
                   Navigasi Formulir
@@ -233,7 +232,7 @@ export function NeedFormVariant2({
             </div>
 
             {/* Section List */}
-            <div className="divide-y divide-border/50 p-2">
+            <div className="divide-y divide-border/40 py-1">
               {sections.map((section) => {
                 const isSelected = section.value === activeSection;
                 const errCount = getTabErrors(section.value).length;
@@ -288,8 +287,8 @@ export function NeedFormVariant2({
             </div>
 
             {/* Sidebar Summary & Save Card */}
-            <div className="border-t border-border/70 bg-muted/20 p-4">
-              <div className="rounded-lg border border-border/70 bg-background p-3">
+            <div className="border-t border-border/60 pt-4">
+              <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
                 <span className="text-[11px] font-medium text-muted-foreground">
                   Total Estimasi Biaya
                 </span>
@@ -327,14 +326,14 @@ export function NeedFormVariant2({
                 )}
               </div>
             </div>
-          </Card>
+          </div>
         </div>
 
         {/* Right Main Content Canvas (8 cols on lg) */}
         <div className="space-y-4 lg:col-span-8">
-          <Card className="overflow-hidden border-border/80 shadow-md">
+          <div>
             {/* Header of Active Section */}
-            <div className="border-b border-border/70 bg-muted/30 p-4 md:p-6">
+            <div className="border-b border-border/60 pb-4 md:pb-6">
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-xs font-semibold text-primary uppercase">
@@ -361,7 +360,7 @@ export function NeedFormVariant2({
             </div>
 
             {/* Active Content - Sections kept mounted in DOM */}
-            <CardContent className="p-4 md:p-6">
+            <div className="pt-4 md:pt-6">
               {isOrphaned && (
                 <div className="mb-4">
                   <Alert variant="destructive">
@@ -564,8 +563,8 @@ export function NeedFormVariant2({
                   )
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </form>

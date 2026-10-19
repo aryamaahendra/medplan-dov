@@ -42,7 +42,7 @@ export function useRolesIndex(props: RolesIndexProps) {
       return;
     }
 
-    router.visit(rolesRoutes.edit.url({ role: String(role.id) }));
+    router.visit(rolesRoutes.edit.url({ role: role.id }));
   };
 
   const onDelete = (role: Role) => {
@@ -61,8 +61,7 @@ export function useRolesIndex(props: RolesIndexProps) {
     }
 
     setIsDeleting(true);
-
-    router.delete(rolesRoutes.destroy.url({ role: String(deletingRole.id) }), {
+    router.delete(rolesRoutes.destroy.url({ role: deletingRole.id }), {
       onSuccess: () => {
         toast.success('Role deleted successfully.');
         setDeletingRole(null);

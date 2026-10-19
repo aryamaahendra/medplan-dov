@@ -68,6 +68,7 @@ export type NeedWorkflowStage =
 export interface Need {
   id: number;
   need_group_id: number;
+  source_need_id?: number | null;
   needGroup?: {
     id: number;
     name: string;

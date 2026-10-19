@@ -22,7 +22,7 @@ export function RoleForm({ role, permissions }: RoleFormProps) {
     e.preventDefault();
 
     if (isEditing) {
-      put(rolesRoutes.update.url({ role: String(role.id) }));
+      put(rolesRoutes.update.url({ role: role.id }));
     } else {
       post(rolesRoutes.store.url());
     }

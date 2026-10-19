@@ -25,7 +25,7 @@ export function PriorityStatusSection({
   }, [data.urgency, data.impact, setData]);
 
   return (
-    <div className="space-y-6 py-6">
+    <div className="space-y-6">
       {canUpdateStatus && (
         <RadioField
           label="Status Usulan"

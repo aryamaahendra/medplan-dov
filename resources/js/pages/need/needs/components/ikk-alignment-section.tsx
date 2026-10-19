@@ -143,7 +143,7 @@ function KpiIndicatorItem({
         )}
         <div className="mt-1 grid gap-1.5 leading-none">
           <Label
-            htmlFor={`kpi-${indicator.id}`}
+            htmlFor={indicator.is_category ? undefined : `kpi-${indicator.id}`}
             className={cn(
               'text-sm leading-normal transition-colors',
               indicator.is_category

@@ -96,7 +96,7 @@ export function FileSection({
   };
 
   return (
-    <div className="space-y-6 py-4">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-medium">Bukti Dukung</h3>

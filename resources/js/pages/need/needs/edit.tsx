@@ -41,7 +41,7 @@ export default function Edit({
   return (
     <>
       <Head title={`${currentGroup.name}: Edit Usulan`} />
-      <div className="flex h-full flex-1 flex-col gap-4 p-4">
+      <div className="flex h-full flex-1 flex-col gap-8 p-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-semibold tracking-tight">
             Edit Usulan: {currentGroup.name}

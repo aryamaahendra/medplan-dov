@@ -1,7 +1,5 @@
 import { RiAlertLine } from '@remixicon/react';
 import {
-  RiArrowLeftLine,
-  RiArrowRightLine,
   RiAttachmentLine,
   RiBarChartLine,
   RiBriefcaseLine,
@@ -13,7 +11,6 @@ import {
   RiFireLine,
   RiHistoryLine,
   RiInformationLine,
-  RiSaveLine,
 } from '@remixicon/react';
 import React, { useMemo, useState } from 'react';
 
@@ -21,7 +18,6 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { usePermission } from '@/hooks/use-permission';
-import { formatIDR } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import type {
   Need,
@@ -160,8 +156,8 @@ export function NeedFormVariant2({
       },
       {
         value: 'detail',
-        label: 'Detail KAK',
-        subtitle: 'Uraian KAK & spesifikasi',
+        label: 'Kerangka Acuan Kerja (KAK)',
+        subtitle: 'Spesifikasi teknis & uraian KAK',
         icon: RiFileTextLine,
         permission: 'update need tab detail',
         isFilled:
@@ -181,27 +177,20 @@ export function NeedFormVariant2({
   const activeIndex = sections.findIndex((s) => s.value === activeSection);
   const currentSectionMeta = sections[activeIndex] ?? sections[0];
 
-  const totalPriceFormatted = useMemo(() => {
-    return formatIDR(data.total_price || 0);
-  }, [data.total_price]);
-
   return (
     <form onSubmit={handleSubmit} className={cn('w-full', className)}>
-      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
+      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
         {/* Left Main Content Canvas (8 cols on lg) */}
         <div className="space-y-4 lg:col-span-8">
           <div>
             {/* Header of Active Section */}
-            <div className="border-b border-border/60 pb-4 md:pb-6">
+            <div className="">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-semibold text-primary uppercase">
-                    Bagian {activeIndex + 1} dari {sections.length}
-                  </span>
                   <h2 className="text-lg font-bold tracking-tight text-foreground md:text-xl">
                     {currentSectionMeta?.label}
                   </h2>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
+                  <p className="mt-1 text-xs text-muted-foreground uppercase">
                     {currentSectionMeta?.subtitle}
                   </p>
                 </div>
@@ -359,20 +348,17 @@ export function NeedFormVariant2({
                   )}
                 </div>
               </fieldset>
-
               {/* Step Navigation Glide Buttons */}
-              <div className="mt-8 flex items-center justify-between border-t border-border/60 pt-4">
+              <div className="flex items-center justify-between pt-6">
                 {activeIndex > 0 ? (
                   <Button
                     type="button"
                     variant="outline"
-                    size="sm"
+
                     onClick={() =>
                       setActiveSection(sections[activeIndex - 1].value)
                     }
-                    className="gap-1.5 text-xs"
                   >
-                    <RiArrowLeftLine className="h-3.5 w-3.5" />
                     <span>Ke: {sections[activeIndex - 1]?.label}</span>
                   </Button>
                 ) : (
@@ -382,25 +368,17 @@ export function NeedFormVariant2({
                 {activeIndex < sections.length - 1 ? (
                   <Button
                     type="button"
-                    variant="secondary"
-                    size="sm"
+                    variant="default"
+
                     onClick={() =>
                       setActiveSection(sections[activeIndex + 1].value)
                     }
-                    className="gap-1.5 text-xs"
                   >
                     <span>Lanjut ke: {sections[activeIndex + 1]?.label}</span>
-                    <RiArrowRightLine className="h-3.5 w-3.5" />
                   </Button>
                 ) : (
                   !isLocked && (
-                    <Button
-                      type="submit"
-                      size="sm"
-                      disabled={processing}
-                      className="gap-1.5 text-xs font-semibold"
-                    >
-                      <RiSaveLine className="h-3.5 w-3.5" />
+                    <Button type="submit" disabled={processing}>
                       {isEditing ? 'Simpan Usulan' : 'Tambah Usulan'}
                     </Button>
                   )
@@ -427,16 +405,32 @@ export function NeedFormVariant2({
           )}
 
           <div className="space-y-4">
-            <div className="border-b border-border/60 pb-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">
-                  Navigasi Formulir
-                </span>
-                <span className="font-mono text-[10px] text-muted-foreground">
-                  {sections.length} Bagian
-                </span>
-              </div>
+            {/* Sidebar Summary & Save Card */}
+            <div>
+              <div className="mt-3 flex items-center gap-1">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={onCancel}
+                  className="flex-1 text-xs"
+                >
+                  {isLocked ? 'KEMBALI' : 'BATAL'}
+                </Button>
 
+                {!isLocked && (
+                  <Button
+                    type="submit"
+
+                    disabled={processing}
+                    className="min-w-2/3 flex-1 gap-1 text-xs font-semibold"
+                  >
+                    {isEditing ? 'SIMPAN' : 'TAMBAH'}
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            <div>
               {!isEditing && (
                 <div className="mt-3">
                   <Button
@@ -467,9 +461,8 @@ export function NeedFormVariant2({
                 </div>
               )}
             </div>
-
             {/* Section List */}
-            <div className="divide-y divide-border/40 py-1">
+            <div className="space-y-1 py-1">
               {sections.map((section) => {
                 const isSelected = section.value === activeSection;
                 const errCount = getTabErrors(section.value).length;
@@ -483,7 +476,7 @@ export function NeedFormVariant2({
                     className={cn(
                       'group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all',
                       isSelected
-                        ? 'bg-primary/10 font-medium text-primary dark:bg-primary/15'
+                        ? 'bg-muted font-medium text-primary dark:bg-muted'
                         : 'text-foreground/80 hover:bg-muted/60 hover:text-foreground',
                     )}
                   >
@@ -500,7 +493,7 @@ export function NeedFormVariant2({
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-1">
-                        <span className="text-xs font-semibold">
+                        <span className="text-xs font-semibold uppercase">
                           {section.label}
                         </span>
                         {errCount > 0 ? (
@@ -514,54 +507,13 @@ export function NeedFormVariant2({
                           <RiCheckLine className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                         ) : null}
                       </div>
-                      <p className="line-clamp-1 text-[10px] text-muted-foreground">
+                      <p className="line-clamp-1 text-xs text-muted-foreground">
                         {section.subtitle}
                       </p>
                     </div>
                   </button>
                 );
               })}
-            </div>
-
-            {/* Sidebar Summary & Save Card */}
-            <div className="border-t border-border/60 pt-4">
-              <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-                <span className="text-[11px] font-medium text-muted-foreground">
-                  Total Estimasi Biaya
-                </span>
-                <div className="mt-0.5 text-lg font-bold text-primary">
-                  {totalPriceFormatted}
-                </div>
-                <div className="mt-1 text-[11px] text-muted-foreground">
-                  {data.volume
-                    ? `${data.volume} ${data.unit || 'unit'}`
-                    : 'Volume belum diisi'}
-                </div>
-              </div>
-
-              <div className="mt-3 flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={onCancel}
-                  className="flex-1 text-xs"
-                >
-                  {isLocked ? 'Kembali' : 'Batal'}
-                </Button>
-
-                {!isLocked && (
-                  <Button
-                    type="submit"
-                    size="sm"
-                    disabled={processing}
-                    className="flex-1 gap-1 text-xs font-semibold"
-                  >
-                    <RiSaveLine className="h-3.5 w-3.5" />
-                    {isEditing ? 'Simpan' : 'Tambah'}
-                  </Button>
-                )}
-              </div>
             </div>
           </div>
         </div>

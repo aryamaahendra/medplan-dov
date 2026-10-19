@@ -64,7 +64,7 @@ export function TechSpecExtra({
       </div>
 
       {hasAttachments && (
-        <div className="grid grid-cols-1 gap-2 border-b p-2 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-2 pt-2 md:grid-cols-2">
           {existingAttachments.map((att) => (
             <AttachmentCard
               key={att.id}

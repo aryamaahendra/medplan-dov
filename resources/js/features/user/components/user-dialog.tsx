@@ -160,8 +160,9 @@ function UserFormContent({
           label="Unit Kerja"
           error={errors.organizational_unit_id}
         >
-          {() => (
+          {({ id }) => (
             <TreeSelect
+              id={id}
               items={organizationalUnits}
               value={data.organizational_unit_id}
               onValueChange={(v) => setData('organizational_unit_id', v)}

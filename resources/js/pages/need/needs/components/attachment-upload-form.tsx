@@ -95,10 +95,14 @@ export function AttachmentUploadForm({ needId }: AttachmentUploadFormProps) {
           {data.file && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-2">
-                <Label className="text-xs text-muted-foreground">
+                <Label
+                  htmlFor="display_name"
+                  className="text-xs text-muted-foreground"
+                >
                   Ubah Nama
                 </Label>
                 <Input
+                  id="display_name"
                   placeholder="Nama tampilan (opsional)"
                   value={data.display_name}
                   onChange={(e) => setData('display_name', e.target.value)}

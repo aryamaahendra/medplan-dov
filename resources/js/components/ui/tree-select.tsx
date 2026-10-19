@@ -26,6 +26,7 @@ interface TreeItem {
 }
 
 interface TreeSelectProps {
+  id?: string;
   items: { id: number; name: string; parent_id: number | null }[];
   value?: string | number;
   onValueChange: (value: string) => void;
@@ -35,6 +36,7 @@ interface TreeSelectProps {
 }
 
 export function TreeSelect({
+  id,
   items,
   value,
   onValueChange,
@@ -178,6 +180,7 @@ export function TreeSelect({
       <DialogTrigger
         render={
           <Button
+            id={id}
             variant="outline"
             role="combobox"
             aria-expanded={open}

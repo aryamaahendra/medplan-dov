@@ -30,7 +30,7 @@ const parseIDR = (value: string) => {
 const UNIT_OPTIONS = [
   'pcs',
   'unit',
-  'orang/thn',
+  'orang',
   'paket',
   'set',
   'buah',
@@ -60,15 +60,16 @@ export function GeneralInfoSection({
   handleUnitPriceChange,
 }: GeneralInfoSectionProps) {
   return (
-    <div className="space-y-5 py-6">
+    <div className="space-y-6">
       <FormGrid cols={2} density="comfortable">
         <FieldWrapper
           id="organizational_unit_id"
           label="Unit Kerja"
           error={errors.organizational_unit_id}
         >
-          {() => (
+          {({ id }) => (
             <TreeSelect
+              id={id}
               items={organizationalUnits}
               value={data.organizational_unit_id}
               onValueChange={(v) => setData('organizational_unit_id', v)}
@@ -136,43 +137,43 @@ export function GeneralInfoSection({
         error={errors.description}
       />
 
-      <FormGrid cols={2} density="comfortable">
-        <TextareaField
-          id="current_condition"
-          name="current_condition"
-          label="Kondisi Saat Ini"
-          placeholder="Apa kendala saat ini?"
-          value={data.current_condition}
-          onChange={(e) => setData('current_condition', e.target.value)}
-          rows={2}
-          className="resize-none bg-muted/5 text-sm"
-          error={errors.current_condition}
-        />
+      <TextareaField
+        id="current_condition"
+        name="current_condition"
+        label="Kondisi Saat Ini"
+        placeholder="Apa kendala saat ini?"
+        value={data.current_condition}
+        onChange={(e) => setData('current_condition', e.target.value)}
+        rows={2}
+        className="resize-none bg-muted/5 text-sm"
+        error={errors.current_condition}
+      />
 
-        <TextareaField
-          id="required_condition"
-          name="required_condition"
-          label="Kondisi Optimal"
-          placeholder="Target yang diharapkan?"
-          value={data.required_condition}
-          onChange={(e) => setData('required_condition', e.target.value)}
-          rows={2}
-          className="resize-none bg-muted/5 text-sm"
-          error={errors.required_condition}
-        />
-      </FormGrid>
+      <TextareaField
+        id="required_condition"
+        name="required_condition"
+        label="Kondisi Optimal"
+        placeholder="Target yang diharapkan?"
+        value={data.required_condition}
+        onChange={(e) => setData('required_condition', e.target.value)}
+        rows={2}
+        className="resize-none bg-muted/5 text-sm"
+        error={errors.required_condition}
+      />
+
       <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
         <div className="space-y-2">
-          <Label className="text-xs font-semibold tracking-tight text-muted-foreground uppercase">
+          <Label
+            htmlFor="volume"
+            className="text-xs font-semibold tracking-tight text-muted-foreground uppercase"
+          >
             Satuan & Volume
           </Label>
           <div className="flex flex-wrap items-center gap-2">
             <ToggleGroup
               value={data.unit ? [data.unit] : []}
               onValueChange={(v) => {
-                if (v[0]) {
-                  setData('unit', v[0]);
-                }
+                setData('unit', v[0] ?? '');
               }}
               variant="outline"
               className="flex-wrap items-center justify-start"
@@ -181,7 +182,7 @@ export function GeneralInfoSection({
                 <ToggleGroupItem
                   key={u}
                   value={u}
-                  className="h-8 min-w-10 rounded-md border px-2.5 text-xs capitalize data-[state=on]:bg-foreground/30"
+                  className="h-8 min-w-10 rounded-md border px-2.5 text-xs capitalize data-pressed:bg-primary data-pressed:text-primary-foreground"
                 >
                   {u}
                 </ToggleGroupItem>
@@ -235,14 +236,11 @@ export function GeneralInfoSection({
           </div>
 
           <div className="space-y-1.5">
-            <Label
-              htmlFor="total_price"
-              className="text-xs font-semibold text-primary"
-            >
+            <Label htmlFor="total_price" className="text-xs font-semibold">
               Estimasi Total (Rp)
             </Label>
             <div className="relative">
-              <span className="absolute top-1/2 left-3 -translate-y-1/2 text-xs font-bold text-primary/70">
+              <span className="absolute top-1/2 left-3 -translate-y-1/2 text-xs font-bold">
                 Rp
               </span>
               <Input
@@ -251,7 +249,7 @@ export function GeneralInfoSection({
                 type="text"
                 value={formatIDR(data.total_price)}
                 readOnly
-                className="border-primary/20 bg-primary/5 pl-9 font-mono font-bold text-primary"
+                className="pl-9 font-mono font-bold"
                 tabIndex={-1}
               />
             </div>

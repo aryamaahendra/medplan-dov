@@ -79,11 +79,12 @@ export function FundingSection({
 
   return (
     <SectionWrapper
-      label="Sumber Dana & Estimasi Biaya"
-      footer="*Pilih sumber dana dan biaya estimasi (otomatis)."
+      label="Sumber Pendanaan & Estimasi Biaya"
+      footer="Pilih sumber dana pengadaan serta pantau perkiraan total anggaran kegiatan."
     >
       <div className="space-y-4">
         <FieldWrapper
+          id="funding_source_ids"
           label="Sumber Dana"
           labelProps={{
             className:
@@ -91,70 +92,77 @@ export function FundingSection({
           }}
           error={errors[`detail.funding_source_ids`]}
         >
-          <Popover open={sourceOpen} onOpenChange={setSourceOpen}>
-            <PopoverTrigger
-              render={
-                <Button
-                  variant="outline"
-                  className="w-full justify-between font-normal"
+          {({ id }) => (
+            <Popover open={sourceOpen} onOpenChange={setSourceOpen}>
+              <PopoverTrigger
+                render={
+                  <Button
+                    id={id}
+                    variant="outline"
+                    className="w-full justify-between font-normal"
+                  />
+                }
+              >
+                <span className="truncate">
+                  {selectedSourcesLabel || 'Pilih sumber dana...'}
+                </span>
+                <RiArrowDownSLine
+                  data-icon="inline-end"
+                  className="opacity-50"
                 />
-              }
-            >
-              <span className="truncate">
-                {selectedSourcesLabel || 'Pilih sumber dana...'}
-              </span>
-              <RiArrowDownSLine data-icon="inline-end" className="opacity-50" />
-            </PopoverTrigger>
-            <PopoverContent className="w-(--anchor-width) p-0" align="start">
-              <div className="flex items-center border-b px-3">
-                <RiSearchLine className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-                <Input
-                  placeholder="Cari atau tambah sumber dana..."
-                  className="border-none bg-transparent shadow-none focus-visible:ring-0"
-                  value={sourceSearch}
-                  onChange={(e) => setSourceSearch(e.target.value)}
-                />
-              </div>
-              <ScrollArea className="max-h-[200px]">
-                <div className="p-1">
-                  {filteredSources.map((source) => (
-                    <div
-                      key={source.id}
-                      className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm hover:bg-accent"
-                      onClick={() => toggleSource(source.id)}
-                    >
-                      <RiCheckLine
-                        className={cn(
-                          'h-4 w-4',
-                          fundingSourceIds.some(
-                            (i) => i.toString() === source.id.toString(),
-                          )
-                            ? 'opacity-100'
-                            : 'opacity-0',
-                        )}
-                      />
-                      {source.name}
-                    </div>
-                  ))}
-                  {showAddNew && (
-                    <div
-                      className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm font-medium text-primary hover:bg-accent"
-                      onClick={() => {
-                        toggleSource(sourceSearch);
-                        setSourceSearch('');
-                      }}
-                    >
-                      <RiAddLine className="h-4 w-4" />
-                      Tambah "{sourceSearch}"
-                    </div>
-                  )}
+              </PopoverTrigger>
+              <PopoverContent className="w-(--anchor-width) p-0" align="start">
+                <div className="flex items-center border-b px-3">
+                  <RiSearchLine className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                  <Input
+                    placeholder="Cari atau tambah sumber dana..."
+                    className="border-none bg-transparent shadow-none focus-visible:ring-0"
+                    value={sourceSearch}
+                    onChange={(e) => setSourceSearch(e.target.value)}
+                  />
                 </div>
-              </ScrollArea>
-            </PopoverContent>
-          </Popover>
+                <ScrollArea className="max-h-[200px]">
+                  <div className="p-1">
+                    {filteredSources.map((source) => (
+                      <div
+                        key={source.id}
+                        className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm hover:bg-accent"
+                        onClick={() => toggleSource(source.id)}
+                      >
+                        <RiCheckLine
+                          className={cn(
+                            'h-4 w-4',
+                            fundingSourceIds.some(
+                              (i) => i.toString() === source.id.toString(),
+                            )
+                              ? 'opacity-100'
+                              : 'opacity-0',
+                          )}
+                        />
+                        {source.name}
+                      </div>
+                    ))}
+                    {showAddNew && (
+                      <div
+                        className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm font-medium text-primary hover:bg-accent"
+                        onClick={() => {
+                          toggleSource(sourceSearch);
+                          setSourceSearch('');
+                        }}
+                      >
+                        <RiAddLine className="h-4 w-4" />
+                        Tambah "{sourceSearch}"
+                      </div>
+                    )}
+                  </div>
+                </ScrollArea>
+              </PopoverContent>
+            </Popover>
+          )}
         </FieldWrapper>
 
         <TextareaField
+          id="estimated_cost"
           label="Estimasi Biaya"
           labelProps={{
             className:

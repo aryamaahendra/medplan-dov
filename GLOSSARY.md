@@ -46,12 +46,28 @@ _Avoid_: Reassigned need, duplicate need
 The financial appropriation or revenue source allocated to cover the estimated expenditure of a need.
 _Avoid_: Budget source, payment origin
 
-**Proposal Status**:
-The baseline proposal lifecycle state of a Need: Draft (belum diajukan / masih penyusunan), Diajukan (telah diverifikasi dan diajukan oleh unit), or Ditolak (ditolak pada tahap internal).
-_Avoid_: Technical status, stage flag
+**Need Status**:
+The unified lifecycle state of a Need: Draft (`draft`), Diajukan (`submitted`), Disetujui (`approved`), Ditolak (`rejected`), or Perlu Revisi (`revision`).
+_Avoid_: Proposal status, technical status, stage flag
+
+**Approved Volume**:
+The quantitative volume formally accepted by the Director, which may match or be adjusted down from the proposed volume.
+_Avoid_: Final volume, accepted volume
+
+**Approved Unit Price**:
+The per-unit monetary valuation formally sanctioned by the Director.
+_Avoid_: Final unit price, accepted price
+
+**Approved Total Price**:
+The total monetary allocation sanctioned by the Director, computed as approved volume multiplied by approved unit price.
+_Avoid_: Final total price, accepted total
+
+**Next Cycle Recommendation**:
+A formal executive designation applied by the Director on a rejected proposal or on the unapproved residual volume of a partially approved proposal, qualifying it for prioritized rollover into subsequent Need Groups.
+_Avoid_: Rollover candidate, rollover flag, deferral
 
 **Director Review Status**:
-The executive review determination rendered by the Director on a proposal: Disetujui (Approved, marked with `approved_by_director_at`), Perlu Revisi / Ada Catatan (has review comments without approval, rendered in destructive red), or Menunggu Review (pending executive evaluation).
+The executive review determination rendered by the Director on a proposal: Disetujui (`approved`), Ditolak (`rejected`), Perlu Revisi (`revision`), or Menunggu Review (`submitted`).
 _Avoid_: Workflow stage, final sign-off, executive stamp
 **Priority Flag**:
 A binary designation indicating an executive or strategic prioritization mandate on a Need, separate from operational urgency or risk analysis.

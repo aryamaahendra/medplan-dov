@@ -36,16 +36,7 @@ class NeedProposalEngine
             $isPriority = ($attributes['urgency'] ?? '') === 'high' && ($attributes['impact'] ?? '') === 'high';
             $attributes['is_priority'] = $isPriority;
 
-            if ($payload->shouldSubmit) {
-                $attributes['status'] = Need::STATUS_SUBMITTED;
-                $attributes['is_locked'] = true;
-                $attributes['locked_at'] = now();
-                $attributes['locked_by_user_id'] = $actor?->id;
-                $attributes['lock_reason'] = NeedLockLifecycle::LOCK_REASON_EXECUTIVE_REVIEW;
-                $attributes['unlocked_until'] = null;
-            } else {
-                $attributes['status'] = $attributes['status'] ?? Need::STATUS_DRAFT;
-            }
+            $attributes['status'] = $attributes['status'] ?? Need::STATUS_DRAFT;
 
             /** @var Need $need */
             $need = Need::query()->create($attributes);
@@ -53,6 +44,9 @@ class NeedProposalEngine
             $this->alignmentEngine->syncForNeed($need, $payload, isPartialUpdate: false);
             $this->saveDetail($need, $payload->detail, $payload->fundingSources);
             $this->storeAttachments($need, $payload);
+            if ($payload->shouldSubmit) {
+                $this->lockLifecycle->lockForExecutiveReview($need, $actor);
+            }
 
             return $need;
         });
@@ -71,14 +65,7 @@ class NeedProposalEngine
             $impact = $attributes['impact'] ?? $need->impact;
             $attributes['is_priority'] = $urgency === 'high' && $impact === 'high';
 
-            if ($payload->shouldSubmit) {
-                $attributes['status'] = Need::STATUS_SUBMITTED;
-                $attributes['is_locked'] = true;
-                $attributes['locked_at'] = now();
-                $attributes['locked_by_user_id'] = $actor?->id;
-                $attributes['lock_reason'] = NeedLockLifecycle::LOCK_REASON_EXECUTIVE_REVIEW;
-                $attributes['unlocked_until'] = null;
-            }
+            // Proposal lock & status transition are handled via lockLifecycle if submitted
 
             $need->update($attributes);
             $this->alignmentEngine->syncForNeed($need, $payload, isPartialUpdate: true);
@@ -99,6 +86,9 @@ class NeedProposalEngine
             }
 
             $this->storeAttachments($need, $payload);
+            if ($payload->shouldSubmit) {
+                $this->lockLifecycle->submit($need, $actor);
+            }
 
             return $need;
         });

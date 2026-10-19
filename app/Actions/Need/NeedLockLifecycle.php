@@ -7,6 +7,7 @@ namespace App\Actions\Need;
 use App\Models\Need;
 use App\Models\User;
 use DateTimeInterface;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Deep module owning all Need locking, unlocking, extension, schedule-inheritance,
@@ -30,6 +31,12 @@ class NeedLockLifecycle
      */
     public function submit(Need $need, ?User $actor = null): Need
     {
+        if (! in_array($need->status, [Need::STATUS_DRAFT, Need::STATUS_REVISION], true)) {
+            throw ValidationException::withMessages([
+                'status' => 'Hanya usulan dengan status draft atau revisi yang dapat diajukan.',
+            ]);
+        }
+
         return $this->lockForExecutiveReview($need, $actor);
     }
 

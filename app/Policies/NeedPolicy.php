@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Enums\UserRole;
 use App\Models\Need;
 use App\Models\NeedGroup;
 use App\Models\User;
@@ -80,11 +81,14 @@ final class NeedPolicy
         }
 
         if ($need->isLocked($user)) {
+            $isPrivilegedSubmitted = $need->status === Need::STATUS_SUBMITTED
+                && $this->canBypassSubmissionWindow($user);
+
             $isLockedByGroupOnly = ! $need->isExplicitlyLocked()
                 && $need->approved_by_director_at === null
                 && $this->canBypassSubmissionWindow($user);
 
-            if (! $isLockedByGroupOnly) {
+            if (! $isLockedByGroupOnly && ! $isPrivilegedSubmitted) {
                 $needGroup = $need->relationLoaded('needGroup') ? $need->needGroup : null;
                 if ($needGroup && ! $needGroup->isOpenForSubmission() && ! ($need->unlocked_until !== null && $need->unlocked_until->isFuture()) && $need->is_locked !== false) {
                     return Response::deny('Periode pengajuan usulan kebutuhan untuk kelompok ini sedang ditutup.');
@@ -112,7 +116,7 @@ final class NeedPolicy
             return Response::deny('Usulan kebutuhan sedang dalam proses review dan tidak dapat dihapus.');
         }
 
-        if ($need->isLocked($user)) {
+        if ($need->isLocked($user) && ! ($need->status === Need::STATUS_SUBMITTED && $this->canBypassSubmissionWindow($user))) {
             return Response::deny('Usulan kebutuhan terkunci dan tidak dapat dihapus.');
         }
 
@@ -247,6 +251,6 @@ final class NeedPolicy
      */
     private function canBypassSubmissionWindow(User $user): bool
     {
-        return $user->hasRole('super-admin') || $user->hasRole('admin') || $user->hasRole('planner');
+        return $user->hasRole(UserRole::SuperAdmin->value) || $user->hasRole(UserRole::Planner->value);
     }
 }

@@ -11,6 +11,7 @@ use App\Models\OrganizationalUnit;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 use Spatie\Permission\PermissionRegistrar;
 
 uses(RefreshDatabase::class);
@@ -115,6 +116,19 @@ describe('Dedicated Submission Endpoint', function () {
         $response->assertSessionHasErrors('status');
         expect($approvedNeed->fresh()->status)->toBe(Need::STATUS_APPROVED);
     });
+
+    it('validates that proposal is in draft or revision via lifecycle action', function () {
+        $need = Need::factory()->create([
+            'need_group_id' => $this->openGroup->id,
+            'organizational_unit_id' => $this->orgUnit->id,
+            'status' => Need::STATUS_APPROVED,
+        ]);
+
+        $lifecycle = app(NeedLockLifecycle::class);
+
+        expect(fn () => $lifecycle->submit($need, $this->staffUser))
+            ->toThrow(ValidationException::class);
+    });
 });
 
 describe('Direct Submission Flag on Create & Update', function () {
@@ -217,8 +231,29 @@ describe('Policy Authorization for Submission', function () {
 
         $response = $this->actingAs($this->otherStaffUser)
             ->post(route('needs.submit', $need));
-
         $response->assertForbidden();
+    });
+
+    it('rejects atomic creation and submission for users belonging to a different unit', function () {
+        $payload = [
+            'need_group_id' => $this->openGroup->id,
+            'organizational_unit_id' => $this->otherOrgUnit->id,
+            'need_type_id' => $this->needType->id,
+            'year' => 2026,
+            'title' => 'Cross-Unit Create and Submit',
+            'volume' => 1,
+            'unit' => 'unit',
+            'unit_price' => 1000,
+            'total_price' => 1000,
+            'urgency' => Urgency::Low->value,
+            'impact' => Impact::Low->value,
+            'submit' => true,
+        ];
+
+        $response = $this->actingAs($this->staffUser)
+            ->post(route('needs.store'), $payload);
+
+        $response->assertSessionHasErrors(['organizational_unit_id']);
     });
 });
 
@@ -251,6 +286,8 @@ describe('Read-Only Locking Protection on Submitted Proposals', function () {
             ]);
 
         $response->assertForbidden();
+
+        expect($this->plannerUser->can('update', $need))->toBeTrue();
     });
 
     it('rejects delete requests from standard submitters while proposal is submitted', function () {

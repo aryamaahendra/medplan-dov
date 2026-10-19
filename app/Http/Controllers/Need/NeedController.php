@@ -119,9 +119,14 @@ final class NeedController extends Controller
             technicalSpecificationAttachments: $request->file('technical_specification_attachments') ?? [],
             technicalSpecificationAttachmentNames: (array) $request->input('technical_specification_attachment_names', []),
         );
+        if ($payload->shouldSubmit) {
+            $prototypeNeed = new Need($payload->attributes);
+            $prototypeNeed->status = Need::STATUS_DRAFT;
+            $prototypeNeed->setRelation('needGroup', $needGroup);
+            $this->authorize('submit', $prototypeNeed);
+        }
 
         $need = $engine->submit($payload, $request->user());
-
         $message = $payload->shouldSubmit
             ? 'Usulan kebutuhan berhasil dibuat dan diajukan.'
             : 'Usulan kebutuhan berhasil dibuat.';
@@ -288,7 +293,7 @@ final class NeedController extends Controller
     {
         if (! in_array($need->status, [Need::STATUS_DRAFT, Need::STATUS_REVISION], true)) {
             throw ValidationException::withMessages([
-                'status' => 'Hanya usulan berstatus draft atau revisi yang dapat diajukan.',
+                'status' => 'Hanya usulan dengan status draft atau revisi yang dapat diajukan.',
             ]);
         }
 

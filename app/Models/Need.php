@@ -160,13 +160,6 @@ class Need extends Model
             return ['is_locked' => false, 'reason' => $this->lock_reason];
         }
 
-        if ($this->is_locked === true) {
-            return [
-                'is_locked' => true,
-                'reason' => $this->lock_reason ?: 'Usulan dikunci secara manual oleh perencana.',
-            ];
-        }
-
         if ($this->approved_by_director_at !== null) {
             return [
                 'is_locked' => true,
@@ -178,6 +171,13 @@ class Need extends Model
             return [
                 'is_locked' => true,
                 'reason' => $this->lock_reason ?: 'Usulan sedang dalam proses review eksekutif.',
+            ];
+        }
+
+        if ($this->is_locked === true) {
+            return [
+                'is_locked' => true,
+                'reason' => $this->lock_reason ?: 'Usulan dikunci secara manual oleh perencana.',
             ];
         }
 

@@ -44,6 +44,11 @@ use Illuminate\Support\Facades\Storage;
     'locked_by_user_id',
     'lock_reason',
     'unlocked_until',
+    'approved_volume',
+    'approved_unit_price',
+    'approved_total_price',
+    'is_recommended_for_next_cycle',
+    'recommended_volume',
 ])]
 class Need extends Model
 {
@@ -52,14 +57,20 @@ class Need extends Model
 
     public const STATUS_DRAFT = 'draft';
 
+    public const STATUS_SUBMITTED = 'submitted';
+
     public const STATUS_APPROVED = 'approved';
 
     public const STATUS_REJECTED = 'rejected';
 
+    public const STATUS_REVISION = 'revision';
+
     public const STATUSES = [
         self::STATUS_DRAFT,
+        self::STATUS_SUBMITTED,
         self::STATUS_APPROVED,
         self::STATUS_REJECTED,
+        self::STATUS_REVISION,
     ];
 
     protected function casts(): array
@@ -77,6 +88,11 @@ class Need extends Model
             'is_locked' => 'boolean',
             'locked_at' => 'datetime',
             'unlocked_until' => 'datetime',
+            'approved_volume' => 'decimal:4',
+            'approved_unit_price' => 'decimal:2',
+            'approved_total_price' => 'decimal:2',
+            'is_recommended_for_next_cycle' => 'boolean',
+            'recommended_volume' => 'decimal:4',
         ];
     }
 
@@ -201,23 +217,31 @@ class Need extends Model
 
     /**
      * Get the workflow stage for this need.
-     * Returns one of: 'approved' | 'rejected' | 'under_review' | 'draft'
+     * Returns one of: 'draft' | 'submitted' | 'approved' | 'rejected' | 'revision'
      */
     public function getWorkflowStage(): string
     {
         if ($this->status === self::STATUS_REJECTED) {
-            return 'rejected';
+            return self::STATUS_REJECTED;
+        }
+
+        if ($this->status === self::STATUS_REVISION) {
+            return self::STATUS_REVISION;
         }
 
         if ($this->approved_by_director_at !== null) {
-            return 'approved';
+            return self::STATUS_APPROVED;
         }
 
         if ($this->status === self::STATUS_APPROVED) {
-            return 'under_review';
+            return self::STATUS_APPROVED;
         }
 
-        return 'draft';
+        if ($this->status === self::STATUS_SUBMITTED) {
+            return self::STATUS_SUBMITTED;
+        }
+
+        return self::STATUS_DRAFT;
     }
 
     /**

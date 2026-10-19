@@ -34,7 +34,7 @@ export default function NeedGroupsIndex({
     <>
       <Head title="Kelompok Usulan" />
 
-      <div className="flex flex-col gap-6 p-4 pb-12 sm:p-6 lg:p-8">
+      <div className="flex flex-col gap-6 p-4 pb-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
@@ -48,7 +48,7 @@ export default function NeedGroupsIndex({
 
           <div className="flex items-center gap-3">
             {hasPermission('create need-groups') && (
-              <Button onClick={actions.onCreate} className="gap-1.5 shadow-xs">
+              <Button onClick={actions.onCreate}>
                 <RiAddLine data-icon="inline-start" />
                 Tambah Kelompok
               </Button>

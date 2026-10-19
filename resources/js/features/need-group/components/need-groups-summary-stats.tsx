@@ -3,8 +3,17 @@ import {
   RiFileList3Line,
   RiCoinsLine,
 } from '@remixicon/react';
-import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
+import type { ReactNode } from 'react';
+import { Area, AreaChart } from 'recharts';
 
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   ChartContainer,
   ChartTooltip,
@@ -32,13 +41,57 @@ const budgetChartConfig = {
   },
 } satisfies ChartConfig;
 
+interface StatCardProps {
+  title: string;
+  value: ReactNode;
+  subtitle?: ReactNode;
+  badge?: ReactNode;
+  icon?: ReactNode;
+  children: ReactNode;
+}
+
+function StatCard({
+  title,
+  value,
+  subtitle,
+  badge,
+  icon,
+  children,
+}: StatCardProps) {
+  return (
+    <Card className="justify-between py-0">
+      <CardHeader className="px-4 pt-4">
+        <CardDescription className="text-xs font-semibold tracking-wider uppercase">
+          {title}
+        </CardDescription>
+        {icon ? (
+          <CardAction>{icon}</CardAction>
+        ) : badge ? (
+          <CardAction>{badge}</CardAction>
+        ) : null}
+        <CardTitle className="flex items-baseline justify-between gap-2 pt-1 font-heading text-3xl font-extrabold tracking-tight">
+          <div className="flex items-baseline gap-1.5">
+            <span>{value}</span>
+            {subtitle ? (
+              <span className="text-xs font-normal text-muted-foreground">
+                {subtitle}
+              </span>
+            ) : null}
+          </div>
+          {icon && badge ? badge : null}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-0">{children}</CardContent>
+    </Card>
+  );
+}
+
 export function NeedGroupsSummaryStats({ stats }: NeedGroupsSummaryStatsProps) {
-  const yearlyTrends = stats.yearly_trends ?? [];
-  const latestTrend = yearlyTrends[yearlyTrends.length - 1];
+  const groupTrends = stats.group_trends ?? stats.yearly_trends ?? [];
+  const latestTrend = groupTrends[groupTrends.length - 1];
 
   const latestNeeds = latestTrend?.total_needs ?? stats.total_needs ?? 0;
   const latestBudget = latestTrend?.total_budget ?? stats.total_budget ?? 0;
-
   const activePercent =
     stats.total_groups > 0
       ? Math.min(
@@ -50,27 +103,17 @@ export function NeedGroupsSummaryStats({ stats }: NeedGroupsSummaryStatsProps) {
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
       {/* Stat 1: Total Kelompok & Kelompok Aktif */}
-      <div className="flex flex-col justify-between rounded-xl border border-border bg-card p-4 shadow-xs sm:p-5">
-        <div>
-          <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-              Kelompok Usulan
-            </span>
-            <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <RiFolderChartLine className="size-4" />
-            </div>
+      <StatCard
+        title="Kelompok Usulan"
+        value={formatNumber(stats.total_groups)}
+        subtitle="Total Kelompok"
+        icon={
+          <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <RiFolderChartLine className="size-4" />
           </div>
-          <div className="mt-2.5 flex items-baseline gap-2">
-            <span className="font-heading text-3xl font-extrabold tracking-tight text-foreground">
-              {formatNumber(stats.total_groups)}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              Total Kelompok
-            </span>
-          </div>
-        </div>
-
-        <div className="mt-4 flex flex-col gap-2 border-t border-border/60 pt-3">
+        }
+      >
+        <div className="flex flex-col gap-2 border-t border-border/60 px-4 py-4">
           <div className="flex items-center justify-between text-xs">
             <span className="flex items-center gap-1.5 font-medium text-foreground">
               <span className="size-2 rounded-full bg-success" />
@@ -88,42 +131,33 @@ export function NeedGroupsSummaryStats({ stats }: NeedGroupsSummaryStatsProps) {
             />
           </div>
         </div>
-      </div>
+      </StatCard>
 
       {/* Stat 2: Area Chart 5 Tahun Usulan */}
-      <div className="flex flex-col justify-between rounded-xl border border-border bg-card p-4 shadow-xs sm:p-5">
-        <div>
-          <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-              Tren Usulan Kebutuhan
-            </span>
-            <div className="flex size-8 items-center justify-center rounded-lg bg-info/10 text-info">
-              <RiFileList3Line className="size-4" />
-            </div>
+      <StatCard
+        title="Tren Usulan Kebutuhan"
+        value={formatNumber(latestNeeds)}
+        subtitle={
+          latestTrend?.name
+            ? `(${latestTrend.name})`
+            : latestTrend?.year
+              ? `(TA ${latestTrend.year})`
+              : undefined
+        }
+        icon={
+          <div className="flex size-8 items-center justify-center rounded-lg bg-info/10 text-info">
+            <RiFileList3Line className="size-4" />
           </div>
-          <div className="mt-2.5 flex items-baseline justify-between gap-2">
-            <div className="flex items-baseline gap-1.5">
-              <span className="font-heading text-3xl font-extrabold tracking-tight text-foreground">
-                {formatNumber(latestNeeds)}
-              </span>
-              <span className="text-xs text-muted-foreground">
-                Usulan {latestTrend ? `(TA ${latestTrend.year})` : ''}
-              </span>
-            </div>
-            <span className="font-mono text-[11px] text-muted-foreground">
-              5 Thn
-            </span>
-          </div>
-        </div>
-
-        <div className="mt-2 h-20 w-full">
-          {yearlyTrends.length > 0 ? (
+        }
+      >
+        <div className="h-20 w-full">
+          {groupTrends.length > 0 ? (
             <ChartContainer
               config={needsChartConfig}
               className="aspect-auto h-20 w-full"
             >
               <AreaChart
-                data={yearlyTrends}
+                data={groupTrends}
                 margin={{ top: 4, right: 4, left: 4, bottom: 0 }}
               >
                 <defs>
@@ -140,23 +174,22 @@ export function NeedGroupsSummaryStats({ stats }: NeedGroupsSummaryStatsProps) {
                     />
                   </linearGradient>
                 </defs>
-                <CartesianGrid
-                  vertical={false}
-                  strokeDasharray="3 3"
-                  className="stroke-muted/30"
-                />
-                <XAxis
-                  dataKey="year"
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={4}
-                  className="fill-muted-foreground font-mono text-[10px]"
-                />
                 <ChartTooltip
                   content={
                     <ChartTooltipContent
                       indicator="dot"
-                      labelFormatter={(val) => `Tahun Anggaran ${val}`}
+                      labelFormatter={(_, payload) => {
+                        const item = payload?.[0]?.payload as
+                          (typeof groupTrends)[number] | undefined;
+
+                        if (!item) {
+return '';
+}
+
+                        return item.year
+                          ? `${item.name ?? 'Kelompok Usulan'} (TA ${item.year})`
+                          : (item.name ?? '');
+                      }}
                       formatter={(val) => (
                         <span className="font-mono font-medium text-foreground">
                           {formatNumber(Number(val))} Usulan
@@ -183,42 +216,35 @@ export function NeedGroupsSummaryStats({ stats }: NeedGroupsSummaryStatsProps) {
             </div>
           )}
         </div>
-      </div>
+      </StatCard>
 
       {/* Stat 3: Area Chart 5 Tahun Anggaran */}
-      <div className="flex flex-col justify-between rounded-xl border border-border bg-card p-4 shadow-xs sm:p-5">
-        <div>
-          <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-              Tren Anggaran Usulan
-            </span>
-            <div className="flex size-8 items-center justify-center rounded-lg bg-warning/10 text-warning">
-              <RiCoinsLine className="size-4" />
-            </div>
+      <StatCard
+        title="Tren Anggaran Usulan"
+        value={
+          <span className="text-2xl">{formatCompactIDR(latestBudget)}</span>
+        }
+        subtitle={
+          latestTrend?.name
+            ? `(${latestTrend.name})`
+            : latestTrend?.year
+              ? `(TA ${latestTrend.year})`
+              : undefined
+        }
+        icon={
+          <div className="flex size-8 items-center justify-center rounded-lg bg-warning/10 text-warning">
+            <RiCoinsLine className="size-4" />
           </div>
-          <div className="mt-2.5 flex items-baseline justify-between gap-2">
-            <div className="flex items-baseline gap-1.5">
-              <span className="font-heading text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
-                {formatCompactIDR(latestBudget)}
-              </span>
-              <span className="text-xs text-muted-foreground">
-                {latestTrend ? `(TA ${latestTrend.year})` : ''}
-              </span>
-            </div>
-            <span className="font-mono text-[11px] text-muted-foreground">
-              5 Thn
-            </span>
-          </div>
-        </div>
-
-        <div className="mt-2 h-20 w-full">
-          {yearlyTrends.length > 0 ? (
+        }
+      >
+        <div className="h-20 w-full">
+          {groupTrends.length > 0 ? (
             <ChartContainer
               config={budgetChartConfig}
               className="aspect-auto h-20 w-full"
             >
               <AreaChart
-                data={yearlyTrends}
+                data={groupTrends}
                 margin={{ top: 4, right: 4, left: 4, bottom: 0 }}
               >
                 <defs>
@@ -241,23 +267,22 @@ export function NeedGroupsSummaryStats({ stats }: NeedGroupsSummaryStatsProps) {
                     />
                   </linearGradient>
                 </defs>
-                <CartesianGrid
-                  vertical={false}
-                  strokeDasharray="3 3"
-                  className="stroke-muted/30"
-                />
-                <XAxis
-                  dataKey="year"
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={4}
-                  className="fill-muted-foreground font-mono text-[10px]"
-                />
                 <ChartTooltip
                   content={
                     <ChartTooltipContent
                       indicator="dot"
-                      labelFormatter={(val) => `Tahun Anggaran ${val}`}
+                      labelFormatter={(_, payload) => {
+                        const item = payload?.[0]?.payload as
+                          (typeof groupTrends)[number] | undefined;
+
+                        if (!item) {
+return '';
+}
+
+                        return item.year
+                          ? `${item.name ?? 'Kelompok Usulan'} (TA ${item.year})`
+                          : (item.name ?? '');
+                      }}
                       formatter={(val) => (
                         <span className="font-mono font-medium text-foreground">
                           {formatIDR(Number(val))}
@@ -284,7 +309,7 @@ export function NeedGroupsSummaryStats({ stats }: NeedGroupsSummaryStatsProps) {
             </div>
           )}
         </div>
-      </div>
+      </StatCard>
     </div>
   );
 }

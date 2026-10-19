@@ -4,8 +4,8 @@ import {
   RiListCheck3,
   RiTimeLine,
   RiArrowRightLine,
-  RiShieldCheckLine,
-  RiFireLine,
+  RiFireFill,
+  RiVerifiedBadgeFill,
 } from '@remixicon/react';
 
 import { ActionDropdown } from '@/components/action-dropdown';
@@ -51,16 +51,16 @@ export function NeedGroupCard({
   return (
     <article
       data-slot="need-group-card"
-      className="relative w-full overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-xs sm:p-6"
+      className="relative w-full overflow-hidden rounded-2xl border bg-card p-4"
     >
       {/* Top Telemetry Header */}
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Monospace Year Code */}
-          <div className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/60 px-2.5 py-1 font-mono text-xs font-bold text-foreground">
+          <Badge variant="outline" className="">
             <span className="text-muted-foreground">TA //</span>
-            <span className="text-primary">{group.year}</span>
-          </div>
+            <span className="font-bold text-foreground">{group.year}</span>
+          </Badge>
 
           {/* Status Pill */}
           <Badge
@@ -120,15 +120,12 @@ export function NeedGroupCard({
             </Link>
           </h2>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5">
             <Link
               href={groupRoutes.checklists.index.url({ need_group: group.id })}
-              className={buttonVariants({
-                variant: 'secondary',
-                size: 'sm',
-              })}
+              className={buttonVariants({ size: 'sm' })}
             >
-              <RiListCheck3 className="size-3.5 text-primary" />
+              <RiListCheck3 />
               Checklist
             </Link>
             <ActionDropdown actions={actions} />
@@ -143,7 +140,7 @@ export function NeedGroupCard({
       </div>
 
       {/* Dual Telemetry Pipeline Visualization */}
-      <div className="my-5 grid grid-cols-1 gap-3.5 rounded-xl border border-border/80 bg-muted/20 p-4 lg:grid-cols-2 lg:gap-6">
+      <div className="my-5 grid grid-cols-1 gap-3.5 lg:grid-cols-2 lg:gap-6">
         {/* Track A: Time Progression Track */}
         <div className="flex flex-col justify-between gap-2">
           <div className="flex items-center justify-between font-mono text-xs">
@@ -220,7 +217,7 @@ export function NeedGroupCard({
       <div className="grid grid-cols-2 gap-2.5 pt-1 sm:grid-cols-4 sm:gap-3">
         {/* Metric 1 */}
         <div className="rounded-xl border border-border/70 bg-muted/30 p-3">
-          <div className="font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
+          <div className="font-mono text-[11px] tracking-wider text-muted-foreground uppercase">
             Total Usulan
           </div>
           <div className="mt-1 font-heading text-lg font-bold text-foreground">
@@ -236,7 +233,7 @@ export function NeedGroupCard({
 
         {/* Metric 2 */}
         <div className="rounded-xl border border-border/70 bg-muted/30 p-3">
-          <div className="font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
+          <div className="font-mono text-[11px] tracking-wider text-muted-foreground uppercase">
             Rata-rata Pagu
           </div>
           <div className="mt-1 font-heading text-lg font-bold text-foreground">
@@ -249,9 +246,9 @@ export function NeedGroupCard({
 
         {/* Metric 3 */}
         <div className="rounded-xl border border-border/70 bg-muted/30 p-3">
-          <div className="flex items-center justify-between font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
+          <div className="flex items-center justify-between font-mono text-[11px] tracking-wider text-muted-foreground uppercase">
             <span>Urgensi</span>
-            <RiFireLine className="size-3 text-warning" />
+            <RiFireFill className="size-3.5 text-warning" />
           </div>
           <div className="mt-1 font-heading text-lg font-bold text-warning">
             {metrics.priorityRate}%
@@ -263,9 +260,9 @@ export function NeedGroupCard({
 
         {/* Metric 4 */}
         <div className="rounded-xl border border-border/70 bg-muted/30 p-3">
-          <div className="flex items-center justify-between font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
+          <div className="flex items-center justify-between font-mono text-[11px] tracking-wider text-muted-foreground uppercase">
             <span>Validasi</span>
-            <RiShieldCheckLine className="size-3 text-success" />
+            <RiVerifiedBadgeFill className="size-3.5 text-success" />
           </div>
           <div className="mt-1 font-heading text-lg font-bold text-success">
             {metrics.approvalRate}%

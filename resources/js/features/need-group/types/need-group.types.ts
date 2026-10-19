@@ -25,11 +25,15 @@ export interface PaginatedNeedGroups {
   to: number | null;
 }
 
-export interface YearlyTrendStat {
-  year: number;
+export interface GroupTrendStat {
+  id?: number;
+  name?: string;
+  year?: number;
   total_needs: number;
   total_budget: number;
 }
+
+export type YearlyTrendStat = GroupTrendStat;
 
 export interface NeedGroupsSummaryStatsData {
   total_groups: number;
@@ -37,5 +41,6 @@ export interface NeedGroupsSummaryStatsData {
   total_needs?: number;
   total_approved?: number;
   total_budget?: number;
-  yearly_trends?: YearlyTrendStat[];
+  group_trends?: GroupTrendStat[];
+  yearly_trends?: GroupTrendStat[];
 }

@@ -27,6 +27,10 @@ class NeedLockLifecycle
 {
     public const string LOCK_REASON_EXECUTIVE_REVIEW = 'Usulan sedang dalam proses review eksekutif.';
 
+    public const string LOCK_REASON_EXECUTIVE_APPROVED = 'Usulan telah disetujui oleh Direktur.';
+
+    public const string LOCK_REASON_EXECUTIVE_REJECTED = 'Usulan telah ditolak oleh Direktur.';
+
     /**
      * Submit a need proposal for executive review, transitioning status to 'submitted'
      * and locking it with an explicit executive review reason.
@@ -146,7 +150,7 @@ class NeedLockLifecycle
             'is_locked' => true,
             'locked_at' => now(),
             'locked_by_user_id' => $approver?->id,
-            'lock_reason' => self::LOCK_REASON_EXECUTIVE_REVIEW,
+            'lock_reason' => self::LOCK_REASON_EXECUTIVE_APPROVED,
             'unlocked_until' => null,
         ]);
 
@@ -176,7 +180,7 @@ class NeedLockLifecycle
             'is_locked' => true,
             'locked_at' => now(),
             'locked_by_user_id' => $actor?->id,
-            'lock_reason' => self::LOCK_REASON_EXECUTIVE_REVIEW,
+            'lock_reason' => self::LOCK_REASON_EXECUTIVE_REJECTED,
             'unlocked_until' => null,
         ]);
 

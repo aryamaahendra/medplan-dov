@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Actions\Need\NeedLockLifecycle;
 use App\Models\Need;
 use App\Models\NeedGroup;
 use App\Models\NeedType;
@@ -120,7 +121,7 @@ describe('UpdateDirectorReviewRequest validation', function () {
             ->patch(route('needs.director-review', $need), [
                 'decision' => Need::STATUS_APPROVED,
                 'approved_volume' => 8,
-                'approved_unit_price' => 95000,
+                'approved_unit_price' => 0,
             ])
             ->assertSessionHasNoErrors();
     });
@@ -157,6 +158,7 @@ describe('Director Review executive decision transitions', function () {
             ->and((float) $freshNeed->approved_unit_price)->toBe(50000.0)
             ->and((float) $freshNeed->approved_total_price)->toBe(500000.0)
             ->and($freshNeed->is_locked)->toBeTrue()
+            ->and($freshNeed->lock_reason)->toBe(NeedLockLifecycle::LOCK_REASON_EXECUTIVE_APPROVED)
             ->and($freshNeed->locked_by_user_id)->toBe($this->directorUser->id)
             ->and($freshNeed->is_recommended_for_next_cycle)->toBeFalse()
             ->and($freshNeed->recommended_volume)->toBeNull();
@@ -223,7 +225,8 @@ describe('Director Review executive decision transitions', function () {
             ->and($freshNeed->approved_total_price)->toBeNull()
             ->and($freshNeed->is_recommended_for_next_cycle)->toBeTrue()
             ->and((float) $freshNeed->recommended_volume)->toBe(8.0)
-            ->and($freshNeed->is_locked)->toBeTrue();
+            ->and($freshNeed->is_locked)->toBeTrue()
+            ->and($freshNeed->lock_reason)->toBe(NeedLockLifecycle::LOCK_REASON_EXECUTIVE_REJECTED);
     });
 
     it('sets status to revision, clears approval timestamp, records mandatory notes, and unlocks proposal for submitter', function () {

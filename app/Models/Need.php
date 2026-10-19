@@ -347,22 +347,36 @@ class Need extends Model
     }
 
     /**
-     * Scope a query to unapproved candidate needs eligible for rollover into a target need group.
+     * Scope a query to include proposals eligible for rollover into a target group.
      */
-    public function scopeUnapprovedCandidates(Builder $query, ?int $targetGroupId, User $user): Builder
+    public function scopeEligibleForRollover(Builder $query, ?int $targetGroupId = null): Builder
     {
         $query->where(function (Builder $q): void {
-            $q->whereNull('approved_by_director_at')
-                ->orWhere(function (Builder $sub): void {
-                    $sub->where('is_recommended_for_next_cycle', true)
-                        ->where('recommended_volume', '>', 0);
-                });
+            $q->where(function (Builder $unapproved): void {
+                $unapproved->whereNull('approved_by_director_at')
+                    ->where('status', '!=', self::STATUS_REJECTED);
+            })->orWhere(function (Builder $sub): void {
+                $sub->where('is_recommended_for_next_cycle', true)
+                    ->where('recommended_volume', '>', 0);
+            });
         });
 
         if ($targetGroupId !== null && $targetGroupId > 0) {
             $query->where('need_group_id', '!=', $targetGroupId)
-                ->whereDoesntHave('rolloverNeeds', fn (Builder $q) => $q->where('need_group_id', $targetGroupId));
+                ->whereDoesntHave('rolloverNeeds', function (Builder $q) use ($targetGroupId): void {
+                    $q->where('need_group_id', $targetGroupId);
+                });
         }
+
+        return $query;
+    }
+
+    /**
+     * Scope a query to unapproved candidate needs eligible for rollover into a target need group.
+     */
+    public function scopeUnapprovedCandidates(Builder $query, ?int $targetGroupId, User $user): Builder
+    {
+        $this->scopeEligibleForRollover($query, $targetGroupId);
 
         if (! $user->hasAnyRole(['super-admin', 'admin', 'planner']) && ! $user->can('view any needs')) {
             if ($user->can('view descendant needs') && $user->organizational_unit_id) {
@@ -389,6 +403,18 @@ class Need extends Model
         }
 
         return $query;
+    }
+
+    /**
+     * Get the effective requested volume for rollover into a new planning cycle.
+     */
+    public function getEffectiveRolloverVolume(): float
+    {
+        if ($this->is_recommended_for_next_cycle && $this->recommended_volume !== null && (float) $this->recommended_volume > 0) {
+            return (float) $this->recommended_volume;
+        }
+
+        return (float) $this->volume;
     }
 
     /**

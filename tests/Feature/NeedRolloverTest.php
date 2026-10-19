@@ -286,6 +286,41 @@ it('unapproved candidates query includes partially approved needs with residual 
         ->and($ids)->not->toContain($fullyApprovedWithoutResidual->id);
 });
 
+it('unapproved candidates query excludes rejected needs without recommendation for next cycle', function () {
+    $this->be($this->admin);
+
+    $rejectedWithoutRecommendation = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'status' => Need::STATUS_REJECTED,
+        'approved_by_director_at' => null,
+        'volume' => 10,
+        'is_recommended_for_next_cycle' => false,
+        'recommended_volume' => null,
+    ]);
+
+    $rejectedWithRecommendation = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'status' => Need::STATUS_REJECTED,
+        'approved_by_director_at' => null,
+        'volume' => 10,
+        'is_recommended_for_next_cycle' => true,
+        'recommended_volume' => 10,
+    ]);
+
+    $response = $this->getJson(route('needs.unapproved-candidates', [
+        'target_need_group_id' => $this->group2->id,
+    ]));
+
+    $response->assertOk();
+    $ids = collect($response->json('data'))->pluck('id')->all();
+    expect($ids)->toContain($rejectedWithRecommendation->id)
+        ->and($ids)->not->toContain($rejectedWithoutRecommendation->id);
+});
+
 it('clones partially approved need with requested volume set to residual recommended volume', function () {
     $this->be($this->admin);
 

@@ -29,12 +29,7 @@ final class UpdateDirectorReviewRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        /** @var Need|int|string|null $need */
-        $need = $this->route('need');
-        if (! ($need instanceof Need) && is_numeric($need)) {
-            $need = Need::query()->find($need);
-        }
-
+        $need = $this->resolveNeed();
         // Backward compatibility for legacy callers passing is_approved
         if (! $this->has('decision') && $this->has('is_approved')) {
             $isApproved = $this->boolean('is_approved');
@@ -49,16 +44,17 @@ final class UpdateDirectorReviewRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, array<int, mixed>>
+     * @return array{
+     *     decision: array<int, mixed>,
+     *     notes: array<int, mixed>,
+     *     approved_volume: array<int, mixed>,
+     *     approved_unit_price: array<int, mixed>,
+     *     is_recommended_for_next_cycle: array<int, string>
+     * }
      */
     public function rules(): array
     {
-        /** @var Need|int|string|null $need */
-        $need = $this->route('need');
-        if (! ($need instanceof Need) && is_numeric($need)) {
-            $need = Need::query()->find($need);
-        }
-
+        $need = $this->resolveNeed();
         $maxVolume = $need ? (float) $need->volume : null;
 
         return [
@@ -83,12 +79,26 @@ final class UpdateDirectorReviewRequest extends FormRequest
                 Rule::requiredIf(fn () => $this->input('decision') === Need::STATUS_APPROVED),
                 'nullable',
                 'numeric',
-                'gt:0',
+                'gte:0',
             ],
             'is_recommended_for_next_cycle' => [
                 'nullable',
                 'boolean',
             ],
         ];
+    }
+
+    /**
+     * Resolve the target Need model from route parameters.
+     */
+    private function resolveNeed(): ?Need
+    {
+        /** @var Need|int|string|null $need */
+        $need = $this->route('need');
+        if (! ($need instanceof Need) && is_numeric($need)) {
+            $need = Need::query()->find($need);
+        }
+
+        return $need instanceof Need ? $need : null;
     }
 }

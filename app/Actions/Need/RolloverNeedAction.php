@@ -44,15 +44,10 @@ class RolloverNeedAction
                 'attachments',
             ]);
 
-            // Create cloned Need record
-            $targetVolume = ($sourceNeed->is_recommended_for_next_cycle && $sourceNeed->recommended_volume !== null && (float) $sourceNeed->recommended_volume > 0)
-                ? (float) $sourceNeed->recommended_volume
-                : (float) $sourceNeed->volume;
-
+            $targetVolume = $sourceNeed->getEffectiveRolloverVolume();
             $unitPrice = (float) $sourceNeed->unit_price;
             $targetTotalPrice = round($targetVolume * $unitPrice, 2);
 
-            // Create cloned Need record
             /** @var Need $newNeed */
             $newNeed = Need::query()->create([
                 'need_group_id' => $targetGroup->id,
@@ -145,15 +140,7 @@ class RolloverNeedAction
     {
         $needs = Need::query()
             ->whereIn('id', $sourceNeedIds)
-            ->where(function ($q) {
-                $q->whereNull('approved_by_director_at')
-                    ->orWhere(function ($sub) {
-                        $sub->where('is_recommended_for_next_cycle', true)
-                            ->where('recommended_volume', '>', 0);
-                    });
-            })
-            ->where('need_group_id', '!=', $targetGroup->id)
-            ->whereDoesntHave('rolloverNeeds', fn ($q) => $q->where('need_group_id', $targetGroup->id))
+            ->eligibleForRollover($targetGroup->id)
             ->get();
 
         $rolledOver = new Collection;

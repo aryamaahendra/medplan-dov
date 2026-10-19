@@ -22,7 +22,9 @@ return new class extends Migration
             $table->index(['need_group_id', 'is_recommended_for_next_cycle'], 'idx_needs_group_recommended');
         });
 
-        $this->backfill();
+        DB::transaction(function (): void {
+            $this->backfill();
+        });
     }
 
     /**
@@ -30,13 +32,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        $this->rollbackBackfill();
-
-        Schema::table('needs', function (Blueprint $table) {
-            $table->dropIndex('idx_needs_group_recommended');
+        DB::transaction(function (): void {
+            $this->rollbackBackfill();
         });
 
-        Schema::table('needs', function (Blueprint $table) {
+        Schema::table('needs', function (Blueprint $table): void {
+            $table->dropIndex('idx_needs_group_recommended');
             $table->dropColumn([
                 'approved_volume',
                 'approved_unit_price',
@@ -52,33 +53,41 @@ return new class extends Migration
      */
     public function backfill(): void
     {
-        // 1. Transition historically approved proposals to 'approved' and populate approved figures from requested
-        DB::table('needs')
-            ->whereNotNull('approved_by_director_at')
-            ->update([
-                'status' => 'approved',
-                'approved_volume' => DB::raw('COALESCE(approved_volume, volume)'),
-                'approved_unit_price' => DB::raw('COALESCE(approved_unit_price, unit_price)'),
-                'approved_total_price' => DB::raw('COALESCE(approved_total_price, total_price)'),
-            ]);
+        DB::transaction(function (): void {
+            /**
+             * Transition historically approved proposals to 'approved' and populate approved figures from requested.
+             */
+            DB::table('needs')
+                ->whereNotNull('approved_by_director_at')
+                ->update([
+                    'status' => 'approved',
+                    'approved_volume' => DB::raw('COALESCE(approved_volume, volume)'),
+                    'approved_unit_price' => DB::raw('COALESCE(approved_unit_price, unit_price)'),
+                    'approved_total_price' => DB::raw('COALESCE(approved_total_price, total_price)'),
+                ]);
 
-        // 2. Transition legacy unreviewed proposals previously marked 'approved' (representing submitted) to 'submitted'
-        DB::table('needs')
-            ->where('status', 'approved')
-            ->whereNull('approved_by_director_at')
-            ->update([
-                'status' => 'submitted',
-            ]);
+            /**
+             * Transition legacy unreviewed proposals previously marked 'approved' (representing submitted) to 'submitted'.
+             */
+            DB::table('needs')
+                ->where('status', 'approved')
+                ->whereNull('approved_by_director_at')
+                ->update([
+                    'status' => 'submitted',
+                ]);
 
-        // 3. Transition unapproved proposals with non-empty review notes to 'revision'
-        DB::table('needs')
-            ->whereNull('approved_by_director_at')
-            ->where('status', 'draft')
-            ->whereNotNull('notes')
-            ->whereRaw("TRIM(notes) != ''")
-            ->update([
-                'status' => 'revision',
-            ]);
+            /**
+             * Transition unapproved proposals with non-empty review notes to 'revision'.
+             */
+            DB::table('needs')
+                ->whereNull('approved_by_director_at')
+                ->where('status', 'draft')
+                ->whereNotNull('notes')
+                ->whereRaw("TRIM(notes) != ''")
+                ->update([
+                    'status' => 'revision',
+                ]);
+        });
     }
 
     /**
@@ -86,12 +95,14 @@ return new class extends Migration
      */
     public function rollbackBackfill(): void
     {
-        DB::table('needs')
-            ->where('status', 'submitted')
-            ->update(['status' => 'approved']);
+        DB::transaction(function (): void {
+            DB::table('needs')
+                ->where('status', 'submitted')
+                ->update(['status' => 'approved']);
 
-        DB::table('needs')
-            ->where('status', 'revision')
-            ->update(['status' => 'draft']);
+            DB::table('needs')
+                ->where('status', 'revision')
+                ->update(['status' => 'draft']);
+        });
     }
 };

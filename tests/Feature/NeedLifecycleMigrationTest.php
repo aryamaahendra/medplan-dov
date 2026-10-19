@@ -10,6 +10,33 @@ use Illuminate\Support\Facades\Schema;
 
 uses(RefreshDatabase::class);
 
+/**
+ * Helper to insert a test need row via query builder for migration testing.
+ *
+ * @param  array<string, mixed>  $attributes
+ */
+function insertTestNeed(array $attributes = []): int
+{
+    $needGroup = NeedGroup::factory()->create();
+    $unit = OrganizationalUnit::factory()->create();
+    $type = NeedType::factory()->create();
+
+    return DB::table('needs')->insertGetId(array_merge([
+        'need_group_id' => $needGroup->id,
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $type->id,
+        'year' => 2026,
+        'title' => 'Test Need',
+        'volume' => 10.0000,
+        'unit' => 'unit',
+        'unit_price' => 50000.00,
+        'total_price' => 500000.00,
+        'status' => 'draft',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ], $attributes));
+}
+
 test('need model defines canonical five-state status constants', function () {
     expect(Need::STATUS_DRAFT)->toBe('draft')
         ->and(Need::STATUS_SUBMITTED)->toBe('submitted')
@@ -96,18 +123,9 @@ test('database migration adds approved and recommendation columns and composite 
 test('migration backfill transitions historically approved proposals to approved with amounts populated', function () {
     $migration = require database_path('migrations/2026_10_20_000001_add_approved_and_recommendation_fields_to_needs_table.php');
 
-    $needGroup = NeedGroup::factory()->create();
-    $unit = OrganizationalUnit::factory()->create();
-    $type = NeedType::factory()->create();
-
-    $id = DB::table('needs')->insertGetId([
-        'need_group_id' => $needGroup->id,
-        'organizational_unit_id' => $unit->id,
-        'need_type_id' => $type->id,
-        'year' => 2026,
+    $id = insertTestNeed([
         'title' => 'Historical Approved Need',
         'volume' => 10.0000,
-        'unit' => 'unit',
         'unit_price' => 50000.00,
         'total_price' => 500000.00,
         'status' => 'draft',
@@ -116,8 +134,6 @@ test('migration backfill transitions historically approved proposals to approved
         'approved_unit_price' => null,
         'approved_total_price' => null,
         'is_recommended_for_next_cycle' => false,
-        'created_at' => now(),
-        'updated_at' => now(),
     ]);
 
     $migration->backfill();
@@ -133,18 +149,9 @@ test('migration backfill transitions historically approved proposals to approved
 test('migration backfill preserves existing approved figures without overwriting', function () {
     $migration = require database_path('migrations/2026_10_20_000001_add_approved_and_recommendation_fields_to_needs_table.php');
 
-    $needGroup = NeedGroup::factory()->create();
-    $unit = OrganizationalUnit::factory()->create();
-    $type = NeedType::factory()->create();
-
-    $id = DB::table('needs')->insertGetId([
-        'need_group_id' => $needGroup->id,
-        'organizational_unit_id' => $unit->id,
-        'need_type_id' => $type->id,
-        'year' => 2026,
+    $id = insertTestNeed([
         'title' => 'Partially Approved Need',
         'volume' => 10.0000,
-        'unit' => 'unit',
         'unit_price' => 50000.00,
         'total_price' => 500000.00,
         'status' => 'approved',
@@ -154,8 +161,6 @@ test('migration backfill preserves existing approved figures without overwriting
         'approved_total_price' => 270000.00,
         'is_recommended_for_next_cycle' => true,
         'recommended_volume' => 4.0000,
-        'created_at' => now(),
-        'updated_at' => now(),
     ]);
 
     $migration->backfill();
@@ -172,24 +177,13 @@ test('migration backfill preserves existing approved figures without overwriting
 test('migration backfill transitions legacy unreviewed proposals previously marked approved to submitted', function () {
     $migration = require database_path('migrations/2026_10_20_000001_add_approved_and_recommendation_fields_to_needs_table.php');
 
-    $needGroup = NeedGroup::factory()->create();
-    $unit = OrganizationalUnit::factory()->create();
-    $type = NeedType::factory()->create();
-
-    $id = DB::table('needs')->insertGetId([
-        'need_group_id' => $needGroup->id,
-        'organizational_unit_id' => $unit->id,
-        'need_type_id' => $type->id,
-        'year' => 2026,
+    $id = insertTestNeed([
         'title' => 'Legacy Submitted Need',
         'volume' => 5.0000,
-        'unit' => 'unit',
         'unit_price' => 10000.00,
         'total_price' => 50000.00,
         'status' => 'approved',
         'approved_by_director_at' => null,
-        'created_at' => now(),
-        'updated_at' => now(),
     ]);
 
     $migration->backfill();
@@ -202,59 +196,34 @@ test('migration backfill transitions legacy unreviewed proposals previously mark
 test('migration backfill transitions unapproved proposals with non-empty review notes to revision', function () {
     $migration = require database_path('migrations/2026_10_20_000001_add_approved_and_recommendation_fields_to_needs_table.php');
 
-    $needGroup = NeedGroup::factory()->create();
-    $unit = OrganizationalUnit::factory()->create();
-    $type = NeedType::factory()->create();
-
-    $idWithNotes = DB::table('needs')->insertGetId([
-        'need_group_id' => $needGroup->id,
-        'organizational_unit_id' => $unit->id,
-        'need_type_id' => $type->id,
-        'year' => 2026,
+    $idWithNotes = insertTestNeed([
         'title' => 'Need With Revision Notes',
         'volume' => 3.0000,
-        'unit' => 'unit',
         'unit_price' => 25000.00,
         'total_price' => 75000.00,
         'status' => 'draft',
         'notes' => 'Perbaiki spesifikasi RAM minimal 16GB.',
         'approved_by_director_at' => null,
-        'created_at' => now(),
-        'updated_at' => now(),
     ]);
 
-    $idWithBlankNotes = DB::table('needs')->insertGetId([
-        'need_group_id' => $needGroup->id,
-        'organizational_unit_id' => $unit->id,
-        'need_type_id' => $type->id,
-        'year' => 2026,
+    $idWithBlankNotes = insertTestNeed([
         'title' => 'Need With Blank Notes',
         'volume' => 1.0000,
-        'unit' => 'unit',
         'unit_price' => 10000.00,
         'total_price' => 10000.00,
         'status' => 'draft',
         'notes' => '   ',
         'approved_by_director_at' => null,
-        'created_at' => now(),
-        'updated_at' => now(),
     ]);
 
-    $idWithNullNotes = DB::table('needs')->insertGetId([
-        'need_group_id' => $needGroup->id,
-        'organizational_unit_id' => $unit->id,
-        'need_type_id' => $type->id,
-        'year' => 2026,
+    $idWithNullNotes = insertTestNeed([
         'title' => 'Need With Null Notes',
         'volume' => 1.0000,
-        'unit' => 'unit',
         'unit_price' => 10000.00,
         'total_price' => 10000.00,
         'status' => 'draft',
         'notes' => null,
         'approved_by_director_at' => null,
-        'created_at' => now(),
-        'updated_at' => now(),
     ]);
 
     $migration->backfill();
@@ -267,57 +236,32 @@ test('migration backfill transitions unapproved proposals with non-empty review 
 test('migration backfill is fully idempotent on multiple runs', function () {
     $migration = require database_path('migrations/2026_10_20_000001_add_approved_and_recommendation_fields_to_needs_table.php');
 
-    $needGroup = NeedGroup::factory()->create();
-    $unit = OrganizationalUnit::factory()->create();
-    $type = NeedType::factory()->create();
-
-    $approvedId = DB::table('needs')->insertGetId([
-        'need_group_id' => $needGroup->id,
-        'organizational_unit_id' => $unit->id,
-        'need_type_id' => $type->id,
-        'year' => 2026,
+    $approvedId = insertTestNeed([
         'title' => 'Approved',
         'volume' => 5.0,
-        'unit' => 'unit',
         'unit_price' => 100.0,
         'total_price' => 500.0,
         'status' => 'draft',
         'approved_by_director_at' => now(),
-        'created_at' => now(),
-        'updated_at' => now(),
     ]);
 
-    $submittedId = DB::table('needs')->insertGetId([
-        'need_group_id' => $needGroup->id,
-        'organizational_unit_id' => $unit->id,
-        'need_type_id' => $type->id,
-        'year' => 2026,
+    $submittedId = insertTestNeed([
         'title' => 'Submitted',
         'volume' => 2.0,
-        'unit' => 'unit',
         'unit_price' => 200.0,
         'total_price' => 400.0,
         'status' => 'approved',
         'approved_by_director_at' => null,
-        'created_at' => now(),
-        'updated_at' => now(),
     ]);
 
-    $revisionId = DB::table('needs')->insertGetId([
-        'need_group_id' => $needGroup->id,
-        'organizational_unit_id' => $unit->id,
-        'need_type_id' => $type->id,
-        'year' => 2026,
+    $revisionId = insertTestNeed([
         'title' => 'Revision',
         'volume' => 1.0,
-        'unit' => 'unit',
         'unit_price' => 300.0,
         'total_price' => 300.0,
         'status' => 'draft',
         'notes' => 'Tolong revisi',
         'approved_by_director_at' => null,
-        'created_at' => now(),
-        'updated_at' => now(),
     ]);
 
     // First run
@@ -344,41 +288,22 @@ test('migration backfill is fully idempotent on multiple runs', function () {
 test('migration rollback reverses status transformations and drops columns', function () {
     $migration = require database_path('migrations/2026_10_20_000001_add_approved_and_recommendation_fields_to_needs_table.php');
 
-    $needGroup = NeedGroup::factory()->create();
-    $unit = OrganizationalUnit::factory()->create();
-    $type = NeedType::factory()->create();
-
-    $submittedId = DB::table('needs')->insertGetId([
-        'need_group_id' => $needGroup->id,
-        'organizational_unit_id' => $unit->id,
-        'need_type_id' => $type->id,
-        'year' => 2026,
+    $submittedId = insertTestNeed([
         'title' => 'Submitted Need',
         'volume' => 2.0,
-        'unit' => 'unit',
         'unit_price' => 200.0,
         'total_price' => 400.0,
         'status' => 'submitted',
-        'created_at' => now(),
-        'updated_at' => now(),
     ]);
 
-    $revisionId = DB::table('needs')->insertGetId([
-        'need_group_id' => $needGroup->id,
-        'organizational_unit_id' => $unit->id,
-        'need_type_id' => $type->id,
-        'year' => 2026,
+    $revisionId = insertTestNeed([
         'title' => 'Revision Need',
         'volume' => 1.0,
-        'unit' => 'unit',
         'unit_price' => 300.0,
         'total_price' => 300.0,
         'status' => 'revision',
         'notes' => 'Perbaiki',
-        'created_at' => now(),
-        'updated_at' => now(),
     ]);
-
     // Down reverses backfill and drops columns
     $migration->down();
 

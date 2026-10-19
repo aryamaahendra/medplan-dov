@@ -221,24 +221,17 @@ class Need extends Model
      */
     public function getWorkflowStage(): string
     {
-        if ($this->status === self::STATUS_REJECTED) {
-            return self::STATUS_REJECTED;
-        }
-
-        if ($this->status === self::STATUS_REVISION) {
-            return self::STATUS_REVISION;
+        if (in_array($this->status, [
+            self::STATUS_SUBMITTED,
+            self::STATUS_REJECTED,
+            self::STATUS_REVISION,
+            self::STATUS_APPROVED,
+        ], true)) {
+            return $this->status;
         }
 
         if ($this->approved_by_director_at !== null) {
             return self::STATUS_APPROVED;
-        }
-
-        if ($this->status === self::STATUS_APPROVED) {
-            return self::STATUS_APPROVED;
-        }
-
-        if ($this->status === self::STATUS_SUBMITTED) {
-            return self::STATUS_SUBMITTED;
         }
 
         return self::STATUS_DRAFT;

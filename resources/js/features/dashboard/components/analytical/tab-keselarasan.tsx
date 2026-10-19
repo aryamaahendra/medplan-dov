@@ -1,11 +1,11 @@
 import { Link } from '@inertiajs/react';
 import {
-  RiTargetLine,
+  RiTargetFill,
   RiArrowRightLine,
   RiAlertLine,
-  RiCheckLine,
-  RiFileTextLine,
-  RiAttachment2,
+  RiCheckboxCircleFill,
+  RiFileTextFill,
+  RiAttachmentFill,
   RiSearchLine,
   RiInformationLine,
 } from '@remixicon/react';
@@ -184,16 +184,16 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
           {/* Card 1: Renstra & IKU */}
           <div className="flex flex-col justify-between rounded-lg border border-border/70 bg-card p-3.5">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+              <span className="text-xss font-semibold text-muted-foreground uppercase">
                 Penyelarasan Renstra
               </span>
-              <RiTargetLine className="size-4 text-primary" />
+              <RiTargetFill className="size-4 text-foreground" />
             </div>
             <div className="mt-2">
               <div className="font-mono text-2xl font-bold text-foreground">
                 {formatPercent(dataReadiness.alignment_coverage)}
               </div>
-              <p className="mt-0.5 text-[11px] text-muted-foreground">
+              <p className="mt-0.5 text-xss text-muted-foreground">
                 Usulan terhubung Sasaran / IKU
               </p>
             </div>
@@ -210,16 +210,16 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
           {/* Card 2: KAK / Detail Teknis */}
           <div className="flex flex-col justify-between rounded-lg border border-border/70 bg-card p-3.5">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+              <span className="text-xss font-semibold text-muted-foreground uppercase">
                 Kelengkapan KAK
               </span>
-              <RiFileTextLine className="size-4 text-success" />
+              <RiFileTextFill className="size-4 text-success" />
             </div>
             <div className="mt-2">
               <div className="font-mono text-2xl font-bold text-success-foreground dark:text-success">
                 {formatPercent(dataReadiness.kak_detail_coverage)}
               </div>
-              <p className="mt-0.5 text-[11px] text-muted-foreground">
+              <p className="mt-0.5 text-xss text-muted-foreground">
                 Spesifikasi teknis terisi
               </p>
             </div>
@@ -236,16 +236,16 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
           {/* Card 3: Berkas Lampiran */}
           <div className="flex flex-col justify-between rounded-lg border border-border/70 bg-card p-3.5">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+              <span className="text-xss font-semibold text-muted-foreground uppercase">
                 Lampiran Pendukung
               </span>
-              <RiAttachment2 className="size-4 text-info" />
+              <RiAttachmentFill className="size-4 text-info" />
             </div>
             <div className="mt-2">
               <div className="font-mono text-2xl font-bold text-foreground">
                 {formatPercent(dataReadiness.attachment_coverage)}
               </div>
-              <p className="mt-0.5 text-[11px] text-muted-foreground">
+              <p className="mt-0.5 text-xss text-muted-foreground">
                 Usulan memiliki lampiran
               </p>
             </div>
@@ -262,16 +262,16 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
           {/* Card 4: Rata-rata Checklist */}
           <div className="flex flex-col justify-between rounded-lg border border-border/70 bg-card p-3.5">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+              <span className="text-xss font-semibold text-muted-foreground uppercase">
                 Rata-rata Checklist
               </span>
-              <RiCheckLine className="size-4 text-warning" />
+              <RiCheckboxCircleFill className="size-4 text-warning" />
             </div>
             <div className="mt-2">
               <div className="font-mono text-2xl font-bold text-foreground">
                 {formatPercent(dataReadiness.avg_checklist)}
               </div>
-              <p className="mt-0.5 text-[11px] text-muted-foreground">
+              <p className="mt-0.5 text-xss text-muted-foreground">
                 Kesiapan administratif
               </p>
             </div>
@@ -367,7 +367,7 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
         <div className="flex flex-col gap-4">
           {/* DC6 NON-ADDITIVE DISCLAIMER BANNER */}
           <div className="flex items-start gap-2.5 rounded-lg border border-border/70 bg-muted/20 p-3 text-xs text-muted-foreground">
-            <RiInformationLine className="mt-0.5 size-4 shrink-0 text-primary" />
+            <RiInformationLine className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
             <p className="leading-relaxed">
               <strong>Catatan Penyelarasan (DC6):</strong> Usulan kebutuhan
               dapat terhubung ke lebih dari satu sasaran strategis secara
@@ -421,7 +421,7 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
                     )}
                   >
                     <div>
-                      <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                      <span className="text-xss font-semibold tracking-wider text-muted-foreground uppercase">
                         {sasaran.tujuan_name}
                       </span>
                       <h4 className="mt-1 line-clamp-2 leading-snug font-medium text-foreground">
@@ -430,14 +430,14 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
                     </div>
 
                     <div className="mt-3 flex items-center justify-between border-t border-border/50 pt-2 font-mono">
-                      <span className="text-[11px] text-muted-foreground">
+                      <span className="text-xss text-muted-foreground">
                         Dukungan Usulan:
                       </span>
                       <div className="flex items-center gap-1.5">
                         <span
                           className={cn(
                             'text-xs font-bold',
-                            hasNeeds ? 'text-primary' : 'text-destructive',
+                            hasNeeds ? 'text-foreground' : 'text-destructive',
                           )}
                         >
                           {sasaran.needs_count} usulan

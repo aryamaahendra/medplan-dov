@@ -162,13 +162,13 @@ export function GlobalDashboardControls({
                     <span
                       className={cn(
                         'truncate',
-                        isSelected && 'font-semibold text-primary',
+                        isSelected && 'font-semibold text-foreground',
                       )}
                     >
                       {group.name} ({group.year})
                     </span>
                     {isSelected && (
-                      <RiCheckLine className="size-3.5 text-primary" />
+                      <RiCheckLine className="size-3.5 text-foreground" />
                     )}
                   </DropdownMenuItem>
                 );
@@ -224,7 +224,7 @@ export function GlobalDashboardControls({
                       {group.name} ({group.year})
                     </span>
                     {compareGroupId === group.id && (
-                      <RiCheckLine className="ml-auto size-3.5 text-primary" />
+                      <RiCheckLine className="ml-auto size-3.5 text-foreground" />
                     )}
                   </DropdownMenuItem>
                 ))}

@@ -254,7 +254,7 @@ function IndicatorItem({
         <div className="mt-0.5">
           {targetForYear ? (
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <span className="text-[10px] font-medium text-muted-foreground/70 uppercase">
+              <span className="text-xss font-medium text-muted-foreground/70 uppercase">
                 Target {year}:
               </span>
               <span className="font-medium text-foreground">
@@ -262,7 +262,7 @@ function IndicatorItem({
               </span>
             </div>
           ) : (
-            <span className="text-[10px] font-medium text-destructive italic">
+            <span className="text-xss font-medium text-destructive italic">
               (Target tahun {year} tidak tersedia)
             </span>
           )}

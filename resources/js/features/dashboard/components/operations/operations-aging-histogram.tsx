@@ -52,7 +52,7 @@ export function OperationsAgingHistogram({
       <CardHeader>
         <CardTitle>
           <span className="flex items-center gap-2">
-            <RiTimeLine className="size-4 text-primary" />
+            <RiTimeLine className="size-4 text-foreground" />
             <span>Distribusi Ketidakaktifan Usulan (Aging Histogram)</span>
           </span>
         </CardTitle>
@@ -109,8 +109,8 @@ export function OperationsAgingHistogram({
           </div>
 
           {/* Metric disclaimer banner */}
-          <div className="flex items-center gap-2 rounded-md border border-border/70 bg-muted/20 px-3 py-2 text-[11px] text-muted-foreground">
-            <RiInformationLine className="size-4 shrink-0 text-primary" />
+          <div className="flex items-center gap-2 rounded-md border border-border/70 bg-muted/20 px-3 py-2 text-xss text-muted-foreground">
+            <RiInformationLine className="size-4 shrink-0 text-muted-foreground" />
             <span>
               Metrik diukur berdasarkan{' '}
               <strong>&quot;tidak aktif X hari&quot;</strong> dari tanggal
@@ -144,7 +144,7 @@ export function OperationsAgingHistogram({
                         <span className="font-semibold text-foreground">
                           {bucket.label}
                         </span>
-                        <span className="text-[11px] text-muted-foreground">
+                        <span className="text-xss text-muted-foreground">
                           ({bucket.description})
                         </span>
                       </div>

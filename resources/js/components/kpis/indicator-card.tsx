@@ -182,8 +182,8 @@ export function IndicatorCard({
     <Card className="overflow-hidden border-l-2 shadow-sm">
       <div className="flex items-center justify-between border-b bg-muted/10 p-3">
         <div>
-          <h4 className="font-medium text-primary/90">{indicator.name}</h4>
-          <span className="text-[10px] font-bold text-muted-foreground uppercase">
+          <h4 className="font-semibold text-foreground">{indicator.name}</h4>
+          <span className="text-xss font-bold text-muted-foreground uppercase">
             Indikator
           </span>
         </div>

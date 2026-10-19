@@ -30,7 +30,7 @@ export function NewAttachmentItem({
           onChange={(e) => onNameChange(index, e.target.value)}
           className="border-none bg-transparent p-0 shadow-none focus-visible:ring-1"
         />
-        <p className="text-[10px] leading-none text-muted-foreground uppercase">
+        <p className="text-xss leading-none text-muted-foreground uppercase">
           {file.name.split('.').pop()} • {formatFileSize(file.size)}
         </p>
       </div>

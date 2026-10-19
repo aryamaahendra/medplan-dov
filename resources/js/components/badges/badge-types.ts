@@ -21,7 +21,7 @@ export const domainBadgeVariants = cva(
           'border-border/60 bg-muted/60 text-muted-foreground dark:border-border/80 dark:bg-muted/40',
       },
       size: {
-        sm: 'h-5 gap-1 rounded-full border px-2 py-0 text-[11px] [&>svg]:size-3!',
+        sm: 'h-5 gap-1 rounded-full border px-2 py-0 text-xss [&>svg]:size-3!',
         default:
           'h-6 gap-1.5 rounded-full border px-2.5 py-0.5 text-xs [&>svg]:size-3.5!',
       },

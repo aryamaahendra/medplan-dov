@@ -87,7 +87,7 @@ export function TabUnit({ payload, slice, onSliceChange }: TabUnitProps) {
       <div className="flex flex-col gap-3 rounded-xl border border-border/70 bg-card p-4 shadow-xs sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <RiBuildingLine className="size-4 text-primary" />
+            <RiBuildingLine className="size-4 text-foreground" />
             <span className="text-xs font-semibold text-foreground">
               Unit Kerja Aktif
             </span>
@@ -178,49 +178,49 @@ export function TabUnit({ payload, slice, onSliceChange }: TabUnitProps) {
           {/* KPI Strip per Unit */}
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
-              <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+              <span className="text-xss font-semibold text-muted-foreground uppercase">
                 Total Usulan
               </span>
               <div className="mt-1 font-mono text-xl font-bold text-foreground">
                 {formatNumber(currentUnitStat?.count ?? 0)}
               </div>
-              <span className="font-mono text-[11px] text-muted-foreground">
+              <span className="font-mono text-xss text-muted-foreground">
                 {formatCompactIDR(currentUnitStat?.total_budget ?? 0)}
               </span>
             </div>
 
             <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
-              <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+              <span className="text-xss font-semibold text-muted-foreground uppercase">
                 Disetujui Direktur
               </span>
               <div className="mt-1 font-mono text-xl font-bold text-success-foreground dark:text-success">
                 {formatNumber(currentUnitStat?.approved_count ?? 0)}
               </div>
-              <span className="font-mono text-[11px] text-muted-foreground">
+              <span className="font-mono text-xss text-muted-foreground">
                 {formatCompactIDR(currentUnitStat?.approved_budget ?? 0)}
               </span>
             </div>
 
             <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
-              <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+              <span className="text-xss font-semibold text-muted-foreground uppercase">
                 Menunggu Review
               </span>
               <div className="mt-1 font-mono text-xl font-bold text-warning-foreground dark:text-warning">
                 {formatNumber(currentUnitStat?.under_review_count ?? 0)}
               </div>
-              <span className="font-mono text-[11px] text-muted-foreground">
+              <span className="font-mono text-xss text-muted-foreground">
                 {formatCompactIDR(currentUnitStat?.review_budget ?? 0)}
               </span>
             </div>
 
             <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
-              <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+              <span className="text-xss font-semibold text-muted-foreground uppercase">
                 Draft / Perlu Tindak Lanjut
               </span>
               <div className="mt-1 font-mono text-xl font-bold text-foreground">
                 {formatNumber(currentUnitStat?.draft_count ?? 0)}
               </div>
-              <span className="font-mono text-[11px] text-muted-foreground">
+              <span className="font-mono text-xss text-muted-foreground">
                 {formatCompactIDR(currentUnitStat?.draft_budget ?? 0)}
               </span>
             </div>
@@ -287,7 +287,7 @@ export function TabUnit({ payload, slice, onSliceChange }: TabUnitProps) {
                         })}
                         className={cn(
                           buttonVariants({ variant: 'ghost', size: 'sm' }),
-                          'text-primary',
+                          'font-semibold text-foreground hover:underline',
                         )}
                       >
                         Buka di daftar
@@ -354,7 +354,7 @@ export function TabUnit({ payload, slice, onSliceChange }: TabUnitProps) {
                         })}
                         className={cn(
                           buttonVariants({ variant: 'ghost', size: 'sm' }),
-                          'text-primary',
+                          'font-semibold text-foreground hover:underline',
                         )}
                       >
                         Lihat Usulan &rarr;

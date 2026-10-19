@@ -1,8 +1,8 @@
 import {
-  RiCheckboxCircleLine,
-  RiCheckDoubleLine,
-  RiCloseLine,
-  RiSubtractLine,
+  RiCheckboxCircleFill,
+  RiCheckDoubleFill,
+  RiCloseCircleFill,
+  RiSubtractFill,
 } from '@remixicon/react';
 import { useMemo } from 'react';
 
@@ -75,18 +75,18 @@ export function NeedChecklistSection({
         <Card size="sm" className="border-border/70 shadow-2xs">
           <CardContent className="flex items-center justify-between gap-2">
             <div className="space-y-0.5">
-              <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+              <span className="text-xss font-semibold tracking-wider text-muted-foreground uppercase">
                 Kemajuan
               </span>
               <div className="font-mono text-2xl font-bold tracking-tight text-foreground">
                 {stats.progressPercent}%
               </div>
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-xss text-muted-foreground">
                 {stats.evaluatedCount} dari {stats.totalCount} terisi
               </p>
             </div>
             <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-info/10 text-info">
-              <RiCheckDoubleLine className="size-5" />
+              <RiCheckDoubleFill className="size-5" />
             </div>
           </CardContent>
         </Card>
@@ -94,18 +94,18 @@ export function NeedChecklistSection({
         <Card size="sm" className="border-border/70 shadow-2xs">
           <CardContent className="flex items-center justify-between gap-2">
             <div className="space-y-0.5">
-              <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+              <span className="text-xss font-semibold tracking-wider text-muted-foreground uppercase">
                 Memenuhi
               </span>
               <div className="font-mono text-2xl font-bold tracking-tight text-success-foreground dark:text-success">
                 {stats.yesCount}
               </div>
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-xss text-muted-foreground">
                 Kriteria terpenuhi
               </p>
             </div>
             <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-success/15 text-success-foreground dark:bg-success/20 dark:text-success">
-              <RiCheckboxCircleLine className="size-5" />
+              <RiCheckboxCircleFill className="size-5" />
             </div>
           </CardContent>
         </Card>
@@ -113,18 +113,16 @@ export function NeedChecklistSection({
         <Card size="sm" className="border-border/70 shadow-2xs">
           <CardContent className="flex items-center justify-between gap-2">
             <div className="space-y-0.5">
-              <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+              <span className="text-xss font-semibold tracking-wider text-muted-foreground uppercase">
                 Belum Memenuhi
               </span>
               <div className="font-mono text-2xl font-bold tracking-tight text-destructive">
                 {stats.noCount}
               </div>
-              <p className="text-[11px] text-muted-foreground">
-                Perlu perbaikan
-              </p>
+              <p className="text-xss text-muted-foreground">Perlu perbaikan</p>
             </div>
             <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-destructive/10 text-destructive dark:bg-destructive/20">
-              <RiCloseLine className="size-5" />
+              <RiCloseCircleFill className="size-5" />
             </div>
           </CardContent>
         </Card>
@@ -132,16 +130,16 @@ export function NeedChecklistSection({
         <Card size="sm" className="border-border/70 shadow-2xs">
           <CardContent className="flex items-center justify-between gap-2">
             <div className="space-y-0.5">
-              <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+              <span className="text-xss font-semibold tracking-wider text-muted-foreground uppercase">
                 Dilewati
               </span>
               <div className="font-mono text-2xl font-bold tracking-tight text-muted-foreground">
                 {stats.skipCount}
               </div>
-              <p className="text-[11px] text-muted-foreground">Belum dinilai</p>
+              <p className="text-xss text-muted-foreground">Belum dinilai</p>
             </div>
             <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-              <RiSubtractLine className="size-5" />
+              <RiSubtractFill className="size-5" />
             </div>
           </CardContent>
         </Card>

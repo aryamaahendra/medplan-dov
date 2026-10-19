@@ -161,7 +161,7 @@ export function ShowcaseContent() {
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                <RiEyeLine className="size-4 text-primary" />
+                <RiEyeLine className="size-4 text-foreground" />
                 Interactive Form Playground
               </CardTitle>
               <CardDescription>
@@ -573,7 +573,7 @@ export function ShowcaseContent() {
       {/* Section: Grid Presets & Density Layouts */}
       <section className="space-y-4">
         <div className="flex items-center gap-2">
-          <RiLayoutGridLine className="size-5 text-primary" />
+          <RiLayoutGridLine className="size-5 text-foreground" />
           <div>
             <h2 className="text-lg font-semibold tracking-tight">
               4. Grid Presets & Layout Density (Cols 1-12, Compact, Dense,
@@ -763,7 +763,7 @@ export function ShowcaseContent() {
       {/* Documentation / Code Examples */}
       <section className="space-y-4">
         <div className="flex items-center gap-2">
-          <RiCodeLine className="size-5 text-primary" />
+          <RiCodeLine className="size-5 text-foreground" />
           <h2 className="text-lg font-semibold tracking-tight">
             Developer Usage Guide (Variants &amp; Grid Presets)
           </h2>

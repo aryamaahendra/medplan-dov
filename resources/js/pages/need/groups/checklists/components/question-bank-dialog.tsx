@@ -72,7 +72,7 @@ export function QuestionBankDialog({
                       {!q.is_active && (
                         <Badge
                           variant="destructive"
-                          className="h-4 px-1 text-[10px] leading-none"
+                          className="h-4 px-1 text-xss leading-none"
                         >
                           Non-aktif Global
                         </Badge>

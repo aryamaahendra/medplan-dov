@@ -176,7 +176,7 @@ function ActivityGroup({
             </span>
           </Label>
           {level === 0 && isOutOfRange && (
-            <span className="mt-0.5 block text-[10px] font-medium text-destructive">
+            <span className="mt-0.5 block text-xss font-medium text-destructive">
               (Renja di luar jangkauan tahun {planningVersion?.year_start} -{' '}
               {planningVersion?.year_end})
             </span>
@@ -184,7 +184,7 @@ function ActivityGroup({
           {targetForYear && (
             <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
               <span className="flex items-center gap-1.5">
-                <span className="text-[10px] font-medium text-muted-foreground/70 uppercase">
+                <span className="text-xss font-medium text-muted-foreground/70 uppercase">
                   Target {year}:
                 </span>
                 <span className="font-medium text-foreground">
@@ -193,7 +193,7 @@ function ActivityGroup({
               </span>
               {targetForYear.budget && (
                 <span className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-medium text-muted-foreground/70 uppercase">
+                  <span className="text-xss font-medium text-muted-foreground/70 uppercase">
                     Pagu:
                   </span>
                   <span className="font-medium text-foreground">
@@ -236,14 +236,14 @@ function ActivityGroup({
                   <div className="mt-1 grid gap-1.5 leading-none">
                     <Label
                       htmlFor={`activity-indicator-${indicator.id}`}
-                      className="cursor-pointer text-sm leading-normal font-medium text-foreground transition-colors hover:text-primary"
+                      className="cursor-pointer text-sm leading-normal font-medium text-foreground transition-colors hover:underline"
                     >
                       {indicator.name}
                     </Label>
                     <div className="mt-0.5">
                       {indicatorTarget ? (
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                          <span className="text-[10px] font-medium text-muted-foreground/70 uppercase">
+                          <span className="text-xss font-medium text-muted-foreground/70 uppercase">
                             Target {year}:
                           </span>
                           <span className="font-medium text-foreground">
@@ -251,7 +251,7 @@ function ActivityGroup({
                           </span>
                         </div>
                       ) : (
-                        <span className="text-[10px] font-medium text-destructive italic">
+                        <span className="text-xss font-medium text-destructive italic">
                           (Target tahun {year} tidak tersedia)
                         </span>
                       )}

@@ -144,7 +144,7 @@ export function FundingSection({
                     ))}
                     {showAddNew && (
                       <div
-                        className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm font-medium text-primary hover:bg-accent"
+                        className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm font-semibold text-foreground hover:bg-accent"
                         onClick={() => {
                           toggleSource(sourceSearch);
                           setSourceSearch('');

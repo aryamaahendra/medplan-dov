@@ -21,7 +21,7 @@ export function RenstraInfo({ renstra }: RenstraInfoProps) {
           <span
             className={
               renstra.is_active
-                ? 'font-medium text-primary'
+                ? 'font-semibold text-foreground'
                 : 'text-muted-foreground'
             }
           >

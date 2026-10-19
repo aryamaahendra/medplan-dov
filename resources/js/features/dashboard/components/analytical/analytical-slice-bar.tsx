@@ -197,7 +197,7 @@ export function AnalyticalSliceBar({
       <div className="flex flex-wrap items-center justify-between gap-3 px-4 pt-4">
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-1.5 font-semibold text-foreground">
-            <RiFilterLine className="size-4 text-primary" />
+            <RiFilterLine className="size-4 text-foreground" />
             <span className="text-xs tracking-tight">
               Irisan Analitis Global
             </span>
@@ -251,7 +251,7 @@ export function AnalyticalSliceBar({
               {formatNumber(matchingCount)} usulan
             </span>
             <span className="text-muted-foreground">·</span>
-            <span className="font-mono font-semibold text-primary">
+            <span className="font-mono font-semibold text-foreground">
               {formatCompactIDR(matchingBudget)}
             </span>
           </div>
@@ -299,7 +299,7 @@ export function AnalyticalSliceBar({
                 />
                 <span>Unit Kerja</span>
                 {slice.unitIds.length > 0 && (
-                  <span className="py-0.2 ml-1 rounded-full bg-primary/20 px-1.5 font-mono text-[10px] font-semibold text-primary">
+                  <span className="py-0.2 ml-1 rounded-full bg-foreground/10 px-1.5 font-mono text-xss font-semibold text-foreground">
                     {slice.unitIds.length}
                   </span>
                 )}
@@ -316,7 +316,7 @@ export function AnalyticalSliceBar({
                     onClick={() =>
                       onSliceChange((prev) => ({ ...prev, unitIds: [] }))
                     }
-                    className="cursor-pointer text-[11px] text-muted-foreground hover:text-foreground"
+                    className="cursor-pointer text-xss text-muted-foreground hover:text-foreground"
                   >
                     Hapus pilihan
                   </button>
@@ -333,7 +333,7 @@ export function AnalyticalSliceBar({
                 />
               </div>
 
-              <label className="flex cursor-pointer items-center gap-2 border-b border-border/60 pb-2 text-[11px] text-muted-foreground">
+              <label className="flex cursor-pointer items-center gap-2 border-b border-border/60 pb-2 text-xss text-muted-foreground">
                 <Checkbox
                   checked={slice.includeDescendants}
                   onCheckedChange={(checked) =>
@@ -368,7 +368,7 @@ export function AnalyticalSliceBar({
                         className={cn(isSelected && 'bg-accent/70 font-medium')}
                       >
                         <span className="truncate pr-2">{unit.name}</span>
-                        <div className="flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">
+                        <div className="flex items-center gap-1.5 font-mono text-xss text-muted-foreground">
                           <span>{unit.count}</span>
                           <Checkbox checked={isSelected} />
                         </div>
@@ -400,7 +400,7 @@ export function AnalyticalSliceBar({
                 />
                 <span>Kategori</span>
                 {slice.typeIds.length > 0 && (
-                  <span className="py-0.2 ml-1 rounded-full bg-primary/20 px-1.5 font-mono text-[10px] font-semibold text-primary">
+                  <span className="py-0.2 ml-1 rounded-full bg-foreground/10 px-1.5 font-mono text-xss font-semibold text-foreground">
                     {slice.typeIds.length}
                   </span>
                 )}
@@ -419,7 +419,7 @@ export function AnalyticalSliceBar({
                     onClick={() =>
                       onSliceChange((prev) => ({ ...prev, typeIds: [] }))
                     }
-                    className="cursor-pointer text-[11px] text-muted-foreground hover:text-foreground"
+                    className="cursor-pointer text-xss text-muted-foreground hover:text-foreground"
                   >
                     Hapus
                   </button>
@@ -450,7 +450,7 @@ export function AnalyticalSliceBar({
                       )}
                     >
                       <span className="truncate pr-2">{t.name}</span>
-                      <div className="flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">
+                      <div className="flex items-center gap-1.5 font-mono text-xss text-muted-foreground">
                         <span>{t.count}</span>
                         <Checkbox checked={isSelected} />
                       </div>
@@ -481,7 +481,7 @@ export function AnalyticalSliceBar({
                 />
                 <span>Tahapan</span>
                 {slice.stages.length > 0 && (
-                  <span className="py-0.2 ml-1 rounded-full bg-primary/20 px-1.5 font-mono text-[10px] font-semibold text-primary">
+                  <span className="py-0.2 ml-1 rounded-full bg-foreground/10 px-1.5 font-mono text-xss font-semibold text-foreground">
                     {slice.stages.length}
                   </span>
                 )}
@@ -580,7 +580,7 @@ export function AnalyticalSliceBar({
                 className={cn(
                   'cursor-pointer rounded-md p-1.5 text-left transition-colors hover:bg-accent/50',
                   slice.priority === 'priority_only' &&
-                    'bg-accent font-medium text-primary',
+                    'bg-accent font-semibold text-foreground',
                 )}
               >
                 Hanya Prioritas Tinggi
@@ -623,7 +623,7 @@ export function AnalyticalSliceBar({
               >
                 <span>Urgensi & Dampak</span>
                 {slice.urgencies.length + slice.impacts.length > 0 && (
-                  <span className="py-0.2 ml-1 rounded-full bg-primary/20 px-1.5 font-mono text-[10px] font-semibold text-primary">
+                  <span className="py-0.2 ml-1 rounded-full bg-foreground/10 px-1.5 font-mono text-xss font-semibold text-foreground">
                     {slice.urgencies.length + slice.impacts.length}
                   </span>
                 )}
@@ -633,7 +633,7 @@ export function AnalyticalSliceBar({
           <PopoverContent align="start" className="w-56 p-3">
             <div className="flex flex-col gap-3">
               <div>
-                <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+                <span className="text-xss font-semibold text-muted-foreground uppercase">
                   Urgensi
                 </span>
                 <div className="mt-1 flex flex-col gap-1">
@@ -655,7 +655,7 @@ export function AnalyticalSliceBar({
               </div>
 
               <div className="border-t border-border/60 pt-2">
-                <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+                <span className="text-xss font-semibold text-muted-foreground uppercase">
                   Dampak
                 </span>
                 <div className="mt-1 flex flex-col gap-1">
@@ -774,7 +774,7 @@ export function AnalyticalSliceBar({
       {/* Active Filter Chips */}
       {hasActiveFilters && (
         <div className="flex flex-wrap items-center gap-1.5 border-t border-border/60 pt-2">
-          <span className="text-[11px] font-medium text-muted-foreground">
+          <span className="text-xss font-medium text-muted-foreground">
             Irisan Aktif:
           </span>
 

@@ -51,7 +51,7 @@ export function AttachmentTable({
           <TableRow key={attachment.id}>
             <TableCell>
               <div className="flex items-center gap-2">
-                <RiFileLine className="h-4 w-4 text-primary" />
+                <RiFileLine className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium">{attachment.display_name}</span>
               </div>
             </TableCell>

@@ -170,7 +170,7 @@ function NeedGroupForm({
                 <Label className="text-xs font-semibold">
                   Tarik Usulan Lama
                 </Label>
-                <p className="text-[11px] text-muted-foreground">
+                <p className="text-xss text-muted-foreground">
                   {data.carry_over_need_ids.length > 0
                     ? `${data.carry_over_need_ids.length} usulan terpilih akan ditarik ke kelompok ini.`
                     : 'Pilih usulan belum disetujui untuk disertakan.'}

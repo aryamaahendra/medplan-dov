@@ -116,7 +116,7 @@ export function OperationsAttentionPanel({
                           {formatNumber(readyQueue.count)}
                         </Badge>
                       </div>
-                      <p className="text-[11px] text-success-foreground/80 dark:text-success/80">
+                      <p className="text-xss text-success-foreground/80 dark:text-success/80">
                         Draf dengan checklist &ge; 85% dan kelengkapan dokumen
                         penuh
                         {readyQueue.budget > 0 &&
@@ -145,7 +145,7 @@ export function OperationsAttentionPanel({
                 <p className="text-xs font-semibold text-foreground">
                   Tidak ada yang tertahan
                 </p>
-                <p className="mt-0.5 text-[11px] text-muted-foreground">
+                <p className="mt-0.5 text-xss text-muted-foreground">
                   Seluruh tahapan usulan berjalan sesuai tata kelola.
                 </p>
               </div>
@@ -154,7 +154,7 @@ export function OperationsAttentionPanel({
                 {/* 1. Critical Severity Group */}
                 {criticalItems.length > 0 && (
                   <div>
-                    <div className="mb-2 flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-destructive uppercase">
+                    <div className="mb-2 flex items-center gap-1.5 text-xss font-bold tracking-wider text-destructive uppercase">
                       <RiErrorWarningLine className="size-3.5" />
                       <span>Kritis (Tindakan Segera)</span>
                     </div>
@@ -176,7 +176,7 @@ export function OperationsAttentionPanel({
                                 {item.title}
                               </span>
                             </div>
-                            <p className="mt-0.5 text-[11px] text-muted-foreground">
+                            <p className="mt-0.5 text-xss text-muted-foreground">
                               {item.description}
                             </p>
                           </div>
@@ -196,7 +196,7 @@ export function OperationsAttentionPanel({
                 {/* 2. Warning Severity Group */}
                 {warningItems.length > 0 && (
                   <div>
-                    <div className="mb-2 flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-warning-foreground uppercase dark:text-warning">
+                    <div className="mb-2 flex items-center gap-1.5 text-xss font-bold tracking-wider text-warning-foreground uppercase dark:text-warning">
                       <RiAlertLine className="size-3.5" />
                       <span>Peringatan (Perlu Pemantauan)</span>
                     </div>
@@ -218,7 +218,7 @@ export function OperationsAttentionPanel({
                                 {item.title}
                               </span>
                             </div>
-                            <p className="mt-0.5 text-[11px] text-muted-foreground">
+                            <p className="mt-0.5 text-xss text-muted-foreground">
                               {item.description}
                             </p>
                           </div>
@@ -241,7 +241,7 @@ export function OperationsAttentionPanel({
                 {/* 3. Info Severity Group */}
                 {infoItems.length > 0 && (
                   <div>
-                    <div className="mb-2 flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-muted-foreground uppercase">
+                    <div className="mb-2 flex items-center gap-1.5 text-xss font-bold tracking-wider text-muted-foreground uppercase">
                       <RiTimeLine className="size-3.5" />
                       <span>Informasi / Siklus Lanjutan</span>
                     </div>
@@ -263,7 +263,7 @@ export function OperationsAttentionPanel({
                                 {item.title}
                               </span>
                             </div>
-                            <p className="mt-0.5 text-[11px] text-muted-foreground">
+                            <p className="mt-0.5 text-xss text-muted-foreground">
                               {item.description}
                             </p>
                           </div>

@@ -141,7 +141,7 @@ export function UnapprovedNeedPickerDialog({
       <DialogContent className="flex max-h-[85vh] flex-col sm:max-w-[850px]">
         <DialogHeader>
           <div className="flex items-center gap-2">
-            <RiHistoryLine className="h-5 w-5 text-primary" />
+            <RiHistoryLine className="h-5 w-5 text-foreground" />
             <DialogTitle>
               Pilih dari Usulan Sebelumnya yang Belum Disetujui
             </DialogTitle>
@@ -181,7 +181,7 @@ export function UnapprovedNeedPickerDialog({
         <div className="flex-1 overflow-y-auto rounded-md border">
           {loading ? (
             <div className="flex h-48 flex-col items-center justify-center gap-2 text-muted-foreground">
-              <RiLoader4Line className="h-6 w-6 animate-spin text-primary" />
+              <RiLoader4Line className="h-6 w-6 animate-spin text-foreground" />
               <p className="text-sm">Memuat usulan sebelumnya...</p>
             </div>
           ) : candidates.length === 0 ? (

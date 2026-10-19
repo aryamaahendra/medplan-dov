@@ -71,7 +71,7 @@ export const getNeedColumns = (
           <div className="flex items-start gap-1.5">
             <Link
               href={needRoutes.show.url({ need: need.id })}
-              className="line-clamp-2 text-left leading-snug font-semibold text-foreground transition-colors hover:text-primary hover:underline"
+              className="line-clamp-2 text-left leading-snug font-semibold text-foreground transition-colors hover:text-foreground hover:underline"
             >
               {need.title}
             </Link>
@@ -87,7 +87,7 @@ export const getNeedColumns = (
                 <Tooltip>
                   <TooltipTrigger
                     render={
-                      <span className="line-clamp-1 cursor-help text-[11px] hover:text-foreground">
+                      <span className="line-clamp-1 cursor-help text-xss hover:text-foreground">
                         {path[path.length - 1]}
                       </span>
                     }
@@ -121,7 +121,7 @@ export const getNeedColumns = (
           <span className="text-sm font-semibold text-foreground">
             {formatIDR(need.total_price)}
           </span>
-          <span className="text-[11px] text-muted-foreground">
+          <span className="text-xss text-muted-foreground">
             {Number(need.volume).toLocaleString('id-ID')} {need.unit} ×{' '}
             {formatIDR(need.unit_price)}
           </span>
@@ -182,7 +182,7 @@ export const getNeedColumns = (
 
       return (
         <div className="flex w-[120px] flex-col gap-1.5">
-          <div className="flex items-center justify-between font-mono text-[11px] text-muted-foreground">
+          <div className="flex items-center justify-between font-mono text-xss text-muted-foreground">
             <span>Checklist</span>
             <span className="font-semibold text-foreground">{percentage}%</span>
           </div>
@@ -201,7 +201,7 @@ export const getNeedColumns = (
             />
           </div>
 
-          <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+          <div className="flex items-center gap-2 text-xss text-muted-foreground">
             <span
               className="inline-flex items-center gap-0.5"
               title="Jumlah file lampiran"

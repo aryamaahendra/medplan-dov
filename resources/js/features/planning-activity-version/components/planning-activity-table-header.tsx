@@ -42,10 +42,10 @@ export function PlanningActivityTableHeader({
       <TableRow className="bg-muted/50 hover:bg-muted/50">
         {years.map((year) => (
           <Fragment key={year}>
-            <TableHead className="w-[120px] border-r text-center text-[10px] font-bold">
+            <TableHead className="w-[120px] border-r text-center text-xss font-bold">
               TARGET
             </TableHead>
-            <TableHead className="w-[140px] border-r text-center text-[10px] font-bold">
+            <TableHead className="w-[140px] border-r text-center text-xss font-bold">
               PAGU
             </TableHead>
           </Fragment>

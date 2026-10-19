@@ -125,7 +125,7 @@ export function NeedLockDialog({
                 </>
               ) : (
                 <>
-                  <RiLockUnlockLine className="h-5 w-5 text-primary" />
+                  <RiLockUnlockLine className="h-5 w-5 text-foreground" />
                   Buka Kunci / Beri Perpanjangan
                 </>
               )}

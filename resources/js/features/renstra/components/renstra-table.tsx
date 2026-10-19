@@ -36,13 +36,13 @@ export function RenstraTable({ renstra }: RenstraTableProps) {
                   className={cn(
                     'text-center',
                     renstra.year_start === currentYear &&
-                      'bg-primary/15 font-bold text-primary ring-1 ring-primary/30 ring-inset',
+                      'bg-muted/60 font-bold text-foreground ring-1 ring-border ring-inset',
                   )}
                 >
                   <div className="flex flex-col items-center gap-0.5">
                     <span>Baseline ({renstra.year_start})</span>
                     {renstra.year_start === currentYear && (
-                      <span className="rounded-full bg-primary/20 px-1.5 py-0.5 text-[9px] font-semibold text-primary">
+                      <span className="rounded-full bg-foreground/10 px-1.5 py-0.5 text-xss font-semibold text-foreground">
                         Saat ini
                       </span>
                     )}
@@ -63,13 +63,13 @@ export function RenstraTable({ renstra }: RenstraTableProps) {
                       className={cn(
                         'w-1 text-center transition-colors',
                         isCurrent &&
-                          'bg-primary/15 font-bold text-primary ring-1 ring-primary/30 ring-inset',
+                          'bg-muted/60 font-bold text-foreground ring-1 ring-border ring-inset',
                       )}
                     >
                       <div className="flex flex-col items-center gap-0.5">
                         <span>{year}</span>
                         {isCurrent && (
-                          <span className="rounded-full bg-primary/20 px-1.5 py-0.5 text-[9px] font-semibold text-primary">
+                          <span className="rounded-full bg-foreground/10 px-1.5 py-0.5 text-xss font-semibold text-foreground">
                             Saat ini
                           </span>
                         )}
@@ -184,7 +184,8 @@ function TujuanRows({
               key={y}
               className={cn(
                 'text-center text-muted-foreground italic',
-                y === currentYear && 'bg-primary/10 text-primary',
+                y === currentYear &&
+                  'bg-muted/40 font-semibold text-foreground',
               )}
             >
               -
@@ -230,7 +231,7 @@ function TujuanRows({
             key={y}
             className={cn(
               'text-center text-muted-foreground italic',
-              y === currentYear && 'bg-primary/10 text-primary',
+              y === currentYear && 'bg-muted/40 font-semibold text-foreground',
             )}
           >
             -
@@ -271,14 +272,14 @@ function IndicatorColumns({
             className={cn(
               'text-center font-mono whitespace-nowrap transition-colors',
               isCurrent &&
-                'bg-primary/10 font-bold text-primary ring-1 ring-primary/20 ring-inset',
+                'bg-muted/40 font-bold text-foreground ring-1 ring-border ring-inset',
             )}
           >
             {target?.target ? (
               <span
                 className={cn(
                   isCurrent &&
-                    'inline-block rounded bg-primary/20 px-1.5 py-0.5 font-semibold text-primary',
+                    'inline-block rounded bg-foreground/10 px-1.5 py-0.5 font-semibold text-foreground',
                 )}
               >
                 {target.target}

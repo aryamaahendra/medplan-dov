@@ -65,7 +65,7 @@ export function NeedGroupCard({
           {/* Status Pill */}
           <Badge
             variant={group.is_active ? 'default' : 'secondary'}
-            className="font-mono text-[11px]"
+            className="font-mono text-xss"
           >
             <span
               className={`mr-1 size-1.5 rounded-full ${
@@ -78,7 +78,7 @@ export function NeedGroupCard({
           {/* Window Status Badge */}
           <Badge
             variant="outline"
-            className={`font-mono text-[11px] ${windowStatus.badgeClass}`}
+            className={`font-mono text-xss ${windowStatus.badgeClass}`}
           >
             <span
               className={`mr-1.5 size-1.5 rounded-full ${windowStatus.dotClass}`}
@@ -87,7 +87,7 @@ export function NeedGroupCard({
           </Badge>
 
           {/* Days Remaining Pill */}
-          <span className="rounded-md bg-muted/40 px-2 py-0.5 font-mono text-[11px] text-muted-foreground">
+          <span className="rounded-md bg-muted/40 px-2 py-0.5 font-mono text-xss text-muted-foreground">
             {timeline.humanDiffText}
           </span>
         </div>
@@ -100,7 +100,7 @@ export function NeedGroupCard({
           <span className="font-heading text-xl font-extrabold tracking-tight text-foreground sm:text-2xl">
             {formatCompactIDR(metrics.totalBudget)}
           </span>
-          <span className="hidden font-mono text-[11px] text-muted-foreground/80 xl:inline">
+          <span className="hidden font-mono text-xss text-muted-foreground/80 xl:inline">
             ({formatIDR(metrics.totalBudget)})
           </span>
         </div>
@@ -114,7 +114,7 @@ export function NeedGroupCard({
               href={needsRoutes.index.url({
                 query: { need_group_id: group.id },
               })}
-              className="transition-colors hover:text-primary hover:underline"
+              className="transition-colors hover:text-foreground hover:underline"
             >
               {group.name}
             </Link>
@@ -166,7 +166,7 @@ export function NeedGroupCard({
             />
           </div>
 
-          <div className="flex items-center justify-between font-mono text-[11px] text-muted-foreground">
+          <div className="flex items-center justify-between font-mono text-xss text-muted-foreground">
             <span>{timeline.startDateFormatted}</span>
             <RiArrowRightLine className="size-3 text-muted-foreground/40" />
             <span>{timeline.endDateFormatted}</span>
@@ -199,7 +199,7 @@ export function NeedGroupCard({
             />
           </div>
 
-          <div className="flex items-center justify-between font-mono text-[11px]">
+          <div className="flex items-center justify-between font-mono text-xss">
             <span className="text-success">
               {metrics.approvedCount} Disetujui
             </span>
@@ -217,7 +217,7 @@ export function NeedGroupCard({
       <div className="grid grid-cols-2 gap-2.5 pt-1 sm:grid-cols-4 sm:gap-3">
         {/* Metric 1 */}
         <div className="rounded-xl border border-border/70 bg-muted/30 p-3">
-          <div className="font-mono text-[11px] tracking-wider text-muted-foreground uppercase">
+          <div className="font-mono text-xss tracking-wider text-muted-foreground uppercase">
             Total Usulan
           </div>
           <div className="mt-1 font-heading text-lg font-bold text-foreground">
@@ -226,48 +226,48 @@ export function NeedGroupCard({
               Item
             </span>
           </div>
-          <div className="text-[11px] text-muted-foreground">
+          <div className="text-xss text-muted-foreground">
             Terdaftar di grup
           </div>
         </div>
 
         {/* Metric 2 */}
         <div className="rounded-xl border border-border/70 bg-muted/30 p-3">
-          <div className="font-mono text-[11px] tracking-wider text-muted-foreground uppercase">
+          <div className="font-mono text-xss tracking-wider text-muted-foreground uppercase">
             Rata-rata Pagu
           </div>
           <div className="mt-1 font-heading text-lg font-bold text-foreground">
             {metrics.avgBudgetFormatted}
           </div>
-          <div className="text-[11px] text-muted-foreground">
+          <div className="text-xss text-muted-foreground">
             Per usulan kebutuhan
           </div>
         </div>
 
         {/* Metric 3 */}
         <div className="rounded-xl border border-border/70 bg-muted/30 p-3">
-          <div className="flex items-center justify-between font-mono text-[11px] tracking-wider text-muted-foreground uppercase">
+          <div className="flex items-center justify-between font-mono text-xss tracking-wider text-muted-foreground uppercase">
             <span>Urgensi</span>
             <RiFireFill className="size-3.5 text-warning" />
           </div>
           <div className="mt-1 font-heading text-lg font-bold text-warning">
             {metrics.priorityRate}%
           </div>
-          <div className="text-[11px] text-muted-foreground">
+          <div className="text-xss text-muted-foreground">
             {metrics.priorityCount} Usulan prioritas
           </div>
         </div>
 
         {/* Metric 4 */}
         <div className="rounded-xl border border-border/70 bg-muted/30 p-3">
-          <div className="flex items-center justify-between font-mono text-[11px] tracking-wider text-muted-foreground uppercase">
+          <div className="flex items-center justify-between font-mono text-xss tracking-wider text-muted-foreground uppercase">
             <span>Validasi</span>
             <RiVerifiedBadgeFill className="size-3.5 text-success" />
           </div>
           <div className="mt-1 font-heading text-lg font-bold text-success">
             {metrics.approvalRate}%
           </div>
-          <div className="text-[11px] text-muted-foreground">
+          <div className="text-xss text-muted-foreground">
             {metrics.approvedCount} Disahkan
           </div>
         </div>

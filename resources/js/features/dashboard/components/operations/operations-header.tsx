@@ -78,7 +78,7 @@ export function OperationsHeader({
           <Badge variant="outline" className="text-muted-foreground">
             <RiShieldCheckLine
               data-icon="inline-start"
-              className="text-primary"
+              className="text-foreground"
             />
             <span>Cakupan: {meta?.scope_label ?? 'Seluruh Rumah Sakit'}</span>
           </Badge>
@@ -98,7 +98,7 @@ export function OperationsHeader({
             title="Muat ulang data operasional"
           >
             <RiRefreshLine
-              className={cn(isRefreshing && 'animate-spin text-primary')}
+              className={cn(isRefreshing && 'animate-spin text-foreground')}
             />
           </Button>
         </div>

@@ -176,7 +176,7 @@ export function NeedsStageTabs({
               </span>
               <span
                 className={cn(
-                  'rounded-md px-1.5 py-0.5 font-mono text-[10px] font-medium',
+                  'rounded-md px-1.5 py-0.5 font-mono text-xss font-medium',
                   isActive
                     ? 'bg-background/80 font-semibold shadow-2xs'
                     : 'text-muted-foreground',
@@ -188,7 +188,7 @@ export function NeedsStageTabs({
               </span>
             </div>
 
-            <div className="mt-1 truncate text-[11px] text-muted-foreground">
+            <div className="mt-1 truncate text-xss text-muted-foreground">
               {tab.description}
             </div>
           </button>

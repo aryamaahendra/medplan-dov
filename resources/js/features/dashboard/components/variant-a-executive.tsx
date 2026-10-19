@@ -1,10 +1,10 @@
 import { Link } from '@inertiajs/react';
 import {
-  RiMoneyDollarCircleLine,
-  RiCheckboxCircleLine,
-  RiTimeLine,
-  RiAlertLine,
-  RiFileList3Line,
+  RiMoneyDollarCircleFill,
+  RiCheckboxCircleFill,
+  RiTimeFill,
+  RiAlertFill,
+  RiFileList3Fill,
   RiArrowRightLine,
   RiShieldCheckLine,
   RiBuildingLine,
@@ -216,19 +216,19 @@ export function VariantAExecutive({
         >
           <Card
             size="sm"
-            className="h-full border-border/70 transition-all hover:border-primary/50 hover:shadow-xs"
+            className="h-full border-border/70 transition-all hover:border-foreground/30 hover:shadow-xs"
           >
             <CardHeader className="flex flex-row items-center justify-between">
-              <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+              <span className="text-xss font-semibold tracking-wider text-muted-foreground uppercase">
                 TOTAL ANGGARAN
               </span>
-              <RiMoneyDollarCircleLine className="size-4 text-muted-foreground transition-colors group-hover:text-primary" />
+              <RiMoneyDollarCircleFill className="size-4 text-muted-foreground transition-colors group-hover:text-foreground" />
             </CardHeader>
             <CardContent>
               <div className="font-mono text-xl font-bold tracking-tight text-foreground">
                 {formatCompactIDR(stats.total_budget)}
               </div>
-              <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
+              <div className="mt-1 flex items-center justify-between text-xss text-muted-foreground">
                 <span>{formatNumber(activeCount)} usulan aktif</span>
                 {totalBudgetDelta !== null && (
                   <span className="flex items-center gap-0.5 font-mono text-muted-foreground">
@@ -260,16 +260,16 @@ export function VariantAExecutive({
             className="h-full border-border/70 transition-all hover:border-success/50 hover:shadow-xs"
           >
             <CardHeader className="flex flex-row items-center justify-between">
-              <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+              <span className="text-xss font-semibold tracking-wider text-muted-foreground uppercase">
                 DISETUJUI DIREKTUR
               </span>
-              <RiCheckboxCircleLine className="size-4 text-success" />
+              <RiCheckboxCircleFill className="size-4 text-success" />
             </CardHeader>
             <CardContent>
               <div className="font-mono text-xl font-bold tracking-tight text-success-foreground dark:text-success">
                 {formatCompactIDR(stats.approved_budget)}
               </div>
-              <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
+              <div className="mt-1 flex items-center justify-between text-xss text-muted-foreground">
                 <span>
                   {approvedPct}% dari anggaran (
                   {formatNumber(stats.approved_by_director)} item)
@@ -301,13 +301,13 @@ export function VariantAExecutive({
               'h-full transition-all hover:shadow-xs',
               canApprove
                 ? 'border-warning/40 bg-warning/10 hover:border-warning/70 dark:bg-warning/15'
-                : 'border-border/70 hover:border-primary/50',
+                : 'border-border/70 hover:border-foreground/30',
             )}
           >
             <CardHeader className="flex flex-row items-center justify-between">
               <span
                 className={cn(
-                  'text-[11px] font-semibold tracking-wider uppercase',
+                  'text-xss font-semibold tracking-wider uppercase',
                   canApprove
                     ? 'text-warning-foreground dark:text-warning'
                     : 'text-muted-foreground',
@@ -315,7 +315,7 @@ export function VariantAExecutive({
               >
                 {canApprove ? 'MENUNGGU PERSETUJUAN ANDA' : 'MENUNGGU DIREKTUR'}
               </span>
-              <RiTimeLine
+              <RiTimeFill
                 className={cn(
                   'size-4',
                   canApprove ? 'text-warning' : 'text-muted-foreground',
@@ -335,7 +335,7 @@ export function VariantAExecutive({
               </div>
               <p
                 className={cn(
-                  'mt-1 truncate font-mono text-[11px]',
+                  'mt-1 truncate font-mono text-xss',
                   canApprove
                     ? 'text-warning-foreground/80 dark:text-warning/80'
                     : 'text-muted-foreground',
@@ -360,19 +360,19 @@ export function VariantAExecutive({
         >
           <Card
             size="sm"
-            className="h-full border-border/70 transition-all hover:border-primary/50 hover:shadow-xs"
+            className="h-full border-border/70 transition-all hover:border-foreground/30 hover:shadow-xs"
           >
             <CardHeader className="flex flex-row items-center justify-between">
-              <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+              <span className="text-xss font-semibold tracking-wider text-muted-foreground uppercase">
                 USULAN PRIORITAS
               </span>
-              <RiAlertLine className="size-4 text-warning" />
+              <RiAlertFill className="size-4 text-warning" />
             </CardHeader>
             <CardContent>
               <div className="font-mono text-xl font-bold tracking-tight text-warning-foreground dark:text-warning">
                 {formatNumber(stats.priority_needs)} Usulan
               </div>
-              <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
+              <div className="mt-1 flex items-center justify-between text-xss text-muted-foreground">
                 <span>
                   {priorityPct}% dari usulan (
                   {stats.unapproved_priority_count ?? 0} belum acc)
@@ -401,19 +401,19 @@ export function VariantAExecutive({
         >
           <Card
             size="sm"
-            className="h-full border-border/70 transition-all hover:border-primary/50 hover:shadow-xs"
+            className="h-full border-border/70 transition-all hover:border-foreground/30 hover:shadow-xs"
           >
             <CardHeader className="flex flex-row items-center justify-between">
-              <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+              <span className="text-xss font-semibold tracking-wider text-muted-foreground uppercase">
                 RATA KELENGKAPAN
               </span>
-              <RiFileList3Line className="size-4 text-muted-foreground transition-colors group-hover:text-primary" />
+              <RiFileList3Fill className="size-4 text-muted-foreground transition-colors group-hover:text-foreground" />
             </CardHeader>
             <CardContent>
               <div className="font-mono text-xl font-bold tracking-tight text-foreground">
                 {formatPercent(stats.avg_completeness)}
               </div>
-              <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
+              <div className="mt-1 flex items-center justify-between text-xss text-muted-foreground">
                 <span>
                   terisi {stats.assessed_needs_count ?? 0}/{activeCount} usulan
                 </span>
@@ -503,7 +503,7 @@ export function VariantAExecutive({
                   aria-label={`${stage.label}: ${formatCompactIDR(stage.budget)}, ${stage.pct} persen, ${stage.count} usulan`}
                   style={{ width: `${Math.max(stage.pct, 3)}%` }}
                   className={cn(
-                    'flex h-full items-center justify-center text-[10px] font-semibold transition-opacity first:rounded-l last:rounded-r hover:opacity-90',
+                    'flex h-full items-center justify-center text-xss font-semibold transition-opacity first:rounded-l last:rounded-r hover:opacity-90',
                     stage.color,
                     stage.textColor,
                   )}
@@ -589,7 +589,7 @@ export function VariantAExecutive({
                     stage: ['under_review'],
                   },
                 })}
-                className="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                className="flex items-center gap-1 text-xs font-semibold text-foreground hover:underline"
               >
                 Lihat semua ({stats.awaiting_director})
                 <RiArrowRightLine className="size-3.5" />
@@ -626,12 +626,12 @@ export function VariantAExecutive({
                           )}
                           <Link
                             href={needRoutes.show.url({ need: item.id })}
-                            className="max-w-[420px] truncate text-xs font-semibold text-foreground transition-colors hover:text-primary"
+                            className="max-w-[420px] truncate text-xs font-semibold text-foreground transition-colors hover:underline"
                           >
                             {item.title}
                           </Link>
                           {item.attachments_count ? (
-                            <span className="flex items-center gap-0.5 font-mono text-[10px] text-muted-foreground">
+                            <span className="flex items-center gap-0.5 font-mono text-xss text-muted-foreground">
                               <RiAttachment2 className="size-3" />
                               {item.attachments_count}
                             </span>
@@ -646,7 +646,7 @@ export function VariantAExecutive({
                           )}
                         </div>
 
-                        <div className="mt-1 flex flex-wrap items-center gap-x-2 text-[11px] text-muted-foreground">
+                        <div className="mt-1 flex flex-wrap items-center gap-x-2 text-xss text-muted-foreground">
                           <span className="truncate">{item.unit_name}</span>
                           <span className="text-border">•</span>
                           <span className="font-mono font-medium text-foreground">
@@ -660,7 +660,7 @@ export function VariantAExecutive({
                           <span className="text-border">•</span>
                           <span
                             className={cn(
-                              'py-0.2 rounded px-1 font-mono text-[10px]',
+                              'py-0.2 rounded px-1 font-mono text-xss',
                               item.checklist_percentage < 85
                                 ? 'bg-warning/15 text-warning-foreground dark:text-warning'
                                 : 'text-muted-foreground',
@@ -709,23 +709,23 @@ export function VariantAExecutive({
             <CardContent>
               <div className="grid grid-cols-4 gap-1.5 text-center text-xs">
                 {/* Header Axis */}
-                <div className="p-1 text-[11px] font-semibold text-muted-foreground">
+                <div className="p-1 text-xss font-semibold text-muted-foreground">
                   Dampak \ Urg
                 </div>
-                <div className="p-1 text-[11px] font-semibold text-muted-foreground">
+                <div className="p-1 text-xss font-semibold text-muted-foreground">
                   Rendah
                 </div>
-                <div className="p-1 text-[11px] font-semibold text-muted-foreground">
+                <div className="p-1 text-xss font-semibold text-muted-foreground">
                   Sedang
                 </div>
-                <div className="p-1 text-[11px] font-semibold text-muted-foreground">
+                <div className="p-1 text-xss font-semibold text-muted-foreground">
                   Tinggi
                 </div>
 
                 {/* Rows from High Impact to Low Impact */}
                 {(['high', 'medium', 'low'] as const).map((impact) => (
                   <div key={impact} className="contents">
-                    <div className="flex items-center justify-center p-1 text-[11px] font-semibold text-muted-foreground capitalize">
+                    <div className="flex items-center justify-center p-1 text-xss font-semibold text-muted-foreground capitalize">
                       {impact === 'high'
                         ? 'Tinggi'
                         : impact === 'medium'
@@ -773,7 +773,7 @@ export function VariantAExecutive({
                               {cell.count}
                             </span>
                           </div>
-                          <span className="mt-1 w-full truncate font-mono text-[10px] text-muted-foreground">
+                          <span className="mt-1 w-full truncate font-mono text-xss text-muted-foreground">
                             {cell.count > 0
                               ? formatCompactIDR(cell.budget)
                               : 'Rp 0'}
@@ -915,7 +915,7 @@ export function VariantAExecutive({
                                 stage: ['draft', 'under_review', 'approved'],
                               },
                             })}
-                            className="flex items-center justify-between text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+                            className="flex items-center justify-between text-xss text-muted-foreground transition-colors hover:text-foreground"
                           >
                             <span className="max-w-[70%] truncate">
                               {unit.name}
@@ -983,7 +983,7 @@ export function VariantAExecutive({
                         className="h-full rounded-full bg-info/80 transition-all group-hover:bg-info"
                       />
                     </div>
-                    <div className="flex items-center justify-between font-mono text-[10px] text-muted-foreground">
+                    <div className="flex items-center justify-between font-mono text-xss text-muted-foreground">
                       <span>{type.count} usulan</span>
                       {type.avg_ticket ? (
                         <span>Rata: {formatCompactIDR(type.avg_ticket)}</span>

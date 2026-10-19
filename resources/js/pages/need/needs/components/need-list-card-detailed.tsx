@@ -189,7 +189,7 @@ export function NeedListCardDetailed({
             <div className="flex items-start gap-1.5">
               <Link
                 href={needRoutes.show.url({ need: need.id })}
-                className="text-left text-base leading-snug font-semibold text-foreground transition-colors hover:text-primary hover:underline sm:text-lg"
+                className="text-left text-base leading-snug font-semibold text-foreground transition-colors hover:text-foreground hover:underline sm:text-lg"
               >
                 {need.title}
               </Link>
@@ -279,7 +279,7 @@ export function NeedListCardDetailed({
             <div className="mt-1 font-mono text-xl font-bold tracking-tight text-foreground tabular-nums">
               {formatIDR(need.total_price)}
             </div>
-            <div className="mt-0.5 text-[11px] text-muted-foreground tabular-nums">
+            <div className="mt-0.5 text-xss text-muted-foreground tabular-nums">
               Harga satuan: {formatIDR(need.unit_price)} / {need.unit}
             </div>
           </div>
@@ -317,7 +317,7 @@ export function NeedListCardDetailed({
           <PriorityBadge isPriority={need.is_priority} />
           <UrgencyImpactBadge urgency={need.urgency} impact={need.impact} />
 
-          <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+          <span className="inline-flex items-center gap-1 text-xss text-muted-foreground">
             <RiAttachmentLine className="size-3 opacity-70" />
             {need.attachments_count ?? 0} Lampiran
           </span>
@@ -326,13 +326,13 @@ export function NeedListCardDetailed({
         <div className="flex items-center gap-2">
           <Link
             href={needRoutes.show.url({ need: need.id })}
-            className="text-[11px] font-medium text-primary hover:underline"
+            className="text-xss font-semibold text-foreground hover:underline"
           >
             Lihat Detail Lengkap ›
           </Link>
 
           {need.created_at && (
-            <span className="hidden font-mono text-[11px] text-muted-foreground lg:inline-block">
+            <span className="hidden font-mono text-xss text-muted-foreground lg:inline-block">
               <RiTimeLine className="mr-0.5 inline size-3 opacity-60" />
               {formatDateTime(need.created_at, {
                 day: 'numeric',

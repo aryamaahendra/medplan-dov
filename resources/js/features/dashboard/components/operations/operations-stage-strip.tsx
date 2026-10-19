@@ -1,10 +1,10 @@
 import { Link } from '@inertiajs/react';
 import {
-  RiFileTextLine,
-  RiTimeLine,
-  RiCheckboxCircleLine,
-  RiCloseCircleLine,
-  RiAlertLine,
+  RiFileTextFill,
+  RiTimeFill,
+  RiCheckboxCircleFill,
+  RiCloseCircleFill,
+  RiAlertFill,
   RiArrowRightLine,
 } from '@remixicon/react';
 
@@ -43,12 +43,12 @@ export function OperationsStageStrip({
       percentage: stageDistribution.draft.percentage,
       holder: tiles?.draft.holder ?? 'Unit Kerja',
       exceptionsCount: tiles?.draft.exceptions_count ?? 0,
-      icon: RiFileTextLine,
+      icon: RiFileTextFill,
       colorClasses: {
-        card: 'border-border/70 hover:border-primary/50',
+        card: 'border-border/70 hover:border-foreground/30',
         title: 'text-muted-foreground',
         number: 'text-foreground',
-        icon: 'text-muted-foreground group-hover:text-primary',
+        icon: 'text-muted-foreground group-hover:text-foreground',
       },
       linkQuery: { stage: ['draft'], need_group_id: groupId },
     },
@@ -62,7 +62,7 @@ export function OperationsStageStrip({
       percentage: stageDistribution.under_review.percentage,
       holder: tiles?.under_review.holder ?? 'Tim Perencana / Direktur',
       exceptionsCount: tiles?.under_review.exceptions_count ?? 0,
-      icon: RiTimeLine,
+      icon: RiTimeFill,
       colorClasses: {
         card: 'border-warning/30 bg-warning/5 hover:border-warning/60 dark:bg-warning/10',
         title: 'text-warning-foreground dark:text-warning font-semibold',
@@ -80,7 +80,7 @@ export function OperationsStageStrip({
       percentage: stageDistribution.approved.percentage,
       holder: tiles?.approved.holder ?? 'Selesai',
       exceptionsCount: 0,
-      icon: RiCheckboxCircleLine,
+      icon: RiCheckboxCircleFill,
       colorClasses: {
         card: 'border-success/30 bg-success/5 hover:border-success/60 dark:bg-success/10',
         title: 'text-success-foreground dark:text-success font-semibold',
@@ -98,7 +98,7 @@ export function OperationsStageStrip({
       percentage: stageDistribution.rejected.percentage,
       holder: tiles?.rejected.holder ?? 'Unit Kerja (Revisi)',
       exceptionsCount: tiles?.rejected.exceptions_count ?? 0,
-      icon: RiCloseCircleLine,
+      icon: RiCloseCircleFill,
       colorClasses: {
         card: 'border-border/70 hover:border-destructive/50',
         title: 'text-destructive font-medium',
@@ -127,7 +127,7 @@ export function OperationsStageStrip({
             >
               <CardHeader className="flex flex-row items-center justify-between">
                 <span
-                  className={`text-[11px] tracking-wide ${item.colorClasses.title}`}
+                  className={`text-xss tracking-wide ${item.colorClasses.title}`}
                 >
                   {item.number}. {item.title}
                 </span>
@@ -144,12 +144,12 @@ export function OperationsStageStrip({
                     {formatNumber(item.count)}
                   </div>
 
-                  <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">
+                  <p className="mt-0.5 font-mono text-xss text-muted-foreground">
                     {formatCompactIDR(item.budget)} ({item.percentage}%)
                   </p>
                 </div>
 
-                <div className="mt-3 flex flex-wrap items-center justify-between gap-1 border-t border-border/50 pt-2 text-[10px]">
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-1 border-t border-border/50 pt-2 text-xss">
                   <span className="truncate text-muted-foreground">
                     Aksi:{' '}
                     <strong className="text-foreground">{item.holder}</strong>
@@ -161,11 +161,11 @@ export function OperationsStageStrip({
                       className="font-mono"
                       title={`${item.exceptionsCount} usulan memerlukan perhatian pada tahapan ini`}
                     >
-                      <RiAlertLine data-icon="inline-start" />
+                      <RiAlertFill data-icon="inline-start" />
                       {item.exceptionsCount} macet
                     </Badge>
                   ) : (
-                    <span className="flex items-center gap-0.5 text-muted-foreground group-hover:text-primary">
+                    <span className="flex items-center gap-0.5 text-muted-foreground group-hover:text-foreground">
                       <span>Buka</span>
                       <RiArrowRightLine className="size-2.5" />
                     </span>

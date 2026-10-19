@@ -48,7 +48,7 @@ export const getColumns = (
             className="size-7 shrink-0 overflow-hidden rounded-full"
           >
             <AvatarImage src={avatarSrc} alt={user.name} />
-            <AvatarFallback className="rounded-full bg-muted text-[10px] text-foreground">
+            <AvatarFallback className="rounded-full bg-muted text-xss text-foreground">
               {initials}
             </AvatarFallback>
           </Avatar>

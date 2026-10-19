@@ -1,13 +1,16 @@
 import { Link } from '@inertiajs/react';
 import {
   RiArrowRightLine,
-  RiCheckLine,
-  RiTimeLine,
+  RiCheckboxCircleFill,
+  RiTimeFill,
+  RiShieldCheckFill,
+  RiStarFill,
+  RiBuildingLine,
+  RiPriceTag3Line,
   RiAlertLine,
   RiShieldCheckLine,
   RiStarLine,
-  RiBuildingLine,
-  RiPriceTag3Line,
+  RiTimeLine,
 } from '@remixicon/react';
 import { useMemo, useState } from 'react';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -387,7 +390,7 @@ export function TabRingkasan({
         {/* KPI 1: Total Usulan Cocok */}
         <Card size="sm" className="border-border/70 shadow-xs">
           <CardHeader>
-            <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+            <span className="text-xss font-semibold tracking-wider text-muted-foreground uppercase">
               Total Usulan
             </span>
           </CardHeader>
@@ -395,7 +398,7 @@ export function TabRingkasan({
             <div className="font-mono text-2xl font-bold tracking-tight text-foreground">
               {formatNumber(metrics.totalCount)}
             </div>
-            <p className="mt-1 text-[11px] text-muted-foreground">
+            <p className="mt-1 text-xss text-muted-foreground">
               Estimasi belanja {formatCompactIDR(metrics.totalBudget)}
             </p>
           </CardContent>
@@ -404,16 +407,16 @@ export function TabRingkasan({
         {/* KPI 2: Disetujui Direktur */}
         <Card size="sm" className="border-border/70 shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between">
-            <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+            <span className="text-xss font-semibold tracking-wider text-muted-foreground uppercase">
               Disetujui Direktur
             </span>
-            <RiCheckLine className="size-4 text-success" />
+            <RiCheckboxCircleFill className="size-4 text-success" />
           </CardHeader>
           <CardContent>
             <div className="font-mono text-2xl font-bold tracking-tight text-success-foreground dark:text-success">
               {formatNumber(metrics.approvedCount)}
             </div>
-            <p className="mt-1 text-[11px] text-muted-foreground">
+            <p className="mt-1 text-xss text-muted-foreground">
               {formatCompactIDR(metrics.approvedBudget)} terkunci
             </p>
           </CardContent>
@@ -422,16 +425,16 @@ export function TabRingkasan({
         {/* KPI 3: Menunggu Review */}
         <Card size="sm" className="border-border/70 shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between">
-            <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+            <span className="text-xss font-semibold tracking-wider text-muted-foreground uppercase">
               Menunggu Review
             </span>
-            <RiTimeLine className="size-4 text-warning" />
+            <RiTimeFill className="size-4 text-warning" />
           </CardHeader>
           <CardContent>
             <div className="font-mono text-2xl font-bold tracking-tight text-warning-foreground dark:text-warning">
               {formatNumber(metrics.reviewCount)}
             </div>
-            <p className="mt-1 text-[11px] text-muted-foreground">
+            <p className="mt-1 text-xss text-muted-foreground">
               {formatCompactIDR(metrics.reviewBudget)} butuh telaah
             </p>
           </CardContent>
@@ -440,16 +443,16 @@ export function TabRingkasan({
         {/* KPI 4: Kesiapan Data (Readiness) */}
         <Card size="sm" className="border-border/70 shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between">
-            <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+            <span className="text-xss font-semibold tracking-wider text-muted-foreground uppercase">
               Kesiapan Data
             </span>
-            <RiShieldCheckLine className="size-4 text-primary" />
+            <RiShieldCheckFill className="size-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="font-mono text-2xl font-bold tracking-tight text-foreground">
               {formatPercent(metrics.avgReadiness)}
             </div>
-            <p className="mt-1 text-[11px] text-muted-foreground">
+            <p className="mt-1 text-xss text-muted-foreground">
               Dinilai {metrics.assessedCount} dari {metrics.totalCount} usulan
             </p>
           </CardContent>
@@ -458,16 +461,16 @@ export function TabRingkasan({
         {/* KPI 5: Porsi Prioritas */}
         <Card size="sm" className="border-border/70 shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between">
-            <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+            <span className="text-xss font-semibold tracking-wider text-muted-foreground uppercase">
               Porsi Prioritas
             </span>
-            <RiStarLine className="size-4 text-warning" />
+            <RiStarFill className="size-4 text-warning" />
           </CardHeader>
           <CardContent>
             <div className="font-mono text-2xl font-bold tracking-tight text-warning-foreground dark:text-warning">
               {formatNumber(metrics.priorityCount)}
             </div>
-            <p className="mt-1 text-[11px] text-muted-foreground">
+            <p className="mt-1 text-xss text-muted-foreground">
               {metrics.totalCount > 0
                 ? Math.round((metrics.priorityCount / metrics.totalCount) * 100)
                 : 0}
@@ -578,7 +581,7 @@ export function TabRingkasan({
                       })}
                       className={cn(
                         buttonVariants({ variant: 'ghost', size: 'sm' }),
-                        'h-6 px-2 text-xs text-primary',
+                        'h-6 px-2 text-xs font-semibold text-foreground hover:underline',
                       )}
                     >
                       Buka di daftar
@@ -731,9 +734,9 @@ export function TabRingkasan({
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                  <div className="flex items-center justify-between text-xss text-muted-foreground">
                     <span>{formatCompactIDR(stage.budget)}</span>
-                    <span className="text-primary hover:underline">
+                    <span className="font-semibold text-foreground hover:underline">
                       Filter &rarr;
                     </span>
                   </div>
@@ -838,7 +841,7 @@ export function TabRingkasan({
                       variant="ghost"
                       size="xs"
                       onClick={() => handleCrossFilter(row)}
-                      className="text-primary"
+                      className="font-semibold text-foreground"
                     >
                       Pilih Irisan
                     </Button>
@@ -852,7 +855,7 @@ export function TabRingkasan({
         <div className="flex flex-col gap-4">
           {/* Dimension Selector Ribbon */}
           <div className="flex flex-wrap items-center gap-1.5 border-b border-border/60 pb-3">
-            <span className="text-[11px] font-medium text-muted-foreground">
+            <span className="text-xss font-medium text-muted-foreground">
               Dimensi Rincian:
             </span>
 
@@ -944,10 +947,10 @@ export function TabRingkasan({
                 >
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex max-w-[65%] items-center gap-2">
-                      <span className="font-mono text-[11px] font-semibold text-muted-foreground">
+                      <span className="font-mono text-xss font-semibold text-muted-foreground">
                         #{row.rank}
                       </span>
-                      <span className="truncate font-medium text-foreground group-hover:text-primary">
+                      <span className="truncate font-medium text-foreground group-hover:underline">
                         {row.label}
                       </span>
                     </div>
@@ -982,7 +985,7 @@ export function TabRingkasan({
 
                     <span
                       className={cn(
-                        'w-16 shrink-0 text-right font-mono text-[10px]',
+                        'w-16 shrink-0 text-right font-mono text-xss',
                         row.deltaFromAvg >= 0
                           ? 'text-success-foreground dark:text-success'
                           : 'text-muted-foreground',

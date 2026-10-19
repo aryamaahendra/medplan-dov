@@ -294,10 +294,10 @@ export function VariantCAnalytical({
                 className="group flex h-auto cursor-pointer flex-col items-start gap-1 rounded-xl border border-border/70 bg-card p-3 text-left transition-all hover:border-border hover:bg-muted/40 data-[state=active]:border-primary/60 data-[state=active]:bg-primary/5 data-[state=active]:shadow-xs dark:data-[state=active]:bg-primary/10"
               >
                 <div className="flex w-full items-center justify-between">
-                  <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground">
+                  <div className="flex size-7 items-center justify-center rounded-lg bg-muted text-foreground transition-colors group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground">
                     <RiPieChartLine className="size-4" />
                   </div>
-                  <span className="font-mono text-[10px] font-semibold text-muted-foreground/70 group-data-[state=active]:text-primary">
+                  <span className="font-mono text-xss font-semibold text-muted-foreground/70 group-data-[state=active]:font-bold group-data-[state=active]:text-foreground">
                     01
                   </span>
                 </div>
@@ -305,7 +305,7 @@ export function VariantCAnalytical({
                   <span className="text-xs font-semibold text-foreground">
                     Ringkasan
                   </span>
-                  <span className="line-clamp-1 text-[11px] leading-tight text-muted-foreground">
+                  <span className="line-clamp-1 text-xss leading-tight text-muted-foreground">
                     KPI makro & sebaran utama
                   </span>
                 </div>
@@ -322,7 +322,7 @@ export function VariantCAnalytical({
                   <div className="flex size-7 items-center justify-center rounded-lg bg-success/10 text-success transition-colors group-data-[state=active]:bg-success group-data-[state=active]:text-success-foreground">
                     <RiMoneyDollarCircleLine className="size-4" />
                   </div>
-                  <span className="font-mono text-[10px] font-semibold text-muted-foreground/70 group-data-[state=active]:text-success">
+                  <span className="font-mono text-xss font-semibold text-muted-foreground/70 group-data-[state=active]:text-success">
                     02
                   </span>
                 </div>
@@ -330,7 +330,7 @@ export function VariantCAnalytical({
                   <span className="text-xs font-semibold text-foreground">
                     Anggaran
                   </span>
-                  <span className="line-clamp-1 text-[11px] leading-tight text-muted-foreground">
+                  <span className="line-clamp-1 text-xss leading-tight text-muted-foreground">
                     Pagu unit, kategori & pareto
                   </span>
                 </div>
@@ -344,10 +344,10 @@ export function VariantCAnalytical({
                 className="group flex h-auto cursor-pointer flex-col items-start gap-1 rounded-xl border border-border/70 bg-card p-3 text-left transition-all hover:border-border hover:bg-muted/40 data-[state=active]:border-primary/60 data-[state=active]:bg-primary/5 data-[state=active]:shadow-xs dark:data-[state=active]:bg-primary/10"
               >
                 <div className="flex w-full items-center justify-between">
-                  <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground">
+                  <div className="flex size-7 items-center justify-center rounded-lg bg-muted text-foreground transition-colors group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground">
                     <RiTargetLine className="size-4" />
                   </div>
-                  <span className="font-mono text-[10px] font-semibold text-muted-foreground/70 group-data-[state=active]:text-primary">
+                  <span className="font-mono text-xss font-semibold text-muted-foreground/70 group-data-[state=active]:font-bold group-data-[state=active]:text-foreground">
                     03
                   </span>
                 </div>
@@ -355,7 +355,7 @@ export function VariantCAnalytical({
                   <span className="text-xs font-semibold text-foreground">
                     Keselarasan
                   </span>
-                  <span className="line-clamp-1 text-[11px] leading-tight text-muted-foreground">
+                  <span className="line-clamp-1 text-xss leading-tight text-muted-foreground">
                     Renstra, IKU & dokumen KAK
                   </span>
                 </div>
@@ -372,7 +372,7 @@ export function VariantCAnalytical({
                   <div className="flex size-7 items-center justify-center rounded-lg bg-warning/10 text-warning transition-colors group-data-[state=active]:bg-warning group-data-[state=active]:text-warning-foreground">
                     <RiGitCommitLine className="size-4" />
                   </div>
-                  <span className="font-mono text-[10px] font-semibold text-muted-foreground/70 group-data-[state=active]:text-warning">
+                  <span className="font-mono text-xss font-semibold text-muted-foreground/70 group-data-[state=active]:text-warning">
                     04
                   </span>
                 </div>
@@ -380,7 +380,7 @@ export function VariantCAnalytical({
                   <span className="text-xs font-semibold text-foreground">
                     Alur
                   </span>
-                  <span className="line-clamp-1 text-[11px] leading-tight text-muted-foreground">
+                  <span className="line-clamp-1 text-xss leading-tight text-muted-foreground">
                     Corong siklus & aging usulan
                   </span>
                 </div>
@@ -396,7 +396,7 @@ export function VariantCAnalytical({
                 <div className="flex size-7 items-center justify-center rounded-lg bg-info/10 text-info transition-colors group-data-[state=active]:bg-info group-data-[state=active]:text-info-foreground">
                   <RiBuildingLine className="size-4" />
                 </div>
-                <span className="font-mono text-[10px] font-semibold text-muted-foreground/70 group-data-[state=active]:text-info">
+                <span className="font-mono text-xss font-semibold text-muted-foreground/70 group-data-[state=active]:text-info">
                   05
                 </span>
               </div>
@@ -404,7 +404,7 @@ export function VariantCAnalytical({
                 <span className="text-xs font-semibold text-foreground">
                   Unit
                 </span>
-                <span className="line-clamp-1 text-[11px] leading-tight text-muted-foreground">
+                <span className="line-clamp-1 text-xss leading-tight text-muted-foreground">
                   Fokus unit & hirarki turunan
                 </span>
               </div>

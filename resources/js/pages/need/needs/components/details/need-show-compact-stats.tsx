@@ -1,4 +1,4 @@
-import { RiBuildingLine, RiCoinsLine } from '@remixicon/react';
+import { RiBuildingFill, RiCoinsFill } from '@remixicon/react';
 
 import {
   PriorityBadge,
@@ -40,7 +40,7 @@ function BentoTile({
       {(label || headerRight) && (
         <div className="flex items-center justify-between gap-2">
           {label && (
-            <span className="text-[11px] leading-none font-semibold tracking-wider text-muted-foreground uppercase">
+            <span className="text-xss leading-none font-semibold tracking-wider text-muted-foreground uppercase">
               {label}
             </span>
           )}
@@ -68,8 +68,8 @@ export function NeedShowCompactStats({ need }: NeedShowCompactStatsProps) {
         {/* Panel Pagu Anggaran */}
         <Card className="bg-linear-to-br from-primary/10 via-primary/5 to-transparent lg:col-span-4">
           <CardContent className="flex h-full flex-col justify-between">
-            <div className="flex items-center gap-2 text-xs font-semibold tracking-wider text-primary-foreground uppercase">
-              <RiCoinsLine className="h-4 w-4" />
+            <div className="flex items-center gap-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+              <RiCoinsFill className="h-4 w-4 text-foreground" />
               <span>Alokasi Pagu Anggaran</span>
             </div>
 
@@ -156,7 +156,7 @@ export function NeedShowCompactStats({ need }: NeedShowCompactStatsProps) {
             {/* Unit Pengusul Tile */}
             <BentoTile label="Unit Pengusul" className="sm:col-span-5">
               <div className="mt-1 flex items-center gap-1.5 text-xs font-medium text-foreground">
-                <RiBuildingLine className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                <RiBuildingFill className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                 <span className="truncate">
                   {need.organizational_unit?.name || 'Unit Organisasi'}
                 </span>
@@ -167,7 +167,7 @@ export function NeedShowCompactStats({ need }: NeedShowCompactStatsProps) {
           {/* Bento Baris 3: Telaah Direktur
           <div className="rounded-lg border  p-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+              <span className="text-xss font-semibold tracking-wider text-muted-foreground uppercase">
                 Hasil Telaah Direktur
               </span>
               <DirectorReviewBadge need={need} />
@@ -175,7 +175,7 @@ export function NeedShowCompactStats({ need }: NeedShowCompactStatsProps) {
 
             {need.notes && (
               <div className="mt-2 flex items-start gap-2 border-t border-border/50 pt-2 text-xs">
-                <RiQuillPenLine className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+                <RiQuillPenLine className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                 <p className="text-muted-foreground">
                   <span className="font-semibold text-foreground">
                     Catatan:{' '}

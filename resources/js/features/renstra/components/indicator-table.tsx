@@ -93,13 +93,13 @@ export function IndicatorTable({
                     className={cn(
                       'w-1 border-r text-center transition-colors',
                       isCurrent &&
-                        'bg-primary/15 font-bold text-primary ring-1 ring-primary/30 ring-inset',
+                        'bg-muted/60 font-bold text-foreground ring-1 ring-border ring-inset',
                     )}
                   >
                     <div className="flex flex-col items-center gap-0.5">
                       <span>{year}</span>
                       {isCurrent && (
-                        <span className="py-0.2 rounded-full bg-primary/20 px-1 text-[9px] font-semibold text-primary">
+                        <span className="py-0.2 rounded-full bg-foreground/10 px-1.5 text-xss font-semibold text-foreground">
                           Saat ini
                         </span>
                       )}
@@ -149,14 +149,14 @@ export function IndicatorTable({
                         className={cn(
                           'border-r text-center font-mono transition-colors',
                           isCurrent &&
-                            'bg-primary/10 font-bold text-primary ring-1 ring-primary/20 ring-inset',
+                            'bg-muted/40 font-bold text-foreground ring-1 ring-border ring-inset',
                         )}
                       >
                         {target?.target ? (
                           <span
                             className={cn(
                               isCurrent &&
-                                'inline-block rounded bg-primary/20 px-1.5 py-0.5 font-semibold text-primary',
+                                'inline-block rounded bg-foreground/10 px-1.5 py-0.5 font-semibold text-foreground',
                             )}
                           >
                             {target.target}

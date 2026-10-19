@@ -157,19 +157,19 @@ export function TabAlur({ payload, metrics }: TabAlurProps) {
             {/* Step 1: Draft */}
             <div className="flex flex-col justify-between rounded-lg border border-border/70 bg-card p-3.5">
               <div>
-                <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+                <span className="text-xss font-semibold text-muted-foreground uppercase">
                   Tahap 1: Draft
                 </span>
                 <div className="mt-1 font-mono text-2xl font-bold text-foreground">
                   {formatNumber(funnelData.draft)}
                 </div>
-                <span className="text-[11px] text-muted-foreground">
+                <span className="text-xss text-muted-foreground">
                   Semua usulan diajukan
                 </span>
               </div>
               <div className="mt-3 flex items-center justify-between border-t border-border/50 pt-2 text-xs">
                 <span className="text-muted-foreground">Lanjut Telaah:</span>
-                <span className="font-mono font-semibold text-primary">
+                <span className="font-mono font-semibold text-foreground">
                   {funnelData.toReviewPct}%
                 </span>
               </div>
@@ -178,13 +178,13 @@ export function TabAlur({ payload, metrics }: TabAlurProps) {
             {/* Step 2: Under Review */}
             <div className="flex flex-col justify-between rounded-lg border border-border/70 bg-card p-3.5">
               <div>
-                <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+                <span className="text-xss font-semibold text-muted-foreground uppercase">
                   Tahap 2: Review
                 </span>
                 <div className="mt-1 font-mono text-2xl font-bold text-warning-foreground dark:text-warning">
                   {formatNumber(funnelData.review)}
                 </div>
-                <span className="text-[11px] text-muted-foreground">
+                <span className="text-xss text-muted-foreground">
                   Masuk proses verifikasi
                 </span>
               </div>
@@ -199,13 +199,13 @@ export function TabAlur({ payload, metrics }: TabAlurProps) {
             {/* Step 3: Approved */}
             <div className="flex flex-col justify-between rounded-lg border border-border/70 bg-card p-3.5">
               <div>
-                <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+                <span className="text-xss font-semibold text-muted-foreground uppercase">
                   Tahap 3: Final
                 </span>
                 <div className="mt-1 font-mono text-2xl font-bold text-success-foreground dark:text-success">
                   {formatNumber(funnelData.approved)}
                 </div>
-                <span className="text-[11px] text-muted-foreground">
+                <span className="text-xss text-muted-foreground">
                   Disetujui direktur
                 </span>
               </div>

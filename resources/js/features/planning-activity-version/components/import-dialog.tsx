@@ -109,7 +109,7 @@ export function ActivityImportDialog({
             </FormGrid>
           </div>
           <DialogFooter className="flex items-center justify-between sm:justify-between">
-            <div className="text-[10px] text-muted-foreground italic">
+            <div className="text-xss text-muted-foreground italic">
               * Anggaran akan dihitung ulang secara otomatis setelah impor
             </div>
             <div className="flex gap-2">

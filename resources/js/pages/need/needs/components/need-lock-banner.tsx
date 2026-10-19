@@ -91,7 +91,7 @@ export function NeedLockBanner({ need, className }: NeedLockBannerProps) {
             </p>
           )}
           {need.lock_reason && (
-            <p className="text-[11px] text-warning-foreground/80 italic">
+            <p className="text-xss text-warning-foreground/80 italic">
               Alasan: {need.lock_reason}
             </p>
           )}
@@ -117,12 +117,12 @@ export function NeedLockBanner({ need, className }: NeedLockBannerProps) {
             'Usulan ini dikunci sehingga tidak dapat diubah atau dihapus.'}
         </p>
         {need.group_submission_end_at && (
-          <p className="text-[11px] opacity-80">
+          <p className="text-xss opacity-80">
             Batas akhir: {formatDateTime(need.group_submission_end_at)}
           </p>
         )}
         {need.locked_at && (
-          <p className="text-[11px] opacity-80">
+          <p className="text-xss opacity-80">
             Waktu kunci: {formatDateTime(need.locked_at)}
           </p>
         )}

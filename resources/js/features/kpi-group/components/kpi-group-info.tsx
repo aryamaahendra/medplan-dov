@@ -21,7 +21,7 @@ export function KpiGroupInfo({ group }: KpiGroupInfoProps) {
           <span
             className={
               group.is_active
-                ? 'font-medium text-primary'
+                ? 'font-semibold text-foreground'
                 : 'text-muted-foreground'
             }
           >

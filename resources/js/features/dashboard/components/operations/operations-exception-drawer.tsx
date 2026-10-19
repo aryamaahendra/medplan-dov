@@ -144,21 +144,21 @@ export function OperationsExceptionDrawer({
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-1.5">
                         {item.stage === 'approved' ? (
-                          <span className="inline-flex items-center gap-1 rounded bg-success/10 px-1.5 py-0.5 text-[10px] font-medium text-success-foreground dark:text-success">
+                          <span className="inline-flex items-center gap-1 rounded bg-success/10 px-1.5 py-0.5 text-xss font-medium text-success-foreground dark:text-success">
                             <RiCheckboxCircleLine className="size-3" />
                             Disetujui
                           </span>
                         ) : item.stage === 'under_review' ? (
-                          <span className="inline-flex items-center gap-1 rounded bg-warning/10 px-1.5 py-0.5 text-[10px] font-medium text-warning-foreground dark:text-warning">
+                          <span className="inline-flex items-center gap-1 rounded bg-warning/10 px-1.5 py-0.5 text-xss font-medium text-warning-foreground dark:text-warning">
                             <RiTimeLine className="size-3" />
                             Menunggu Review
                           </span>
                         ) : item.stage === 'rejected' ? (
-                          <span className="inline-flex items-center gap-1 rounded bg-destructive/10 px-1.5 py-0.5 text-[10px] font-medium text-destructive">
+                          <span className="inline-flex items-center gap-1 rounded bg-destructive/10 px-1.5 py-0.5 text-xss font-medium text-destructive">
                             Ditolak / Revisi
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                          <span className="inline-flex items-center gap-1 rounded bg-muted px-1.5 py-0.5 text-xss font-medium text-muted-foreground">
                             <RiFileTextLine className="size-3" />
                             Draf
                           </span>
@@ -170,7 +170,7 @@ export function OperationsExceptionDrawer({
                           </Badge>
                         )}
                         {item.is_locked && (
-                          <span className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground">
+                          <span className="inline-flex items-center gap-0.5 text-xss text-muted-foreground">
                             <RiLockLine className="size-3" />
                             Terkunci
                           </span>
@@ -181,14 +181,14 @@ export function OperationsExceptionDrawer({
                         href={needRoutes.index.url({
                           query: { search: item.title },
                         })}
-                        className="mt-1 block font-medium text-foreground hover:text-primary hover:underline"
+                        className="mt-1 block font-medium text-foreground hover:underline"
                       >
                         <span className="text-xs leading-snug font-semibold">
                           {item.title}
                         </span>
                       </Link>
 
-                      <div className="mt-1.5 flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
+                      <div className="mt-1.5 flex flex-wrap items-center gap-3 text-xss text-muted-foreground">
                         <span className="flex items-center gap-1 truncate">
                           <RiBuildingLine className="size-3 shrink-0" />
                           {item.unit_name}
@@ -224,12 +224,12 @@ export function OperationsExceptionDrawer({
                       </div>
 
                       {item.lock_reason && (
-                        <p className="mt-1 text-[11px] text-muted-foreground italic">
+                        <p className="mt-1 text-xss text-muted-foreground italic">
                           Alasan kunci: {item.lock_reason}
                         </p>
                       )}
                       {item.unlocked_until && (
-                        <p className="mt-0.5 text-[11px] font-medium text-warning-foreground dark:text-warning">
+                        <p className="mt-0.5 text-xss font-medium text-warning-foreground dark:text-warning">
                           Dispensasi sampai: {item.unlocked_until}
                         </p>
                       )}

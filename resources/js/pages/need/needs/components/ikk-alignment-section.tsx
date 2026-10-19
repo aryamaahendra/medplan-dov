@@ -150,7 +150,7 @@ function KpiIndicatorItem({
                 ? 'font-medium tracking-wider uppercase'
                 : 'cursor-pointer font-medium',
               isSelected
-                ? 'text-primary'
+                ? 'font-semibold text-foreground'
                 : indicator.is_category
                   ? 'text-foreground'
                   : '',
@@ -165,7 +165,7 @@ function KpiIndicatorItem({
             <div className="mt-0.5">
               {targetForYear ? (
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <span className="text-[10px] font-medium text-muted-foreground/70 uppercase">
+                  <span className="text-xss font-medium text-muted-foreground/70 uppercase">
                     Target {year}:
                   </span>
                   <span className="font-medium text-foreground">
@@ -173,7 +173,7 @@ function KpiIndicatorItem({
                   </span>
                 </div>
               ) : (
-                <span className="text-[10px] font-medium text-destructive italic">
+                <span className="text-xss font-medium text-destructive italic">
                   (Target tahun {year} tidak tersedia)
                 </span>
               )}

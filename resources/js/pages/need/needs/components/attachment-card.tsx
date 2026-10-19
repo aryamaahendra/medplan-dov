@@ -87,13 +87,13 @@ export function AttachmentCard({
       )}
     >
       <div className="flex shrink-0 items-center justify-center">
-        <RiUploadLine className="h-4 w-4 text-primary" />
+        <RiUploadLine className="h-4 w-4 text-muted-foreground" />
       </div>
       <div className="min-w-0 flex-1">
         <p className="truncate text-[13px] leading-tight font-medium">
           {attachment.display_name}
         </p>
-        <p className="mt-0.5 text-[10px] leading-none text-muted-foreground uppercase">
+        <p className="mt-0.5 text-xss leading-none text-muted-foreground uppercase">
           {attachment.extension || 'FILE'} •{' '}
           {formatFileSize(attachment.file_size)}
         </p>

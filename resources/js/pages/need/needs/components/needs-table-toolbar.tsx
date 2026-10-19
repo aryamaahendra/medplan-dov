@@ -316,7 +316,7 @@ export function NeedsTableToolbar({
                 className={cn(
                   'border transition-colors',
                   isActive
-                    ? 'border-primary bg-primary/10 font-medium text-primary hover:bg-primary/15'
+                    ? 'border-foreground/30 bg-muted font-semibold text-foreground hover:bg-muted/80'
                     : 'border-border/80 bg-background text-foreground/80 hover:bg-muted/60',
                 )}
               >

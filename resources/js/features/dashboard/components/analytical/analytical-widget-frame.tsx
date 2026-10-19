@@ -101,7 +101,7 @@ export function AnalyticalWidgetFrame({
                   className={cn(
                     'flex cursor-pointer items-center transition-colors select-none',
                     !showTable
-                      ? 'text-primary'
+                      ? 'text-foreground'
                       : 'text-muted-foreground hover:text-foreground',
                   )}
                 >
@@ -124,7 +124,7 @@ export function AnalyticalWidgetFrame({
                   className={cn(
                     'flex cursor-pointer items-center transition-colors select-none',
                     showTable
-                      ? 'text-primary'
+                      ? 'text-foreground'
                       : 'text-muted-foreground hover:text-foreground',
                   )}
                 >
@@ -138,7 +138,7 @@ export function AnalyticalWidgetFrame({
                 href={listHref}
                 className={cn(
                   buttonVariants({ variant: 'ghost', size: 'sm' }),
-                  'text-primary hover:text-primary/90',
+                  'font-semibold text-foreground hover:underline',
                 )}
               >
                 <span>{listActionLabel}</span>

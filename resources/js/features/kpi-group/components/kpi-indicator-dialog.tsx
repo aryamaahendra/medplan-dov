@@ -185,7 +185,7 @@ function KpiIndicatorForm({
                         label={`Tahun ${year}`}
                         labelProps={{
                           className:
-                            'font-mono text-[10px] text-muted-foreground uppercase',
+                            'font-mono text-xss text-muted-foreground uppercase',
                         }}
                         placeholder="Target"
                         value={existingTarget?.target_value ?? ''}

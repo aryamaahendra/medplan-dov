@@ -212,7 +212,7 @@ export function OperationsUnitProgressTable({
                                   include_descendants: 1,
                                 },
                               })}
-                              className="truncate font-semibold text-foreground hover:text-primary hover:underline"
+                              className="truncate font-semibold text-foreground hover:underline"
                               title={item.name}
                             >
                               {item.name}
@@ -229,7 +229,7 @@ export function OperationsUnitProgressTable({
                           </div>
 
                           {item.breadcrumb && (
-                            <span className="mt-0.5 truncate text-[10px] text-muted-foreground/80">
+                            <span className="mt-0.5 truncate text-xss text-muted-foreground/80">
                               {item.breadcrumb}
                             </span>
                           )}
@@ -244,7 +244,7 @@ export function OperationsUnitProgressTable({
                       {/* Stage composition mini-bar */}
                       <TableCell>
                         {total === 0 ? (
-                          <div className="text-center font-mono text-[11px] text-muted-foreground">
+                          <div className="text-center font-mono text-xss text-muted-foreground">
                             -
                           </div>
                         ) : (
@@ -282,7 +282,7 @@ export function OperationsUnitProgressTable({
                             </div>
 
                             {/* Counts legend */}
-                            <div className="flex justify-between font-mono text-[10px] text-muted-foreground">
+                            <div className="flex justify-between font-mono text-xss text-muted-foreground">
                               <span>Draf: {item.draft_count}</span>
                               <span className="text-warning-foreground dark:text-warning">
                                 Rev: {item.under_review_count}

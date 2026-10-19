@@ -182,7 +182,7 @@ export function NeedIkkTable({ kpiIndicators, needYear }: NeedIkkTableProps) {
                         <span className="text-xs font-semibold text-foreground sm:text-sm">
                           {group.name}
                         </span>
-                        <Badge variant="secondary" className="text-[10px]">
+                        <Badge variant="secondary" className="text-xss">
                           Kategori
                         </Badge>
                       </div>

@@ -1,7 +1,7 @@
 import {
-  RiFolderChartLine,
-  RiFileList3Line,
-  RiCoinsLine,
+  RiFolderChartFill,
+  RiFileList3Fill,
+  RiCoinsFill,
 } from '@remixicon/react';
 import type { ReactNode } from 'react';
 import { Area, AreaChart } from 'recharts';
@@ -109,7 +109,7 @@ export function NeedGroupsSummaryStats({ stats }: NeedGroupsSummaryStatsProps) {
         subtitle="Total Kelompok"
         icon={
           <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <RiFolderChartLine className="size-4" />
+            <RiFolderChartFill className="size-4" />
           </div>
         }
       >
@@ -146,7 +146,7 @@ export function NeedGroupsSummaryStats({ stats }: NeedGroupsSummaryStatsProps) {
         }
         icon={
           <div className="flex size-8 items-center justify-center rounded-lg bg-info/10 text-info">
-            <RiFileList3Line className="size-4" />
+            <RiFileList3Fill className="size-4" />
           </div>
         }
       >
@@ -183,8 +183,8 @@ export function NeedGroupsSummaryStats({ stats }: NeedGroupsSummaryStatsProps) {
                           (typeof groupTrends)[number] | undefined;
 
                         if (!item) {
-return '';
-}
+                          return '';
+                        }
 
                         return item.year
                           ? `${item.name ?? 'Kelompok Usulan'} (TA ${item.year})`
@@ -233,7 +233,7 @@ return '';
         }
         icon={
           <div className="flex size-8 items-center justify-center rounded-lg bg-warning/10 text-warning">
-            <RiCoinsLine className="size-4" />
+            <RiCoinsFill className="size-4" />
           </div>
         }
       >
@@ -276,8 +276,8 @@ return '';
                           (typeof groupTrends)[number] | undefined;
 
                         if (!item) {
-return '';
-}
+                          return '';
+                        }
 
                         return item.year
                           ? `${item.name ?? 'Kelompok Usulan'} (TA ${item.year})`

@@ -136,14 +136,14 @@ export function FileSection({
                   'bg-muted/50 line-through opacity-50',
               )}
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-foreground">
                 <RiUploadLine className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1 text-left">
                 <p className="truncate text-sm leading-tight font-medium text-foreground">
                   {att.display_name}
                 </p>
-                <p className="mt-1 text-[10px] leading-none text-muted-foreground uppercase">
+                <p className="mt-1 text-xss leading-none text-muted-foreground uppercase">
                   {att.extension || 'FILE'} • {formatFileSize(att.file_size)}
                 </p>
               </div>
@@ -191,7 +191,7 @@ export function FileSection({
               key={index}
               className="group flex items-center gap-3 rounded-lg border border-primary/20 bg-primary/5 p-3"
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-foreground">
                 <RiUploadLine className="h-5 w-5" />
               </div>
               <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -202,7 +202,7 @@ export function FileSection({
                     className="h-6 border-none bg-transparent p-0 py-0 text-sm font-medium text-foreground shadow-none focus-visible:ring-0 focus-visible:ring-1"
                   />
                 </div>
-                <p className="text-[10px] leading-none text-muted-foreground uppercase">
+                <p className="text-xss leading-none text-muted-foreground uppercase">
                   {file.name.split('.').pop()} • {formatFileSize(file.size)}
                 </p>
                 {errors?.[`attachments.${index}`] && (

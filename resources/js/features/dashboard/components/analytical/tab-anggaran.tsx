@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { RiArrowRightLine, RiStarFill, RiAlertLine } from '@remixicon/react';
+import { RiArrowRightLine, RiStarFill, RiAlertFill } from '@remixicon/react';
 import { useMemo } from 'react';
 
 import { Badge } from '@/components/ui/badge';
@@ -235,7 +235,7 @@ export function TabAnggaran({
       <div className="grid gap-3 sm:grid-cols-3">
         <Card size="sm" className="border-border/70 shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between">
-            <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+            <span className="text-xss font-semibold tracking-wider text-muted-foreground uppercase">
               Belanja Prioritas Tinggi
             </span>
             <RiStarFill className="size-4 text-warning" />
@@ -244,7 +244,7 @@ export function TabAnggaran({
             <div className="font-mono text-xl font-bold text-warning-foreground dark:text-warning">
               {formatCompactIDR(metrics.priorityBudget)}
             </div>
-            <p className="mt-1 text-[11px] text-muted-foreground">
+            <p className="mt-1 text-xss text-muted-foreground">
               {metrics.totalBudget > 0
                 ? Math.round(
                     (metrics.priorityBudget / metrics.totalBudget) * 100,
@@ -257,7 +257,7 @@ export function TabAnggaran({
 
         <Card size="sm" className="border-border/70 shadow-xs">
           <CardHeader>
-            <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+            <span className="text-xss font-semibold tracking-wider text-muted-foreground uppercase">
               Belanja Non-Prioritas
             </span>
           </CardHeader>
@@ -267,7 +267,7 @@ export function TabAnggaran({
                 Math.max(0, metrics.totalBudget - metrics.priorityBudget),
               )}
             </div>
-            <p className="mt-1 text-[11px] text-muted-foreground">
+            <p className="mt-1 text-xss text-muted-foreground">
               {metrics.totalBudget > 0
                 ? 100 -
                   Math.round(
@@ -281,16 +281,16 @@ export function TabAnggaran({
 
         <Card size="sm" className="border-border/70 shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between">
-            <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+            <span className="text-xss font-semibold tracking-wider text-muted-foreground uppercase">
               Anggaran Usulan Ditolak
             </span>
-            <RiAlertLine className="size-4 text-destructive" />
+            <RiAlertFill className="size-4 text-destructive" />
           </CardHeader>
           <CardContent>
             <div className="font-mono text-xl font-bold text-destructive">
               {formatCompactIDR(metrics.rejectedBudget)}
             </div>
-            <p className="mt-1 text-[11px] text-muted-foreground">
+            <p className="mt-1 text-xss text-muted-foreground">
               {metrics.rejectedCount} usulan tidak masuk pagu aktif
             </p>
           </CardContent>
@@ -336,7 +336,7 @@ export function TabAnggaran({
                         type="button"
                         variant="ghost"
                         size="xs"
-                        className="text-primary"
+                        className="font-semibold text-foreground"
                         onClick={() => {
                           if (u.unit_id !== null) {
                             onSliceChange((prev) => ({
@@ -407,7 +407,7 @@ export function TabAnggaran({
                         'max-w-[60%] truncate font-medium text-foreground',
                         unit.unit_id !== null &&
                           unit.unit_id > 0 &&
-                          'cursor-pointer hover:text-primary hover:underline',
+                          'cursor-pointer hover:text-foreground hover:underline',
                       )}
                     >
                       {unit.name}
@@ -506,7 +506,7 @@ export function TabAnggaran({
                 className="group flex cursor-pointer flex-col gap-1 rounded-md p-1.5 transition-colors hover:bg-accent/40"
               >
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-medium text-foreground group-hover:text-primary">
+                  <span className="font-medium text-foreground group-hover:underline">
                     {t.name}
                   </span>
                   <div className="flex items-center gap-2 font-mono">
@@ -526,7 +526,7 @@ export function TabAnggaran({
                       className="h-full rounded-full bg-info transition-all"
                     />
                   </div>
-                  <span className="w-20 shrink-0 text-right font-mono text-[10px] text-muted-foreground">
+                  <span className="w-20 shrink-0 text-right font-mono text-xss text-muted-foreground">
                     avg {formatCompactIDR(t.avg_ticket ?? 0)}
                   </span>
                 </div>
@@ -575,7 +575,7 @@ export function TabAnggaran({
                   {concentrationData.top5Share}%
                 </span>
               </div>
-              <p className="mt-1 text-[11px] text-muted-foreground">
+              <p className="mt-1 text-xss text-muted-foreground">
                 Top 5 unit kerja menyerap akumulasi pagu{' '}
                 <span className="font-mono font-semibold text-foreground">
                   {formatCompactIDR(concentrationData.top5Budget)}
@@ -586,7 +586,7 @@ export function TabAnggaran({
 
             {/* SVG Concentration Stepped Curve */}
             <div className="flex flex-col gap-2">
-              <span className="text-[11px] font-semibold text-muted-foreground uppercase">
+              <span className="text-xss font-semibold text-muted-foreground uppercase">
                 Akumulasi Kumulatif (% Pagu):
               </span>
               <div className="flex h-28 w-full items-end gap-1.5 border-b border-border/80 pt-4 pb-1">
@@ -596,14 +596,14 @@ export function TabAnggaran({
                     className="group relative flex h-full flex-1 flex-col items-center justify-end"
                     title={`${pt.unitName}: ${pt.share}% kumulatif`}
                   >
-                    <span className="mb-1 font-mono text-[9px] text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+                    <span className="mb-1 font-mono text-xss text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
                       {pt.share}%
                     </span>
                     <div
                       style={{ height: `${Math.max(pt.share, 4)}%` }}
                       className="w-full rounded-t-sm bg-primary/80 transition-all hover:bg-primary"
                     />
-                    <span className="mt-1 font-mono text-[9px] text-muted-foreground">
+                    <span className="mt-1 font-mono text-xss text-muted-foreground">
                       U{i + 1}
                     </span>
                   </div>
@@ -656,7 +656,7 @@ export function TabAnggaran({
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-1.5">
                     <span className="font-mono font-medium">{bin.bin}</span>
-                    <span className="text-[10px] text-muted-foreground">
+                    <span className="text-xss text-muted-foreground">
                       ({bin.label})
                     </span>
                   </div>
@@ -757,7 +757,7 @@ export function TabAnggaran({
                             style={{
                               backgroundColor: `rgba(16, 185, 129, ${Math.max(intensityPct / 100, 0.08)})`,
                             }}
-                            className="rounded p-1.5 font-mono text-[11px] font-medium text-foreground"
+                            className="rounded p-1.5 font-mono text-xss font-medium text-foreground"
                           >
                             {formatCompactIDR(cell.budget)}
                           </div>
@@ -826,7 +826,7 @@ export function TabAnggaran({
                           <span>Prioritas</span>
                         </Badge>
                       ) : (
-                        <span className="text-[11px] text-muted-foreground">
+                        <span className="text-xss text-muted-foreground">
                           Reguler
                         </span>
                       )}
@@ -836,7 +836,7 @@ export function TabAnggaran({
                         href={needRoutes.show.url(need.id)}
                         className={cn(
                           buttonVariants({ variant: 'ghost', size: 'sm' }),
-                          'h-6 px-2 text-xs text-primary',
+                          'h-6 px-2 text-xs font-semibold text-foreground hover:underline',
                         )}
                       >
                         <span>Rincian</span>

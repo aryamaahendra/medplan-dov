@@ -29,13 +29,13 @@ export function TypeBadge({ activity, className }: TypeBadgeProps) {
       'border-warning/30 bg-warning/15 text-warning-foreground dark:bg-warning/20 dark:text-warning';
   } else if (type === 'subkegiatan') {
     badgeClass =
-      'border-primary/30 bg-primary/15 text-primary-foreground dark:bg-primary/20 dark:text-primary';
+      'border-border/70 bg-muted/80 text-foreground dark:bg-muted/50';
   } else if (type === 'output') {
     if (parentType === 'subkegiatan') {
       variant = 'outline';
     } else if (parentType === 'kegiatan') {
       badgeClass =
-        'border-primary/30 bg-primary/10 text-primary dark:bg-primary/20';
+        'border-border/70 bg-muted/60 text-foreground dark:bg-muted/40';
     }
   }
 

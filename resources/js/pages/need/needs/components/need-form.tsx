@@ -454,8 +454,8 @@ export function NeedForm({
                 )}
 
                 {sourceTitle && (
-                  <div className="mt-2 flex items-center justify-between rounded-md border border-primary/20 bg-primary/5 px-2.5 py-1.5 text-xs text-primary">
-                    <span className="line-clamp-1 text-[11px]">
+                  <div className="mt-2 flex items-center justify-between rounded-md border border-border/70 bg-muted/50 px-2.5 py-1.5 text-xs text-foreground">
+                    <span className="line-clamp-1 text-xss">
                       Draf: <strong>{sourceTitle}</strong>
                     </span>
                     <button
@@ -484,7 +484,7 @@ export function NeedForm({
                       className={cn(
                         'group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all',
                         isSelected
-                          ? 'bg-muted font-medium text-primary dark:bg-muted'
+                          ? 'bg-muted font-semibold text-foreground dark:bg-muted'
                           : 'text-foreground/80 hover:bg-muted/60 hover:text-foreground',
                       )}
                     >
@@ -507,12 +507,12 @@ export function NeedForm({
                           {errCount > 0 ? (
                             <Badge
                               variant="destructive"
-                              className="h-4 px-1 text-[9px] font-bold"
+                              className="h-4 px-1 text-xss font-bold"
                             >
                               {errCount}
                             </Badge>
                           ) : section.isFilled ? (
-                            <RiCheckLine className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                            <RiCheckLine className="h-3.5 w-3.5 text-success" />
                           ) : null}
                         </div>
                         <p className="line-clamp-1 text-xs text-muted-foreground">

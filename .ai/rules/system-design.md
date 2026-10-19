@@ -66,6 +66,15 @@ Standardize all status colors using project OKLCH CSS variables in resources/css
   Never use ad-hoc Tailwind color utilities (e.g., text-emerald-_, bg-rose-_, text-blue-_, bg-amber-_, text-red-*).
   Do not modify primitive shadcn components in resources/js/components/ui/ to add custom status colors; instead use dedicated forked components such as @/components/status-badge.
 
-## Text Color Contrast - No Primary as Text
+## Text Color Contrast - Never Primary as Text
 
-Do not use primary color as text color (e.g. text-primary). Primary color has low contrast with background when used as text. Use foreground with bold instead (e.g. text-foreground font-semibold/font-bold).
+- **Never Use Primary Color as Text**: Never use primary color utilities as text color (e.g., `text-primary`, `text-primary/*`, `hover:text-primary`, `group-hover:text-primary`). Primary color (lime brand color) has insufficient contrast ratio against light backgrounds when rendered as typography. For visual emphasis or active states, use `text-foreground` paired with font weight (e.g., `text-foreground font-semibold` or `font-bold`), or appropriate high-contrast foreground/semantic tokens.
+
+## Minimum Font Size & `text-xss` Utility
+
+- **Minimum 11px, Never Lower**: The absolute minimum font size allowed in the codebase is 11px. Never render text smaller than 11px (strict ban on `text-[10px]`, `text-[9px]`, `text-[8px]`, etc.).
+- **Extended Utility `text-xss`**: Use the extended Tailwind utility `text-xss` (`0.6875rem` / `11px`) for all 11px microcopy, badges, table headers, and indicator labels. Do not use ad-hoc arbitrary classes like `text-[11px]`; use `text-xss`.
+
+## Stat Cards - Use Fill Icons
+
+- **Fill Icons for Stat & Metric Cards**: When working on stat cards, KPI cards, metric summary tiles, or dashboard status strips, always use solid/fill icon variants (e.g., `Ri...Fill`), never outline/line variants (`Ri...Line`). Filled icons provide solid visual grounding and weight suitable for high-density executive dashboards.

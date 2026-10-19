@@ -331,7 +331,7 @@ export function YearlyDataCell({
                 : 'Total terhitung dari sub-aktivitas'
           }
           className={cn(
-            'mt-1 flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-[10px] font-bold',
+            'mt-1 flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-xss font-bold',
             {
               'bg-destructive/10 text-destructive':
                 hasBudget &&
@@ -339,7 +339,7 @@ export function YearlyDataCell({
               'bg-success/15 text-success-foreground dark:text-success':
                 hasBudget &&
                 Number(yearlyData.total_budget) < Number(yearlyData.budget),
-              'bg-primary/10 text-primary':
+              'bg-muted text-foreground':
                 !hasBudget ||
                 Number(yearlyData.total_budget) === Number(yearlyData.budget),
             },

@@ -132,7 +132,7 @@ export function NeedGridCard({
           {/* Financial */}
           <div className="border-t px-3 py-2.5">
             <div className="flex items-baseline justify-between gap-1">
-              <span className="text-[11px] text-muted-foreground tabular-nums">
+              <span className="text-xss text-muted-foreground tabular-nums">
                 {Number(need.volume).toLocaleString('id-ID')} {need.unit} ×{' '}
                 {formatIDR(need.unit_price)}
               </span>
@@ -165,7 +165,7 @@ export function NeedGridCard({
               className={cn(
                 'text-xs font-semibold tabular-nums',
                 percentage >= 85
-                  ? 'text-primary'
+                  ? 'font-bold text-foreground'
                   : percentage >= 50
                     ? 'text-warning'
                     : 'text-muted-foreground',

@@ -1,10 +1,11 @@
 import {
-  RiLockLine,
-  RiLockUnlockLine,
-  RiTimeLine,
+  RiLockFill,
+  RiLockUnlockFill,
+  RiTimeFill,
   RiAlertLine,
-  RiCheckboxCircleLine,
+  RiCheckboxCircleFill,
   RiCalendarEventLine,
+  RiLockLine,
 } from '@remixicon/react';
 import { useState } from 'react';
 
@@ -52,7 +53,7 @@ export function OperationsLockMonitor({
           <div className="flex items-center justify-between">
             <CardTitle>
               <span className="flex items-center gap-2">
-                <RiLockLine className="size-4 text-primary" />
+                <RiLockLine className="size-4 text-foreground" />
                 <span>Monitor Kunci & Dispensasi Siklus (Lock Monitor)</span>
               </span>
             </CardTitle>
@@ -74,10 +75,10 @@ export function OperationsLockMonitor({
               <div className="flex flex-col gap-2 rounded-lg border border-border/70 bg-muted/20 p-3.5">
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                   <span className="flex items-center gap-1.5 font-semibold text-foreground">
-                    <RiCalendarEventLine className="size-3.5 text-primary" />
+                    <RiCalendarEventLine className="size-3.5 text-muted-foreground" />
                     Jadwal Pengajuan Siklus
                   </span>
-                  <span className="font-mono text-[11px] text-muted-foreground">
+                  <span className="font-mono text-xss text-muted-foreground">
                     Waktu Server: {timeline.now_formatted}
                   </span>
                 </div>
@@ -105,7 +106,7 @@ export function OperationsLockMonitor({
                   </div>
                 </div>
 
-                <div className="mt-1 flex flex-wrap items-center justify-between text-[11px] text-muted-foreground">
+                <div className="mt-1 flex flex-wrap items-center justify-between text-xss text-muted-foreground">
                   <span>Mulai: {timeline.start_at ?? 'Terbuka'}</span>
                   <span className="font-medium text-foreground">
                     {timeline.status === 'open' &&
@@ -134,58 +135,58 @@ export function OperationsLockMonitor({
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {/* Tier 2: Dispensasi Aktif */}
                 <div className="flex flex-col justify-between rounded-md border border-warning/30 bg-warning/5 p-2.5 dark:bg-warning/10">
-                  <div className="flex items-center justify-between text-[11px] text-warning-foreground dark:text-warning">
+                  <div className="flex items-center justify-between text-xss text-warning-foreground dark:text-warning">
                     <span>Dispensasi</span>
-                    <RiLockUnlockLine className="size-3 text-warning" />
+                    <RiLockUnlockFill className="size-3 text-warning" />
                   </div>
                   <div className="mt-1 font-mono text-lg font-bold text-warning-foreground dark:text-warning">
                     {formatNumber(
                       tiers?.tier_2_extension ?? activeUnlocks.length,
                     )}
                   </div>
-                  <span className="text-[10px] text-muted-foreground">
+                  <span className="text-xss text-muted-foreground">
                     Izin edit sementara
                   </span>
                 </div>
 
                 {/* Tier 3: Manual Kunci */}
                 <div className="flex flex-col justify-between rounded-md border border-border/80 bg-card p-2.5">
-                  <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                  <div className="flex items-center justify-between text-xss text-muted-foreground">
                     <span>Manual Kunci</span>
-                    <RiLockLine className="size-3 text-muted-foreground" />
+                    <RiLockFill className="size-3 text-muted-foreground" />
                   </div>
                   <div className="mt-1 font-mono text-lg font-bold text-foreground">
                     {formatNumber(tiers?.tier_3_manual ?? 0)}
                   </div>
-                  <span className="text-[10px] text-muted-foreground">
+                  <span className="text-xss text-muted-foreground">
                     Oleh tim perencana
                   </span>
                 </div>
 
                 {/* Tier 4: Disetujui Direktur */}
                 <div className="flex flex-col justify-between rounded-md border border-success/30 bg-success/5 p-2.5 dark:bg-success/10">
-                  <div className="flex items-center justify-between text-[11px] text-success-foreground dark:text-success">
+                  <div className="flex items-center justify-between text-xss text-success-foreground dark:text-success">
                     <span>Persetujuan Direktur</span>
-                    <RiCheckboxCircleLine className="size-3 text-success" />
+                    <RiCheckboxCircleFill className="size-3 text-success" />
                   </div>
                   <div className="mt-1 font-mono text-lg font-bold text-success-foreground dark:text-success">
                     {formatNumber(tiers?.tier_4_director ?? 0)}
                   </div>
-                  <span className="text-[10px] text-muted-foreground">
+                  <span className="text-xss text-muted-foreground">
                     Terkunci permanen
                   </span>
                 </div>
 
                 {/* Tier 5: Jadwal Ditutup */}
                 <div className="flex flex-col justify-between rounded-md border border-border/80 bg-card p-2.5">
-                  <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                  <div className="flex items-center justify-between text-xss text-muted-foreground">
                     <span>Jadwal Tutup</span>
-                    <RiTimeLine className="size-3 text-muted-foreground" />
+                    <RiTimeFill className="size-3 text-muted-foreground" />
                   </div>
                   <div className="mt-1 font-mono text-lg font-bold text-foreground">
                     {formatNumber(tiers?.tier_5_window ?? 0)}
                   </div>
-                  <span className="text-[10px] text-muted-foreground">
+                  <span className="text-xss text-muted-foreground">
                     Kunci otomatis siklus
                   </span>
                 </div>
@@ -212,7 +213,7 @@ export function OperationsLockMonitor({
                           <RiAlertLine className="size-3.5" />
                           <span>{anom.title}</span>
                         </div>
-                        <p className="mt-0.5 text-[11px] text-muted-foreground">
+                        <p className="mt-0.5 text-xss text-muted-foreground">
                           {anom.description}
                         </p>
                       </div>
@@ -255,7 +256,7 @@ export function OperationsLockMonitor({
                         <span className="block truncate font-medium text-foreground">
                           {item.title}
                         </span>
-                        <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
+                        <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xss text-muted-foreground">
                           <span className="truncate">{item.unit_name}</span>
                           <span>-</span>
                           <span className="font-mono font-medium text-warning-foreground dark:text-warning">

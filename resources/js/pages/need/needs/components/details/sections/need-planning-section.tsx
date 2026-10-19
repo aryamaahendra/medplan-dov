@@ -59,7 +59,7 @@ export function NeedPlanningSection({ need }: NeedPlanningSectionProps) {
                       <span className="font-medium text-foreground">
                         {v.name}
                       </span>
-                      <span className="font-mono text-xs font-semibold text-primary">
+                      <span className="font-mono text-xs font-semibold text-foreground">
                         {v.code || '-'}
                       </span>
                     </div>

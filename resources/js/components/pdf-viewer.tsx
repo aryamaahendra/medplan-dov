@@ -61,7 +61,7 @@ export default function PdfViewer({
         onLoadSuccess={onDocumentLoadSuccess}
         loading={
           <div className="flex flex-col items-center">
-            <RiLoaderLine className="h-8 w-8 animate-spin text-primary" />
+            <RiLoaderLine className="h-8 w-8 animate-spin text-foreground" />
             <p className="mt-2 text-sm text-muted-foreground">Memuat PDF...</p>
           </div>
         }

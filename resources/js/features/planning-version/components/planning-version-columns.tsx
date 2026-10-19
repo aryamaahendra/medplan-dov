@@ -50,7 +50,7 @@ export const getColumns = (
             href={planningVersions.activities.index.url({
               planning_version: version.id,
             })}
-            className="font-medium text-primary hover:underline"
+            className="font-semibold text-foreground hover:underline"
           >
             {version.name}
           </Link>

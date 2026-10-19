@@ -191,13 +191,13 @@ export function KpiGroupTable({
                           className={cn(
                             'w-[90px] border-r text-center transition-colors',
                             isCurrent &&
-                              'bg-primary/15 font-bold text-primary ring-1 ring-primary/30 ring-inset',
+                              'bg-muted/60 font-bold text-foreground ring-1 ring-border ring-inset',
                           )}
                         >
                           <div className="flex flex-col items-center gap-0.5">
                             <span>{year}</span>
                             {isCurrent && (
-                              <span className="py-0.2 rounded-full bg-primary/20 px-1.5 text-[9px] font-semibold text-primary">
+                              <span className="py-0.2 rounded-full bg-foreground/10 px-1.5 text-xss font-semibold text-foreground">
                                 Saat ini
                               </span>
                             )}
@@ -224,7 +224,7 @@ export function KpiGroupTable({
                           <Button
                             variant="link"
                             onClick={onCreateFirst}
-                            className="mt-2 text-primary"
+                            className="mt-2 font-semibold text-foreground"
                           >
                             <RiAddLine data-icon="inline-start" />
                             Buat indikator pertama
@@ -264,7 +264,7 @@ export function KpiGroupTable({
                               {isCategory ? (
                                 <RiFolderLine className="h-4 w-4 shrink-0 text-amber-500" />
                               ) : (
-                                <RiLineChartLine className="h-4 w-4 shrink-0 text-primary" />
+                                <RiLineChartLine className="h-4 w-4 shrink-0 text-muted-foreground" />
                               )}
                               <span
                                 className={cn(
@@ -277,7 +277,7 @@ export function KpiGroupTable({
                               {isCategory && (
                                 <Badge
                                   variant="secondary"
-                                  className="ml-auto shrink-0 text-[10px]"
+                                  className="ml-auto shrink-0 text-xss"
                                 >
                                   Kategori L{depth + 1}
                                 </Badge>
@@ -305,7 +305,7 @@ export function KpiGroupTable({
                                 className={cn(
                                   'border-r text-center font-mono text-sm transition-colors',
                                   isCurrent &&
-                                    'bg-primary/10 font-bold text-primary ring-1 ring-primary/20 ring-inset',
+                                    'bg-muted/40 font-bold text-foreground ring-1 ring-border ring-inset',
                                 )}
                               >
                                 {isCategory ? (
@@ -316,7 +316,7 @@ export function KpiGroupTable({
                                   <span
                                     className={cn(
                                       isCurrent &&
-                                        'inline-block rounded bg-primary/20 px-1.5 py-0.5 font-semibold text-primary',
+                                        'inline-block rounded bg-foreground/10 px-1.5 py-0.5 font-semibold text-foreground',
                                     )}
                                   >
                                     {target.target_value}

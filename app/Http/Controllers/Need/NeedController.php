@@ -28,6 +28,7 @@ use App\Traits\HasDataTable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -110,16 +111,23 @@ final class NeedController extends Controller
     {
         $needGroup = NeedGroup::query()->find($request->input('need_group_id'));
         $this->authorize('create', [Need::class, $needGroup]);
-        $need = $engine->submit(NeedProposalPayload::fromArray(
+
+        $payload = NeedProposalPayload::fromArray(
             data: $request->validated(),
             attachments: $request->file('attachments') ?? [],
             attachmentNames: (array) $request->input('attachment_names', []),
             technicalSpecificationAttachments: $request->file('technical_specification_attachments') ?? [],
             technicalSpecificationAttachmentNames: (array) $request->input('technical_specification_attachment_names', []),
-        ));
+        );
+
+        $need = $engine->submit($payload, $request->user());
+
+        $message = $payload->shouldSubmit
+            ? 'Usulan kebutuhan berhasil dibuat dan diajukan.'
+            : 'Usulan kebutuhan berhasil dibuat.';
 
         return redirect()->route('needs.index', ['need_group_id' => $need->need_group_id])
-            ->with('success', 'Usulan kebutuhan berhasil dibuat.');
+            ->with('success', $message);
     }
 
     public function create(Request $request, NeedStrategicAlignmentEngine $alignmentEngine): Response
@@ -172,16 +180,33 @@ final class NeedController extends Controller
     public function update(UpdateNeedRequest $request, Need $need, NeedProposalEngine $engine): RedirectResponse
     {
         $this->authorize('update', $need);
-        $engine->update($need, NeedProposalPayload::fromArray(
+
+        $payload = NeedProposalPayload::fromArray(
             data: $request->validated(),
             attachments: $request->file('attachments') ?? [],
             attachmentNames: (array) $request->input('attachment_names', []),
             technicalSpecificationAttachments: $request->file('technical_specification_attachments') ?? [],
             technicalSpecificationAttachmentNames: (array) $request->input('technical_specification_attachment_names', []),
-        ));
+        );
+
+        if ($payload->shouldSubmit) {
+            if (! in_array($need->status, [Need::STATUS_DRAFT, Need::STATUS_REVISION], true)) {
+                throw ValidationException::withMessages([
+                    'status' => 'Hanya usulan berstatus draft atau revisi yang dapat diajukan.',
+                ]);
+            }
+
+            $this->authorize('submit', $need);
+        }
+
+        $engine->update($need, $payload, $request->user());
+
+        $message = $payload->shouldSubmit
+            ? 'Usulan kebutuhan berhasil diperbarui dan diajukan.'
+            : 'Usulan kebutuhan berhasil diperbarui.';
 
         return redirect()->route('needs.index', ['need_group_id' => $need->need_group_id])
-            ->with('success', 'Usulan kebutuhan berhasil diperbarui.');
+            ->with('success', $message);
     }
 
     public function show(Need $need): Response
@@ -257,6 +282,21 @@ final class NeedController extends Controller
         }
 
         return back()->with('success', 'Review direktur berhasil diperbarui.');
+    }
+
+    public function submit(Request $request, Need $need, NeedLockLifecycle $lifecycle): RedirectResponse
+    {
+        if (! in_array($need->status, [Need::STATUS_DRAFT, Need::STATUS_REVISION], true)) {
+            throw ValidationException::withMessages([
+                'status' => 'Hanya usulan berstatus draft atau revisi yang dapat diajukan.',
+            ]);
+        }
+
+        $this->authorize('submit', $need);
+
+        $lifecycle->submit($need, $request->user());
+
+        return back()->with('success', 'Usulan kebutuhan berhasil diajukan.');
     }
 
     /**

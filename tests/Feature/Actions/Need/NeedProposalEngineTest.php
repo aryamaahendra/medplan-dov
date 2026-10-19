@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\Need\NeedLockLifecycle;
 use App\Actions\Need\NeedProposalEngine;
 use App\DTOs\Need\NeedProposalPayload;
 use App\Models\Indicator;
@@ -226,4 +227,49 @@ it('can add and delete discrete attachments directly through the engine', functi
 
     expect(Storage::disk('local')->exists($attachment->file_path))->toBeFalse()
         ->and(Need::find($need->id)->attachments)->toHaveCount(0);
+});
+
+it('submits a new proposal in submitted status when shouldSubmit is true', function () {
+    $group = NeedGroup::factory()->create();
+    $unit = OrganizationalUnit::factory()->create();
+    $type = NeedType::factory()->create();
+    $engine = app(NeedProposalEngine::class);
+
+    $payload = NeedProposalPayload::fromArray([
+        'need_group_id' => $group->id,
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $type->id,
+        'title' => 'Proposal with Direct Submit',
+        'year' => 2026,
+        'volume' => 1,
+        'unit' => 'unit',
+        'unit_price' => 1000000,
+        'total_price' => 1000000,
+        'urgency' => 'high',
+        'impact' => 'high',
+        'submit' => true,
+    ]);
+
+    $need = $engine->submit($payload);
+
+    expect($need->status)->toBe(Need::STATUS_SUBMITTED);
+    expect($need->is_locked)->toBeTrue();
+    expect($need->lock_reason)->toBe(NeedLockLifecycle::LOCK_REASON_EXECUTIVE_REVIEW);
+});
+
+it('updates an existing proposal and marks as submitted when shouldSubmit is true', function () {
+    $need = Need::factory()->create(['status' => Need::STATUS_DRAFT, 'is_locked' => false]);
+    $engine = app(NeedProposalEngine::class);
+
+    $payload = NeedProposalPayload::fromArray([
+        'title' => 'Updated and Submitted Proposal',
+        'submit' => true,
+    ]);
+
+    $updated = $engine->update($need, $payload);
+
+    expect($updated->title)->toBe('Updated and Submitted Proposal');
+    expect($updated->status)->toBe(Need::STATUS_SUBMITTED);
+    expect($updated->is_locked)->toBeTrue();
+    expect($updated->lock_reason)->toBe(NeedLockLifecycle::LOCK_REASON_EXECUTIVE_REVIEW);
 });

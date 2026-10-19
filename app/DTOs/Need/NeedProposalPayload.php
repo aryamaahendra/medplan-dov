@@ -39,6 +39,7 @@ final readonly class NeedProposalPayload
         public array $technicalSpecificationAttachments = [],
         public array $technicalSpecificationAttachmentNames = [],
         public array $deletedAttachmentIds = [],
+        public bool $shouldSubmit = false,
     ) {}
 
     /**
@@ -68,6 +69,8 @@ final readonly class NeedProposalPayload
             }
         }
 
+        $shouldSubmit = filter_var($data['submit'] ?? $data['is_submitted'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
         $coreAttributes = collect($data)->except([
             'detail',
             'sasaran_ids',
@@ -82,6 +85,8 @@ final readonly class NeedProposalPayload
             'technical_specification_attachment_names',
             'deleted_attachment_ids',
             'is_priority',
+            'submit',
+            'is_submitted',
         ])->all();
 
         // Also check if files were passed inside $data directly
@@ -120,6 +125,7 @@ final readonly class NeedProposalPayload
             technicalSpecificationAttachments: $techFiles,
             technicalSpecificationAttachmentNames: $techNames,
             deletedAttachmentIds: $deletedIds,
+            shouldSubmit: $shouldSubmit,
         );
     }
 }

@@ -174,6 +174,13 @@ class Need extends Model
             ];
         }
 
+        if ($this->status === self::STATUS_SUBMITTED) {
+            return [
+                'is_locked' => true,
+                'reason' => $this->lock_reason ?: 'Usulan sedang dalam proses review eksekutif.',
+            ];
+        }
+
         $needGroup = $this->needGroup;
         if ($needGroup && ! $needGroup->isOpenForSubmission()) {
             if ($this->lock_reason) {

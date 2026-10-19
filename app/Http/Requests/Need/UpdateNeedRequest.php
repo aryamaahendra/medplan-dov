@@ -62,6 +62,9 @@ class UpdateNeedRequest extends FormRequest
             $allowedFields[] = 'status';
         }
 
+        $allowedFields[] = 'submit';
+        $allowedFields[] = 'is_submitted';
+
         // Only keep allowed fields in the request
         $this->replace($this->only($allowedFields));
     }
@@ -199,6 +202,8 @@ class UpdateNeedRequest extends FormRequest
                 'deleted_attachment_ids.*' => ['exists:need_attachments,id'],
             ]);
         }
+        $rules['submit'] = ['sometimes', 'boolean'];
+        $rules['is_submitted'] = ['sometimes', 'boolean'];
 
         return $rules;
     }

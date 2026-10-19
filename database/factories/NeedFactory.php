@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Actions\Need\NeedLockLifecycle;
 use App\Enums\Impact;
 use App\Enums\Urgency;
 use App\Models\Need;
@@ -41,7 +42,50 @@ class NeedFactory extends Factory
             'urgency' => $this->faker->randomElement(Urgency::cases()),
             'impact' => $this->faker->randomElement(Impact::cases()),
             'is_priority' => $this->faker->boolean(20), // 20% chance to be true
-            'status' => $this->faker->randomElement(Need::STATUSES),
+            'status' => Need::STATUS_DRAFT,
         ];
+    }
+
+    public function draft(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => Need::STATUS_DRAFT,
+            'is_locked' => false,
+        ]);
+    }
+
+    public function submitted(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => Need::STATUS_SUBMITTED,
+            'is_locked' => true,
+            'lock_reason' => NeedLockLifecycle::LOCK_REASON_EXECUTIVE_REVIEW,
+        ]);
+    }
+
+    public function approved(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => Need::STATUS_APPROVED,
+            'approved_by_director_at' => now(),
+            'is_locked' => true,
+        ]);
+    }
+
+    public function rejected(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => Need::STATUS_REJECTED,
+            'is_locked' => true,
+        ]);
+    }
+
+    public function revision(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => Need::STATUS_REVISION,
+            'notes' => 'Perlu revisi detail spesifikasi.',
+            'is_locked' => false,
+        ]);
     }
 }

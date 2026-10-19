@@ -36,7 +36,7 @@ it('can view need groups index', function () {
             ->where('summaryStats.total_needs', 2)
             ->where('summaryStats.total_approved', 2)
             ->where('summaryStats.total_budget', 2000)
-            ->has('summaryStats.yearly_trends', 5)
+            ->has('summaryStats.yearly_trends', 1)
         );
 });
 

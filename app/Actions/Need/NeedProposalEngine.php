@@ -9,6 +9,7 @@ use App\Models\FundingSource;
 use App\Models\Need;
 use App\Models\NeedAttachment;
 use App\Models\NeedDetail;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -18,20 +19,33 @@ class NeedProposalEngine
 {
     public function __construct(
         protected ?NeedStrategicAlignmentEngine $alignmentEngine = null,
+        protected ?NeedLockLifecycle $lockLifecycle = null,
     ) {
         $this->alignmentEngine ??= app(NeedStrategicAlignmentEngine::class);
+        $this->lockLifecycle ??= app(NeedLockLifecycle::class);
     }
 
     /**
      * Submit a new need proposal with its alignments, details, and attachments.
      */
-    public function submit(NeedProposalPayload $payload): Need
+    public function submit(NeedProposalPayload $payload, ?User $actor = null): Need
     {
-        return DB::transaction(function () use ($payload) {
+        return DB::transaction(function () use ($payload, $actor) {
             $attributes = $payload->attributes;
 
             $isPriority = ($attributes['urgency'] ?? '') === 'high' && ($attributes['impact'] ?? '') === 'high';
             $attributes['is_priority'] = $isPriority;
+
+            if ($payload->shouldSubmit) {
+                $attributes['status'] = Need::STATUS_SUBMITTED;
+                $attributes['is_locked'] = true;
+                $attributes['locked_at'] = now();
+                $attributes['locked_by_user_id'] = $actor?->id;
+                $attributes['lock_reason'] = NeedLockLifecycle::LOCK_REASON_EXECUTIVE_REVIEW;
+                $attributes['unlocked_until'] = null;
+            } else {
+                $attributes['status'] = $attributes['status'] ?? Need::STATUS_DRAFT;
+            }
 
             /** @var Need $need */
             $need = Need::query()->create($attributes);
@@ -48,17 +62,25 @@ class NeedProposalEngine
      * Update an existing need proposal with partial alignment sync, detail updates,
      * attachment deletions, and new attachment uploads.
      */
-    public function update(Need $need, NeedProposalPayload $payload): Need
+    public function update(Need $need, NeedProposalPayload $payload, ?User $actor = null): Need
     {
-        return DB::transaction(function () use ($need, $payload) {
+        return DB::transaction(function () use ($need, $payload, $actor) {
             $attributes = $payload->attributes;
 
             $urgency = $attributes['urgency'] ?? $need->urgency;
             $impact = $attributes['impact'] ?? $need->impact;
             $attributes['is_priority'] = $urgency === 'high' && $impact === 'high';
 
-            $need->update($attributes);
+            if ($payload->shouldSubmit) {
+                $attributes['status'] = Need::STATUS_SUBMITTED;
+                $attributes['is_locked'] = true;
+                $attributes['locked_at'] = now();
+                $attributes['locked_by_user_id'] = $actor?->id;
+                $attributes['lock_reason'] = NeedLockLifecycle::LOCK_REASON_EXECUTIVE_REVIEW;
+                $attributes['unlocked_until'] = null;
+            }
 
+            $need->update($attributes);
             $this->alignmentEngine->syncForNeed($need, $payload, isPartialUpdate: true);
 
             if ($payload->detail !== null) {

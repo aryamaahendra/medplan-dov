@@ -57,6 +57,7 @@ class NeedResource extends JsonResource
             'can' => [
                 'update' => $request->user()?->can('update', $this->resource),
                 'delete' => $request->user()?->can('delete', $this->resource),
+                'submit' => $request->user()?->can('submit', $this->resource),
                 'approve' => $request->user()?->can('approve', $this->resource),
                 'performChecklist' => $request->user()?->can('performChecklist', $this->resource),
                 'lock' => $request->user()?->can('lock', $this->resource),

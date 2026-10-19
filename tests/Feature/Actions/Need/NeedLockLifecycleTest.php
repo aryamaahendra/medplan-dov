@@ -29,6 +29,23 @@ describe('lock()', function () {
         expect($result->unlocked_until)->toBeNull();
     });
 });
+describe('submit() / lockForExecutiveReview()', function () {
+    it('transitions need to submitted and locks with executive review reason', function () {
+        $this->need->update([
+            'status' => Need::STATUS_DRAFT,
+            'unlocked_until' => now()->addDay(),
+        ]);
+
+        $result = $this->lifecycle->submit($this->need, $this->actor);
+
+        expect($result->status)->toBe(Need::STATUS_SUBMITTED);
+        expect($result->is_locked)->toBeTrue();
+        expect($result->lock_reason)->toBe(NeedLockLifecycle::LOCK_REASON_EXECUTIVE_REVIEW);
+        expect($result->locked_by_user_id)->toBe($this->actor->id);
+        expect($result->locked_at)->not->toBeNull();
+        expect($result->unlocked_until)->toBeNull();
+    });
+});
 
 describe('unlock()', function () {
     it('sets is_locked=false for indefinite unlock', function () {

@@ -17,9 +17,39 @@ use DateTimeInterface;
  *   unlock(Need, ?string, ?User, DateTimeInterface|string|null, bool): Need
  *   approveByDirector(Need, ?string, ?User): Need
  *   rejectDirectorApproval(Need, ?string, bool): Need
+ *   submit(Need, ?User): Need
+ *   lockForExecutiveReview(Need, ?User): Need
  */
 class NeedLockLifecycle
 {
+    public const string LOCK_REASON_EXECUTIVE_REVIEW = 'Usulan sedang dalam proses review eksekutif.';
+
+    /**
+     * Submit a need proposal for executive review, transitioning status to 'submitted'
+     * and locking it with an explicit executive review reason.
+     */
+    public function submit(Need $need, ?User $actor = null): Need
+    {
+        return $this->lockForExecutiveReview($need, $actor);
+    }
+
+    /**
+     * Move need to submitted status and lock it for executive review.
+     */
+    public function lockForExecutiveReview(Need $need, ?User $actor = null): Need
+    {
+        $need->update([
+            'status' => Need::STATUS_SUBMITTED,
+            'is_locked' => true,
+            'locked_at' => now(),
+            'locked_by_user_id' => $actor?->id,
+            'lock_reason' => self::LOCK_REASON_EXECUTIVE_REVIEW,
+            'unlocked_until' => null,
+        ]);
+
+        return $need;
+    }
+
     /**
      * Explicitly lock a need, recording who locked it and why.
      * Clears any active temporary extension window.

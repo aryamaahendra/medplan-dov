@@ -51,6 +51,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             });
             Route::controller('NeedController')->group(function () {
                 Route::patch('{need}/director-review', 'updateDirectorReview')->name('director-review');
+                Route::post('{need}/submit', 'submit')->name('submit');
             });
             Route::controller('NeedLockController')->group(function () {
                 Route::post('{need}/lock', 'lock')->name('lock');

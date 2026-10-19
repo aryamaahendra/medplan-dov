@@ -62,6 +62,9 @@ class StoreNeedRequest extends FormRequest
             $allowedFields[] = 'status';
         }
 
+        $allowedFields[] = 'submit';
+        $allowedFields[] = 'is_submitted';
+
         if (! $user->hasPermissionTo('update need tab urgency')) {
             $this->merge([
                 'urgency' => Urgency::Medium->value,
@@ -155,8 +158,9 @@ class StoreNeedRequest extends FormRequest
             'attachment_names.*' => ['string', 'max:255'],
             'technical_specification_attachments' => ['nullable', 'array'],
             'technical_specification_attachments.*' => ['file', 'max:10240', 'mimes:jpg,jpeg,png,pdf,doc,docx'],
-            'technical_specification_attachment_names' => ['nullable', 'array'],
             'technical_specification_attachment_names.*' => ['string', 'max:255'],
+            'submit' => ['sometimes', 'boolean'],
+            'is_submitted' => ['sometimes', 'boolean'],
         ];
     }
 }

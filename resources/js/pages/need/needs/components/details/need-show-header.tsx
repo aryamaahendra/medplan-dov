@@ -5,6 +5,7 @@ import {
   RiLockLine,
   RiLockUnlockLine,
   RiQuillPenLine,
+  RiSendPlaneLine,
 } from '@remixicon/react';
 
 import { Button } from '@/components/ui/button';
@@ -29,8 +30,10 @@ export function NeedShowHeader({
     isLocked,
     canManageLock,
     canReviewDirector,
+    canSubmit,
     setIsReviewDialogOpen,
     setIsLockDialogOpen,
+    setIsSubmitDialogOpen,
     setLockModalMode,
   } = showState;
 
@@ -104,6 +107,7 @@ export function NeedShowHeader({
         {need.can?.update && !isLocked && (
           <Button
             size="sm"
+            variant={canSubmit ? 'outline' : 'default'}
             className="gap-1.5"
             nativeButton={false}
             render={
@@ -113,6 +117,28 @@ export function NeedShowHeader({
               </Link>
             }
           />
+        )}
+
+        {canSubmit && need.status === 'draft' && (
+          <Button
+            size="sm"
+            onClick={() => setIsSubmitDialogOpen(true)}
+            className="gap-1.5"
+          >
+            <RiSendPlaneLine className="h-4 w-4" />
+            <span>Ajukan Usulan</span>
+          </Button>
+        )}
+
+        {canSubmit && need.status === 'revision' && (
+          <Button
+            size="sm"
+            onClick={() => setIsSubmitDialogOpen(true)}
+            className="gap-1.5"
+          >
+            <RiSendPlaneLine className="h-4 w-4" />
+            <span>Ajukan Kembali</span>
+          </Button>
         )}
       </div>
     </div>

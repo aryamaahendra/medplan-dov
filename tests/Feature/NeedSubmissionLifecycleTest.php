@@ -12,6 +12,7 @@ use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
+use Inertia\Testing\AssertableInertia as Assert;
 use Spatie\Permission\PermissionRegistrar;
 
 uses(RefreshDatabase::class);
@@ -307,5 +308,68 @@ describe('Read-Only Locking Protection on Submitted Proposals', function () {
 
         $response->assertForbidden();
         expect($need->fresh())->not->toBeNull();
+    });
+});
+
+describe('Inertia Presentation of Submission Capabilities', function () {
+    it('exposes can.submit as true for draft and revision proposals viewed by authorized submitter', function () {
+        $draftNeed = Need::factory()->create([
+            'need_group_id' => $this->openGroup->id,
+            'organizational_unit_id' => $this->orgUnit->id,
+            'need_type_id' => $this->needType->id,
+            'status' => Need::STATUS_DRAFT,
+            'is_locked' => false,
+        ]);
+
+        $this->actingAs($this->staffUser)
+            ->get(route('needs.show', $draftNeed))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('need/needs/show')
+                ->where('need.can.submit', true)
+                ->where('need.can.update', true)
+                ->where('need.status', Need::STATUS_DRAFT)
+            );
+
+        $revisionNeed = Need::factory()->create([
+            'need_group_id' => $this->openGroup->id,
+            'organizational_unit_id' => $this->orgUnit->id,
+            'need_type_id' => $this->needType->id,
+            'status' => Need::STATUS_REVISION,
+            'is_locked' => false,
+            'notes' => 'Catatan revisi',
+        ]);
+
+        $this->actingAs($this->staffUser)
+            ->get(route('needs.show', $revisionNeed))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('need/needs/show')
+                ->where('need.can.submit', true)
+                ->where('need.can.update', true)
+                ->where('need.status', Need::STATUS_REVISION)
+            );
+    });
+
+    it('exposes can.submit as false and locks interface once submitted', function () {
+        $submittedNeed = Need::factory()->create([
+            'need_group_id' => $this->openGroup->id,
+            'organizational_unit_id' => $this->orgUnit->id,
+            'need_type_id' => $this->needType->id,
+            'status' => Need::STATUS_SUBMITTED,
+            'is_locked' => true,
+            'lock_reason' => NeedLockLifecycle::LOCK_REASON_EXECUTIVE_REVIEW,
+        ]);
+
+        $this->actingAs($this->staffUser)
+            ->get(route('needs.show', $submittedNeed))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('need/needs/show')
+                ->where('need.can.submit', false)
+                ->where('need.can.update', false)
+                ->where('need.is_locked', true)
+                ->where('need.status', Need::STATUS_SUBMITTED)
+            );
     });
 });

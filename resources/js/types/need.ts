@@ -125,6 +125,7 @@ export interface Need {
     update: boolean;
     delete: boolean;
     approve: boolean;
+    submit?: boolean;
     performChecklist?: boolean;
     lock?: boolean;
     unlock?: boolean;

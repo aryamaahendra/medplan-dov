@@ -2,6 +2,7 @@ import type { Need } from '@/types';
 
 import { NeedDirectorReviewDialog } from '../need-director-review-dialog';
 import { NeedLockDialog } from '../need-lock-dialog';
+import { NeedSubmitDialog } from './need-submit-dialog';
 import type { useNeedShow } from './use-need-show';
 
 interface NeedShowDialogsProps {
@@ -23,6 +24,14 @@ export function NeedShowDialogs({ need, showState }: NeedShowDialogsProps) {
         open={showState.isLockDialogOpen}
         onOpenChange={showState.setIsLockDialogOpen}
         mode={showState.lockModalMode}
+      />
+
+      <NeedSubmitDialog
+        need={need}
+        open={showState.isSubmitDialogOpen}
+        onOpenChange={showState.setIsSubmitDialogOpen}
+        onConfirm={showState.handleSubmitNeed}
+        loading={showState.isSubmitting}
       />
     </>
   );

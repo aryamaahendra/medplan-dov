@@ -1,3 +1,4 @@
+import { router } from '@inertiajs/react';
 import {
   RiAttachmentLine,
   RiCalendarLine,
@@ -7,7 +8,9 @@ import {
   RiInformationLine,
 } from '@remixicon/react';
 import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
+import NeedController from '@/actions/App/Http/Controllers/Need/NeedController';
 import { usePermission } from '@/hooks/use-permission';
 import type { ChecklistAnswer, Need, Sasaran, Tujuan } from '@/types';
 
@@ -30,12 +33,46 @@ export function useNeedShow({ need, existingAnswers }: UseNeedShowProps) {
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const [lockModalMode, setLockModalMode] = useState<'lock' | 'unlock'>('lock');
   const [isLockDialogOpen, setIsLockDialogOpen] = useState(false);
-
+  const [isSubmitDialogOpen, setIsSubmitDialogOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const isLocked = Boolean(need.is_locked);
   const canManageLock =
     hasPermission('lock need') || hasPermission('unlock need');
   const canReviewDirector =
     hasPermission('review need director') && need.status === 'approved';
+  const canSubmit =
+    Boolean(need.can?.submit) &&
+    (need.status === 'draft' || need.status === 'revision');
+
+  const handleSubmitNeed = () => {
+    setIsSubmitting(true);
+    router.post(
+      NeedController.submit.url({ need: need.id }),
+      {},
+      {
+        preserveScroll: true,
+        onSuccess: () => {
+          setIsSubmitDialogOpen(false);
+          toast.success(
+            need.status === 'revision'
+              ? 'Usulan kebutuhan berhasil diajukan kembali.'
+              : 'Usulan kebutuhan berhasil diajukan.',
+          );
+        },
+        onError: (errs) => {
+          const message =
+            errs.status ||
+            Object.values(errs)[0] ||
+            'Gagal mengajukan usulan kebutuhan.';
+          toast.error(message);
+        },
+        onFinish: () => {
+          setIsSubmitting(false);
+        },
+      },
+    );
+  };
+
   const checklistAnswers = useMemo(
     () => existingAnswers?.data ?? [],
     [existingAnswers?.data],
@@ -176,10 +213,15 @@ export function useNeedShow({ need, existingAnswers }: UseNeedShowProps) {
     isLocked,
     canManageLock,
     canReviewDirector,
+    canSubmit,
     isReviewDialogOpen,
     setIsReviewDialogOpen,
     isLockDialogOpen,
     setIsLockDialogOpen,
+    isSubmitDialogOpen,
+    setIsSubmitDialogOpen,
+    isSubmitting,
+    handleSubmitNeed,
     lockModalMode,
     setLockModalMode,
     isOrphaned,

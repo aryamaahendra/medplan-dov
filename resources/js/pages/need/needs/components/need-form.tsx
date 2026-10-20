@@ -11,6 +11,7 @@ import {
   RiFireLine,
   RiHistoryLine,
   RiInformationLine,
+  RiSendPlaneLine,
 } from '@remixicon/react';
 import React, { useMemo, useState } from 'react';
 
@@ -385,9 +386,33 @@ export function NeedForm({
                     </Button>
                   ) : (
                     !isLocked && (
-                      <Button type="submit" disabled={processing}>
-                        {isEditing ? 'Simpan Usulan' : 'Tambah Usulan'}
-                      </Button>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={processing}
+                          onClick={(e) =>
+                            handleSubmit(e, { shouldSubmit: false })
+                          }
+                        >
+                          Simpan sebagai Draft
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="default"
+                          disabled={
+                            processing ||
+                            (isEditing && need?.can?.submit === false)
+                          }
+                          onClick={(e) =>
+                            handleSubmit(e, { shouldSubmit: true })
+                          }
+                          className="gap-1.5"
+                        >
+                          <RiSendPlaneLine className="h-4 w-4" />
+                          <span>Simpan & Ajukan</span>
+                        </Button>
+                      </div>
                     )
                   )}
                 </div>
@@ -415,23 +440,42 @@ export function NeedForm({
             <div className="space-y-4">
               {/* Sidebar Summary & Save Card */}
               <div>
-                <div className="mt-3 flex items-center gap-1">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={onCancel}
-                    className="flex-1 text-xs"
-                  >
-                    {isLocked ? 'KEMBALI' : 'BATAL'}
-                  </Button>
-
+                <div className="mt-3 flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={onCancel}
+                      className="flex-1 text-xs"
+                    >
+                      {isLocked ? 'KEMBALI' : 'BATAL'}
+                    </Button>
+                    {!isLocked && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={processing}
+                        onClick={(e) =>
+                          handleSubmit(e, { shouldSubmit: false })
+                        }
+                        className="flex-1 text-xs font-medium"
+                      >
+                        Simpan sebagai Draft
+                      </Button>
+                    )}
+                  </div>
                   {!isLocked && (
                     <Button
-                      type="submit"
-                      disabled={processing}
-                      className="min-w-2/3 flex-1 gap-1 text-xs font-semibold"
+                      type="button"
+                      variant="default"
+                      disabled={
+                        processing || (isEditing && need?.can?.submit === false)
+                      }
+                      onClick={(e) => handleSubmit(e, { shouldSubmit: true })}
+                      className="w-full gap-1.5 text-xs font-semibold"
                     >
-                      {isEditing ? 'SIMPAN' : 'TAMBAH'}
+                      <RiSendPlaneLine className="h-3.5 w-3.5" />
+                      <span>Simpan & Ajukan</span>
                     </Button>
                   )}
                 </div>

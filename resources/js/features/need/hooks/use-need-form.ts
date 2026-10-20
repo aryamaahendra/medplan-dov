@@ -47,6 +47,7 @@ export interface NeedFormData {
   impact: string;
   is_priority: boolean;
   status: string;
+  submit?: boolean;
   sasaran_ids: string[];
   indicator_ids: string[];
   kpi_indicator_ids: string[];
@@ -101,7 +102,7 @@ export function useNeedForm({
     },
     {
       value: 'urgency',
-      label: 'Urgensi & Status',
+      label: 'Urgensi & Prioritas',
       permission: 'update need tab urgency',
     },
     {
@@ -286,7 +287,7 @@ export function useNeedForm({
       'unit_price',
       'total_price',
     ],
-    urgency: ['urgency', 'impact', 'is_priority', 'status'],
+    urgency: ['urgency', 'impact', 'is_priority'],
     renstra: ['sasaran_ids', 'indicator_ids'],
     ikk: ['kpi_indicator_ids'],
     rls: ['strategic_service_plan_ids'],
@@ -321,8 +322,13 @@ export function useNeedForm({
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (
+    e?: React.FormEvent,
+    submitOptions?: { shouldSubmit?: boolean },
+  ) => {
+    if (e) {
+      e.preventDefault();
+    }
 
     if (isOrphanedWithoutActiveSelection) {
       toast.error('Unit kerja aktif wajib dipilih sebelum menyimpan usulan.');
@@ -330,12 +336,18 @@ export function useNeedForm({
       return;
     }
 
+    const shouldSubmit = Boolean(submitOptions?.shouldSubmit);
+
     const options = {
       onSuccess: () => {
         toast.success(
-          isEditing
-            ? 'Usulan kebutuhan berhasil diperbarui.'
-            : 'Usulan kebutuhan berhasil dibuat.',
+          shouldSubmit
+            ? isEditing
+              ? 'Usulan kebutuhan berhasil diperbarui dan diajukan.'
+              : 'Usulan kebutuhan berhasil dibuat dan diajukan.'
+            : isEditing
+              ? 'Usulan kebutuhan berhasil diperbarui.'
+              : 'Usulan kebutuhan berhasil dibuat.',
         );
       },
       onError: (errs: Record<string, string>) => {
@@ -419,6 +431,7 @@ export function useNeedForm({
 
     transform((formData) => ({
       ...formData,
+      submit: shouldSubmit,
       detail: detailValuesRef.current,
       ...(isEditing ? { _method: 'PATCH' } : {}),
     }));

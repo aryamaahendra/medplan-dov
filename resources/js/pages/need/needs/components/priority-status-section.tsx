@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
 import { RadioField } from '@/components/form';
 import InputError from '@/components/input-error';
-import { PRIORITY_LEVELS, STATUS_OPTIONS } from '@/constants/need';
-import { usePermission } from '@/hooks/use-permission';
+import { PRIORITY_LEVELS } from '@/constants/need';
 import { cn } from '@/lib/utils';
 import type { Need } from '@/types';
 
@@ -17,31 +16,12 @@ export function PriorityStatusSection({
   setData,
   errors,
 }: PriorityStatusSectionProps) {
-  const { hasPermission } = usePermission();
-  const canUpdateStatus = hasPermission('update need status');
-
   useEffect(() => {
     setData('is_priority', data.urgency === 'high' && data.impact === 'high');
   }, [data.urgency, data.impact, setData]);
 
   return (
     <div className="space-y-6">
-      {canUpdateStatus && (
-        <RadioField
-          label="Status Usulan"
-          value={data.status}
-          onValueChange={(v) => setData('status', v as Need['status'])}
-          variant="choice-card"
-          cols={2}
-          options={STATUS_OPTIONS.map((s) => ({
-            label: s.label,
-            value: s.value,
-            description: s.description,
-          }))}
-          error={errors.status}
-        />
-      )}
-
       <div className="grid grid-cols-1 gap-6">
         <RadioField
           label="Tingkat Urgensi"

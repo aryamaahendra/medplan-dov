@@ -43,34 +43,11 @@ export function NextCycleRecommendationChip({
     return null;
   }
 
-  const recVol = recommendedVolumeProp ?? need?.recommended_volume ?? null;
-  const totalVol = volumeProp ?? need?.volume ?? null;
-  const unit = unitProp ?? need?.unit ?? '';
-
-  const parsedRecVol = recVol !== null ? Number(recVol) : null;
-  const parsedTotalVol = totalVol !== null ? Number(totalVol) : null;
-
-  const isPartial =
-    parsedRecVol !== null &&
-    parsedRecVol > 0 &&
-    parsedTotalVol !== null &&
-    parsedRecVol < parsedTotalVol;
-
-  const formattedRecVol =
-    parsedRecVol !== null
-      ? parsedRecVol.toLocaleString('id-ID', { maximumFractionDigits: 4 })
-      : null;
-
-  const label =
-    isPartial && formattedRecVol
-      ? `Siklus Berikutnya (${formattedRecVol}${unit ? ` ${unit}` : ''})`
-      : 'Rekomendasi Siklus Berikutnya';
-
-  const tooltipText =
-    isPartial && formattedRecVol
-      ? `Direkomendasikan Direktur untuk siklus perencanaan berikutnya (Sisa volume: ${formattedRecVol}${unit ? ` ${unit}` : ''})`
-      : 'Direkomendasikan Direktur untuk siklus perencanaan berikutnya';
-
+  const { label, tooltipText } = getRecommendationDetails(
+    recommendedVolumeProp ?? need?.recommended_volume,
+    volumeProp ?? need?.volume,
+    unitProp ?? need?.unit,
+  );
   const chipElement = (
     <span
       className={cn(
@@ -80,9 +57,7 @@ export function NextCycleRecommendationChip({
       )}
       {...props}
     >
-      {showIcon && (
-        <RiShareForwardLine data-icon="inline-start" className="shrink-0" />
-      )}
+      {showIcon && <RiShareForwardLine data-icon="inline-start" />}
       <span>{label}</span>
     </span>
   );
@@ -101,4 +76,37 @@ export function NextCycleRecommendationChip({
       </Tooltip>
     </TooltipProvider>
   );
+}
+
+function getRecommendationDetails(
+  recVol: number | string | null | undefined,
+  totalVol: number | string | null | undefined,
+  unit: string | null | undefined,
+) {
+  const parsedRec = recVol != null ? Number(recVol) : null;
+  const parsedTotal = totalVol != null ? Number(totalVol) : null;
+  const hasVolume =
+    parsedRec != null && !Number.isNaN(parsedRec) && parsedRec > 0;
+  const isPartial =
+    hasVolume &&
+    (parsedTotal != null && !Number.isNaN(parsedTotal)
+      ? parsedRec < parsedTotal
+      : true);
+
+  const formattedRec = hasVolume
+    ? parsedRec.toLocaleString('id-ID', { maximumFractionDigits: 4 })
+    : null;
+  const unitSuffix = unit ? ` ${unit}` : '';
+
+  const label =
+    isPartial && formattedRec
+      ? `Siklus Berikutnya (${formattedRec}${unitSuffix})`
+      : 'Rekomendasi Siklus Berikutnya';
+
+  const tooltipText =
+    isPartial && formattedRec
+      ? `Direkomendasikan Direktur untuk siklus perencanaan berikutnya (Sisa volume: ${formattedRec}${unitSuffix})`
+      : 'Direkomendasikan Direktur untuk siklus perencanaan berikutnya';
+
+  return { label, tooltipText };
 }

@@ -1,10 +1,3 @@
-import {
-  RiCheckboxCircleLine,
-  RiCloseCircleLine,
-  RiFeedbackLine,
-  RiFileTextLine,
-  RiSendPlaneLine,
-} from '@remixicon/react';
 import type * as React from 'react';
 
 import type { BaseDomainBadgeProps } from '@/components/badges/badge-types';
@@ -15,48 +8,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { NEED_STATUS_CONFIG  } from '@/constants/need';
+import type {NeedStatusConfig} from '@/constants/need';
 import { cn } from '@/lib/utils';
 import type { Need, NeedStatus } from '@/types/need';
 
-export interface NeedStatusConfig {
-  label: string;
-  tone: 'muted' | 'info' | 'success' | 'destructive' | 'warning';
-  icon: React.ElementType;
-  defaultTooltip: string;
-}
-
-export const NEED_STATUS_MAP: Record<NeedStatus, NeedStatusConfig> = {
-  draft: {
-    label: 'Draft',
-    tone: 'muted',
-    icon: RiFileTextLine,
-    defaultTooltip: 'Draft usulan belum diajukan',
-  },
-  submitted: {
-    label: 'Diajukan',
-    tone: 'info',
-    icon: RiSendPlaneLine,
-    defaultTooltip: 'Menunggu Review Direktur',
-  },
-  approved: {
-    label: 'Disetujui Direktur',
-    tone: 'success',
-    icon: RiCheckboxCircleLine,
-    defaultTooltip: 'Telah disetujui Direktur',
-  },
-  rejected: {
-    label: 'Ditolak Direktur',
-    tone: 'destructive',
-    icon: RiCloseCircleLine,
-    defaultTooltip: 'Ditolak oleh Direktur',
-  },
-  revision: {
-    label: 'Perlu Revisi',
-    tone: 'warning',
-    icon: RiFeedbackLine,
-    defaultTooltip: 'Perlu perbaikan sesuai arahan Direktur',
-  },
-};
+export const NEED_STATUS_MAP = NEED_STATUS_CONFIG;
+export type { NeedStatusConfig };
 
 export interface NeedStatusBadgeProps extends BaseDomainBadgeProps {
   status?: NeedStatus | string | null;
@@ -95,7 +53,7 @@ export function NeedStatusBadge({
       )}
       {...props}
     >
-      {showIcon && <Icon data-icon="inline-start" className="shrink-0" />}
+      {showIcon && <Icon data-icon="inline-start" />}
       <span>{config.label}</span>
     </span>
   );

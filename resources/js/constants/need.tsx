@@ -9,38 +9,78 @@ import type { ElementType } from 'react';
 
 import type { NeedStatus } from '@/types/need';
 
+export interface NeedStatusConfig {
+  label: string;
+  tone: 'muted' | 'info' | 'success' | 'destructive' | 'warning';
+  icon: ElementType;
+  defaultTooltip: string;
+}
+
+export const NEED_STATUS_CONFIG: Record<NeedStatus, NeedStatusConfig> = {
+  draft: {
+    label: 'Draft',
+    tone: 'muted',
+    icon: RiFileTextLine,
+    defaultTooltip: 'Draft usulan belum diajukan',
+  },
+  submitted: {
+    label: 'Diajukan',
+    tone: 'info',
+    icon: RiSendPlaneLine,
+    defaultTooltip: 'Menunggu Review Direktur',
+  },
+  approved: {
+    label: 'Disetujui Direktur',
+    tone: 'success',
+    icon: RiCheckboxCircleLine,
+    defaultTooltip: 'Telah disetujui Direktur',
+  },
+  rejected: {
+    label: 'Ditolak Direktur',
+    tone: 'destructive',
+    icon: RiCloseCircleLine,
+    defaultTooltip: 'Ditolak oleh Direktur',
+  },
+  revision: {
+    label: 'Perlu Revisi',
+    tone: 'warning',
+    icon: RiFeedbackLine,
+    defaultTooltip: 'Perlu revisi berdasarkan catatan telaah Direktur',
+  },
+};
+
 export const STATUS_LABELS: Record<NeedStatus, string> = {
-  draft: 'Draft',
-  submitted: 'Diajukan',
-  approved: 'Disetujui',
-  rejected: 'Ditolak',
-  revision: 'Perlu Revisi',
+  draft: NEED_STATUS_CONFIG.draft.label,
+  submitted: NEED_STATUS_CONFIG.submitted.label,
+  approved: NEED_STATUS_CONFIG.approved.label,
+  rejected: NEED_STATUS_CONFIG.rejected.label,
+  revision: NEED_STATUS_CONFIG.revision.label,
 };
 
 export const STATUS_OPTIONS = [
   {
     value: 'draft',
-    label: 'Draft',
+    label: NEED_STATUS_CONFIG.draft.label,
     description: 'Usulan masih dalam tahap pengerjaan dan belum diajukan.',
   },
   {
     value: 'submitted',
-    label: 'Diajukan',
+    label: NEED_STATUS_CONFIG.submitted.label,
     description: 'Usulan telah diajukan dan menunggu review direktur.',
   },
   {
     value: 'approved',
-    label: 'Disetujui',
+    label: NEED_STATUS_CONFIG.approved.label,
     description: 'Usulan telah disetujui secara resmi oleh direktur.',
   },
   {
     value: 'rejected',
-    label: 'Ditolak',
+    label: NEED_STATUS_CONFIG.rejected.label,
     description: 'Usulan tidak disetujui oleh direktur.',
   },
   {
     value: 'revision',
-    label: 'Perlu Revisi',
+    label: NEED_STATUS_CONFIG.revision.label,
     description: 'Usulan dikembalikan oleh direktur untuk perbaikan.',
   },
 ] as const;

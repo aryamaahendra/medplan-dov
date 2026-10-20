@@ -42,6 +42,7 @@ export function useNeedShow({ need, existingAnswers }: UseNeedShowProps) {
     hasPermission('review need director') && need.status === 'approved';
   const canSubmit =
     Boolean(need.can?.submit) &&
+    !isLocked &&
     (need.status === 'draft' || need.status === 'revision');
 
   const handleSubmitNeed = () => {

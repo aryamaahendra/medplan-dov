@@ -340,15 +340,11 @@ export function useNeedForm({
 
     const options = {
       onSuccess: () => {
-        toast.success(
-          shouldSubmit
-            ? isEditing
-              ? 'Usulan kebutuhan berhasil diperbarui dan diajukan.'
-              : 'Usulan kebutuhan berhasil dibuat dan diajukan.'
-            : isEditing
-              ? 'Usulan kebutuhan berhasil diperbarui.'
-              : 'Usulan kebutuhan berhasil dibuat.',
-        );
+        const action = isEditing ? 'diperbarui' : 'dibuat';
+        const message = shouldSubmit
+          ? `Usulan kebutuhan berhasil ${action} dan diajukan.`
+          : `Usulan kebutuhan berhasil ${action}.`;
+        toast.success(message);
       },
       onError: (errs: Record<string, string>) => {
         const errorEntries = Object.entries(errs || {});

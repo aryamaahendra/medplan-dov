@@ -108,36 +108,22 @@ export function NeedShowHeader({
           <Button
             size="sm"
             variant={canSubmit ? 'outline' : 'default'}
-            className="gap-1.5"
             nativeButton={false}
             render={
               <Link href={needRoutes.edit.url({ need: need.id })}>
-                <RiEdit2Line className="h-4 w-4" />
+                <RiEdit2Line data-icon="inline-start" />
                 <span>Edit Usulan</span>
               </Link>
             }
           />
         )}
 
-        {canSubmit && need.status === 'draft' && (
-          <Button
-            size="sm"
-            onClick={() => setIsSubmitDialogOpen(true)}
-            className="gap-1.5"
-          >
-            <RiSendPlaneLine className="h-4 w-4" />
-            <span>Ajukan Usulan</span>
-          </Button>
-        )}
-
-        {canSubmit && need.status === 'revision' && (
-          <Button
-            size="sm"
-            onClick={() => setIsSubmitDialogOpen(true)}
-            className="gap-1.5"
-          >
-            <RiSendPlaneLine className="h-4 w-4" />
-            <span>Ajukan Kembali</span>
+        {canSubmit && (
+          <Button size="sm" onClick={() => setIsSubmitDialogOpen(true)}>
+            <RiSendPlaneLine data-icon="inline-start" />
+            <span>
+              {need.status === 'revision' ? 'Ajukan Kembali' : 'Ajukan Usulan'}
+            </span>
           </Button>
         )}
       </div>

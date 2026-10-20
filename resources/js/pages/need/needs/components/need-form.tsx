@@ -375,15 +375,31 @@ export function NeedForm({
                   )}
 
                   {activeIndex < sections.length - 1 ? (
-                    <Button
-                      type="button"
-                      variant="default"
-                      onClick={() =>
-                        setActiveSection(sections[activeIndex + 1].value)
-                      }
-                    >
-                      <span>Lanjut ke: {sections[activeIndex + 1]?.label}</span>
-                    </Button>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {!isLocked && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={processing}
+                          onClick={(e) =>
+                            handleSubmit(e, { shouldSubmit: false })
+                          }
+                        >
+                          Simpan sebagai Draft
+                        </Button>
+                      )}
+                      <Button
+                        type="button"
+                        variant="default"
+                        onClick={() =>
+                          setActiveSection(sections[activeIndex + 1].value)
+                        }
+                      >
+                        <span>
+                          Lanjut ke: {sections[activeIndex + 1]?.label}
+                        </span>
+                      </Button>
+                    </div>
                   ) : (
                     !isLocked && (
                       <div className="flex flex-wrap items-center gap-2">
@@ -407,9 +423,8 @@ export function NeedForm({
                           onClick={(e) =>
                             handleSubmit(e, { shouldSubmit: true })
                           }
-                          className="gap-1.5"
                         >
-                          <RiSendPlaneLine className="h-4 w-4" />
+                          <RiSendPlaneLine data-icon="inline-start" />
                           <span>Simpan & Ajukan</span>
                         </Button>
                       </div>
@@ -445,8 +460,9 @@ export function NeedForm({
                     <Button
                       type="button"
                       variant="secondary"
+                      size="sm"
                       onClick={onCancel}
-                      className="flex-1 text-xs"
+                      className="flex-1"
                     >
                       {isLocked ? 'KEMBALI' : 'BATAL'}
                     </Button>
@@ -454,11 +470,12 @@ export function NeedForm({
                       <Button
                         type="button"
                         variant="outline"
+                        size="sm"
                         disabled={processing}
                         onClick={(e) =>
                           handleSubmit(e, { shouldSubmit: false })
                         }
-                        className="flex-1 text-xs font-medium"
+                        className="flex-1"
                       >
                         Simpan sebagai Draft
                       </Button>
@@ -468,13 +485,14 @@ export function NeedForm({
                     <Button
                       type="button"
                       variant="default"
+                      size="sm"
                       disabled={
                         processing || (isEditing && need?.can?.submit === false)
                       }
                       onClick={(e) => handleSubmit(e, { shouldSubmit: true })}
-                      className="w-full gap-1.5 text-xs font-semibold"
+                      className="w-full"
                     >
-                      <RiSendPlaneLine className="h-3.5 w-3.5" />
+                      <RiSendPlaneLine data-icon="inline-start" />
                       <span>Simpan & Ajukan</span>
                     </Button>
                   )}

@@ -42,7 +42,7 @@ export function NeedSubmitDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <div className="flex items-center gap-2">
-            <div className="flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <div className="flex size-9 items-center justify-center rounded-full bg-primary/10 text-foreground">
               <RiSendPlaneLine className="size-5" />
             </div>
             <DialogTitle className="text-base font-semibold">
@@ -100,7 +100,7 @@ export function NeedSubmitDialog({
             onClick={onConfirm}
             className="gap-1.5"
           >
-            <RiSendPlaneLine className="size-4" />
+            <RiSendPlaneLine data-icon="inline-start" />
             <span>{loading ? 'Memproses...' : confirmText}</span>
           </Button>
         </DialogFooter>

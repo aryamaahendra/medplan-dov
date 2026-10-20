@@ -46,19 +46,21 @@ class GetFilteredNeedsAction
             ])
             ->withCount(['sasarans', 'indicators', 'kpiIndicators', 'strategicServicePlans', 'attachments'])
             ->when($filters['year'] ?? null, fn ($q, $v) => $q->whereIn('year', (array) $v))
-            ->when($filters['stage'] ?? null, function ($q, $v) {
+            ->when($filters['stage'] ?? null, function (Builder $q, mixed $v): void {
                 $stages = array_filter((array) $v);
                 if (empty($stages)) {
                     return;
                 }
-                $q->where(function ($sub) use ($stages) {
+                $q->where(function (Builder $sub) use ($stages): void {
                     foreach ($stages as $stage) {
                         if ($stage === 'approved') {
-                            $sub->orWhere('status', Need::STATUS_APPROVED)
-                                ->orWhereNotNull('approved_by_director_at');
+                            $sub->orWhere(function (Builder $appr): void {
+                                $appr->where('status', Need::STATUS_APPROVED)
+                                    ->whereNotNull('approved_by_director_at');
+                            });
                         } elseif ($stage === 'under_review' || $stage === Need::STATUS_SUBMITTED) {
                             $sub->orWhere('status', Need::STATUS_SUBMITTED)
-                                ->orWhere(function ($under) {
+                                ->orWhere(function (Builder $under): void {
                                     $under->where('status', 'approved')->whereNull('approved_by_director_at');
                                 });
                         } elseif ($stage === Need::STATUS_REJECTED) {
@@ -73,13 +75,13 @@ class GetFilteredNeedsAction
                     }
                 });
             })
-            ->when($filters['status'] ?? null, function ($q, $v) {
+            ->when($filters['status'] ?? null, function (Builder $q, mixed $v): void {
                 $statuses = array_filter((array) $v);
                 if (! empty($statuses)) {
                     $q->whereIn('status', $statuses);
                 }
             })
-            ->when(isset($filters['is_recommended_for_next_cycle']) && $filters['is_recommended_for_next_cycle'] !== '', function ($q) use ($filters) {
+            ->when(isset($filters['is_recommended_for_next_cycle']) && $filters['is_recommended_for_next_cycle'] !== '', function (Builder $q) use ($filters): void {
                 $raw = (array) $filters['is_recommended_for_next_cycle'];
                 $hasTrue = in_array(true, $raw, true) || in_array('1', $raw, true) || in_array(1, $raw, true) || in_array('true', $raw, true);
                 $hasFalse = in_array(false, $raw, true) || in_array('0', $raw, true) || in_array(0, $raw, true) || in_array('false', $raw, true);
@@ -235,7 +237,7 @@ class GetFilteredNeedsAction
             && $now->lte($currentGroup->submission_end_at)
             && $now->addDays(NeedExceptionCatalog::SUBMISSION_CLOSING_DAYS)->gte($currentGroup->submission_end_at);
 
-        /** @var object{all_count?: int|string, draft_count?: int|string, under_review_count?: int|string, approved_count?: int|string, rejected_count?: int|string, locked_count?: int|string, low_checklist_count?: int|string, revision_closing_count?: int|string, has_notes_count?: int|string, priority_count?: int|string}|null $aggregates */
+        /** @var object{all_count?: int|string, draft_count?: int|string, under_review_count?: int|string, approved_count?: int|string, rejected_count?: int|string, revision_count?: int|string, locked_count?: int|string, low_checklist_count?: int|string, revision_closing_count?: int|string, has_notes_count?: int|string, priority_count?: int|string}|null $aggregates */
         $aggregates = (clone $query)
             ->toBase()
             ->cloneWithout(['columns', 'orders'])
@@ -243,8 +245,9 @@ class GetFilteredNeedsAction
                 COUNT(*) as all_count,
                 COUNT(CASE WHEN status = 'draft' THEN 1 END) as draft_count,
                 COUNT(CASE WHEN status = 'submitted' OR (status = 'approved' AND approved_by_director_at IS NULL) THEN 1 END) as under_review_count,
-                COUNT(CASE WHEN status = 'approved' OR approved_by_director_at IS NOT NULL THEN 1 END) as approved_count,
+                COUNT(CASE WHEN status = 'approved' AND approved_by_director_at IS NOT NULL THEN 1 END) as approved_count,
                 COUNT(CASE WHEN status = 'rejected' THEN 1 END) as rejected_count,
+                COUNT(CASE WHEN status = 'revision' THEN 1 END) as revision_count,
                 COUNT(CASE WHEN is_locked = true THEN 1 END) as locked_count,
                 COUNT(CASE WHEN checklist_percentage > 0 AND checklist_percentage < {$minChecklist} AND approved_by_director_at IS NULL THEN 1 END) as low_checklist_count,
                 COUNT(CASE WHEN (unlocked_until IS NOT NULL AND unlocked_until >= '{$nowStr}' AND unlocked_until <= '{$threeDaysAheadStr}') OR (is_locked = true AND status = 'draft' AND checklist_percentage < {$minChecklist}) THEN 1 END) as revision_closing_count,
@@ -260,6 +263,7 @@ class GetFilteredNeedsAction
                 'under_review' => (int) ($aggregates->under_review_count ?? 0),
                 'approved' => (int) ($aggregates->approved_count ?? 0),
                 'rejected' => (int) ($aggregates->rejected_count ?? 0),
+                'revision' => (int) ($aggregates->revision_count ?? 0),
                 'locked' => (int) ($aggregates->locked_count ?? 0),
             ],
             'attentionCounts' => [

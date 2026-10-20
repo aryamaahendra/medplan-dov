@@ -159,34 +159,16 @@ export function NeedsTableToolbar({
       value: '1',
       icon: RiShareForwardLine,
     },
-    {
-      label: 'Bukan Rekomendasi',
-      value: '0',
-    },
   ];
 
   const isRecommendationActive = useMemo(() => {
     const rec = filters.is_recommended_for_next_cycle;
 
-    if (rec === undefined || rec === null || rec === '') {
+    if (!rec) {
       return false;
     }
 
-    const arr = (Array.isArray(rec) ? rec : [rec]).map(String);
-
-    return arr.includes('1') || arr.includes('true');
-  }, [filters.is_recommended_for_next_cycle]);
-
-  const isNotRecommendedActive = useMemo(() => {
-    const rec = filters.is_recommended_for_next_cycle;
-
-    if (rec === undefined || rec === null || rec === '') {
-      return false;
-    }
-
-    const arr = (Array.isArray(rec) ? rec : [rec]).map(String);
-
-    return arr.includes('0') || arr.includes('false');
+    return getFilterArray(rec).includes('1');
   }, [filters.is_recommended_for_next_cycle]);
 
   const handleToggleRecommendation = () => {
@@ -204,15 +186,20 @@ export function NeedsTableToolbar({
     });
   };
 
-  const handleRemoveRecommendationVal = (valToRemove: string) => {
-    const current = getFilterArray(filters.is_recommended_for_next_cycle);
-    const next = current.filter((v) => v !== valToRemove);
+  const handleRemoveRecommendation = () => {
     mergeParams({
-      is_recommended_for_next_cycle: next.length > 0 ? next : undefined,
+      is_recommended_for_next_cycle: undefined,
       page: 1,
     });
   };
 
+  const handleClearStatusAndRecommendation = () => {
+    mergeParams({
+      status: undefined,
+      is_recommended_for_next_cycle: undefined,
+      page: 1,
+    });
+  };
   const yearOptions = useMemo(() => {
     const currentYear = new Date().getFullYear();
 
@@ -285,6 +272,7 @@ export function NeedsTableToolbar({
       is_approved_by_director: undefined,
       is_recommended_for_next_cycle: undefined,
       min_checklist_score: undefined,
+      page: 1,
     });
   };
 
@@ -545,8 +533,9 @@ export function NeedsTableToolbar({
         )}
       </div>
 
-      {/* 4. Active filter chips (displays unified status labels and clears selections cleanly) */}
-      {activeManualCount > 0 && (
+      {/* 4. Active filter chips (displays unified status labels and recommendation selections) */}
+      {(getFilterArray(filters.status).length > 0 ||
+        isRecommendationActive) && (
         <div className="flex w-full flex-wrap items-center gap-1.5 pt-1">
           <span className="text-xs text-muted-foreground">Filter aktif:</span>
 
@@ -556,318 +545,44 @@ export function NeedsTableToolbar({
             const label = statusLabelMap[statusVal] ?? statusVal;
 
             return (
-              <Badge
-                key={`active-status-${statusVal}`}
-                variant="secondary"
-                className="inline-flex items-center gap-1 py-0.5 pr-1 pl-2 text-xs"
-              >
-                <Icon className="h-3 w-3 text-muted-foreground" />
+              <Badge key={`active-status-${statusVal}`} variant="secondary">
+                <Icon data-icon="inline-start" />
                 <span>Status: {label}</span>
                 <button
                   type="button"
                   onClick={() => handleRemoveStatus(statusVal)}
-                  className="inline-flex h-4 w-4 items-center justify-center rounded-full hover:bg-muted-foreground/20 focus:outline-none"
+                  className="inline-flex rounded-full hover:bg-muted-foreground/20 focus:outline-none"
                   aria-label={`Hapus filter status ${label}`}
                 >
-                  <RiCloseLine className="h-3 w-3" />
+                  <RiCloseLine className="size-3" />
                 </button>
               </Badge>
             );
           })}
 
-          {/* Active recommendation chips */}
+          {/* Active recommendation chip */}
           {isRecommendationActive && (
-            <Badge
-              key="active-rec-true"
-              variant="secondary"
-              className="inline-flex items-center gap-1 py-0.5 pr-1 pl-2 text-xs"
-            >
-              <RiShareForwardLine className="h-3 w-3 text-muted-foreground" />
+            <Badge key="active-rec-true" variant="secondary">
+              <RiShareForwardLine data-icon="inline-start" />
               <span>Rekomendasi Siklus Berikutnya</span>
               <button
                 type="button"
-                onClick={() => handleRemoveRecommendationVal('1')}
-                className="inline-flex h-4 w-4 items-center justify-center rounded-full hover:bg-muted-foreground/20 focus:outline-none"
+                onClick={handleRemoveRecommendation}
+                className="inline-flex rounded-full hover:bg-muted-foreground/20 focus:outline-none"
                 aria-label="Hapus filter rekomendasi siklus berikutnya"
               >
-                <RiCloseLine className="h-3 w-3" />
+                <RiCloseLine className="size-3" />
               </button>
             </Badge>
           )}
-          {isNotRecommendedActive && (
-            <Badge
-              key="active-rec-false"
-              variant="secondary"
-              className="inline-flex items-center gap-1 py-0.5 pr-1 pl-2 text-xs"
-            >
-              <span>Bukan Rekomendasi</span>
-              <button
-                type="button"
-                onClick={() => handleRemoveRecommendationVal('0')}
-                className="inline-flex h-4 w-4 items-center justify-center rounded-full hover:bg-muted-foreground/20 focus:outline-none"
-                aria-label="Hapus filter bukan rekomendasi"
-              >
-                <RiCloseLine className="h-3 w-3" />
-              </button>
-            </Badge>
-          )}
-
-          {/* Active year chips */}
-          {getFilterArray(filters.year).map((yr) => (
-            <Badge
-              key={`active-year-${yr}`}
-              variant="secondary"
-              className="inline-flex items-center gap-1 py-0.5 pr-1 pl-2 text-xs"
-            >
-              <span>Tahun: {yr}</span>
-              <button
-                type="button"
-                onClick={() => {
-                  const next = getFilterArray(filters.year).filter(
-                    (v) => v !== yr,
-                  );
-                  mergeParams({
-                    year: next.length > 0 ? next : undefined,
-                    page: 1,
-                  });
-                }}
-                className="inline-flex h-4 w-4 items-center justify-center rounded-full hover:bg-muted-foreground/20 focus:outline-none"
-                aria-label={`Hapus filter tahun ${yr}`}
-              >
-                <RiCloseLine className="h-3 w-3" />
-              </button>
-            </Badge>
-          ))}
-
-          {/* Active need type chips */}
-          {getFilterArray(filters.need_type_id).map((typeId) => {
-            const typeName =
-              needTypes.find((t) => t.id.toString() === typeId)?.name ?? typeId;
-
-            return (
-              <Badge
-                key={`active-type-${typeId}`}
-                variant="secondary"
-                className="inline-flex items-center gap-1 py-0.5 pr-1 pl-2 text-xs"
-              >
-                <span>Jenis: {typeName}</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const next = getFilterArray(filters.need_type_id).filter(
-                      (v) => v !== typeId,
-                    );
-                    mergeParams({
-                      need_type_id: next.length > 0 ? next : undefined,
-                      page: 1,
-                    });
-                  }}
-                  className="inline-flex h-4 w-4 items-center justify-center rounded-full hover:bg-muted-foreground/20 focus:outline-none"
-                  aria-label={`Hapus filter jenis ${typeName}`}
-                >
-                  <RiCloseLine className="h-3 w-3" />
-                </button>
-              </Badge>
-            );
-          })}
-
-          {/* Active organizational unit chips */}
-          {getFilterArray(filters.organizational_unit_id).map((uId) => {
-            const unitName =
-              uId === 'trashed'
-                ? 'Unit Terhapus'
-                : (organizationalUnits.find((u) => u.id.toString() === uId)
-                    ?.name ?? uId);
-
-            return (
-              <Badge
-                key={`active-unit-${uId}`}
-                variant="secondary"
-                className="inline-flex items-center gap-1 py-0.5 pr-1 pl-2 text-xs"
-              >
-                <span>Unit: {unitName}</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const next = getFilterArray(
-                      filters.organizational_unit_id,
-                    ).filter((v) => v !== uId);
-                    mergeParams({
-                      organizational_unit_id:
-                        next.length > 0 ? next : undefined,
-                      page: 1,
-                    });
-                  }}
-                  className="inline-flex h-4 w-4 items-center justify-center rounded-full hover:bg-muted-foreground/20 focus:outline-none"
-                  aria-label={`Hapus filter unit ${unitName}`}
-                >
-                  <RiCloseLine className="h-3 w-3" />
-                </button>
-              </Badge>
-            );
-          })}
-
-          {/* Active urgency chips */}
-          {getFilterArray(filters.urgency).map((urg) => {
-            const label =
-              urgencyOptions.find((o) => o.value === urg)?.label ?? urg;
-
-            return (
-              <Badge
-                key={`active-urgency-${urg}`}
-                variant="secondary"
-                className="inline-flex items-center gap-1 py-0.5 pr-1 pl-2 text-xs"
-              >
-                <span>Urgensi: {label}</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const next = getFilterArray(filters.urgency).filter(
-                      (v) => v !== urg,
-                    );
-                    mergeParams({
-                      urgency: next.length > 0 ? next : undefined,
-                      page: 1,
-                    });
-                  }}
-                  className="inline-flex h-4 w-4 items-center justify-center rounded-full hover:bg-muted-foreground/20 focus:outline-none"
-                  aria-label={`Hapus filter urgensi ${label}`}
-                >
-                  <RiCloseLine className="h-3 w-3" />
-                </button>
-              </Badge>
-            );
-          })}
-
-          {/* Active impact chips */}
-          {getFilterArray(filters.impact).map((imp) => {
-            const label =
-              impactOptions.find((o) => o.value === imp)?.label ?? imp;
-
-            return (
-              <Badge
-                key={`active-impact-${imp}`}
-                variant="secondary"
-                className="inline-flex items-center gap-1 py-0.5 pr-1 pl-2 text-xs"
-              >
-                <span>Dampak: {label}</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const next = getFilterArray(filters.impact).filter(
-                      (v) => v !== imp,
-                    );
-                    mergeParams({
-                      impact: next.length > 0 ? next : undefined,
-                      page: 1,
-                    });
-                  }}
-                  className="inline-flex h-4 w-4 items-center justify-center rounded-full hover:bg-muted-foreground/20 focus:outline-none"
-                  aria-label={`Hapus filter dampak ${label}`}
-                >
-                  <RiCloseLine className="h-3 w-3" />
-                </button>
-              </Badge>
-            );
-          })}
-
-          {/* Active priority chips */}
-          {getFilterArray(filters.is_priority).map((prio) => {
-            const label = prio === '1' ? 'Ya' : 'Tidak';
-
-            return (
-              <Badge
-                key={`active-priority-${prio}`}
-                variant="secondary"
-                className="inline-flex items-center gap-1 py-0.5 pr-1 pl-2 text-xs"
-              >
-                <span>Prioritas: {label}</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const next = getFilterArray(filters.is_priority).filter(
-                      (v) => v !== prio,
-                    );
-                    mergeParams({
-                      is_priority: next.length > 0 ? next : undefined,
-                      page: 1,
-                    });
-                  }}
-                  className="inline-flex h-4 w-4 items-center justify-center rounded-full hover:bg-muted-foreground/20 focus:outline-none"
-                  aria-label={`Hapus filter prioritas ${label}`}
-                >
-                  <RiCloseLine className="h-3 w-3" />
-                </button>
-              </Badge>
-            );
-          })}
-
-          {/* Active director review chips */}
-          {getFilterArray(filters.is_approved_by_director).map((rev) => {
-            const label = rev === '1' ? 'Sudah Direview' : 'Belum Direview';
-
-            return (
-              <Badge
-                key={`active-review-${rev}`}
-                variant="secondary"
-                className="inline-flex items-center gap-1 py-0.5 pr-1 pl-2 text-xs"
-              >
-                <span>Review Direktur: {label}</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const next = getFilterArray(
-                      filters.is_approved_by_director,
-                    ).filter((v) => v !== rev);
-                    mergeParams({
-                      is_approved_by_director:
-                        next.length > 0 ? next : undefined,
-                      page: 1,
-                    });
-                  }}
-                  className="inline-flex h-4 w-4 items-center justify-center rounded-full hover:bg-muted-foreground/20 focus:outline-none"
-                  aria-label={`Hapus filter review direktur ${label}`}
-                >
-                  <RiCloseLine className="h-3 w-3" />
-                </button>
-              </Badge>
-            );
-          })}
-
-          {/* Active checklist score chips */}
-          {getFilterArray(filters.min_checklist_score).map((sc) => (
-            <Badge
-              key={`active-score-${sc}`}
-              variant="secondary"
-              className="inline-flex items-center gap-1 py-0.5 pr-1 pl-2 text-xs"
-            >
-              <span>Skor: ≥ {sc}%</span>
-              <button
-                type="button"
-                onClick={() => {
-                  const next = getFilterArray(
-                    filters.min_checklist_score,
-                  ).filter((v) => v !== sc);
-                  mergeParams({
-                    min_checklist_score: next.length > 0 ? next : undefined,
-                    page: 1,
-                  });
-                }}
-                className="inline-flex h-4 w-4 items-center justify-center rounded-full hover:bg-muted-foreground/20 focus:outline-none"
-                aria-label="Hapus filter skor checklist"
-              >
-                <RiCloseLine className="h-3 w-3" />
-              </button>
-            </Badge>
-          ))}
 
           <Button
             variant="ghost"
-            size="sm"
-            onClick={handleResetManualFilters}
-            className="h-6 px-1.5 text-xs text-muted-foreground hover:text-foreground"
+            size="xs"
+            onClick={handleClearStatusAndRecommendation}
+            className="text-muted-foreground hover:text-foreground"
           >
-            Hapus Semua
+            Hapus
             <RiCloseLine data-icon="inline-end" />
           </Button>
         </div>

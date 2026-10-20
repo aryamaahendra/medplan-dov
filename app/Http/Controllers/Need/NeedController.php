@@ -72,6 +72,7 @@ final class NeedController extends Controller
             'impact' => $request->input('impact'),
             'is_priority' => $request->input('is_priority'),
             'is_approved_by_director' => $request->input('is_approved_by_director'),
+            'is_recommended_for_next_cycle' => $request->input('is_recommended_for_next_cycle'),
             'min_checklist_score' => $request->input('min_checklist_score'),
             'stage' => $request->input('stage'),
             'need_group_id' => $groupId,

@@ -54,24 +54,42 @@ class GetFilteredNeedsAction
                 $q->where(function ($sub) use ($stages) {
                     foreach ($stages as $stage) {
                         if ($stage === 'approved') {
-                            $sub->orWhereNotNull('approved_by_director_at');
-                        } elseif ($stage === 'under_review') {
-                            $sub->orWhere(function ($under) {
-                                $under->where('status', 'approved')->whereNull('approved_by_director_at');
-                            });
-                        } elseif ($stage === 'rejected') {
-                            $sub->orWhere('status', 'rejected');
-                        } elseif ($stage === 'draft') {
-                            $sub->orWhere(function ($draft) {
-                                $draft->where('status', 'draft')->whereNull('approved_by_director_at');
-                            });
+                            $sub->orWhere('status', Need::STATUS_APPROVED)
+                                ->orWhereNotNull('approved_by_director_at');
+                        } elseif ($stage === 'under_review' || $stage === Need::STATUS_SUBMITTED) {
+                            $sub->orWhere('status', Need::STATUS_SUBMITTED)
+                                ->orWhere(function ($under) {
+                                    $under->where('status', 'approved')->whereNull('approved_by_director_at');
+                                });
+                        } elseif ($stage === Need::STATUS_REJECTED) {
+                            $sub->orWhere('status', Need::STATUS_REJECTED);
+                        } elseif ($stage === Need::STATUS_REVISION) {
+                            $sub->orWhere('status', Need::STATUS_REVISION);
+                        } elseif ($stage === Need::STATUS_DRAFT) {
+                            $sub->orWhere('status', Need::STATUS_DRAFT);
                         } elseif ($stage === 'locked') {
                             $sub->orWhere('is_locked', true);
                         }
                     }
                 });
             })
-            ->when($filters['status'] ?? null, fn ($q, $v) => $q->whereIn('status', (array) $v))
+            ->when($filters['status'] ?? null, function ($q, $v) {
+                $statuses = array_filter((array) $v);
+                if (! empty($statuses)) {
+                    $q->whereIn('status', $statuses);
+                }
+            })
+            ->when(isset($filters['is_recommended_for_next_cycle']) && $filters['is_recommended_for_next_cycle'] !== '', function ($q) use ($filters) {
+                $raw = (array) $filters['is_recommended_for_next_cycle'];
+                $hasTrue = in_array(true, $raw, true) || in_array('1', $raw, true) || in_array(1, $raw, true) || in_array('true', $raw, true);
+                $hasFalse = in_array(false, $raw, true) || in_array('0', $raw, true) || in_array(0, $raw, true) || in_array('false', $raw, true);
+
+                if ($hasTrue && ! $hasFalse) {
+                    $q->where('is_recommended_for_next_cycle', true);
+                } elseif ($hasFalse && ! $hasTrue) {
+                    $q->where('is_recommended_for_next_cycle', false);
+                }
+            })
             ->when($filters['need_type_id'] ?? null, fn ($q, $v) => $q->whereIn('need_type_id', (array) $v))
             ->when($filters['organizational_unit_id'] ?? null, function ($q, $v) use ($filters) {
                 $rawValues = (array) $v;
@@ -223,9 +241,9 @@ class GetFilteredNeedsAction
             ->cloneWithout(['columns', 'orders'])
             ->selectRaw("
                 COUNT(*) as all_count,
-                COUNT(CASE WHEN status = 'draft' AND approved_by_director_at IS NULL THEN 1 END) as draft_count,
-                COUNT(CASE WHEN status = 'approved' AND approved_by_director_at IS NULL THEN 1 END) as under_review_count,
-                COUNT(CASE WHEN approved_by_director_at IS NOT NULL THEN 1 END) as approved_count,
+                COUNT(CASE WHEN status = 'draft' THEN 1 END) as draft_count,
+                COUNT(CASE WHEN status = 'submitted' OR (status = 'approved' AND approved_by_director_at IS NULL) THEN 1 END) as under_review_count,
+                COUNT(CASE WHEN status = 'approved' OR approved_by_director_at IS NOT NULL THEN 1 END) as approved_count,
                 COUNT(CASE WHEN status = 'rejected' THEN 1 END) as rejected_count,
                 COUNT(CASE WHEN is_locked = true THEN 1 END) as locked_count,
                 COUNT(CASE WHEN checklist_percentage > 0 AND checklist_percentage < {$minChecklist} AND approved_by_director_at IS NULL THEN 1 END) as low_checklist_count,

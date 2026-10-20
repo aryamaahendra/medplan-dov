@@ -17,10 +17,10 @@ import {
 import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 import { ActionDropdown } from '@/components/action-dropdown';
 import {
-  DirectorReviewBadge,
   LockStatusBadge,
+  NeedStatusBadge,
+  NextCycleRecommendationChip,
   PriorityBadge,
-  ProposalStatusBadge,
   UrgencyImpactBadge,
 } from '@/components/badges';
 import { Badge } from '@/components/ui/badge';
@@ -143,8 +143,8 @@ export function NeedListCardDetailed({
             </span>
           )}
 
-          <ProposalStatusBadge status={need.status} />
-          <DirectorReviewBadge need={need} />
+          <NeedStatusBadge need={need} />
+          <NextCycleRecommendationChip need={need} />
 
           <LockStatusBadge
             isLocked={need.is_locked}

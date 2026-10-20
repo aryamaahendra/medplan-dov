@@ -1,8 +1,9 @@
 import { RiBuildingFill, RiCoinsFill } from '@remixicon/react';
 
 import {
+  NeedStatusBadge,
+  NextCycleRecommendationChip,
   PriorityBadge,
-  ProposalStatusBadge,
   ReadinessBadge,
   UrgencyImpactBadge,
 } from '@/components/badges';
@@ -108,11 +109,9 @@ export function NeedShowCompactStats({ need }: NeedShowCompactStatsProps) {
           {/* Bento Baris 1: Tiga Pilar Status */}
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-12">
             <BentoTile label="Status Dokumen" className="col-span-5">
-              <div className="space-x-2">
-                <ProposalStatusBadge
-                  status={need.status}
-                  className="uppercase"
-                />
+              <div className="flex flex-wrap items-center gap-1.5">
+                <NeedStatusBadge need={need} className="uppercase" />
+                <NextCycleRecommendationChip need={need} />
                 <PriorityBadge isPriority={need.is_priority} />
               </div>
             </BentoTile>
@@ -163,28 +162,6 @@ export function NeedShowCompactStats({ need }: NeedShowCompactStatsProps) {
               </div>
             </BentoTile>
           </div>
-
-          {/* Bento Baris 3: Telaah Direktur
-          <div className="rounded-lg border  p-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="text-xss font-semibold tracking-wider text-muted-foreground uppercase">
-                Hasil Telaah Direktur
-              </span>
-              <DirectorReviewBadge need={need} />
-            </div>
-
-            {need.notes && (
-              <div className="mt-2 flex items-start gap-2 border-t border-border/50 pt-2 text-xs">
-                <RiQuillPenLine className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                <p className="text-muted-foreground">
-                  <span className="font-semibold text-foreground">
-                    Catatan:{' '}
-                  </span>
-                  {need.notes}
-                </p>
-              </div>
-            )}
-          </div> */}
         </div>
       </div>
     </div>

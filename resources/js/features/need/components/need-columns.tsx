@@ -14,10 +14,10 @@ import type { ColumnDef } from '@tanstack/react-table';
 import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 import { ActionDropdown } from '@/components/action-dropdown';
 import {
-  DirectorReviewBadge,
   LockStatusBadge,
+  NeedStatusBadge,
+  NextCycleRecommendationChip,
   PriorityBadge,
-  ProposalStatusBadge,
   UrgencyImpactBadge,
 } from '@/components/badges';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
@@ -146,16 +146,16 @@ export const getNeedColumns = (
     },
   },
   {
-    id: 'status_review',
-    header: 'Status & Review',
+    id: 'status',
+    header: 'Status',
     cell: ({ row }) => {
       const need = row.original;
 
       return (
         <div className="flex flex-col items-start gap-1">
           <div className="flex flex-wrap items-center gap-1">
-            <ProposalStatusBadge status={need.status} />
-            <DirectorReviewBadge need={need} />
+            <NeedStatusBadge need={need} />
+            <NextCycleRecommendationChip need={need} />
           </div>
           <LockStatusBadge
             isLocked={need.is_locked}

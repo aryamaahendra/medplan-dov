@@ -1,7 +1,9 @@
 import {
   RiCheckboxCircleLine,
-  RiFileTextLine,
   RiCloseCircleLine,
+  RiFeedbackLine,
+  RiFileTextLine,
+  RiSendPlaneLine,
 } from '@remixicon/react';
 import type { ElementType } from 'react';
 
@@ -9,25 +11,37 @@ import type { NeedStatus } from '@/types/need';
 
 export const STATUS_LABELS: Record<NeedStatus, string> = {
   draft: 'Draft',
+  submitted: 'Diajukan',
   approved: 'Disetujui',
   rejected: 'Ditolak',
+  revision: 'Perlu Revisi',
 };
 
 export const STATUS_OPTIONS = [
   {
     value: 'draft',
     label: 'Draft',
-    description: 'Usulan masih dalam tahap pengerjaan.',
+    description: 'Usulan masih dalam tahap pengerjaan dan belum diajukan.',
+  },
+  {
+    value: 'submitted',
+    label: 'Diajukan',
+    description: 'Usulan telah diajukan dan menunggu review direktur.',
   },
   {
     value: 'approved',
     label: 'Disetujui',
-    description: 'Usulan telah disetujui untuk diproses.',
+    description: 'Usulan telah disetujui secara resmi oleh direktur.',
   },
   {
     value: 'rejected',
     label: 'Ditolak',
-    description: 'Usulan tidak dapat dilanjutkan.',
+    description: 'Usulan tidak disetujui oleh direktur.',
+  },
+  {
+    value: 'revision',
+    label: 'Perlu Revisi',
+    description: 'Usulan dikembalikan oleh direktur untuk perbaikan.',
   },
 ] as const;
 
@@ -36,14 +50,18 @@ export const STATUS_VARIANTS: Record<
   'secondary' | 'default' | 'destructive' | 'outline'
 > = {
   draft: 'secondary',
+  submitted: 'outline',
   approved: 'default',
   rejected: 'destructive',
+  revision: 'outline',
 };
 
 export const STATUS_ICONS: Record<NeedStatus, ElementType> = {
   draft: RiFileTextLine,
+  submitted: RiSendPlaneLine,
   approved: RiCheckboxCircleLine,
   rejected: RiCloseCircleLine,
+  revision: RiFeedbackLine,
 };
 
 export const PRIORITY_LABELS: Record<string, string> = {

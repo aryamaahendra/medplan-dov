@@ -10,9 +10,9 @@ import {
 import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 import { ActionDropdown } from '@/components/action-dropdown';
 import {
-  DirectorReviewBadge,
+  NeedStatusBadge,
+  NextCycleRecommendationChip,
   PriorityBadge,
-  ProposalStatusBadge,
   UrgencyImpactBadge,
 } from '@/components/badges';
 import { Badge } from '@/components/ui/badge';
@@ -148,10 +148,10 @@ export function NeedGridCard({
             <UrgencyImpactBadge urgency={need.urgency} impact={need.impact} />
           </div>
 
-          {/* Proposal Status & Director Review */}
+          {/* Unified Status & Recommendation Chip */}
           <div className="flex flex-wrap items-center gap-1.5 border-t px-3 py-2">
-            <ProposalStatusBadge status={need.status} />
-            <DirectorReviewBadge need={need} />
+            <NeedStatusBadge need={need} />
+            <NextCycleRecommendationChip need={need} />
           </div>
         </div>
 

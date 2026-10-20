@@ -60,7 +60,8 @@ export interface NeedDetail {
   training: string | null;
 }
 
-export type NeedStatus = 'draft' | 'approved' | 'rejected';
+export type NeedStatus =
+  'draft' | 'submitted' | 'approved' | 'rejected' | 'revision';
 export type NeedPriority = 'high' | 'medium' | 'low';
 export type NeedWorkflowStage =
   'draft' | 'under_review' | 'approved' | 'rejected';
@@ -106,6 +107,11 @@ export interface Need {
   attachments?: Attachment[];
   notes?: string | null;
   approved_by_director_at?: string | null;
+  approved_volume?: string | number | null;
+  approved_unit_price?: string | number | null;
+  approved_total_price?: string | number | null;
+  is_recommended_for_next_cycle?: boolean;
+  recommended_volume?: string | number | null;
   is_locked?: boolean;
   locked_at?: string | null;
   locked_by_user_id?: number | null;

@@ -6,5 +6,5 @@ export * from './urgency-impact-badge';
 export * from './checklist-answer-badge';
 export * from './readiness-badge';
 export * from './lock-status-badge';
-export * from './proposal-status-badge';
-export * from './director-review-badge';
+export * from './need-status-badge';
+export * from './next-cycle-recommendation-chip';

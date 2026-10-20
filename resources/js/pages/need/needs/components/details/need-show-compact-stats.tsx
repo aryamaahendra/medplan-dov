@@ -12,6 +12,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { formatCompactIDR, formatIDR } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import type { Need } from '@/types';
+import { resolveNeedFinancialFigures } from './need-financial-utils';
 
 export interface NeedShowCompactStatsProps {
   need: Need;
@@ -59,28 +60,34 @@ function BentoTile({
  */
 export function NeedShowCompactStats({ need }: NeedShowCompactStatsProps) {
   const checklistPercentage = Number(need.checklist_percentage ?? 0);
-  const formattedVolume = Number(need.volume).toLocaleString('id-ID', {
+  const {
+    requestedVolume,
+    requestedUnitPrice,
+    requestedTotalPrice,
+    approvedVolume,
+    approvedUnitPrice,
+    approvedTotalPrice,
+    isApproved,
+  } = resolveNeedFinancialFigures(need);
+
+  const displayVolume = isApproved
+    ? (approvedVolume ?? requestedVolume)
+    : requestedVolume;
+  const displayUnitPrice = isApproved
+    ? (approvedUnitPrice ?? requestedUnitPrice)
+    : requestedUnitPrice;
+  const displayTotalPrice = isApproved
+    ? (approvedTotalPrice ?? requestedTotalPrice)
+    : requestedTotalPrice;
+
+  const formattedVolume = displayVolume.toLocaleString('id-ID', {
     maximumFractionDigits: 4,
   });
-  const isApproved = need.status === 'approved';
-  const approvedVolume =
-    need.approved_volume !== null && need.approved_volume !== undefined
-      ? Number(need.approved_volume)
-      : Number(need.volume);
-  const formattedApprovedVolume = approvedVolume.toLocaleString('id-ID', {
+  const formattedApprovedVolume = (
+    approvedVolume ?? requestedVolume
+  ).toLocaleString('id-ID', {
     maximumFractionDigits: 4,
   });
-  const approvedUnitPrice =
-    need.approved_unit_price !== null && need.approved_unit_price !== undefined
-      ? Number(need.approved_unit_price)
-      : Number(need.unit_price);
-  const approvedTotalPrice =
-    need.approved_total_price !== null &&
-    need.approved_total_price !== undefined
-      ? Number(need.approved_total_price)
-      : isApproved
-        ? approvedVolume * approvedUnitPrice
-        : Number(need.total_price);
 
   return (
     <div>
@@ -97,26 +104,15 @@ export function NeedShowCompactStats({ need }: NeedShowCompactStatsProps) {
                     : 'Alokasi Pagu Anggaran'}
                 </span>
               </div>
-              {isApproved && (
-                <Badge
-                  variant="outline"
-                  className="border-primary/40 bg-primary/10 py-0 text-xss text-primary"
-                >
-                  Disetujui
-                </Badge>
-              )}
+              {isApproved && <Badge variant="secondary">Disetujui</Badge>}
             </div>
 
             <div className="my-3">
               <div
                 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
-                title={formatIDR(
-                  isApproved ? approvedTotalPrice : need.total_price,
-                )}
+                title={formatIDR(displayTotalPrice)}
               >
-                {formatCompactIDR(
-                  isApproved ? approvedTotalPrice : need.total_price,
-                )}
+                {formatCompactIDR(displayTotalPrice)}
               </div>
               <div className="mt-2 flex flex-wrap items-center gap-1.5 text-xs text-foreground/80">
                 <span className="font-semibold text-foreground">
@@ -124,18 +120,12 @@ export function NeedShowCompactStats({ need }: NeedShowCompactStatsProps) {
                   {need.unit}
                 </span>
                 <span>x</span>
-                <span
-                  title={formatIDR(
-                    isApproved ? approvedUnitPrice : need.unit_price,
-                  )}
-                >
-                  {formatCompactIDR(
-                    isApproved ? approvedUnitPrice : need.unit_price,
-                  )}
+                <span title={formatIDR(displayUnitPrice)}>
+                  {formatCompactIDR(displayUnitPrice)}
                 </span>
                 {isApproved && (
                   <span className="ml-1 text-muted-foreground">
-                    (Awal: {formatCompactIDR(need.total_price)})
+                    (Awal: {formatCompactIDR(requestedTotalPrice)})
                   </span>
                 )}
               </div>

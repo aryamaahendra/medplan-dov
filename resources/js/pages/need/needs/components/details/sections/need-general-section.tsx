@@ -3,22 +3,30 @@ import { cn } from '@/lib/utils';
 import type { Need } from '@/types';
 
 import { NeedFinancialComparisonCards } from '../need-financial-comparison-cards';
+import { resolveNeedFinancialFigures } from '../need-financial-utils';
+
 interface NeedGeneralSectionProps {
   need: Need;
 }
 
 export function NeedGeneralSection({ need }: NeedGeneralSectionProps) {
-  const formattedVolume = Number(need.volume).toLocaleString('id-ID', {
+  const {
+    requestedVolume,
+    approvedVolume,
+    approvedUnitPrice,
+    approvedTotalPrice,
+    isApproved,
+  } = resolveNeedFinancialFigures(need);
+
+  const formattedVolume = requestedVolume.toLocaleString('id-ID', {
     maximumFractionDigits: 4,
   });
-  const isApproved = need.status === 'approved';
-  const hasApprovedVolume =
-    need.approved_volume !== null && need.approved_volume !== undefined;
-  const formattedApprovedVolume = hasApprovedVolume
-    ? Number(need.approved_volume).toLocaleString('id-ID', {
-        maximumFractionDigits: 4,
-      })
-    : null;
+  const formattedApprovedVolume =
+    approvedVolume !== null
+      ? approvedVolume.toLocaleString('id-ID', {
+          maximumFractionDigits: 4,
+        })
+      : null;
 
   return (
     <div className="space-y-6">
@@ -67,29 +75,25 @@ export function NeedGeneralSection({ need }: NeedGeneralSectionProps) {
           value={formatIDR(need.unit_price)}
           isNumeric
         />
-        {isApproved &&
-          need.approved_unit_price !== null &&
-          need.approved_unit_price !== undefined && (
-            <DatasheetRow
-              label="Harga Satuan Disetujui"
-              value={formatIDR(need.approved_unit_price)}
-              isNumeric
-            />
-          )}
+        {isApproved && approvedUnitPrice !== null && (
+          <DatasheetRow
+            label="Harga Satuan Disetujui"
+            value={formatIDR(approvedUnitPrice)}
+            isNumeric
+          />
+        )}
         <DatasheetRow
           label="Total Anggaran Usulan"
           value={formatIDR(need.total_price)}
           isNumeric
         />
-        {isApproved &&
-          need.approved_total_price !== null &&
-          need.approved_total_price !== undefined && (
-            <DatasheetRow
-              label="Pagu Total Disetujui"
-              value={formatIDR(need.approved_total_price)}
-              isNumeric
-            />
-          )}
+        {isApproved && approvedTotalPrice !== null && (
+          <DatasheetRow
+            label="Pagu Total Disetujui"
+            value={formatIDR(approvedTotalPrice)}
+            isNumeric
+          />
+        )}
         {isApproved &&
           need.is_recommended_for_next_cycle &&
           need.recommended_volume && (

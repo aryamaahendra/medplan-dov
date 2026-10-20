@@ -62,6 +62,25 @@ export function NeedShowCompactStats({ need }: NeedShowCompactStatsProps) {
   const formattedVolume = Number(need.volume).toLocaleString('id-ID', {
     maximumFractionDigits: 4,
   });
+  const isApproved = need.status === 'approved';
+  const approvedVolume =
+    need.approved_volume !== null && need.approved_volume !== undefined
+      ? Number(need.approved_volume)
+      : Number(need.volume);
+  const formattedApprovedVolume = approvedVolume.toLocaleString('id-ID', {
+    maximumFractionDigits: 4,
+  });
+  const approvedUnitPrice =
+    need.approved_unit_price !== null && need.approved_unit_price !== undefined
+      ? Number(need.approved_unit_price)
+      : Number(need.unit_price);
+  const approvedTotalPrice =
+    need.approved_total_price !== null &&
+    need.approved_total_price !== undefined
+      ? Number(need.approved_total_price)
+      : isApproved
+        ? approvedVolume * approvedUnitPrice
+        : Number(need.total_price);
 
   return (
     <div>
@@ -69,29 +88,58 @@ export function NeedShowCompactStats({ need }: NeedShowCompactStatsProps) {
         {/* Panel Pagu Anggaran */}
         <Card className="bg-linear-to-br from-primary/10 via-primary/5 to-transparent lg:col-span-4">
           <CardContent className="flex h-full flex-col justify-between">
-            <div className="flex items-center gap-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-              <RiCoinsFill className="h-4 w-4 text-foreground" />
-              <span>Alokasi Pagu Anggaran</span>
+            <div className="flex items-center justify-between gap-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+              <div className="flex items-center gap-2">
+                <RiCoinsFill className="h-4 w-4 text-foreground" />
+                <span>
+                  {isApproved
+                    ? 'Ketetapan Pagu Anggaran'
+                    : 'Alokasi Pagu Anggaran'}
+                </span>
+              </div>
+              {isApproved && (
+                <Badge
+                  variant="outline"
+                  className="border-primary/40 bg-primary/10 py-0 text-xss text-primary"
+                >
+                  Disetujui
+                </Badge>
+              )}
             </div>
 
             <div className="my-3">
               <div
                 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
-                title={formatIDR(need.total_price)}
+                title={formatIDR(
+                  isApproved ? approvedTotalPrice : need.total_price,
+                )}
               >
-                {formatCompactIDR(need.total_price)}
+                {formatCompactIDR(
+                  isApproved ? approvedTotalPrice : need.total_price,
+                )}
               </div>
               <div className="mt-2 flex flex-wrap items-center gap-1.5 text-xs text-foreground/80">
                 <span className="font-semibold text-foreground">
-                  {formattedVolume} {need.unit}
+                  {isApproved ? formattedApprovedVolume : formattedVolume}{' '}
+                  {need.unit}
                 </span>
                 <span>x</span>
-                <span title={formatIDR(need.unit_price)}>
-                  {formatCompactIDR(need.unit_price)}
+                <span
+                  title={formatIDR(
+                    isApproved ? approvedUnitPrice : need.unit_price,
+                  )}
+                >
+                  {formatCompactIDR(
+                    isApproved ? approvedUnitPrice : need.unit_price,
+                  )}
                 </span>
+                {isApproved && (
+                  <span className="ml-1 text-muted-foreground">
+                    (Awal: {formatCompactIDR(need.total_price)})
+                  </span>
+                )}
               </div>
             </div>
-
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="outline" className="bg-background">
                 TA // {need.year}

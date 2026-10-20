@@ -2,6 +2,7 @@ import { formatIDR } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import type { Need } from '@/types';
 
+import { NeedFinancialComparisonCards } from '../need-financial-comparison-cards';
 interface NeedGeneralSectionProps {
   need: Need;
 }
@@ -10,6 +11,14 @@ export function NeedGeneralSection({ need }: NeedGeneralSectionProps) {
   const formattedVolume = Number(need.volume).toLocaleString('id-ID', {
     maximumFractionDigits: 4,
   });
+  const isApproved = need.status === 'approved';
+  const hasApprovedVolume =
+    need.approved_volume !== null && need.approved_volume !== undefined;
+  const formattedApprovedVolume = hasApprovedVolume
+    ? Number(need.approved_volume).toLocaleString('id-ID', {
+        maximumFractionDigits: 4,
+      })
+    : null;
 
   return (
     <div className="space-y-6">
@@ -20,6 +29,8 @@ export function NeedGeneralSection({ need }: NeedGeneralSectionProps) {
         </h3>
       </div>
 
+      {/* Financial Determinations Comparison Cards */}
+      <NeedFinancialComparisonCards need={need} />
       {/* Horizontal Data Strip Rows */}
       <div className="divide-y divide-border/60">
         <DatasheetRow
@@ -40,20 +51,59 @@ export function NeedGeneralSection({ need }: NeedGeneralSectionProps) {
           value={need.need_type?.name || 'Kebutuhan Umum'}
         />
         <DatasheetRow
-          label="Volume Kuantitas"
+          label="Volume Usulan Awal"
           value={`${formattedVolume} ${need.unit}`}
           isNumeric
         />
+        {isApproved && formattedApprovedVolume !== null && (
+          <DatasheetRow
+            label="Volume Disetujui Direktur"
+            value={`${formattedApprovedVolume} ${need.unit}`}
+            isNumeric
+          />
+        )}
         <DatasheetRow
-          label="Estimasi Harga Satuan"
+          label="Harga Satuan Usulan"
           value={formatIDR(need.unit_price)}
           isNumeric
         />
+        {isApproved &&
+          need.approved_unit_price !== null &&
+          need.approved_unit_price !== undefined && (
+            <DatasheetRow
+              label="Harga Satuan Disetujui"
+              value={formatIDR(need.approved_unit_price)}
+              isNumeric
+            />
+          )}
         <DatasheetRow
-          label="Estimasi Harga Total"
+          label="Total Anggaran Usulan"
           value={formatIDR(need.total_price)}
           isNumeric
         />
+        {isApproved &&
+          need.approved_total_price !== null &&
+          need.approved_total_price !== undefined && (
+            <DatasheetRow
+              label="Pagu Total Disetujui"
+              value={formatIDR(need.approved_total_price)}
+              isNumeric
+            />
+          )}
+        {isApproved &&
+          need.is_recommended_for_next_cycle &&
+          need.recommended_volume && (
+            <DatasheetRow
+              label="Sisa Rekomendasi Siklus Berikutnya"
+              value={`${Number(need.recommended_volume).toLocaleString(
+                'id-ID',
+                {
+                  maximumFractionDigits: 4,
+                },
+              )} ${need.unit}`}
+              isNumeric
+            />
+          )}
         <DatasheetRow
           label="Kondisi Saat Ini"
           value={need.current_condition || '-'}

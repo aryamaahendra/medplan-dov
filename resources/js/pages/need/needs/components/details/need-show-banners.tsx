@@ -15,6 +15,18 @@ export function NeedShowBanners({ need, isOrphaned }: NeedShowBannersProps) {
     <div className="space-y-4">
       <NeedLockBanner need={need} />
 
+      {need.status === 'revision' && need.notes && (
+        <Alert className="border-warning/50 bg-warning/10 text-warning-foreground">
+          <RiAlertLine className="h-4 w-4 text-warning" />
+          <AlertTitle className="font-semibold text-foreground">
+            Arahan Revisi Direktur
+          </AlertTitle>
+          <AlertDescription className="text-sm whitespace-pre-wrap text-foreground/90">
+            {need.notes}
+          </AlertDescription>
+        </Alert>
+      )}
+
       {isOrphaned && (
         <Alert variant="destructive">
           <RiAlertLine className="h-4 w-4" />

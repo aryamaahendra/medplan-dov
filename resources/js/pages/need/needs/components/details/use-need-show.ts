@@ -39,7 +39,8 @@ export function useNeedShow({ need, existingAnswers }: UseNeedShowProps) {
   const canManageLock =
     hasPermission('lock need') || hasPermission('unlock need');
   const canReviewDirector =
-    hasPermission('review need director') && need.status === 'approved';
+    Boolean(need.can?.approve ?? hasPermission('review need director')) &&
+    need.status === 'submitted';
   const canSubmit =
     Boolean(need.can?.submit) &&
     !isLocked &&

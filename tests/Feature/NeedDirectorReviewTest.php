@@ -10,6 +10,7 @@ use App\Models\OrganizationalUnit;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia;
 
 uses(RefreshDatabase::class);
 
@@ -314,5 +315,63 @@ describe('Director Review executive decision transitions', function () {
 
         expect($freshNeed->is_recommended_for_next_cycle)->toBeFalse()
             ->and($freshNeed->recommended_volume)->toBeNull();
+    });
+
+    it('exposes approval capabilities and approved financial determinations on needs show view', function () {
+        $submittedNeed = Need::factory()->create([
+            'need_group_id' => $this->needGroup->id,
+            'organizational_unit_id' => $this->orgUnit->id,
+            'need_type_id' => $this->needType->id,
+            'status' => Need::STATUS_SUBMITTED,
+            'volume' => 10,
+            'unit_price' => 20000,
+            'total_price' => 200000,
+        ]);
+
+        $this->actingAs($this->directorUser)
+            ->get(route('needs.show', $submittedNeed))
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('need/needs/show')
+                ->where('need.can.approve', true)
+                ->where('need.status', Need::STATUS_SUBMITTED)
+            );
+
+        $this->actingAs($this->staffUser)
+            ->get(route('needs.show', $submittedNeed))
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('need/needs/show')
+                ->where('need.can.approve', false)
+            );
+
+        $approvedNeed = Need::factory()->create([
+            'need_group_id' => $this->needGroup->id,
+            'organizational_unit_id' => $this->orgUnit->id,
+            'need_type_id' => $this->needType->id,
+            'status' => Need::STATUS_APPROVED,
+            'volume' => 10,
+            'unit_price' => 20000,
+            'total_price' => 200000,
+            'approved_volume' => 6,
+            'approved_unit_price' => 18000,
+            'approved_total_price' => 108000,
+            'is_recommended_for_next_cycle' => true,
+            'recommended_volume' => 4,
+            'approved_by_director_at' => now(),
+        ]);
+
+        $this->actingAs($this->directorUser)
+            ->get(route('needs.show', $approvedNeed))
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('need/needs/show')
+                ->where('need.status', Need::STATUS_APPROVED)
+                ->where('need.approved_volume', '6.0000')
+                ->where('need.approved_unit_price', '18000.00')
+                ->where('need.approved_total_price', '108000.00')
+                ->where('need.is_recommended_for_next_cycle', true)
+                ->where('need.recommended_volume', '4.0000')
+            );
     });
 });

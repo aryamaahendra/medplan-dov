@@ -7,7 +7,7 @@ import {
 } from '@remixicon/react';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
-
+import { NextCycleRecommendationChip } from '@/components/badges';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -29,6 +29,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { formatIDR } from '@/lib/formatters';
+import { cn } from '@/lib/utils';
 import needGroups from '@/routes/need-groups';
 import { unapprovedCandidates } from '@/routes/needs';
 
@@ -39,7 +40,12 @@ interface CandidateNeed {
   title: string;
   description: string | null;
   year: number;
+  volume?: number | string | null;
+  unit?: string | null;
+  unit_price?: number | string | null;
   total_price: string | number;
+  is_recommended_for_next_cycle?: boolean | number | null;
+  recommended_volume?: number | string | null;
   need_group?: { id: number; name: string; year: number } | null;
   organizational_unit?: { id: number; name: string } | null;
   need_type?: { id: number; name: string } | null;
@@ -253,11 +259,17 @@ export function BulkRolloverDialog({
               <TableBody>
                 {candidates.map((need) => {
                   const isSelected = selectedIds.includes(need.id);
+                  const isRecommended = Boolean(
+                    need.is_recommended_for_next_cycle,
+                  );
 
                   return (
                     <TableRow
                       key={need.id}
-                      className="cursor-pointer hover:bg-muted/50"
+                      className={cn(
+                        'cursor-pointer hover:bg-muted/50',
+                        isRecommended && 'bg-info/5 hover:bg-info/10',
+                      )}
                       onClick={() => toggleSelectOne(need.id)}
                     >
                       <TableCell onClick={(e) => e.stopPropagation()}>
@@ -271,8 +283,17 @@ export function BulkRolloverDialog({
                         <Badge variant="outline">{need.year}</Badge>
                       </TableCell>
                       <TableCell>
-                        <div className="font-medium text-foreground">
-                          {need.title}
+                        <div className="flex flex-wrap items-center gap-1.5 font-medium text-foreground">
+                          <span>{need.title}</span>
+                          {isRecommended && (
+                            <NextCycleRecommendationChip
+                              isRecommended={true}
+                              recommendedVolume={need.recommended_volume}
+                              volume={need.volume}
+                              unit={need.unit}
+                              size="sm"
+                            />
+                          )}
                         </div>
                         {need.need_group && (
                           <span className="text-xs text-muted-foreground">

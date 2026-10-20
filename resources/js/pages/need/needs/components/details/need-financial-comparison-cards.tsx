@@ -6,6 +6,7 @@ import {
   RiShieldCheckFill,
 } from '@remixicon/react';
 
+import { NeedStatusBadge } from '@/components/badges';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatDateTime, formatIDR } from '@/lib/formatters';
@@ -13,6 +14,40 @@ import { cn } from '@/lib/utils';
 import type { Need } from '@/types';
 import { resolveNeedFinancialFigures } from './need-financial-utils';
 
+const STATUS_EMPTY_MESSAGES: Record<
+  string,
+  {
+    title: string;
+    getDescription: (
+      volume: number,
+      unit: string,
+      isRecommended: boolean,
+    ) => string;
+  }
+> = {
+  submitted: {
+    title: 'Menunggu Ketetapan Direktur',
+    getDescription: () =>
+      'Kuantitas dan harga satuan resmi akan ditetapkan oleh Direktur pada tahap review.',
+  },
+  revision: {
+    title: 'Dalam Proses Revisi',
+    getDescription: () =>
+      'Unit kerja pengusul sedang memperbaiki usulan sesuai arahan Direktur.',
+  },
+  rejected: {
+    title: 'Usulan Ditolak',
+    getDescription: (volume, unit, isRecommended) =>
+      isRecommended
+        ? `Usulan ditolak untuk siklus ini namun direkomendasikan penuh (${volume.toLocaleString('id-ID')} ${unit}) untuk siklus berikutnya.`
+        : 'Usulan tidak disetujui untuk siklus anggaran ini.',
+  },
+  draft: {
+    title: 'Belum Diajukan',
+    getDescription: () =>
+      'Usulan masih berupa draft dan belum diajukan untuk review.',
+  },
+};
 interface NeedFinancialComparisonCardsProps {
   need: Need;
   className?: string;
@@ -58,9 +93,7 @@ export function NeedFinancialComparisonCards({
                   </p>
                 </div>
               </div>
-              <Badge variant="outline" className="text-xs font-normal">
-                Pengusul
-              </Badge>
+              <Badge variant="outline">Pengusul</Badge>
             </div>
           </CardHeader>
 
@@ -134,39 +167,7 @@ export function NeedFinancialComparisonCards({
                 </div>
               </div>
 
-              {isApproved && <Badge variant="secondary">Disetujui</Badge>}
-              {need.status === 'submitted' && (
-                <Badge
-                  variant="outline"
-                  className="text-xs text-muted-foreground"
-                >
-                  Menunggu Review
-                </Badge>
-              )}
-              {need.status === 'revision' && (
-                <Badge
-                  variant="outline"
-                  className="border-warning/40 text-xs text-warning-foreground"
-                >
-                  Perlu Revisi
-                </Badge>
-              )}
-              {need.status === 'rejected' && (
-                <Badge
-                  variant="outline"
-                  className="border-destructive/40 text-xs text-destructive"
-                >
-                  Ditolak
-                </Badge>
-              )}
-              {need.status === 'draft' && (
-                <Badge
-                  variant="outline"
-                  className="text-xs text-muted-foreground"
-                >
-                  Draft
-                </Badge>
-              )}
+              <NeedStatusBadge status={need.status} />
             </div>
           </CardHeader>
 
@@ -277,24 +278,22 @@ export function NeedFinancialComparisonCards({
                     <RiInformationFill className="size-5" />
                   </div>
                   <p className="mt-3 text-xs font-semibold text-foreground">
-                    {need.status === 'submitted'
-                      ? 'Menunggu Ketetapan Direktur'
-                      : need.status === 'revision'
-                        ? 'Dalam Proses Revisi'
-                        : need.status === 'rejected'
-                          ? 'Usulan Ditolak'
-                          : 'Belum Diajukan'}
+                    {
+                      (
+                        STATUS_EMPTY_MESSAGES[need.status] ??
+                        STATUS_EMPTY_MESSAGES.draft
+                      ).title
+                    }
                   </p>
                   <p className="mt-1 max-w-[260px] text-xss text-muted-foreground">
-                    {need.status === 'submitted'
-                      ? 'Kuantitas dan harga satuan resmi akan ditetapkan oleh Direktur pada tahap review.'
-                      : need.status === 'revision'
-                        ? 'Unit kerja pengusul sedang memperbaiki usulan sesuai arahan Direktur.'
-                        : need.status === 'rejected'
-                          ? need.is_recommended_for_next_cycle
-                            ? `Usulan ditolak untuk siklus ini namun direkomendasikan penuh (${requestedVolume.toLocaleString('id-ID')} ${need.unit}) untuk siklus berikutnya.`
-                            : 'Usulan tidak disetujui untuk siklus anggaran ini.'
-                          : 'Usulan masih berupa draft dan belum diajukan untuk review.'}
+                    {(
+                      STATUS_EMPTY_MESSAGES[need.status] ??
+                      STATUS_EMPTY_MESSAGES.draft
+                    ).getDescription(
+                      requestedVolume,
+                      need.unit,
+                      Boolean(need.is_recommended_for_next_cycle),
+                    )}
                   </p>
                 </div>
               )}

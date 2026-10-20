@@ -43,8 +43,7 @@ export function useNeedShow({ need, existingAnswers }: UseNeedShowProps) {
     need.status === 'submitted';
   const canSubmit =
     Boolean(need.can?.submit) &&
-    !isLocked &&
-    (need.status === 'draft' || need.status === 'revision');
+    (need.status === 'revision' || (!isLocked && need.status === 'draft'));
 
   const handleSubmitNeed = () => {
     setIsSubmitting(true);

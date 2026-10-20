@@ -8,6 +8,7 @@ use App\Actions\Need\GetFilteredNeedsAction;
 use App\Actions\Need\NeedLockLifecycle;
 use App\Actions\Need\NeedProposalEngine;
 use App\Actions\Need\NeedStrategicAlignmentEngine;
+use App\DTOs\Need\DirectorDetermination;
 use App\DTOs\Need\NeedProposalPayload;
 use App\Enums\Kldi;
 use App\Enums\SatkerSkpd;
@@ -280,9 +281,7 @@ final class NeedController extends Controller
                 need: $need,
                 notes: $validated['notes'] ?? null,
                 approver: $request->user(),
-                approvedVolume: isset($validated['approved_volume']) ? (float) $validated['approved_volume'] : null,
-                approvedUnitPrice: isset($validated['approved_unit_price']) ? (float) $validated['approved_unit_price'] : null,
-                isRecommendedForNextCycle: (bool) ($validated['is_recommended_for_next_cycle'] ?? false),
+                determination: DirectorDetermination::fromArray($validated),
             );
         } elseif ($decision === Need::STATUS_REJECTED) {
             $lifecycle->rejectByDirector(

@@ -49,6 +49,7 @@ final class NeedRolloverController extends Controller
             ->when($request->filled('year'), fn ($q) => $q->where('year', $request->input('year')))
             ->when($request->filled('need_type_id'), fn ($q) => $q->where('need_type_id', $request->input('need_type_id')))
             ->when($request->filled('organizational_unit_id'), fn ($q) => $q->where('organizational_unit_id', $request->input('organizational_unit_id')))
+            ->orderByDesc('is_recommended_for_next_cycle')
             ->orderByDesc('year')
             ->orderByDesc('created_at');
 

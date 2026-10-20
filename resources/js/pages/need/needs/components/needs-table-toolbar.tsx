@@ -41,7 +41,6 @@ interface NeedsTableToolbarProps {
     urgency?: string | string[];
     impact?: string | string[];
     is_priority?: string | string[];
-    is_approved_by_director?: string | string[];
     is_recommended_for_next_cycle?: string | string[];
     min_checklist_score?: string | string[];
   };
@@ -78,7 +77,6 @@ export function NeedsTableToolbar({
       'urgency',
       'impact',
       'is_priority',
-      'is_approved_by_director',
       'is_recommended_for_next_cycle',
       'min_checklist_score',
     ];
@@ -245,11 +243,6 @@ export function NeedsTableToolbar({
     { label: 'Tidak', value: '0' },
   ];
 
-  const directorReviewOptions = [
-    { label: 'Sudah Direview', value: '1' },
-    { label: 'Belum Direview', value: '0' },
-  ];
-
   const scoreOptions = [{ label: '≥ 85%', value: '85' }];
 
   const getFilterArray = (value: string | string[] | undefined) => {
@@ -269,7 +262,6 @@ export function NeedsTableToolbar({
       urgency: undefined,
       impact: undefined,
       is_priority: undefined,
-      is_approved_by_director: undefined,
       is_recommended_for_next_cycle: undefined,
       min_checklist_score: undefined,
       page: 1,
@@ -357,9 +349,7 @@ export function NeedsTableToolbar({
           </span>
 
           {isAdvance && activeManualCount > 0 && (
-            <Badge variant="secondary" className="ml-0.5 font-mono">
-              {activeManualCount}
-            </Badge>
+            <Badge variant="secondary">{activeManualCount}</Badge>
           )}
         </div>
 
@@ -392,7 +382,6 @@ export function NeedsTableToolbar({
                   <Badge
                     variant={isActive ? 'default' : 'secondary'}
                     className={cn(
-                      'font-mono',
                       isActive && 'bg-primary text-primary-foreground',
                     )}
                   >
@@ -501,14 +490,7 @@ export function NeedsTableToolbar({
                 mergeParams({ is_priority: values, page: 1 })
               }
             />
-            <DataTableFacetedFilter
-              title="Review Direktur"
-              options={directorReviewOptions}
-              selectedValues={getFilterArray(filters.is_approved_by_director)}
-              onSelect={(values) =>
-                mergeParams({ is_approved_by_director: values, page: 1 })
-              }
-            />
+
             <DataTableFacetedFilter
               title="Skor Checklist"
               options={scoreOptions}

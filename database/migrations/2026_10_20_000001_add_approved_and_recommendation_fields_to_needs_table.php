@@ -67,6 +67,17 @@ return new class extends Migration
                 ]);
 
             /**
+             * Transition unapproved proposals with non-empty review notes to 'revision'.
+             */
+            DB::table('needs')
+                ->whereNull('approved_by_director_at')
+                ->whereNotNull('notes')
+                ->whereRaw("TRIM(notes) != ''")
+                ->update([
+                    'status' => 'revision',
+                ]);
+
+            /**
              * Transition legacy unreviewed proposals previously marked 'approved' (representing submitted) to 'submitted'.
              */
             DB::table('needs')
@@ -74,18 +85,6 @@ return new class extends Migration
                 ->whereNull('approved_by_director_at')
                 ->update([
                     'status' => 'submitted',
-                ]);
-
-            /**
-             * Transition unapproved proposals with non-empty review notes to 'revision'.
-             */
-            DB::table('needs')
-                ->whereNull('approved_by_director_at')
-                ->where('status', 'draft')
-                ->whereNotNull('notes')
-                ->whereRaw("TRIM(notes) != ''")
-                ->update([
-                    'status' => 'revision',
                 ]);
         });
     }

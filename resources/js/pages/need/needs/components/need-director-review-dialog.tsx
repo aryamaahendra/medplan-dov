@@ -224,6 +224,23 @@ export function NeedDirectorReviewDialog({
             </div>
           </div>
 
+          {/* Prior Revision Notice for resubmitted proposals */}
+          {Boolean(need.notes) && (
+            <div className="rounded-lg border border-warning/40 bg-warning/10 p-3 text-xs text-warning-foreground">
+              <div className="flex items-start gap-2">
+                <RiAlertLine className="size-4 shrink-0 text-warning" />
+                <div className="space-y-1">
+                  <span className="font-semibold text-foreground">
+                    Usulan Telah Diperbaiki (Diajukan Kembali)
+                  </span>
+                  <p className="whitespace-pre-wrap text-foreground/90">
+                    Arahan revisi sebelumnya: {need.notes}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Three-way Decision Cards via standardized RadioField */}
           <RadioField
             label="Keputusan Direktur"

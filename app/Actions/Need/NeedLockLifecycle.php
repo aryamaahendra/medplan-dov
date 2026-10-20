@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Need;
 
+use App\DTOs\Need\DirectorDetermination;
 use App\Models\Need;
 use App\Models\User;
 use DateTimeInterface;
@@ -126,10 +127,17 @@ class NeedLockLifecycle
         Need $need,
         ?string $notes = null,
         ?User $approver = null,
-        ?float $approvedVolume = null,
+        DirectorDetermination|float|null $determination = null,
         ?float $approvedUnitPrice = null,
         bool $isRecommendedForNextCycle = false,
     ): Need {
+        if ($determination instanceof DirectorDetermination) {
+            $approvedVolume = $determination->approvedVolume;
+            $approvedUnitPrice = $determination->approvedUnitPrice;
+            $isRecommendedForNextCycle = $determination->isRecommendedForNextCycle;
+        } else {
+            $approvedVolume = $determination;
+        }
         $volume = (float) $need->volume;
         $finalApprovedVolume = $approvedVolume !== null ? $approvedVolume : $volume;
         $finalApprovedUnitPrice = $approvedUnitPrice !== null ? $approvedUnitPrice : (float) $need->unit_price;

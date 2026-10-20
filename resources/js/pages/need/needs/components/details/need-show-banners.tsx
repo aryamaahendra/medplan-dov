@@ -1,8 +1,7 @@
-import { RiAlertLine } from '@remixicon/react';
+import { RiAlertLine, RiHistoryLine } from '@remixicon/react';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import type { Need } from '@/types';
-
 import { NeedLockBanner } from '../need-lock-banner';
 
 interface NeedShowBannersProps {
@@ -23,6 +22,21 @@ export function NeedShowBanners({ need, isOrphaned }: NeedShowBannersProps) {
           </AlertTitle>
           <AlertDescription className="text-sm whitespace-pre-wrap text-foreground/90">
             {need.notes}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {need.status === 'submitted' && need.notes && (
+        <Alert className="border-info/50 bg-info/10 text-info-foreground">
+          <RiHistoryLine className="h-4 w-4 text-info" />
+          <AlertTitle className="font-semibold text-foreground">
+            Usulan Telah Diperbaiki & Diajukan Kembali
+          </AlertTitle>
+          <AlertDescription className="text-sm text-foreground/90">
+            <span className="font-medium text-muted-foreground">
+              Catatan revisi sebelumnya:
+            </span>{' '}
+            <span className="whitespace-pre-wrap">{need.notes}</span>
           </AlertDescription>
         </Alert>
       )}

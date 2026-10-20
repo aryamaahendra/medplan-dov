@@ -94,12 +94,7 @@ export function NeedSubmitDialog({
           >
             Batal
           </Button>
-          <Button
-            type="button"
-            disabled={loading}
-            onClick={onConfirm}
-            className="gap-1.5"
-          >
+          <Button type="button" disabled={loading} onClick={onConfirm}>
             <RiSendPlaneLine data-icon="inline-start" />
             <span>{loading ? 'Memproses...' : confirmText}</span>
           </Button>

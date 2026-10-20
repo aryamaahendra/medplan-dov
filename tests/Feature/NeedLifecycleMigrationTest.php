@@ -226,9 +226,20 @@ test('migration backfill transitions unapproved proposals with non-empty review 
         'approved_by_director_at' => null,
     ]);
 
+    $idLegacyApprovedWithNotes = insertTestNeed([
+        'title' => 'Legacy Approved Need With Notes',
+        'volume' => 2.0000,
+        'unit_price' => 15000.00,
+        'total_price' => 30000.00,
+        'status' => 'approved',
+        'notes' => 'Harap lampirkan spesifikasi teknis.',
+        'approved_by_director_at' => null,
+    ]);
+
     $migration->backfill();
 
     expect(DB::table('needs')->where('id', $idWithNotes)->value('status'))->toBe('revision')
+        ->and(DB::table('needs')->where('id', $idLegacyApprovedWithNotes)->value('status'))->toBe('revision')
         ->and(DB::table('needs')->where('id', $idWithBlankNotes)->value('status'))->toBe('draft')
         ->and(DB::table('needs')->where('id', $idWithNullNotes)->value('status'))->toBe('draft');
 });

@@ -8,8 +8,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { NEED_STATUS_CONFIG  } from '@/constants/need';
-import type {NeedStatusConfig} from '@/constants/need';
+import { NEED_STATUS_CONFIG } from '@/constants/need';
+import type { NeedStatusConfig } from '@/constants/need';
 import { cn } from '@/lib/utils';
 import type { Need, NeedStatus } from '@/types/need';
 

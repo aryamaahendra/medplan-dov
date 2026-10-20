@@ -30,13 +30,13 @@ export const NEED_STATUS_CONFIG: Record<NeedStatus, NeedStatusConfig> = {
     defaultTooltip: 'Menunggu Review Direktur',
   },
   approved: {
-    label: 'Disetujui Direktur',
+    label: 'Disetujui',
     tone: 'success',
     icon: RiCheckboxCircleLine,
     defaultTooltip: 'Telah disetujui Direktur',
   },
   rejected: {
-    label: 'Ditolak Direktur',
+    label: 'Ditolak',
     tone: 'destructive',
     icon: RiCloseCircleLine,
     defaultTooltip: 'Ditolak oleh Direktur',

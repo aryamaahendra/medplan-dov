@@ -50,6 +50,37 @@ it('unapproved candidates query excludes approved needs', function () {
         ->and($ids)->not->toContain($approvedNeed->id);
 });
 
+it('unapproved candidates query prioritizes proposals with next cycle recommendation', function () {
+    $this->be($this->admin);
+
+    $regularNeed = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'approved_by_director_at' => null,
+        'is_recommended_for_next_cycle' => false,
+        'created_at' => now()->subDay(),
+    ]);
+
+    $recommendedNeed = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'approved_by_director_at' => null,
+        'is_recommended_for_next_cycle' => true,
+        'recommended_volume' => 5,
+        'created_at' => now()->subDays(2),
+    ]);
+
+    $response = $this->getJson(route('needs.unapproved-candidates', [
+        'target_need_group_id' => $this->group2->id,
+    ]));
+
+    $response->assertOk();
+    $data = $response->json('data');
+    expect($data[0]['id'])->toBe($recommendedNeed->id);
+});
+
 it('unapproved candidates query excludes needs from the target group itself', function () {
     $this->be($this->admin);
 

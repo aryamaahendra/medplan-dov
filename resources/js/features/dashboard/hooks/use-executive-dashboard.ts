@@ -1,7 +1,6 @@
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
 
-import type { Need } from '@/types';
 import type {
   DashboardGroupOption,
   NeedsDashboardPayload,
@@ -11,7 +10,6 @@ export function useExecutiveDashboard(
   dashboardPayload?: NeedsDashboardPayload,
 ) {
   const [compareGroupId, setCompareGroupId] = useState<number | null>(null);
-  const [reviewingNeed, setReviewingNeed] = useState<Need | null>(null);
 
   const handleGroupSelect = (group: DashboardGroupOption) => {
     router.visit(
@@ -34,11 +32,9 @@ export function useExecutiveDashboard(
   return {
     state: {
       compareGroupId,
-      reviewingNeed,
     },
     handlers: {
       setCompareGroupId,
-      setReviewingNeed,
       handleGroupSelect,
       handleCompareGroupChange,
     },

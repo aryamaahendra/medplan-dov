@@ -4,7 +4,6 @@ import { DashboardSkeleton } from '@/features/dashboard/components/dashboard-ske
 import { GlobalDashboardControls } from '@/features/dashboard/components/global-dashboard-controls';
 import { VariantAExecutive } from '@/features/dashboard/components/variant-a-executive';
 import { useExecutiveDashboard } from '@/features/dashboard/hooks/use-executive-dashboard';
-import { DirectorReviewDialog } from '@/features/need/director-review';
 import { cn } from '@/lib/utils';
 import type { NeedsDashboardPayload } from '@/types/needs-dashboard';
 
@@ -60,14 +59,6 @@ export default function ExecutiveDashboard({
           }}
         </Deferred>
       </div>
-
-      {state.reviewingNeed && (
-        <DirectorReviewDialog
-          need={state.reviewingNeed}
-          open={!!state.reviewingNeed}
-          onOpenChange={(open) => !open && handlers.setReviewingNeed(null)}
-        />
-      )}
     </>
   );
 }

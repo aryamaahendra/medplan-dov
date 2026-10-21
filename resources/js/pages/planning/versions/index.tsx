@@ -1,7 +1,5 @@
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { RiAddLine } from '@remixicon/react';
-import { useCallback, useState } from 'react';
-import { toast } from 'sonner';
 
 import PlanningVersionController from '@/actions/App/Http/Controllers/Planning/PlanningVersionController';
 import { ConfirmDialog } from '@/components/confirm-dialog';
@@ -9,6 +7,7 @@ import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
 import { getColumns } from '@/features/planning-version/components/planning-version-columns';
 import { VersionDialog } from '@/features/planning-version/components/planning-version-dialog';
+import { usePlanningVersionActions } from '@/features/planning-version/hooks/use-planning-version-actions';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import { usePermission } from '@/hooks/use-permission';
 import { useResourceIndexController } from '@/hooks/use-resource-index-controller';
@@ -21,83 +20,18 @@ interface PlanningVersionsIndexProps {
   filters: DataTableFilters;
 }
 
-interface ConfirmConfig {
-  open: boolean;
-  title: string;
-  description: string;
-  onConfirm: () => void;
-  confirmText?: string;
-  variant?: 'default' | 'destructive';
-}
-
 export default function PlanningVersionsIndex({
   versions,
   filters,
 }: PlanningVersionsIndexProps) {
   const { hasPermission } = usePermission();
 
-  const [confirmConfig, setConfirmConfig] = useState<ConfirmConfig>({
-    open: false,
-    title: '',
-    description: '',
-    onConfirm: () => {},
-  });
-
-  const closeConfirm = useCallback(() => {
-    setConfirmConfig((prev) => ({ ...prev, open: false }));
-  }, []);
-
-  const handleCreateRevision = useCallback(
-    (version: PlanningVersion) => {
-      setConfirmConfig({
-        open: true,
-        title: 'Buat Revisi',
-        description: `Apakah Anda yakin ingin membuat revisi dari "${version.name}"?`,
-        confirmText: 'Buat Revisi',
-        onConfirm: () => {
-          router.post(
-            PlanningVersionController.createRevision.url({
-              planning_version: version.id,
-            }),
-            {},
-            {
-              onSuccess: () => {
-                toast.success('Revisi berhasil dibuat');
-                closeConfirm();
-              },
-            },
-          );
-        },
-      });
-    },
-    [closeConfirm],
-  );
-
-  const handleSetCurrent = useCallback(
-    (version: PlanningVersion) => {
-      setConfirmConfig({
-        open: true,
-        title: 'Jadikan Versi Utama',
-        description: `Jadikan "${version.name}" sebagai versi utama untuk periode ${version.year_start} - ${version.year_end}?`,
-        confirmText: 'Jadikan Utama',
-        onConfirm: () => {
-          router.post(
-            PlanningVersionController.setCurrent.url({
-              planning_version: version.id,
-            }),
-            {},
-            {
-              onSuccess: () => {
-                toast.success('Versi utama diperbarui');
-                closeConfirm();
-              },
-            },
-          );
-        },
-      });
-    },
-    [closeConfirm],
-  );
+  const {
+    confirmConfig,
+    setConfirmConfig,
+    handleCreateRevision,
+    handleSetCurrent,
+  } = usePlanningVersionActions();
 
   const controller = useResourceIndexController<PlanningVersion>({
     data: versions,

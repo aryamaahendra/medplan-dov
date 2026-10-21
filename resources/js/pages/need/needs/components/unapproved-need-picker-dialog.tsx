@@ -1,5 +1,9 @@
 import { RiHistoryLine, RiSearchLine } from '@remixicon/react';
 
+import {
+  RolloverCandidateTable,
+  useRolloverCandidates,
+} from '@/components/rollover';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -9,10 +13,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import {
-  RolloverCandidateTable,
-  useRolloverCandidates,
-} from '@/features/need/rollover';
 
 export interface UnapprovedNeedPickerDialogProps {
   open: boolean;

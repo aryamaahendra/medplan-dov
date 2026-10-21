@@ -1,22 +1,11 @@
-import { useMemo } from 'react';
-
 import { ChecklistForm } from '@/components/needs/checklist-form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { StrategicAlignmentViewer } from '@/features/need/strategic-alignment';
 import { usePermission } from '@/hooks/use-permission';
-import { IkkAlignmentShow } from '@/pages/need/needs/components/ikk-alignment-show';
 import { NeedAttachmentsTab } from '@/pages/need/needs/components/need-attachments-tab';
 import { NeedDetailTab } from '@/pages/need/needs/components/need-detail-tab';
 import { NeedGeneralTab } from '@/pages/need/needs/components/need-general-tab';
-import { PlanningAlignmentShow } from '@/pages/need/needs/components/planning-alignment-show';
-import { RlsAlignmentShow } from '@/pages/need/needs/components/rls-alignment-show';
-import { StrategicAlignmentSection } from '@/pages/need/needs/components/strategic-alignment-section';
-import type {
-  ChecklistQuestion,
-  ChecklistAnswer,
-  Need,
-  Sasaran,
-  Tujuan,
-} from '@/types';
+import type { ChecklistQuestion, ChecklistAnswer, Need } from '@/types';
 
 interface NeedShowTabsProps {
   need: Need;
@@ -65,36 +54,6 @@ export function NeedShowTabs({
 
   const visibleTabs = tabs.filter((tab) => hasPermission(tab.permission));
 
-  const groupedRenstra = useMemo(() => {
-    if (!need.sasarans) {
-      return [];
-    }
-
-    const map = new Map<number, Tujuan & { sasarans: Sasaran[] }>();
-
-    need.sasarans.forEach((sasaran) => {
-      const tujuan = sasaran.tujuan;
-
-      if (!tujuan) {
-        return;
-      }
-
-      if (!map.has(tujuan.id)) {
-        map.set(tujuan.id, { ...tujuan, sasarans: [] });
-      }
-
-      const indicators =
-        need.indicators?.filter((i) => i.sasaran_id === sasaran.id) ?? [];
-
-      map.get(tujuan.id)?.sasarans.push({
-        ...sasaran,
-        indicators,
-      });
-    });
-
-    return Array.from(map.values());
-  }, [need]);
-
   return (
     <Tabs defaultValue={visibleTabs[0]?.value ?? 'general'}>
       <TabsList>
@@ -111,22 +70,22 @@ export function NeedShowTabs({
       )}
       {hasPermission('view need tab strategic') && (
         <TabsContent value="strategic" className="mt-0">
-          <StrategicAlignmentSection groupedRenstra={groupedRenstra} />
+          <StrategicAlignmentViewer framework="renstra" need={need} />
         </TabsContent>
       )}
       {hasPermission('view need tab ikk') && (
         <TabsContent value="ikk" className="mt-0">
-          <IkkAlignmentShow need={need} />
+          <StrategicAlignmentViewer framework="ikk" need={need} />
         </TabsContent>
       )}
       {hasPermission('view need tab rls') && (
         <TabsContent value="rls" className="mt-0">
-          <RlsAlignmentShow need={need} />
+          <StrategicAlignmentViewer framework="rls" need={need} />
         </TabsContent>
       )}
       {hasPermission('view need tab planning') && (
         <TabsContent value="planning" className="mt-0">
-          <PlanningAlignmentShow need={need} />
+          <StrategicAlignmentViewer framework="planning" need={need} />
         </TabsContent>
       )}
       {hasPermission('view need tab checklist') && (

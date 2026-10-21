@@ -19,6 +19,10 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useNeedForm } from '@/features/need/hooks/use-need-form';
+import {
+  StrategicAlignmentEditor,
+  useStrategicAlignment,
+} from '@/features/need/strategic-alignment';
 import { usePermission } from '@/hooks/use-permission';
 import { cn } from '@/lib/utils';
 import type {
@@ -31,13 +35,9 @@ import type {
 
 import { FileSection } from './file-section';
 import { GeneralInfoSection } from './general-info-section';
-import { IkkAlignmentSection } from './ikk-alignment-section';
 import { NeedDetailSection } from './need-detail-section';
 import { NeedLockBanner } from './need-lock-banner';
-import { PlanningAlignmentSection } from './planning-alignment-section';
 import { PriorityStatusSection } from './priority-status-section';
-import { RenstraAlignmentSection } from './renstra-alignment-section';
-import { RlsAlignmentSection } from './rls-alignment-section';
 import { UnapprovedNeedPickerDialog } from './unapproved-need-picker-dialog';
 
 export interface NeedFormProps {
@@ -89,6 +89,16 @@ export function NeedForm({
   });
 
   const { data, setData, errors, processing } = form;
+  const alignmentController = useStrategicAlignment({
+    data,
+    setData,
+    options: {
+      tujuans,
+      kpiGroups,
+      strategicServicePlans,
+      planningActivities,
+    },
+  });
   const {
     isEditing,
     isLocked,
@@ -248,35 +258,35 @@ export function NeedForm({
 
                   <div className={cn(activeSection !== 'renstra' && 'hidden')}>
                     {hasPermission('update need tab strategic') && (
-                      <RenstraAlignmentSection
-                        data={data}
-                        setData={setData}
-                        errors={errors}
-                        tujuans={tujuans}
+                      <StrategicAlignmentEditor
+                        framework="renstra"
+                        controller={alignmentController}
                         year={parseInt(data.year)}
+                        errors={errors}
+                        disabled={isLocked}
                       />
                     )}
                   </div>
 
                   <div className={cn(activeSection !== 'ikk' && 'hidden')}>
                     {hasPermission('update need tab ikk') && (
-                      <IkkAlignmentSection
-                        data={data}
-                        setData={setData}
-                        errors={errors}
-                        kpiGroups={kpiGroups}
+                      <StrategicAlignmentEditor
+                        framework="ikk"
+                        controller={alignmentController}
                         year={parseInt(data.year)}
+                        errors={errors}
+                        disabled={isLocked}
                       />
                     )}
                   </div>
 
                   <div className={cn(activeSection !== 'rls' && 'hidden')}>
                     {hasPermission('update need tab rls') && (
-                      <RlsAlignmentSection
-                        data={data}
-                        setData={setData}
+                      <StrategicAlignmentEditor
+                        framework="rls"
+                        controller={alignmentController}
                         errors={errors}
-                        strategicServicePlans={strategicServicePlans}
+                        disabled={isLocked}
                       />
                     )}
                   </div>
@@ -285,12 +295,12 @@ export function NeedForm({
                     className={cn(activeSection !== 'perencanaan' && 'hidden')}
                   >
                     {hasPermission('update need tab planning') && (
-                      <PlanningAlignmentSection
-                        data={data}
-                        setData={setData}
-                        errors={errors}
-                        planningActivities={planningActivities}
+                      <StrategicAlignmentEditor
+                        framework="planning"
+                        controller={alignmentController}
                         year={parseInt(data.year)}
+                        errors={errors}
+                        disabled={isLocked}
                       />
                     )}
                   </div>

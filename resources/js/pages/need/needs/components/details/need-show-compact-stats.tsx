@@ -104,7 +104,6 @@ export function NeedShowCompactStats({ need }: NeedShowCompactStatsProps) {
                     : 'Alokasi Pagu Anggaran'}
                 </span>
               </div>
-              {isApproved && <Badge variant="secondary">Disetujui</Badge>}
             </div>
 
             <div className="my-3">

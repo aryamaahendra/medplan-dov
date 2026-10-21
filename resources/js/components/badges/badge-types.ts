@@ -6,7 +6,7 @@ export type BadgeSemanticTone =
   'success' | 'warning' | 'info' | 'destructive' | 'muted';
 
 export const domainBadgeVariants = cva(
-  'inline-flex shrink-0 items-center justify-center font-medium whitespace-nowrap transition-colors select-none [&>svg]:pointer-events-none',
+  'inline-flex shrink-0 items-center justify-center text-xs font-medium whitespace-nowrap transition-colors select-none [&>svg]:pointer-events-none',
   {
     variants: {
       tone: {

@@ -1,9 +1,14 @@
 import {
+  RiAlertFill,
   RiCheckboxCircleLine,
   RiCloseCircleLine,
   RiFeedbackLine,
+  RiFileEditFill,
   RiFileTextLine,
+  RiMessage3Fill,
+  RiSendInsFill,
   RiSendPlaneLine,
+  RiVerifiedBadgeFill,
 } from '@remixicon/react';
 import type { ElementType } from 'react';
 
@@ -20,31 +25,31 @@ export const NEED_STATUS_CONFIG: Record<NeedStatus, NeedStatusConfig> = {
   draft: {
     label: 'Draft',
     tone: 'muted',
-    icon: RiFileTextLine,
+    icon: RiFileEditFill,
     defaultTooltip: 'Draft usulan belum diajukan',
   },
   submitted: {
     label: 'Diajukan',
     tone: 'info',
-    icon: RiSendPlaneLine,
+    icon: RiSendInsFill,
     defaultTooltip: 'Menunggu Review Direktur',
   },
   approved: {
     label: 'Disetujui',
     tone: 'success',
-    icon: RiCheckboxCircleLine,
+    icon: RiVerifiedBadgeFill,
     defaultTooltip: 'Telah disetujui Direktur',
   },
   rejected: {
     label: 'Ditolak',
     tone: 'destructive',
-    icon: RiCloseCircleLine,
+    icon: RiAlertFill,
     defaultTooltip: 'Ditolak oleh Direktur',
   },
   revision: {
     label: 'Perlu Revisi',
     tone: 'warning',
-    icon: RiFeedbackLine,
+    icon: RiMessage3Fill,
     defaultTooltip: 'Perlu revisi berdasarkan catatan telaah Direktur',
   },
 };

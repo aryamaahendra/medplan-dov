@@ -5,11 +5,11 @@ import { toast } from 'sonner';
 
 import NeedController from '@/actions/App/Http/Controllers/Need/NeedController';
 import {
+  FieldWrapper,
   FormCol,
   FormGrid,
   InputField,
-  RadioField,
-  SingleCheckboxField,
+  SwitchField,
   TextareaField,
 } from '@/components/form';
 import { Button } from '@/components/ui/button';
@@ -21,10 +21,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { formatIDR } from '@/lib/formatters';
+import { cn } from '@/lib/utils';
 import type { Need } from '@/types';
 import { resolveNeedFinancialFigures } from './details/need-financial-utils';
-
 type ReviewDecision = 'approved' | 'rejected' | 'revision';
 
 interface NeedDirectorReviewDialogProps {
@@ -183,244 +184,341 @@ export function NeedDirectorReviewDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-semibold tracking-tight">
+      <DialogContent className="p-4 sm:max-w-2xl">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <DialogHeader className="gap-0.5 pr-6">
+            <DialogTitle className="text-base font-semibold tracking-tight">
               Review & Ketetapan Direktur
             </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">
-              Tentukan keputusan eksekutif untuk usulan kebutuhan:{' '}
-              <strong className="text-foreground">{need.title}</strong>
+            <DialogDescription className="truncate text-xs text-muted-foreground">
+              Tentukan keputusan eksekutif untuk usulan:{' '}
+              <strong className="font-medium text-foreground">
+                {need.title}
+              </strong>
             </DialogDescription>
           </DialogHeader>
 
-          {/* Ringkasan Usulan Awal */}
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border/70 bg-muted/30 p-3 text-xs">
-            <div>
-              <span className="text-muted-foreground">Kuantitas Usulan:</span>{' '}
-              <strong className="font-semibold text-foreground">
-                {requestedVolume.toLocaleString('id-ID', {
-                  maximumFractionDigits: 4,
-                })}{' '}
-                {need.unit}
-              </strong>
-            </div>
-            <div>
-              <span className="text-muted-foreground">
-                Harga Satuan Usulan:
-              </span>{' '}
-              <strong className="font-semibold text-foreground">
-                {formatIDR(requestedUnitPrice)}
-              </strong>
-            </div>
-            <div>
-              <span className="text-muted-foreground">
-                Estimasi Total Pagu:
-              </span>{' '}
-              <strong className="font-mono font-semibold text-foreground">
-                {formatIDR(requestedTotalPrice)}
-              </strong>
-            </div>
-          </div>
-
-          {/* Prior Revision Notice for resubmitted proposals */}
-          {Boolean(need.notes) && (
-            <div className="rounded-lg border border-warning/40 bg-warning/10 p-3 text-xs text-warning-foreground">
-              <div className="flex items-start gap-2">
-                <RiAlertLine className="size-4 shrink-0 text-warning" />
-                <div className="space-y-1">
-                  <span className="font-semibold text-foreground">
-                    Usulan Telah Diperbaiki (Diajukan Kembali)
-                  </span>
-                  <p className="whitespace-pre-wrap text-foreground/90">
-                    Arahan revisi sebelumnya: {need.notes}
-                  </p>
+          <div className="-mx-1.5 no-scrollbar max-h-[calc(85vh-120px)] space-y-3 overflow-y-auto px-1.5 py-1">
+            {/* Ringkasan Usulan Awal */}
+            <div className="grid grid-cols-1 divide-y divide-border/60 rounded-md border border-border/70 bg-muted/20 px-3 py-2 text-xs sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+              <div className="sm:pr-2">
+                <span className="text-[11px] text-muted-foreground">
+                  Kuantitas Usulan:
+                </span>{' '}
+                <div className="font-semibold text-foreground">
+                  {requestedVolume.toLocaleString('id-ID', {
+                    maximumFractionDigits: 4,
+                  })}{' '}
+                  {need.unit}
+                </div>
+              </div>
+              <div className="pt-1.5 sm:px-2 sm:pt-0">
+                <span className="text-[11px] text-muted-foreground">
+                  Harga Satuan Usulan:
+                </span>{' '}
+                <div className="font-semibold text-foreground">
+                  {formatIDR(requestedUnitPrice)}
+                </div>
+              </div>
+              <div className="pt-1.5 sm:pt-0 sm:pl-2">
+                <span className="text-[11px] text-muted-foreground">
+                  Estimasi Total Pagu:
+                </span>{' '}
+                <div className="font-mono font-semibold text-foreground">
+                  {formatIDR(requestedTotalPrice)}
                 </div>
               </div>
             </div>
-          )}
 
-          {/* Three-way Decision Cards via standardized RadioField */}
-          <RadioField
-            label="Keputusan Direktur"
-            required
-            variant="choice-card"
-            cols={3}
-            density="default"
-            value={data.decision}
-            onValueChange={(val) => setData('decision', val as ReviewDecision)}
-            error={errors.decision}
-            options={[
-              {
-                label: 'Disetujui',
-                value: 'approved',
-                description: 'Setujui kuantitas dan harga pagu',
-              },
-              {
-                label: 'Ditolak',
-                value: 'rejected',
-                description: 'Tolak usulan periode ini',
-              },
-              {
-                label: 'Perlu Revisi',
-                value: 'revision',
-                description: 'Kembalikan untuk diperbaiki',
-              },
-            ]}
-          />
-
-          {/* Conditional Controls: Approved */}
-          {isApproved && (
-            <div className="space-y-4 rounded-xl border border-border/80 bg-muted/10 p-4">
-              <FormGrid cols={2} density="comfortable">
-                <FormCol>
-                  <InputField
-                    id="approved_volume"
-                    label={`Volume Disetujui (${need.unit})`}
-                    required
-                    type="number"
-                    step="any"
-                    min="0.0001"
-                    max={requestedVolume}
-                    value={data.approved_volume}
-                    onChange={(e) => setData('approved_volume', e.target.value)}
-                    description={`Maksimal: ${requestedVolume.toLocaleString('id-ID')} ${need.unit} (sesuai usulan awal)`}
-                    error={errors.approved_volume}
-                  />
-                </FormCol>
-                <FormCol>
-                  <InputField
-                    id="approved_unit_price"
-                    label="Harga Satuan Disetujui (Rp)"
-                    required
-                    type="number"
-                    step="any"
-                    min="0"
-                    value={data.approved_unit_price}
-                    onChange={(e) =>
-                      setData('approved_unit_price', e.target.value)
-                    }
-                    description={`Usulan awal: ${formatIDR(requestedUnitPrice)}`}
-                    error={errors.approved_unit_price}
-                  />
-                </FormCol>
-              </FormGrid>
-
-              {/* Dynamic Total Preview */}
-              <div className="rounded-lg border border-border/70 bg-card p-3.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xss font-semibold tracking-wider text-muted-foreground uppercase">
-                    Ketetapan Pagu Total Disetujui
-                  </span>
-                  {calculatedTotal < requestedTotalPrice && (
-                    <span className="inline-flex items-center gap-1 rounded bg-warning/10 px-1.5 py-0.5 text-xss font-medium text-warning-foreground">
-                      <RiArrowRightDownLine className="size-3" />
-                      Efisiensi: -
-                      {formatIDR(requestedTotalPrice - calculatedTotal)}
+            {/* Prior Revision Notice for resubmitted proposals */}
+            {Boolean(need.notes) && (
+              <div className="rounded-md border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning-foreground">
+                <div className="flex items-start gap-2">
+                  <RiAlertLine className="mt-0.5 size-3.5 shrink-0 text-warning" />
+                  <div className="space-y-0.5">
+                    <span className="font-semibold text-foreground">
+                      Usulan Telah Diperbaiki (Diajukan Kembali)
                     </span>
-                  )}
-                </div>
-                <div className="mt-1 font-mono text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                  {formatIDR(calculatedTotal)}
-                </div>
-                <div className="mt-1 text-xs text-muted-foreground">
-                  Perhitungan: {currentVolumeNum.toLocaleString('id-ID')}{' '}
-                  {need.unit} × {formatIDR(currentUnitPriceNum)}
+                    <p className="whitespace-pre-wrap text-foreground/90">
+                      Arahan revisi sebelumnya: {need.notes}
+                    </p>
+                  </div>
                 </div>
               </div>
+            )}
 
-              {/* Conditional Rollover Checkbox on Partial Approval */}
-              {hasResidualVolume && (
-                <div className="rounded-lg border border-info/30 bg-info/5 p-1">
-                  <SingleCheckboxField
+            {/* Three-way Decision Cards with Semantic Color Schemas */}
+            <FieldWrapper
+              id="decision"
+              label="Keputusan Direktur"
+              required
+              error={errors.decision}
+            >
+              {({ id, errorId }) => (
+                <RadioGroup
+                  value={data.decision}
+                  onValueChange={(val) =>
+                    setData('decision', val as ReviewDecision)
+                  }
+                  className="grid grid-cols-1 gap-2 sm:grid-cols-3"
+                  aria-describedby={errorId}
+                >
+                  {/* 1. Disetujui (Success schema) */}
+                  <label
+                    htmlFor={`${id}-approved`}
+                    onClick={() => setData('decision', 'approved')}
+                    className={cn(
+                      'relative flex cursor-pointer items-center justify-between gap-2.5 rounded-lg border p-2.5 text-xs transition-all',
+                      data.decision === 'approved'
+                        ? 'border-success/60 bg-success/10 ring-1 ring-success/30 dark:bg-success/15'
+                        : 'border-border/70 bg-card hover:border-border hover:bg-muted/30',
+                    )}
+                  >
+                    <div className="flex flex-col gap-0.5">
+                      <span
+                        className={cn(
+                          'text-xs font-medium',
+                          data.decision === 'approved'
+                            ? 'font-semibold text-success-foreground'
+                            : 'text-foreground',
+                        )}
+                      >
+                        Disetujui
+                      </span>
+                      <span className="text-[11px] text-muted-foreground">
+                        Setujui kuantitas & pagu
+                      </span>
+                    </div>
+                    <RadioGroupItem
+                      id={`${id}-approved`}
+                      value="approved"
+                      className="data-checked:border-success data-checked:bg-success data-checked:text-success-foreground"
+                    />
+                  </label>
+
+                  {/* 2. Ditolak (Danger / Error schema) */}
+                  <label
+                    htmlFor={`${id}-rejected`}
+                    onClick={() => setData('decision', 'rejected')}
+                    className={cn(
+                      'relative flex cursor-pointer items-center justify-between gap-2.5 rounded-lg border p-2.5 text-xs transition-all',
+                      data.decision === 'rejected'
+                        ? 'border-destructive/60 bg-destructive/10 ring-1 ring-destructive/30 dark:bg-destructive/15'
+                        : 'border-border/70 bg-card hover:border-border hover:bg-muted/30',
+                    )}
+                  >
+                    <div className="flex flex-col gap-0.5">
+                      <span
+                        className={cn(
+                          'text-xs font-medium',
+                          data.decision === 'rejected'
+                            ? 'font-semibold text-destructive'
+                            : 'text-foreground',
+                        )}
+                      >
+                        Ditolak
+                      </span>
+                      <span className="text-[11px] text-muted-foreground">
+                        Tolak usulan periode ini
+                      </span>
+                    </div>
+                    <RadioGroupItem
+                      id={`${id}-rejected`}
+                      value="rejected"
+                      className="data-checked:border-destructive data-checked:bg-destructive data-checked:text-destructive-foreground"
+                    />
+                  </label>
+
+                  {/* 3. Perlu Revisi (Warning schema) */}
+                  <label
+                    htmlFor={`${id}-revision`}
+                    onClick={() => setData('decision', 'revision')}
+                    className={cn(
+                      'relative flex cursor-pointer items-center justify-between gap-2.5 rounded-lg border p-2.5 text-xs transition-all',
+                      data.decision === 'revision'
+                        ? 'border-warning/60 bg-warning/10 ring-1 ring-warning/30 dark:bg-warning/15'
+                        : 'border-border/70 bg-card hover:border-border hover:bg-muted/30',
+                    )}
+                  >
+                    <div className="flex flex-col gap-0.5">
+                      <span
+                        className={cn(
+                          'text-xs font-medium',
+                          data.decision === 'revision'
+                            ? 'font-semibold text-warning-foreground dark:text-warning'
+                            : 'text-foreground',
+                        )}
+                      >
+                        Perlu Revisi
+                      </span>
+                      <span className="text-[11px] text-muted-foreground">
+                        Kembalikan untuk perbaikan
+                      </span>
+                    </div>
+                    <RadioGroupItem
+                      id={`${id}-revision`}
+                      value="revision"
+                      className="data-checked:border-warning data-checked:bg-warning data-checked:text-warning-foreground"
+                    />
+                  </label>
+                </RadioGroup>
+              )}
+            </FieldWrapper>
+
+            {/* Conditional Controls: Approved */}
+            {isApproved && (
+              <>
+                <FormGrid cols={2} density="dense">
+                  <FormCol>
+                    <InputField
+                      id="approved_volume"
+                      label={`Volume Disetujui (${need.unit})`}
+                      required
+                      type="number"
+                      step="any"
+                      min="0.0001"
+                      max={requestedVolume}
+                      value={data.approved_volume}
+                      onChange={(e) =>
+                        setData('approved_volume', e.target.value)
+                      }
+                      description={`Maks: ${requestedVolume.toLocaleString('id-ID')} ${need.unit} (sesuai usulan awal)`}
+                      error={errors.approved_volume}
+                    />
+                  </FormCol>
+                  <FormCol>
+                    <InputField
+                      id="approved_unit_price"
+                      label="Harga Satuan Disetujui (Rp)"
+                      required
+                      type="number"
+                      step="any"
+                      min="0"
+                      value={data.approved_unit_price}
+                      onChange={(e) =>
+                        setData('approved_unit_price', e.target.value)
+                      }
+                      description={`Usulan awal: ${formatIDR(requestedUnitPrice)}`}
+                      error={errors.approved_unit_price}
+                    />
+                  </FormCol>
+                </FormGrid>
+
+                {/* Dynamic Total Preview */}
+                <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border/70 bg-card px-3 py-2">
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+                        Ketetapan Pagu Total Disetujui
+                      </span>
+                      {calculatedTotal < requestedTotalPrice && (
+                        <span className="inline-flex items-center gap-0.5 rounded bg-warning/10 px-1.5 py-0.5 text-[10px] font-medium text-warning-foreground">
+                          <RiArrowRightDownLine className="size-3" />
+                          Efisiensi: -
+                          {formatIDR(requestedTotalPrice - calculatedTotal)}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground">
+                      Perhitungan: {currentVolumeNum.toLocaleString('id-ID')}{' '}
+                      {need.unit} × {formatIDR(currentUnitPriceNum)}
+                    </div>
+                  </div>
+                  <div className="font-mono text-xl font-bold tracking-tight text-foreground">
+                    {formatIDR(calculatedTotal)}
+                  </div>
+                </div>
+
+                {/* Conditional Rollover Switch on Partial Approval */}
+                {hasResidualVolume && (
+                  <SwitchField
                     id="is_recommended_for_next_cycle"
                     variant="choice-card"
                     label="Rekomendasikan sisa kuantitas untuk siklus berikutnya"
-                    description={`Sisa kuantitas sebanyak ${residualVolume.toLocaleString(
+                    description={`Sisa kuantitas ${residualVolume.toLocaleString(
                       'id-ID',
                       {
                         maximumFractionDigits: 4,
                       },
-                    )} ${need.unit} akan dicatat sebagai rekomendasi eksekutif prioritas (rollover) pada siklus perencanaan berikutnya.`}
+                    )} ${need.unit} dicatat sebagai rekomendasi prioritas (rollover) pada siklus berikutnya.`}
                     checked={data.is_recommended_for_next_cycle}
                     onCheckedChange={(checked) =>
                       setData('is_recommended_for_next_cycle', Boolean(checked))
                     }
                   />
+                )}
+
+                {/* Approval Notes */}
+                <TextareaField
+                  id="notes"
+                  label="Catatan Persetujuan (Opsional)"
+                  rows={2}
+                  value={data.notes}
+                  onChange={(e) => setData('notes', e.target.value)}
+                  placeholder="Tambahkan arahan pelaksanaan atau catatan persetujuan jika diperlukan..."
+                  error={errors.notes}
+                />
+              </>
+            )}
+
+            {/* Conditional Controls: Rejected */}
+            {isRejected && (
+              <>
+                <TextareaField
+                  id="notes"
+                  label="Alasan Penolakan (Opsional)"
+                  rows={2}
+                  value={data.notes}
+                  onChange={(e) => setData('notes', e.target.value)}
+                  placeholder="Jelaskan pertimbangan atau alasan penolakan usulan untuk transparansi kepada unit pengusul..."
+                  error={errors.notes}
+                />
+
+                {/* Rollover Recommendation Switch */}
+                <SwitchField
+                  id="is_recommended_for_next_cycle"
+                  variant="choice-card"
+                  label="Rekomendasikan usulan ini untuk siklus berikutnya"
+                  description={`Seluruh usulan penuh (${requestedVolume.toLocaleString(
+                    'id-ID',
+                    {
+                      maximumFractionDigits: 4,
+                    },
+                  )} ${need.unit}) dicatat sebagai rekomendasi prioritas (rollover) pada siklus berikutnya.`}
+                  checked={data.is_recommended_for_next_cycle}
+                  onCheckedChange={(checked) =>
+                    setData('is_recommended_for_next_cycle', Boolean(checked))
+                  }
+                />
+              </>
+            )}
+
+            {/* Conditional Controls: Revision */}
+            {isRevision && (
+              <>
+                <TextareaField
+                  id="notes"
+                  label="Catatan Revisi"
+                  required
+                  rows={3}
+                  value={data.notes}
+                  onChange={(e) => setData('notes', e.target.value)}
+                  placeholder="Tuliskan arahan perbaikan spesifik yang harus dipenuhi oleh unit pengusul (misal: spesifikasi teknis KAK, rincian kuantitas, bukti dukung)..."
+                  error={errors.notes}
+                  description="Usulan akan berstatus Perlu Revisi dan kunci pengeditan dibuka kembali bagi unit pengusul."
+                />
+                <div className="flex items-start gap-1.5 text-[11px] text-muted-foreground">
+                  <RiAlertLine className="mt-0.5 size-3.5 shrink-0 text-warning" />
+                  <span>
+                    Arahan revisi ini akan ditampilkan sebagai panduan perbaikan
+                    bagi unit kerja pengusul.
+                  </span>
                 </div>
-              )}
+              </>
+            )}
+          </div>
 
-              {/* Approval Notes */}
-              <TextareaField
-                id="notes"
-                label="Catatan Persetujuan (Opsional)"
-                rows={3}
-                value={data.notes}
-                onChange={(e) => setData('notes', e.target.value)}
-                placeholder="Tambahkan arahan pelaksanaan atau catatan persetujuan jika diperlukan..."
-                error={errors.notes}
-              />
-            </div>
-          )}
-
-          {/* Conditional Controls: Rejected */}
-          {isRejected && (
-            <div className="space-y-4 rounded-xl border border-destructive/20 bg-destructive/[0.03] p-4">
-              <TextareaField
-                id="notes"
-                label="Alasan Penolakan (Opsional)"
-                rows={3}
-                value={data.notes}
-                onChange={(e) => setData('notes', e.target.value)}
-                placeholder="Jelaskan pertimbangan atau alasan penolakan usulan untuk transparansi kepada unit pengusul..."
-                error={errors.notes}
-              />
-
-              {/* Rollover Recommendation Checkbox */}
-              <SingleCheckboxField
-                id="is_recommended_for_next_cycle"
-                variant="choice-card"
-                label="Rekomendasikan usulan ini untuk siklus berikutnya"
-                description={`Seluruh usulan dengan kuantitas penuh (${requestedVolume.toLocaleString(
-                  'id-ID',
-                  {
-                    maximumFractionDigits: 4,
-                  },
-                )} ${need.unit}) akan dicatat sebagai rekomendasi eksekutif prioritas (rollover) pada siklus perencanaan berikutnya.`}
-                checked={data.is_recommended_for_next_cycle}
-                onCheckedChange={(checked) =>
-                  setData('is_recommended_for_next_cycle', Boolean(checked))
-                }
-              />
-            </div>
-          )}
-
-          {/* Conditional Controls: Revision */}
-          {isRevision && (
-            <div className="space-y-4 rounded-xl border border-warning/20 bg-warning/[0.03] p-4">
-              <TextareaField
-                id="notes"
-                label="Catatan Revisi"
-                required
-                rows={4}
-                value={data.notes}
-                onChange={(e) => setData('notes', e.target.value)}
-                placeholder="Tuliskan arahan perbaikan spesifik yang harus dipenuhi oleh unit pengusul (misal: spesifikasi teknis KAK, rincian kuantitas, bukti dukung)..."
-                error={errors.notes}
-                description="Setelah review disimpan, usulan akan berstatus Perlu Revisi dan kunci pengeditan akan dibuka kembali bagi unit pengusul."
-              />
-              <div className="flex items-start gap-1.5 text-xss text-warning-foreground">
-                <RiAlertLine className="mt-0.5 size-3.5 shrink-0" />
-                <span>
-                  Arahan revisi ini akan ditampilkan sebagai panduan perbaikan
-                  bagi unit kerja pengusul.
-                </span>
-              </div>
-            </div>
-          )}
-
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="-mx-4 mt-2 -mb-4 gap-1 px-4">
             <Button
               type="button"
               variant="outline"

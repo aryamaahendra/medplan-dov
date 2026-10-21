@@ -32,6 +32,14 @@ import { cn } from '@/lib/utils';
 import type { NeedStatus } from '@/types/need';
 export type { AttentionFilterKey };
 
+function getFilterArray(value: string | string[] | undefined): string[] {
+  if (!value) {
+    return [];
+  }
+
+  return Array.isArray(value) ? value : [value];
+}
+
 interface NeedsTableToolbarProps {
   filters: DataTableFilters & {
     year?: string | string[];
@@ -244,14 +252,6 @@ export function NeedsTableToolbar({
   ];
 
   const scoreOptions = [{ label: '≥ 85%', value: '85' }];
-
-  const getFilterArray = (value: string | string[] | undefined) => {
-    if (!value) {
-      return [];
-    }
-
-    return Array.isArray(value) ? value : [value];
-  };
 
   const handleResetManualFilters = () => {
     mergeParams({

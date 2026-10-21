@@ -1,4 +1,4 @@
-import { RiLockLine, RiLockUnlockLine } from '@remixicon/react';
+import { RiLockFill, RiLockUnlockFill } from '@remixicon/react';
 import type * as React from 'react';
 
 import type { BaseDomainBadgeProps } from '@/components/badges/badge-types';
@@ -41,7 +41,7 @@ export function LockStatusBadge({
   }
 
   const tone = isOverrideActive ? 'info' : 'destructive';
-  const Icon = isOverrideActive ? RiLockUnlockLine : RiLockLine;
+  const Icon = isOverrideActive ? RiLockUnlockFill : RiLockFill;
   const label = isOverrideActive ? 'Perpanjangan Aktif' : 'Terkunci';
 
   const tooltipText = isOverrideActive

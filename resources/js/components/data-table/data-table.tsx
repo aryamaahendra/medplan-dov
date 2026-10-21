@@ -37,6 +37,7 @@ interface DataTableProps<TData extends RowData, TValue> {
   onReset: () => void;
   searchPlaceholder?: string;
   toolbarChildren?: React.ReactNode;
+  toolbarActions?: React.ReactNode;
   toolbarPosition?: 'beside-search' | 'between-search-and-table';
   view?: 'table' | 'grid' | 'list' | string;
   renderGrid?: (rows: TData[]) => React.ReactNode;
@@ -55,6 +56,7 @@ export function DataTable<TData extends RowData, TValue>({
   onReset,
   searchPlaceholder,
   toolbarChildren,
+  toolbarActions,
   toolbarPosition = 'beside-search',
   view = 'table',
   renderGrid,
@@ -94,6 +96,7 @@ export function DataTable<TData extends RowData, TValue>({
         onReset={onReset}
         searchPlaceholder={searchPlaceholder}
         toolbarPosition={toolbarPosition}
+        actions={toolbarActions}
       >
         {toolbarPosition === 'beside-search' && toolbarChildren}
       </DataTableToolbar>

@@ -4,7 +4,11 @@ import type { UseDataTableReturn } from '@/hooks/use-data-table';
 import { NeedGridView } from '@/pages/need/needs/components/need-grid-view';
 import { NeedListView } from '@/pages/need/needs/components/need-list-view';
 import { NeedsStageTabs } from '@/pages/need/needs/components/needs-stage-tabs';
-import { NeedsTableToolbar } from '@/pages/need/needs/components/needs-table-toolbar';
+import {
+  NeedsTableFilters,
+  NeedsTableToolbarActions,
+  useNeedsTableFilters,
+} from '@/pages/need/needs/components/needs-table-toolbar';
 import type {
   UseNeedsIndexActions,
   UseNeedsIndexState,
@@ -36,6 +40,14 @@ export function NeedsTableSection({
   actions,
   dataTable,
 }: NeedsTableSectionProps) {
+  const {
+    isAdvance,
+    setIsAdvance,
+    showFilters,
+    setShowFilters,
+    activeManualCount,
+  } = useNeedsTableFilters({ filters });
+
   if (state.viewMode === 'loading') {
     return (
       <div className="overflow-hidden rounded-md border">
@@ -99,18 +111,31 @@ export function NeedsTableSection({
             />
           )
         }
-        toolbarChildren={
-          <NeedsTableToolbar
-            filters={filters}
-            organizationalUnits={organizationalUnits}
-            needTypes={needTypes}
-            mergeParams={dataTable.mergeParams}
+        toolbarActions={
+          <NeedsTableToolbarActions
             viewMode={state.viewMode}
             setViewMode={actions.setViewMode}
-            attentionCounts={attentionCounts}
-            activeAttentionFilter={state.attentionFilter}
-            onAttentionFilterChange={actions.setAttentionFilter}
+            showFilters={showFilters}
+            onToggleShowFilters={() => setShowFilters((prev) => !prev)}
+            isAdvance={isAdvance}
+            onToggleAdvance={setIsAdvance}
+            activeManualCount={activeManualCount}
           />
+        }
+        toolbarChildren={
+          showFilters ? (
+            <NeedsTableFilters
+              filters={filters}
+              organizationalUnits={organizationalUnits}
+              needTypes={needTypes}
+              mergeParams={dataTable.mergeParams}
+              isAdvance={isAdvance}
+              attentionCounts={attentionCounts}
+              activeAttentionFilter={state.attentionFilter}
+              onAttentionFilterChange={actions.setAttentionFilter}
+              activeManualCount={activeManualCount}
+            />
+          ) : null
         }
         toolbarPosition="between-search-and-table"
       />

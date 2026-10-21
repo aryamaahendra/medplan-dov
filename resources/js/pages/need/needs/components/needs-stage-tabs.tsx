@@ -135,7 +135,7 @@ export function NeedsStageTabs({
             onClick={() => onTabChange(tab.key)}
             className={cn(
               'group relative flex flex-col justify-between rounded-xl border bg-card p-3.5 text-left transition-all',
-              'hover:border-foreground/25 hover:bg-muted/20 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
+              'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
               isActive
                 ? cn(
                     'shadow-xs ring-2',

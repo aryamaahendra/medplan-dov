@@ -25,6 +25,8 @@ import {
 } from '@/components/badges';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { NeedFinancialAdjustmentIndicator } from '@/features/need/components/need-financial-adjustment-indicator';
+import { resolveNeedFinancialFigures } from '@/features/need/utils/need-financial-utils';
 import { formatDateTime, formatIDR } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
@@ -47,6 +49,8 @@ export function NeedListCardDetailed({
   onLock,
   onUnlock,
 }: NeedListCardDetailedProps) {
+  const figures = resolveNeedFinancialFigures(need);
+
   const actions: Parameters<typeof ActionDropdown>[0]['actions'] = [
     {
       label: 'Lihat Detail',
@@ -273,14 +277,21 @@ export function NeedListCardDetailed({
                 Total Anggaran
               </span>
               <span className="font-mono tabular-nums">
-                {Number(need.volume).toLocaleString('id-ID')} {need.unit}
+                {figures.displayVolume.toLocaleString('id-ID')} {need.unit}
               </span>
             </div>
-            <div className="mt-1 font-mono text-xl font-bold tracking-tight text-foreground tabular-nums">
-              {formatIDR(need.total_price)}
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              <span className="font-mono text-xl font-bold tracking-tight text-foreground tabular-nums">
+                {formatIDR(figures.displayTotalPrice)}
+              </span>
+              <NeedFinancialAdjustmentIndicator
+                figures={figures}
+                unit={need.unit}
+                showLabel
+              />
             </div>
             <div className="mt-0.5 text-xss text-muted-foreground tabular-nums">
-              Harga satuan: {formatIDR(need.unit_price)} / {need.unit}
+              Harga satuan: {formatIDR(figures.displayUnitPrice)} / {need.unit}
             </div>
           </div>
 

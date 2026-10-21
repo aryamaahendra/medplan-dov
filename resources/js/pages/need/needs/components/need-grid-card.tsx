@@ -17,6 +17,8 @@ import {
 } from '@/components/badges';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { NeedFinancialAdjustmentIndicator } from '@/features/need/components/need-financial-adjustment-indicator';
+import { resolveNeedFinancialFigures } from '@/features/need/utils/need-financial-utils';
 import { formatIDR } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
@@ -34,6 +36,8 @@ export function NeedGridCard({
   onDelete,
   onReview,
 }: NeedGridCardProps) {
+  const figures = resolveNeedFinancialFigures(need);
+
   const actions: Parameters<typeof ActionDropdown>[0]['actions'] = [
     {
       label: 'Detail',
@@ -133,12 +137,19 @@ export function NeedGridCard({
           <div className="border-t px-3 py-2.5">
             <div className="flex items-baseline justify-between gap-1">
               <span className="text-xss text-muted-foreground tabular-nums">
-                {Number(need.volume).toLocaleString('id-ID')} {need.unit} ×{' '}
-                {formatIDR(need.unit_price)}
+                {figures.displayVolume.toLocaleString('id-ID')} {need.unit} ×{' '}
+                {formatIDR(figures.displayUnitPrice)}
               </span>
             </div>
-            <div className="mt-0.5 font-mono text-lg font-semibold tabular-nums">
-              {formatIDR(need.total_price)}
+            <div className="mt-0.5 flex items-center justify-between gap-1">
+              <span className="font-mono text-lg font-semibold text-foreground tabular-nums">
+                {formatIDR(figures.displayTotalPrice)}
+              </span>
+              <NeedFinancialAdjustmentIndicator
+                figures={figures}
+                unit={need.unit}
+                showLabel={false}
+              />
             </div>
           </div>
 

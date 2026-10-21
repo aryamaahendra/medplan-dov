@@ -34,6 +34,8 @@ import { formatIDR } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import needRoutes from '@/routes/needs';
 import type { Need } from '@/types';
+import { resolveNeedFinancialFigures } from '../utils/need-financial-utils';
+import { NeedFinancialAdjustmentIndicator } from './need-financial-adjustment-indicator';
 
 export const getNeedColumns = (
   onEdit: (need: Need) => void,
@@ -115,15 +117,23 @@ export const getNeedColumns = (
     meta: { cellClassName: 'tabular-nums font-mono w-[180px]' },
     cell: ({ row }) => {
       const need = row.original;
+      const figures = resolveNeedFinancialFigures(need);
 
       return (
         <div className="flex flex-col gap-0.5">
-          <span className="text-sm font-semibold text-foreground">
-            {formatIDR(need.total_price)}
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm font-semibold text-foreground">
+              {formatIDR(figures.displayTotalPrice)}
+            </span>
+            <NeedFinancialAdjustmentIndicator
+              figures={figures}
+              unit={need.unit}
+              showLabel={false}
+            />
+          </div>
           <span className="text-xss text-muted-foreground">
-            {Number(need.volume).toLocaleString('id-ID')} {need.unit} ×{' '}
-            {formatIDR(need.unit_price)}
+            {figures.displayVolume.toLocaleString('id-ID')} {need.unit} ×{' '}
+            {formatIDR(figures.displayUnitPrice)}
           </span>
         </div>
       );

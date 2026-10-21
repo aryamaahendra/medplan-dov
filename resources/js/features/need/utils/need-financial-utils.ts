@@ -7,10 +7,17 @@ export interface NeedFinancialFigures {
   approvedVolume: number | null;
   approvedUnitPrice: number | null;
   approvedTotalPrice: number | null;
+  displayVolume: number;
+  displayUnitPrice: number;
+  displayTotalPrice: number;
   isApproved: boolean;
   hasApprovedFigures: boolean;
   isVolumeReduced: boolean;
   isPriceReduced: boolean;
+  isVolumeChanged: boolean;
+  isUnitPriceChanged: boolean;
+  isTotalPriceChanged: boolean;
+  hasChanges: boolean;
   isAdjusted: boolean;
   volumeDifference: number;
   totalDifference: number;
@@ -55,11 +62,42 @@ export function resolveNeedFinancialFigures(need: Need): NeedFinancialFigures {
         ? requestedTotalPrice
         : null;
 
+  const isFinalized = isApproved || hasApprovedFigures;
+
+  const displayVolume = isFinalized
+    ? (approvedVolume ?? requestedVolume)
+    : requestedVolume;
+  const displayUnitPrice = isFinalized
+    ? (approvedUnitPrice ?? requestedUnitPrice)
+    : requestedUnitPrice;
+  const displayTotalPrice = isFinalized
+    ? (approvedTotalPrice ?? displayVolume * displayUnitPrice)
+    : requestedTotalPrice;
+
   const isVolumeReduced =
     approvedVolume !== null && approvedVolume < requestedVolume;
   const isPriceReduced =
     approvedTotalPrice !== null && approvedTotalPrice < requestedTotalPrice;
-  const isAdjusted = isVolumeReduced || isPriceReduced;
+
+  const isVolumeChanged =
+    isFinalized &&
+    approvedVolume !== null &&
+    Math.abs(approvedVolume - requestedVolume) > 0.0001;
+
+  const isUnitPriceChanged =
+    isFinalized &&
+    approvedUnitPrice !== null &&
+    Math.abs(approvedUnitPrice - requestedUnitPrice) > 0.01;
+
+  const isTotalPriceChanged =
+    isFinalized &&
+    approvedTotalPrice !== null &&
+    Math.abs(approvedTotalPrice - requestedTotalPrice) > 0.01;
+
+  const hasChanges =
+    isVolumeChanged || isUnitPriceChanged || isTotalPriceChanged;
+
+  const isAdjusted = isVolumeReduced || isPriceReduced || hasChanges;
 
   const volumeDifference =
     approvedVolume !== null ? Math.max(0, requestedVolume - approvedVolume) : 0;
@@ -75,10 +113,17 @@ export function resolveNeedFinancialFigures(need: Need): NeedFinancialFigures {
     approvedVolume,
     approvedUnitPrice,
     approvedTotalPrice,
+    displayVolume,
+    displayUnitPrice,
+    displayTotalPrice,
     isApproved,
     hasApprovedFigures,
     isVolumeReduced,
     isPriceReduced,
+    isVolumeChanged,
+    isUnitPriceChanged,
+    isTotalPriceChanged,
+    hasChanges,
     isAdjusted,
     volumeDifference,
     totalDifference,

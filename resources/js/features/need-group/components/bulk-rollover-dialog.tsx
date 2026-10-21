@@ -1,16 +1,6 @@
-import { router } from '@inertiajs/react';
-import {
-  RiHistoryLine,
-  RiSearchLine,
-  RiLoader4Line,
-  RiErrorWarningLine,
-} from '@remixicon/react';
-import { useCallback, useEffect, useState } from 'react';
-import { toast } from 'sonner';
-import { NextCycleRecommendationChip } from '@/components/badges';
-import { Badge } from '@/components/ui/badge';
+import { RiHistoryLine, RiLoader4Line, RiSearchLine } from '@remixicon/react';
+
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -21,37 +11,14 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+  RolloverCandidateTable,
+  useRolloverCandidates,
+} from '@/features/need/rollover';
 import { formatIDR } from '@/lib/formatters';
-import { cn } from '@/lib/utils';
-import needGroups from '@/routes/need-groups';
-import { unapprovedCandidates } from '@/routes/needs';
 
 import type { NeedGroup } from '../types/need-group.types';
 
-interface CandidateNeed {
-  id: number;
-  title: string;
-  description: string | null;
-  year: number;
-  volume?: number | string | null;
-  unit?: string | null;
-  unit_price?: number | string | null;
-  total_price: string | number;
-  is_recommended_for_next_cycle?: boolean | number | null;
-  recommended_volume?: number | string | null;
-  need_group?: { id: number; name: string; year: number } | null;
-  organizational_unit?: { id: number; name: string } | null;
-  need_type?: { id: number; name: string } | null;
-}
-
-interface BulkRolloverDialogProps {
+export interface BulkRolloverDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   needGroup?: NeedGroup | null;
@@ -68,115 +35,38 @@ export function BulkRolloverDialog({
   initialSelectedIds = [],
   onSelectIds,
 }: BulkRolloverDialogProps) {
-  const [candidates, setCandidates] = useState<CandidateNeed[]>([]);
-  const [selectedIds, setSelectedIds] = useState<number[]>(initialSelectedIds);
-  const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [search, setSearch] = useState('');
-
-  const fetchCandidates = useCallback(async () => {
-    if (!open) {
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const url = unapprovedCandidates.url({
-        query: {
-          target_need_group_id: needGroup?.id,
-          search: search.trim() ? search.trim() : undefined,
-        },
-      });
-      const response = await fetch(url, {
-        headers: {
-          Accept: 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Gagal memuat usulan');
-      }
-
-      const json = await response.json();
-      setCandidates(json.data || []);
-      setSelectedIds([]);
-    } catch {
-      toast.error('Gagal mengambil daftar usulan yang belum disetujui');
-    } finally {
-      setLoading(false);
-    }
-  }, [needGroup, open, search]);
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      void fetchCandidates();
-    }, 0);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [open, fetchCandidates]);
-
-  const toggleSelectAll = () => {
-    if (selectedIds.length === candidates.length) {
-      setSelectedIds([]);
-    } else {
-      setSelectedIds(candidates.map((c) => c.id));
-    }
-  };
-
-  const toggleSelectOne = (id: number) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
-    );
-  };
-
-  const selectedTotalBudget = candidates
-    .filter((c) => selectedIds.includes(c.id))
-    .reduce((sum, c) => sum + (parseFloat(String(c.total_price)) || 0), 0);
-
-  const handleSubmit = () => {
-    if (onSelectIds) {
-      onSelectIds(selectedIds);
-      onOpenChange(false);
-
-      return;
-    }
-
-    if (!needGroup || selectedIds.length === 0) {
-      return;
-    }
-
-    setSubmitting(true);
-
-    router.post(
-      needGroups.rollover.url({ need_group: needGroup.id }),
-      { need_ids: selectedIds },
-      {
-        onSuccess: () => {
-          toast.success(
-            `${selectedIds.length} usulan berhasil ditarik ke kelompok ${needGroup.name}.`,
-          );
-          onOpenChange(false);
-        },
-        onError: () => {
-          toast.error('Gagal menarik usulan ke kelompok ini.');
-        },
-        onFinish: () => {
-          setSubmitting(false);
-        },
-      },
-    );
-  };
-
   const groupDisplayName = needGroup?.name ?? 'Kelompok Usulan Baru';
   const groupYear = needGroup?.year ?? targetYear ?? new Date().getFullYear();
+
+  const controller = useRolloverCandidates({
+    targetGroupId: needGroup?.id,
+    targetNeedGroupName: groupDisplayName,
+    open,
+    mode: 'multiple',
+    initialSelectedIds,
+    onSelectIds,
+    onOpenChange,
+  });
+
+  const {
+    selectedIds,
+    selectedBudget,
+    loading,
+    submitting,
+    search,
+    setSearch,
+    fetchCandidates,
+    commitBatch,
+  } = controller;
+
+  const handleSubmit = () => {
+    if (needGroup) {
+      void commitBatch(needGroup.id, needGroup.name);
+    } else if (onSelectIds) {
+      onSelectIds(selectedIds);
+      onOpenChange(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -204,14 +94,14 @@ export function BulkRolloverDialog({
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
-                  fetchCandidates();
+                  void fetchCandidates();
                 }
               }}
             />
           </div>
           <Button
             variant="outline"
-            onClick={fetchCandidates}
+            onClick={() => void fetchCandidates()}
             disabled={loading}
           >
             Cari
@@ -219,103 +109,10 @@ export function BulkRolloverDialog({
         </div>
 
         <div className="flex-1 overflow-y-auto rounded-md border">
-          {loading ? (
-            <div className="flex h-48 flex-col items-center justify-center gap-2 text-muted-foreground">
-              <RiLoader4Line className="h-6 w-6 animate-spin text-foreground" />
-              <p className="text-sm">Memuat usulan sebelumnya...</p>
-            </div>
-          ) : candidates.length === 0 ? (
-            <div className="flex h-48 flex-col items-center justify-center gap-2 text-center text-muted-foreground">
-              <RiErrorWarningLine className="h-8 w-8" />
-              <p className="font-medium">
-                Tidak ada usulan belum disetujui yang tersedia
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Semua usulan sebelumnya telah disetujui atau sudah ditarik ke
-                kelompok ini.
-              </p>
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[40px]">
-                    <Checkbox
-                      checked={
-                        candidates.length > 0 &&
-                        selectedIds.length === candidates.length
-                      }
-                      onCheckedChange={toggleSelectAll}
-                      aria-label="Pilih semua"
-                    />
-                  </TableHead>
-                  <TableHead className="w-[80px]">Tahun</TableHead>
-                  <TableHead>Usulan Kebutuhan</TableHead>
-                  <TableHead>Unit Kerja</TableHead>
-                  <TableHead>Kategori</TableHead>
-                  <TableHead className="text-right">Total Anggaran</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {candidates.map((need) => {
-                  const isSelected = selectedIds.includes(need.id);
-                  const isRecommended = Boolean(
-                    need.is_recommended_for_next_cycle,
-                  );
-
-                  return (
-                    <TableRow
-                      key={need.id}
-                      className={cn(
-                        'cursor-pointer hover:bg-muted/50',
-                        isRecommended && 'bg-info/5 hover:bg-info/10',
-                      )}
-                      onClick={() => toggleSelectOne(need.id)}
-                    >
-                      <TableCell onClick={(e) => e.stopPropagation()}>
-                        <Checkbox
-                          checked={isSelected}
-                          onCheckedChange={() => toggleSelectOne(need.id)}
-                          aria-label={`Pilih ${need.title}`}
-                        />
-                      </TableCell>
-                      <TableCell className="font-mono text-xs">
-                        <Badge variant="outline">{need.year}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap items-center gap-1.5 font-medium text-foreground">
-                          <span>{need.title}</span>
-                          {isRecommended && (
-                            <NextCycleRecommendationChip
-                              isRecommended={true}
-                              recommendedVolume={need.recommended_volume}
-                              volume={need.volume}
-                              unit={need.unit}
-                              size="sm"
-                            />
-                          )}
-                        </div>
-                        {need.need_group && (
-                          <span className="text-xs text-muted-foreground">
-                            Kelompok: {need.need_group.name}
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-xs text-muted-foreground">
-                        {need.organizational_unit?.name ?? '-'}
-                      </TableCell>
-                      <TableCell className="text-xs">
-                        {need.need_type?.name ?? '-'}
-                      </TableCell>
-                      <TableCell className="text-right font-mono text-xs font-semibold">
-                        {formatIDR(need.total_price)}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          )}
+          <RolloverCandidateTable
+            controller={controller}
+            emptyMessage="Semua usulan sebelumnya telah disetujui atau sudah ditarik ke kelompok ini."
+          />
         </div>
 
         <DialogFooter className="flex flex-col items-center justify-between gap-2 border-t pt-3 sm:flex-row">
@@ -324,7 +121,7 @@ export function BulkRolloverDialog({
             {selectedIds.length > 0 && (
               <>
                 {' '}
-                • Total: <strong>{formatIDR(selectedTotalBudget)}</strong>
+                • Total: <strong>{formatIDR(selectedBudget)}</strong>
               </>
             )}
           </div>

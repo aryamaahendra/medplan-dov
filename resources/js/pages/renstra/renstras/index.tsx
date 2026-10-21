@@ -4,24 +4,17 @@ import { RiAddLine } from '@remixicon/react';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
+import { getColumns } from '@/features/renstra/components/renstra-columns';
 import { RenstraDialog } from '@/features/renstra/components/renstra-dialog';
-import { useRenstrasIndex } from '@/features/renstra/hooks/use-renstras-index';
 import type { DataTableFilters } from '@/hooks/use-data-table';
+import { usePermission } from '@/hooks/use-permission';
+import { useResourceIndexController } from '@/hooks/use-resource-index-controller';
+import type { PaginatedData } from '@/hooks/use-resource-index-controller';
 import renstraRoutes from '@/routes/renstras';
 import type { Renstra } from '@/types';
 
-interface PaginatedRenstras {
-  data: Renstra[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-  from: number | null;
-  to: number | null;
-}
-
 interface RenstrasIndexProps {
-  renstras: PaginatedRenstras;
+  renstras: PaginatedData<Renstra>;
   filters: DataTableFilters;
 }
 
@@ -29,19 +22,18 @@ export default function RenstrasIndex({
   renstras,
   filters,
 }: RenstrasIndexProps) {
-  const {
-    hasPermission,
-    dialogOpen,
-    setDialogOpen,
-    editingRenstra,
-    deletingRenstra,
-    setDeletingRenstra,
-    isDeleting,
-    onCreate,
-    handleConfirmDelete,
-    columns,
-    dataTable,
-  } = useRenstrasIndex();
+  const { hasPermission } = usePermission();
+
+  const controller = useResourceIndexController<Renstra>({
+    data: renstras,
+    filters,
+    only: ['renstras', 'filters'],
+    resourceName: 'Renstra',
+    deleteUrl: (renstra) => renstraRoutes.destroy.url({ renstra: renstra.id }),
+    getColumns: ({ onEdit, onDelete }) =>
+      getColumns(onEdit, onDelete, hasPermission),
+    searchPlaceholder: 'Cari renstra...',
+  });
 
   return (
     <>
@@ -59,39 +51,32 @@ export default function RenstrasIndex({
             </p>
           </div>
           {hasPermission('create renstras') && (
-            <Button onClick={onCreate}>
+            <Button onClick={controller.dialog.openCreate}>
               <RiAddLine data-icon="inline-start" />
               Tambah Renstra
             </Button>
           )}
         </div>
 
-        <DataTable
-          columns={columns}
-          data={renstras.data}
-          meta={renstras}
-          filters={filters}
-          {...dataTable}
-          searchPlaceholder="Cari renstra..."
-        />
+        <DataTable {...controller.tableProps} />
       </div>
 
       <RenstraDialog
-        key={editingRenstra?.id ?? 'new'}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        renstra={editingRenstra}
+        key={controller.dialog.editingItem?.id ?? 'new'}
+        open={controller.dialog.isOpen}
+        onOpenChange={controller.dialog.setIsOpen}
+        renstra={controller.dialog.editingItem}
       />
 
       <ConfirmDialog
-        open={!!deletingRenstra}
-        onOpenChange={(open) => !open && setDeletingRenstra(null)}
-        onConfirm={handleConfirmDelete}
+        open={controller.deleteDialog.isOpen}
+        onOpenChange={controller.deleteDialog.setIsOpen}
+        onConfirm={controller.deleteDialog.confirmDelete}
         title="Hapus Renstra"
-        description={`Apakah Anda yakin ingin menghapus "${deletingRenstra?.name}"? Tindakan ini tidak dapat dibatalkan.`}
+        description={`Apakah Anda yakin ingin menghapus "${controller.deleteDialog.deletingItem?.name}"? Tindakan ini tidak dapat dibatalkan.`}
         confirmText="Hapus"
         variant="destructive"
-        loading={isDeleting}
+        loading={controller.deleteDialog.isDeleting}
       />
     </>
   );

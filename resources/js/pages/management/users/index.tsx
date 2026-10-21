@@ -4,23 +4,40 @@ import { RiAddLine } from '@remixicon/react';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
-
+import { getColumns } from '@/features/user/components/user-columns';
+import type { User } from '@/features/user/components/user-columns';
 import { UserDialog } from '@/features/user/components/user-dialog';
-import { useUsersIndex } from '@/features/user/hooks/use-users-index';
-import type { UsersIndexProps } from '@/features/user/hooks/use-users-index';
+import type { DataTableFilters } from '@/hooks/use-data-table';
+import { usePermission } from '@/hooks/use-permission';
+import { useResourceIndexController } from '@/hooks/use-resource-index-controller';
+import type { PaginatedData } from '@/hooks/use-resource-index-controller';
 import userRoutes from '@/routes/users';
 
-export default function UsersIndex(props: UsersIndexProps) {
-  const {
-    state,
-    handlers,
-    table,
-    hasPermission,
-    users,
-    roles,
-    organizationalUnits,
+export interface UsersIndexProps {
+  users: PaginatedData<User>;
+  roles: { id: number; name: string }[];
+  organizationalUnits: { id: number; name: string; parent_id: number | null }[];
+  filters: DataTableFilters;
+}
+
+export default function UsersIndex({
+  users,
+  roles,
+  organizationalUnits,
+  filters,
+}: UsersIndexProps) {
+  const { hasPermission } = usePermission();
+
+  const controller = useResourceIndexController<User>({
+    data: users,
     filters,
-  } = useUsersIndex(props);
+    only: ['users', 'filters'],
+    resourceName: 'User',
+    deleteUrl: (user) => userRoutes.destroy.url({ user: user.id }),
+    getColumns: ({ onEdit, onDelete }) =>
+      getColumns(onEdit, onDelete, hasPermission),
+    searchPlaceholder: 'Search by name or email...',
+  });
 
   return (
     <>
@@ -35,44 +52,33 @@ export default function UsersIndex(props: UsersIndexProps) {
             </p>
           </div>
           {hasPermission('create users') && (
-            <Button onClick={handlers.onCreate}>
+            <Button onClick={controller.dialog.openCreate}>
               <RiAddLine data-icon="inline-start" />
               Tambah User
             </Button>
           )}
         </div>
 
-        <DataTable
-          columns={table.columns}
-          data={users.data}
-          meta={users}
-          filters={filters}
-          onSearch={table.onSearch}
-          onSort={table.onSort}
-          onPageChange={table.onPageChange}
-          onPerPageChange={table.onPerPageChange}
-          onReset={table.onReset}
-          searchPlaceholder="Search by name or email..."
-        />
+        <DataTable {...controller.tableProps} />
       </div>
 
       <UserDialog
-        open={state.dialogOpen}
-        onOpenChange={handlers.setDialogOpen}
-        user={state.editingUser}
+        open={controller.dialog.isOpen}
+        onOpenChange={controller.dialog.setIsOpen}
+        user={controller.dialog.editingItem}
         roles={roles}
         organizationalUnits={organizationalUnits}
       />
 
       <ConfirmDialog
-        open={!!state.deletingUser}
-        onOpenChange={(open) => !open && handlers.setDeletingUser(null)}
-        onConfirm={handlers.handleConfirmDelete}
+        open={controller.deleteDialog.isOpen}
+        onOpenChange={controller.deleteDialog.setIsOpen}
+        onConfirm={controller.deleteDialog.confirmDelete}
         title="Delete User"
-        description={`Are you sure you want to delete ${state.deletingUser?.name}? This action cannot be undone.`}
+        description={`Are you sure you want to delete ${controller.deleteDialog.deletingItem?.name}? This action cannot be undone.`}
         confirmText="Delete User"
         variant="destructive"
-        loading={state.isDeleting}
+        loading={controller.deleteDialog.isDeleting}
       />
     </>
   );

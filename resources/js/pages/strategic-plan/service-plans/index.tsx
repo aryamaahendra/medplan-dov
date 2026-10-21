@@ -4,24 +4,17 @@ import { RiAddLine } from '@remixicon/react';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
+import { getColumns } from '@/features/strategic-service-plan/components/strategic-service-plan-columns';
 import { StrategicServicePlanDialog } from '@/features/strategic-service-plan/components/strategic-service-plan-dialog';
-import { useStrategicServicePlansIndex } from '@/features/strategic-service-plan/hooks/use-strategic-service-plans-index';
 import type { DataTableFilters } from '@/hooks/use-data-table';
+import { usePermission } from '@/hooks/use-permission';
+import { useResourceIndexController } from '@/hooks/use-resource-index-controller';
+import type { PaginatedData } from '@/hooks/use-resource-index-controller';
 import strategicServicePlansRoutes from '@/routes/strategic-service-plans';
 import type { StrategicServicePlan } from '@/types';
 
-interface PaginatedStrategicServicePlans {
-  data: StrategicServicePlan[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-  from: number | null;
-  to: number | null;
-}
-
 interface StrategicServicePlansIndexProps {
-  plans: PaginatedStrategicServicePlans;
+  plans: PaginatedData<StrategicServicePlan>;
   filters: DataTableFilters;
 }
 
@@ -29,19 +22,21 @@ export default function StrategicServicePlansIndex({
   plans,
   filters,
 }: StrategicServicePlansIndexProps) {
-  const {
-    hasPermission,
-    dialogOpen,
-    setDialogOpen,
-    editingPlan,
-    deletingPlan,
-    setDeletingPlan,
-    isDeleting,
-    onCreate,
-    handleConfirmDelete,
-    columns,
-    dataTable,
-  } = useStrategicServicePlansIndex();
+  const { hasPermission } = usePermission();
+
+  const controller = useResourceIndexController<StrategicServicePlan>({
+    data: plans,
+    filters,
+    only: ['plans', 'filters'],
+    resourceName: 'Rencana pengembangan layanan',
+    deleteUrl: (plan) =>
+      strategicServicePlansRoutes.destroy.url({
+        strategic_service_plan: plan.id,
+      }),
+    getColumns: ({ onEdit, onDelete }) =>
+      getColumns(onEdit, onDelete, hasPermission),
+    searchPlaceholder: 'Cari program, rencana, sasaran...',
+  });
 
   return (
     <>
@@ -58,38 +53,31 @@ export default function StrategicServicePlansIndex({
             </p>
           </div>
           {hasPermission('create ssps') && (
-            <Button onClick={onCreate}>
+            <Button onClick={controller.dialog.openCreate}>
               <RiAddLine data-icon="inline-start" />
               Tambah Rencana
             </Button>
           )}
         </div>
 
-        <DataTable
-          columns={columns}
-          data={plans.data}
-          meta={plans}
-          filters={filters}
-          {...dataTable}
-          searchPlaceholder="Cari program, rencana, sasaran..."
-        />
+        <DataTable {...controller.tableProps} />
       </div>
 
       <StrategicServicePlanDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        plan={editingPlan}
+        open={controller.dialog.isOpen}
+        onOpenChange={controller.dialog.setIsOpen}
+        plan={controller.dialog.editingItem}
       />
 
       <ConfirmDialog
-        open={!!deletingPlan}
-        onOpenChange={(open) => !open && setDeletingPlan(null)}
-        onConfirm={handleConfirmDelete}
+        open={controller.deleteDialog.isOpen}
+        onOpenChange={controller.deleteDialog.setIsOpen}
+        onConfirm={controller.deleteDialog.confirmDelete}
         title="Hapus Rencana Pengembangan Layanan"
         description="Apakah Anda yakin ingin menghapus rencana pengembangan layanan ini? Tindakan ini dapat dibatalkan melalui fitur restorasi jika diperlukan."
         confirmText="Hapus"
         variant="destructive"
-        loading={isDeleting}
+        loading={controller.deleteDialog.isDeleting}
       />
     </>
   );

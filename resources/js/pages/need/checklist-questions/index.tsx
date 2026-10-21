@@ -4,10 +4,15 @@ import { RiAddLine } from '@remixicon/react';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
+import { getChecklistQuestionColumns } from '@/features/checklist-question/components/checklist-question-columns';
 import { ChecklistQuestionDialog } from '@/features/checklist-question/components/checklist-question-dialog';
-import { useChecklistQuestionsIndex } from '@/features/checklist-question/hooks/use-checklist-questions-index';
-import type { PaginatedChecklistQuestions } from '@/features/checklist-question/types/checklist-question.types';
+import type {
+  ChecklistQuestion,
+  PaginatedChecklistQuestions,
+} from '@/features/checklist-question/types/checklist-question.types';
 import type { DataTableFilters } from '@/hooks/use-data-table';
+import { usePermission } from '@/hooks/use-permission';
+import { useResourceIndexController } from '@/hooks/use-resource-index-controller';
 import checklistQuestionRoutes from '@/routes/checklist-questions';
 
 interface ChecklistQuestionsIndexProps {
@@ -19,8 +24,19 @@ export default function ChecklistQuestionsIndex({
   questions,
   filters,
 }: ChecklistQuestionsIndexProps) {
-  const { state, actions, hasPermission, dataTable } =
-    useChecklistQuestionsIndex();
+  const { hasPermission } = usePermission();
+
+  const controller = useResourceIndexController<ChecklistQuestion>({
+    data: questions,
+    filters,
+    only: ['questions', 'filters'],
+    resourceName: 'Pertanyaan checklist',
+    deleteUrl: (question) =>
+      checklistQuestionRoutes.destroy.url({ checklist_question: question.id }),
+    getColumns: ({ onEdit, onDelete }) =>
+      getChecklistQuestionColumns(onEdit, onDelete, hasPermission),
+    searchPlaceholder: 'Cari berdasarkan pertanyaan atau deskripsi...',
+  });
 
   return (
     <>
@@ -38,43 +54,32 @@ export default function ChecklistQuestionsIndex({
             </p>
           </div>
           {hasPermission('create checklist-questions') && (
-            <Button onClick={actions.onCreate}>
+            <Button onClick={controller.dialog.openCreate}>
               <RiAddLine data-icon="inline-start" />
               Tambah Pertanyaan
             </Button>
           )}
         </div>
 
-        <DataTable
-          columns={state.columns}
-          data={questions.data}
-          meta={questions}
-          filters={filters}
-          onSearch={dataTable.onSearch}
-          onSort={dataTable.onSort}
-          onPageChange={dataTable.onPageChange}
-          onPerPageChange={dataTable.onPerPageChange}
-          onReset={dataTable.onReset}
-          searchPlaceholder="Cari berdasarkan pertanyaan atau deskripsi..."
-        />
+        <DataTable {...controller.tableProps} />
       </div>
 
       <ChecklistQuestionDialog
-        key={state.editingQuestion?.id ?? 'new'}
-        open={state.isDialogOpen}
-        onOpenChange={actions.setIsDialogOpen}
-        question={state.editingQuestion}
+        key={controller.dialog.editingItem?.id ?? 'new'}
+        open={controller.dialog.isOpen}
+        onOpenChange={controller.dialog.setIsOpen}
+        question={controller.dialog.editingItem}
       />
 
       <ConfirmDialog
-        open={!!state.deletingQuestion}
-        onOpenChange={(open) => !open && actions.setDeletingQuestion(null)}
-        onConfirm={actions.handleConfirmDelete}
+        open={controller.deleteDialog.isOpen}
+        onOpenChange={controller.deleteDialog.setIsOpen}
+        onConfirm={controller.deleteDialog.confirmDelete}
         title="Hapus Pertanyaan Checklist"
-        description={`Apakah Anda yakin ingin menghapus "${state.deletingQuestion?.question}"? Data yang dihapus akan dipindahkan ke tempat sampah (Soft Delete).`}
+        description={`Apakah Anda yakin ingin menghapus "${controller.deleteDialog.deletingItem?.question}"? Data yang dihapus akan dipindahkan ke tempat sampah (Soft Delete).`}
         confirmText="Hapus"
         variant="destructive"
-        loading={state.isDeleting}
+        loading={controller.deleteDialog.isDeleting}
       />
     </>
   );

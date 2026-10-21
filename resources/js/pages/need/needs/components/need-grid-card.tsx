@@ -17,6 +17,12 @@ import {
 } from '@/components/badges';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { NeedFinancialAdjustmentIndicator } from '@/features/need/components/need-financial-adjustment-indicator';
 import { resolveNeedFinancialFigures } from '@/features/need/utils/need-financial-utils';
 import { formatIDR } from '@/lib/formatters';
@@ -127,9 +133,29 @@ export function NeedGridCard({
           {/* Unit path */}
           {unitPath.length > 0 && (
             <div className="px-3 pb-3">
-              <span className="text-[12px] leading-tight text-muted-foreground">
-                {unitPath.join(' › ')}
-              </span>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <span
+                        className={cn(
+                          'line-clamp-1 text-[12px] leading-tight text-muted-foreground hover:text-foreground',
+                          unitPath.length > 1 && 'cursor-help',
+                        )}
+                      >
+                        {unitPath[unitPath.length - 1]}
+                      </span>
+                    }
+                  />
+                  <TooltipContent
+                    side="bottom"
+                    align="start"
+                    className="text-xs"
+                  >
+                    {unitPath.join(' › ')}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           )}
 

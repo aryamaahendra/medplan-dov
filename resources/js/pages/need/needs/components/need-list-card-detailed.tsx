@@ -25,6 +25,12 @@ import {
 } from '@/components/badges';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { NeedFinancialAdjustmentIndicator } from '@/features/need/components/need-financial-adjustment-indicator';
 import { resolveNeedFinancialFigures } from '@/features/need/utils/need-financial-utils';
 import { formatDateTime, formatIDR } from '@/lib/formatters';
@@ -141,9 +147,29 @@ export function NeedListCardDetailed({
           {unitPath.length > 0 && (
             <span className="inline-flex items-center gap-1 text-muted-foreground">
               <RiGovernmentLine className="size-3.5 opacity-60" />
-              <span className="font-medium text-foreground">
-                {unitPath.join(' › ')}
-              </span>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <span
+                        className={cn(
+                          'font-medium text-foreground hover:underline',
+                          unitPath.length > 1 && 'cursor-help',
+                        )}
+                      >
+                        {unitPath[unitPath.length - 1]}
+                      </span>
+                    }
+                  />
+                  <TooltipContent
+                    side="bottom"
+                    align="start"
+                    className="text-xs"
+                  >
+                    {unitPath.join(' › ')}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </span>
           )}
 

@@ -89,7 +89,12 @@ export const getNeedColumns = (
                 <Tooltip>
                   <TooltipTrigger
                     render={
-                      <span className="line-clamp-1 cursor-help text-xss hover:text-foreground">
+                      <span
+                        className={cn(
+                          'line-clamp-1 text-xss hover:text-foreground',
+                          path.length > 1 && 'cursor-help',
+                        )}
+                      >
                         {path[path.length - 1]}
                       </span>
                     }

@@ -1,6 +1,6 @@
+import { DirectorReviewDialog } from '@/features/need/director-review';
 import type { Need } from '@/types';
 
-import { NeedDirectorReviewDialog } from '../need-director-review-dialog';
 import { NeedLockDialog } from '../need-lock-dialog';
 import { NeedSubmitDialog } from './need-submit-dialog';
 import type { useNeedShow } from './use-need-show';
@@ -13,7 +13,7 @@ interface NeedShowDialogsProps {
 export function NeedShowDialogs({ need, showState }: NeedShowDialogsProps) {
   return (
     <>
-      <NeedDirectorReviewDialog
+      <DirectorReviewDialog
         need={need}
         open={showState.isReviewDialogOpen}
         onOpenChange={showState.setIsReviewDialogOpen}

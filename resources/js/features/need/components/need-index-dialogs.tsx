@@ -1,5 +1,5 @@
 import { ConfirmDialog } from '@/components/confirm-dialog';
-import { NeedDirectorReviewDialog } from '@/pages/need/needs/components/need-director-review-dialog';
+import { DirectorReviewDialog } from '@/features/need/director-review';
 import { NeedLockDialog } from '@/pages/need/needs/components/need-lock-dialog';
 import type { Need } from '@/types';
 
@@ -48,7 +48,7 @@ export function NeedIndexDialogs({
       />
 
       {reviewingNeed && (
-        <NeedDirectorReviewDialog
+        <DirectorReviewDialog
           key={reviewingNeed.id}
           need={reviewingNeed}
           open={!!reviewingNeedId}

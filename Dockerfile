@@ -1,5 +1,5 @@
 # Stage 1: Base PHP image with extensions
-FROM dunglas/frankenphp:php8.4 AS base
+FROM dunglas/frankenphp:1.13.2-php8.4 AS base
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \

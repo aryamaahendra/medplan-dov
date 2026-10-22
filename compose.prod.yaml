@@ -34,6 +34,8 @@ services:
       # FrankenPHP options
       CADDY_GLOBAL_OPTIONS: 'debug'
       SERVER_NAME: ':8000'
+    volumes:
+      - storage-data:/app/storage/app
     depends_on:
       db:
         condition: service_healthy
@@ -66,6 +68,8 @@ services:
       REDIS_PORT: 6379
       CACHE_STORE: redis
       QUEUE_CONNECTION: redis
+    volumes:
+      - storage-data:/app/storage/app
     depends_on:
       db:
         condition: service_healthy
@@ -140,3 +144,4 @@ networks:
 
 volumes:
   db-data:
+  storage-data:

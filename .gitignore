@@ -30,3 +30,6 @@ yarn-error.log
 **/caddy
 frankenphp
 frankenphp-worker.php
+
+.scratch
+docs/tmp

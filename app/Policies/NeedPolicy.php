@@ -80,6 +80,13 @@ final class NeedPolicy
             return Response::deny($need->getEffectiveLockReason($user) ?: 'Usulan kebutuhan sedang dalam proses review dan tidak dapat diubah.');
         }
 
+        if ($need->status === Need::STATUS_REVISION) {
+            if ($need->isLocked($user)) {
+                return Response::deny($need->getEffectiveLockReason($user) ?: 'Usulan kebutuhan terkunci dan tidak dapat diubah.');
+            }
+
+            return true;
+        }
         if ($need->isLocked($user)) {
             $isPrivilegedSubmitted = $need->status === Need::STATUS_SUBMITTED
                 && $this->canBypassSubmissionWindow($user);
@@ -149,6 +156,12 @@ final class NeedPolicy
         if ($need->status === Need::STATUS_DRAFT && ! $this->canBypassSubmissionWindow($user)) {
             if ($need->isLocked($user)) {
                 return Response::deny($need->getEffectiveLockReason($user) ?: 'Periode pengajuan usulan kebutuhan untuk kelompok ini sedang ditutup.');
+            }
+        }
+
+        if ($need->status === Need::STATUS_REVISION && ! $this->canBypassSubmissionWindow($user)) {
+            if ($need->isLocked($user)) {
+                return Response::deny($need->getEffectiveLockReason($user) ?: 'Usulan kebutuhan terkunci dan tidak dapat diajukan.');
             }
         }
 

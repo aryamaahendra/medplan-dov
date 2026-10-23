@@ -496,7 +496,7 @@ describe('Full Lifecycle Transitions, Resubmission, and Rollover', function () {
             ->and($needRevision->notes)->toBe('Tolong lampirkan perbandingan harga pasar.')
             ->and($needRevision->is_recommended_for_next_cycle)->toBeFalse()
             ->and($needRevision->recommended_volume)->toBeNull()
-            ->and($needRevision->is_locked)->toBeNull()
+            ->and($needRevision->is_locked)->toBeFalse()
             ->and($needRevision->isLocked($this->staffUser))->toBeFalse();
     });
 

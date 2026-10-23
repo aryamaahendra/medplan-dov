@@ -203,6 +203,9 @@ class NeedLockLifecycle
         string $notes,
         ?User $actor = null,
     ): Need {
+        $extensionDays = config('planning.revision_extension_days');
+        $unlockedUntil = $extensionDays !== null ? now()->addDays((int) $extensionDays) : null;
+
         $need->update([
             'status' => Need::STATUS_REVISION,
             'notes' => $notes,
@@ -212,11 +215,11 @@ class NeedLockLifecycle
             'approved_total_price' => null,
             'is_recommended_for_next_cycle' => false,
             'recommended_volume' => null,
-            'is_locked' => null,
+            'is_locked' => $unlockedUntil !== null ? null : false,
             'locked_at' => null,
             'locked_by_user_id' => null,
             'lock_reason' => null,
-            'unlocked_until' => null,
+            'unlocked_until' => $unlockedUntil,
         ]);
 
         return $need;

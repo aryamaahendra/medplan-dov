@@ -259,7 +259,7 @@ describe('Director Review executive decision transitions', function () {
             ->and($freshNeed->notes)->toBe('Rasionalisasi kembali jumlah kebutuhan sesuai beban kerja.')
             ->and($freshNeed->is_recommended_for_next_cycle)->toBeFalse()
             ->and($freshNeed->recommended_volume)->toBeNull()
-            ->and($freshNeed->is_locked)->toBeNull()
+            ->and($freshNeed->is_locked)->toBeFalse()
             ->and($freshNeed->isLocked($this->staffUser))->toBeFalse();
     });
 

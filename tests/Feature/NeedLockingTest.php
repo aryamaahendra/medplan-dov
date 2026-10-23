@@ -441,7 +441,7 @@ describe('Director Review lifecycle freezing and releasing', function () {
         $response->assertSessionHasNoErrors();
         $freshNeed = $need->fresh();
         expect($freshNeed->approved_by_director_at)->toBeNull();
-        expect($freshNeed->is_locked)->toBeNull();
+        expect($freshNeed->is_locked)->toBeFalse();
         expect($freshNeed->locked_at)->toBeNull();
         expect($freshNeed->locked_by_user_id)->toBeNull();
         expect($freshNeed->lock_reason)->toBeNull();
@@ -464,7 +464,7 @@ describe('Director Review lifecycle freezing and releasing', function () {
 
         $response = $this->actingAs($this->directorUser)
             ->patch(route('needs.director-review', $need), [
-                'is_approved' => false,
+                'decision' => Need::STATUS_REJECTED,
                 'notes' => 'Ditolak, dan jendela pengajuan sudah ditutup',
             ]);
 

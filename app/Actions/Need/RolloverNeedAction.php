@@ -8,7 +8,9 @@ use App\Models\Need;
 use App\Models\NeedAttachment;
 use App\Models\NeedDetail;
 use App\Models\NeedGroup;
+use App\Models\OrganizationalUnit;
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -32,6 +34,10 @@ class RolloverNeedAction
 
     public function execute(Need $sourceNeed, NeedGroup $targetGroup, ?User $actor = null): Need
     {
+        if ($actor !== null && ! $this->isAuthorizedForNeed($actor, $sourceNeed)) {
+            throw new AuthorizationException('Unauthorized to rollover this proposal.');
+        }
+
         return DB::transaction(function () use ($sourceNeed, $targetGroup) {
             $sourceNeed->loadMissing([
                 'detail.fundingSources',
@@ -138,10 +144,16 @@ class RolloverNeedAction
      */
     public function executeMany(array $sourceNeedIds, NeedGroup $targetGroup, ?User $actor = null): Collection
     {
-        $needs = Need::query()
-            ->whereIn('id', $sourceNeedIds)
-            ->eligibleForRollover($targetGroup->id)
-            ->get();
+        $query = Need::query()
+            ->whereIn('id', $sourceNeedIds);
+
+        if ($actor !== null) {
+            $query->unapprovedCandidates($targetGroup->id, $actor);
+        } else {
+            $query->eligibleForRollover($targetGroup->id);
+        }
+
+        $needs = $query->get();
 
         $rolledOver = new Collection;
         foreach ($needs as $sourceNeed) {
@@ -149,5 +161,27 @@ class RolloverNeedAction
         }
 
         return $rolledOver;
+    }
+
+    protected function isAuthorizedForNeed(User $actor, Need $need): bool
+    {
+        if ($actor->hasAnyRole(['super-admin', 'admin', 'planner']) || $actor->can('view any needs') || $actor->can('create any needs')) {
+            return true;
+        }
+
+        if (($actor->can('view descendant needs') || $actor->can('create descendant needs')) && $actor->organizational_unit_id) {
+            if ($actor->organizational_unit_id === $need->organizational_unit_id) {
+                return true;
+            }
+
+            $needUnit = $need->organizationalUnit;
+            if ($needUnit instanceof OrganizationalUnit && $needUnit->isDescendantOf($actor->organizational_unit_id)) {
+                return true;
+            }
+
+            return false;
+        }
+
+        return $actor->organizational_unit_id === $need->organizational_unit_id;
     }
 }

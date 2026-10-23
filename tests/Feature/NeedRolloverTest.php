@@ -9,7 +9,10 @@ use App\Models\NeedGroup;
 use App\Models\NeedType;
 use App\Models\OrganizationalUnit;
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
 
@@ -19,8 +22,8 @@ beforeEach(function () {
     $this->unit2 = OrganizationalUnit::factory()->create(['name' => 'Unit 2']);
     $this->needType = NeedType::factory()->create();
 
-    $this->group1 = NeedGroup::factory()->create(['year' => 2025, 'name' => 'Group 2025']);
-    $this->group2 = NeedGroup::factory()->create(['year' => 2026, 'name' => 'Group 2026']);
+    $this->group1 = NeedGroup::factory()->openWindow()->create(['year' => 2025, 'name' => 'Group 2025']);
+    $this->group2 = NeedGroup::factory()->openWindow()->create(['year' => 2026, 'name' => 'Group 2026']);
 });
 
 it('unapproved candidates query excludes approved needs', function () {
@@ -387,4 +390,213 @@ it('clones partially approved need with requested volume set to residual recomme
         ->and($clonedNeed->recommended_volume)->toBeNull()
         ->and($clonedNeed->is_locked)->toBeNull()
         ->and($clonedNeed->source_need_id)->toBe($sourceNeed->id);
+});
+
+it('validates that candidate ids in bulk rollover must be eligible for rollover', function () {
+    $this->be($this->admin);
+
+    $approvedNeed = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'approved_by_director_at' => now(),
+        'is_recommended_for_next_cycle' => false,
+    ]);
+
+    $response = $this->post(route('need-groups.rollover', $this->group2), [
+        'need_ids' => [$approvedNeed->id],
+    ]);
+
+    $response->assertSessionHasErrors('need_ids.0');
+    $this->assertDatabaseMissing('needs', [
+        'source_need_id' => $approvedNeed->id,
+        'need_group_id' => $this->group2->id,
+    ]);
+});
+
+it('prevents non-privileged unit staff from rolling over proposals belonging to another unit', function () {
+    $staff = User::factory()->create(['organizational_unit_id' => $this->unit1->id]);
+    $staff->givePermissionTo(['create needs', 'view needs']);
+    $this->be($staff);
+
+    $needUnit1 = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'approved_by_director_at' => null,
+    ]);
+
+    $needUnit2 = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit2->id,
+        'need_type_id' => $this->needType->id,
+        'approved_by_director_at' => null,
+    ]);
+
+    $response = $this->post(route('need-groups.rollover', $this->group2), [
+        'need_ids' => [$needUnit1->id, $needUnit2->id],
+    ]);
+
+    $response->assertRedirect();
+    $response->assertSessionHas('success', '1 usulan berhasil ditarik ke kelompok ini.');
+
+    $this->assertDatabaseHas('needs', [
+        'source_need_id' => $needUnit1->id,
+        'need_group_id' => $this->group2->id,
+        'organizational_unit_id' => $this->unit1->id,
+    ]);
+
+    $this->assertDatabaseMissing('needs', [
+        'source_need_id' => $needUnit2->id,
+        'need_group_id' => $this->group2->id,
+    ]);
+});
+
+it('allows unit head to rollover proposals belonging to descendant units but excludes other units', function () {
+    $childUnit = OrganizationalUnit::factory()->create([
+        'name' => 'Child Unit',
+        'parent_id' => $this->unit1->id,
+    ]);
+
+    $unitHead = User::factory()->create(['organizational_unit_id' => $this->unit1->id]);
+    $unitHead->givePermissionTo(['create descendant needs', 'view descendant needs']);
+    $this->be($unitHead);
+
+    $needOwnUnit = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'approved_by_director_at' => null,
+    ]);
+
+    $needChildUnit = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $childUnit->id,
+        'need_type_id' => $this->needType->id,
+        'approved_by_director_at' => null,
+    ]);
+
+    $needOtherUnit = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit2->id,
+        'need_type_id' => $this->needType->id,
+        'approved_by_director_at' => null,
+    ]);
+
+    $response = $this->post(route('need-groups.rollover', $this->group2), [
+        'need_ids' => [$needOwnUnit->id, $needChildUnit->id, $needOtherUnit->id],
+    ]);
+
+    $response->assertRedirect();
+    $response->assertSessionHas('success', '2 usulan berhasil ditarik ke kelompok ini.');
+
+    $this->assertDatabaseHas('needs', [
+        'source_need_id' => $needOwnUnit->id,
+        'need_group_id' => $this->group2->id,
+        'organizational_unit_id' => $this->unit1->id,
+    ]);
+    $this->assertDatabaseHas('needs', [
+        'source_need_id' => $needChildUnit->id,
+        'need_group_id' => $this->group2->id,
+        'organizational_unit_id' => $childUnit->id,
+    ]);
+    $this->assertDatabaseMissing('needs', [
+        'source_need_id' => $needOtherUnit->id,
+        'need_group_id' => $this->group2->id,
+    ]);
+});
+
+it('allows planner or super-admin to rollover proposals across all units', function () {
+    $planner = User::factory()->create();
+    $planner->assignRole('planner');
+    $this->be($planner);
+
+    $needUnit1 = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'approved_by_director_at' => null,
+    ]);
+
+    $needUnit2 = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit2->id,
+        'need_type_id' => $this->needType->id,
+        'approved_by_director_at' => null,
+    ]);
+
+    $response = $this->post(route('need-groups.rollover', $this->group2), [
+        'need_ids' => [$needUnit1->id, $needUnit2->id],
+    ]);
+
+    $response->assertRedirect();
+    $response->assertSessionHas('success', '2 usulan berhasil ditarik ke kelompok ini.');
+
+    $this->assertDatabaseHas('needs', [
+        'source_need_id' => $needUnit1->id,
+        'need_group_id' => $this->group2->id,
+        'organizational_unit_id' => $this->unit1->id,
+    ]);
+    $this->assertDatabaseHas('needs', [
+        'source_need_id' => $needUnit2->id,
+        'need_group_id' => $this->group2->id,
+        'organizational_unit_id' => $this->unit2->id,
+    ]);
+});
+
+it('throws authorization exception when RolloverNeedAction::execute is called directly with unauthorized actor', function () {
+    $staffUnit1 = User::factory()->create(['organizational_unit_id' => $this->unit1->id]);
+    $staffUnit1->givePermissionTo(['create needs', 'view needs']);
+
+    $needUnit2 = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit2->id,
+        'need_type_id' => $this->needType->id,
+        'approved_by_director_at' => null,
+    ]);
+
+    $action = app(RolloverNeedAction::class);
+
+    expect(fn () => $action->execute($needUnit2, $this->group2, $staffUnit1))
+        ->toThrow(AuthorizationException::class);
+});
+
+it('sets organizational_unit_id matching source need and preserves data integrity during rollover', function () {
+    Storage::fake('local');
+    Config::set('filesystems.attachments_disk', 'local');
+
+    $sourceNeed = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'title' => 'Proposal with Attachments and Details',
+        'approved_by_director_at' => null,
+    ]);
+
+    NeedDetail::factory()->create([
+        'need_id' => $sourceNeed->id,
+        'background' => 'Detailed background text',
+    ]);
+
+    $sourceNeed->attachments()->create([
+        'category' => 'general',
+        'display_name' => 'spec.pdf',
+        'file_path' => 'needs/source/spec.pdf',
+        'file_size' => 1024,
+        'mime_type' => 'application/pdf',
+        'extension' => 'pdf',
+    ]);
+    Storage::disk('local')->put('needs/source/spec.pdf', 'dummy content');
+
+    $action = app(RolloverNeedAction::class);
+    $cloned = $action->execute($sourceNeed, $this->group2, $this->admin);
+
+    expect($cloned->organizational_unit_id)->toBe($sourceNeed->organizational_unit_id)
+        ->and($cloned->source_need_id)->toBe($sourceNeed->id)
+        ->and($cloned->need_group_id)->toBe($this->group2->id)
+        ->and($cloned->detail)->not->toBeNull()
+        ->and($cloned->detail->background)->toBe('Detailed background text')
+        ->and($cloned->attachments)->toHaveCount(1)
+        ->and($cloned->attachments->first()->display_name)->toBe('spec.pdf')
+        ->and(Storage::disk('local')->exists($cloned->attachments->first()->file_path))->toBeTrue();
 });

@@ -378,8 +378,8 @@ class Need extends Model
     {
         $this->scopeEligibleForRollover($query, $targetGroupId);
 
-        if (! $user->hasAnyRole(['super-admin', 'admin', 'planner']) && ! $user->can('view any needs')) {
-            if ($user->can('view descendant needs') && $user->organizational_unit_id) {
+        if (! $user->hasAnyRole(['super-admin', 'admin', 'planner']) && ! $user->can('view any needs') && ! $user->can('create any needs')) {
+            if (($user->can('view descendant needs') || $user->can('create descendant needs')) && $user->organizational_unit_id) {
                 /** @var OrganizationalUnit|null $unit */
                 $unit = $user->organizationalUnit;
                 if ($unit) {

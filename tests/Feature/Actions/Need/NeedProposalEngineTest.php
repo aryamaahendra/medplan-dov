@@ -273,3 +273,68 @@ it('updates an existing proposal and marks as submitted when shouldSubmit is tru
     expect($updated->is_locked)->toBeTrue();
     expect($updated->lock_reason)->toBe(NeedLockLifecycle::LOCK_REASON_EXECUTIVE_REVIEW);
 });
+
+it('preserves is_priority as true when updating general fields without submitting urgency', function () {
+    $need = Need::factory()->create([
+        'status' => Need::STATUS_DRAFT,
+        'urgency' => 'high',
+        'impact' => 'high',
+        'is_priority' => true,
+        'volume' => 5,
+        'unit_price' => 100000,
+        'total_price' => 500000,
+    ]);
+    $engine = app(NeedProposalEngine::class);
+
+    // Updating only title without urgency fields
+    $payload = NeedProposalPayload::fromArray([
+        'title' => 'Updated Title Only',
+    ]);
+
+    $updated = $engine->update($need, $payload);
+
+    expect($updated->title)->toBe('Updated Title Only')
+        ->and($updated->fresh()->is_priority)->toBeTrue();
+});
+
+it('recalculates total_price server-side when submitting proposal even if manipulated total_price is passed', function () {
+    $group = NeedGroup::factory()->create();
+    $unit = OrganizationalUnit::factory()->create();
+    $type = NeedType::factory()->create();
+    $engine = app(NeedProposalEngine::class);
+
+    $payload = NeedProposalPayload::fromArray([
+        'need_group_id' => $group->id,
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $type->id,
+        'title' => 'Recalculated Proposal',
+        'year' => 2026,
+        'volume' => 3,
+        'unit' => 'unit',
+        'unit_price' => 150000,
+        'total_price' => 999999999, // Arbitrary manipulated total
+        'urgency' => 'medium',
+        'impact' => 'low',
+    ]);
+
+    $need = $engine->submit($payload);
+
+    expect((float) $need->fresh()->total_price)->toBe(450000.0);
+});
+
+it('recalculates total_price server-side when updating proposal volume or unit price', function () {
+    $need = Need::factory()->create([
+        'volume' => 2,
+        'unit_price' => 50000,
+        'total_price' => 100000,
+    ]);
+    $engine = app(NeedProposalEngine::class);
+
+    $payload = NeedProposalPayload::fromArray([
+        'volume' => 5,
+    ]);
+
+    $updated = $engine->update($need, $payload);
+
+    expect((float) $updated->fresh()->total_price)->toBe(250000.0);
+});

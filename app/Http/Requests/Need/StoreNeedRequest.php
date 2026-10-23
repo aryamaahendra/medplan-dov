@@ -115,7 +115,21 @@ class StoreNeedRequest extends FormRequest
             'volume' => ['required', 'numeric', 'min:0'],
             'unit' => ['required', 'string', Rule::in(['pcs', 'unit', 'orang', 'paket', 'set', 'buah', 'lembar', 'kg', 'liter', 'meter'])],
             'unit_price' => ['required', 'numeric', 'min:0'],
-            'total_price' => ['required', 'numeric', 'min:0'],
+            'total_price' => [
+                'required',
+                'numeric',
+                'min:0',
+                function ($attribute, $value, $fail) {
+                    $volume = $this->input('volume');
+                    $unitPrice = $this->input('unit_price');
+                    if (is_numeric($volume) && is_numeric($unitPrice)) {
+                        $expected = round((float) $volume * (float) $unitPrice, 2);
+                        if (abs((float) $value - $expected) > 0.05) {
+                            $fail(__('Total harga tidak sesuai dengan perkalian volume dan harga satuan.'));
+                        }
+                    }
+                },
+            ],
             'urgency' => ['required', Rule::enum(Urgency::class)],
             'impact' => ['required', Rule::enum(Impact::class)],
             'is_priority' => ['boolean'],

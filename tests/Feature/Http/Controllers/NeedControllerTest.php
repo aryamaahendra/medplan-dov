@@ -339,6 +339,24 @@ test('staff without urgency permission can store a need with default urgency and
     ]);
 });
 
+test('store validates total_price matches volume multiplied by unit_price', function () {
+    $user = User::factory()->create();
+    $user->assignRole('super-admin');
+    $group = NeedGroup::factory()->create(['is_active' => true]);
+    $unit = OrganizationalUnit::factory()->create();
+    $needType = NeedType::factory()->create();
+
+    $payload = validNeedPayload($group, $unit, $needType, [
+        'volume' => 5,
+        'unit_price' => 10000,
+        'total_price' => 99999,
+    ]);
+
+    $this->actingAs($user)
+        ->post(route('needs.store'), $payload)
+        ->assertSessionHasErrors(['total_price']);
+});
+
 // ─── Update ───────────────────────────────────────────────────────────────────
 
 test('update modifies an existing need', function () {
@@ -410,6 +428,29 @@ test('update numerical fields cannot be negative', function () {
         ->put(route('needs.update', $need), $payload)
         ->assertSessionHasErrors(['volume', 'unit_price', 'total_price']);
 });
+
+test('update validates total_price matches volume multiplied by unit_price', function () {
+    $user = User::factory()->create();
+    $user->assignRole('super-admin');
+    $group = NeedGroup::factory()->create(['is_active' => true]);
+    $unit = OrganizationalUnit::factory()->create();
+    $needType = NeedType::factory()->create();
+    $need = Need::factory()->create([
+        'need_group_id' => $group->id,
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $needType->id,
+    ]);
+
+    $payload = validNeedPayload($group, $unit, $needType, [
+        'volume' => 10,
+        'unit_price' => 5000,
+        'total_price' => 12345,
+    ]);
+
+    $this->actingAs($user)
+        ->put(route('needs.update', $need), $payload)
+        ->assertSessionHasErrors(['total_price']);
+});
 test('staff without urgency permission can update general fields without urgency validation error and without wiping relations', function () {
     $unit = OrganizationalUnit::factory()->create();
     $staff = User::factory()->create(['organizational_unit_id' => $unit->id]);
@@ -452,6 +493,7 @@ test('staff without urgency permission can update general fields without urgency
     expect($refreshed->title)->toBe('Judul Baru Staff')
         ->and($refreshed->urgency->value)->toBe('high')
         ->and($refreshed->impact->value)->toBe('high')
+        ->and($refreshed->is_priority)->toBeTrue()
         ->and($refreshed->sasarans)->toHaveCount(1);
 });
 

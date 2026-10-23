@@ -10,6 +10,7 @@ use App\Models\Need;
 use App\Models\NeedAttachment;
 use App\Models\NeedDetail;
 use App\Models\User;
+use BackedEnum;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -33,8 +34,13 @@ class NeedProposalEngine
         return DB::transaction(function () use ($payload, $actor) {
             $attributes = $payload->attributes;
 
-            $isPriority = ($attributes['urgency'] ?? '') === 'high' && ($attributes['impact'] ?? '') === 'high';
-            $attributes['is_priority'] = $isPriority;
+            $urgency = $this->normalizeEnumValue($attributes['urgency'] ?? null);
+            $impact = $this->normalizeEnumValue($attributes['impact'] ?? null);
+            $attributes['is_priority'] = $urgency === 'high' && $impact === 'high';
+
+            if (array_key_exists('volume', $attributes) && array_key_exists('unit_price', $attributes)) {
+                $attributes['total_price'] = round((float) $attributes['volume'] * (float) $attributes['unit_price'], 2);
+            }
 
             $attributes['status'] = $attributes['status'] ?? Need::STATUS_DRAFT;
 
@@ -61,9 +67,13 @@ class NeedProposalEngine
         return DB::transaction(function () use ($need, $payload, $actor) {
             $attributes = $payload->attributes;
 
-            $urgency = $attributes['urgency'] ?? $need->urgency;
-            $impact = $attributes['impact'] ?? $need->impact;
+            $urgency = $this->normalizeEnumValue($attributes['urgency'] ?? $need->urgency);
+            $impact = $this->normalizeEnumValue($attributes['impact'] ?? $need->impact);
             $attributes['is_priority'] = $urgency === 'high' && $impact === 'high';
+
+            $volume = array_key_exists('volume', $attributes) ? (float) $attributes['volume'] : (float) $need->volume;
+            $unitPrice = array_key_exists('unit_price', $attributes) ? (float) $attributes['unit_price'] : (float) $need->unit_price;
+            $attributes['total_price'] = round($volume * $unitPrice, 2);
 
             // Proposal lock & status transition are handled via lockLifecycle if submitted
 
@@ -230,5 +240,13 @@ class NeedProposalEngine
                 ]);
             }
         }
+    }
+
+    /**
+     * Normalize an enum instance or primitive value to its scalar backing value.
+     */
+    protected function normalizeEnumValue(mixed $value): mixed
+    {
+        return $value instanceof BackedEnum ? $value->value : $value;
     }
 }

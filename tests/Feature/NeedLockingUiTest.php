@@ -313,4 +313,41 @@ describe('Inertia response contains lock metadata', function () {
                 ->where('need.submission_window_status', 'closed')
             );
     });
+
+    it('supplies lock permissions to planner on needs show view', function () {
+        $unlockedNeed = Need::factory()->create([
+            'need_group_id' => $this->openGroup->id,
+            'organizational_unit_id' => $this->orgUnit->id,
+            'need_type_id' => $this->needType->id,
+            'is_locked' => false,
+        ]);
+
+        $this->actingAs($this->plannerUser)
+            ->get(route('needs.show', $unlockedNeed))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('need/needs/show')
+                ->has('need')
+                ->where('need.is_locked', false)
+                ->where('need.can.lock', true)
+            );
+
+        $lockedNeed = Need::factory()->create([
+            'need_group_id' => $this->openGroup->id,
+            'organizational_unit_id' => $this->orgUnit->id,
+            'need_type_id' => $this->needType->id,
+            'is_locked' => true,
+            'lock_reason' => 'Admin locked',
+        ]);
+
+        $this->actingAs($this->plannerUser)
+            ->get(route('needs.show', $lockedNeed))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('need/needs/show')
+                ->has('need')
+                ->where('need.is_locked', true)
+                ->where('need.can.unlock', true)
+            );
+    });
 });

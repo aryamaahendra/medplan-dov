@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Actions\Need\RolloverNeedAction;
+use App\Enums\Kldi;
+use App\Enums\SatkerSkpd;
 use App\Models\Need;
 use App\Models\NeedDetail;
 use App\Models\NeedGroup;
@@ -599,4 +601,41 @@ it('sets organizational_unit_id matching source need and preserves data integrit
         ->and($cloned->attachments)->toHaveCount(1)
         ->and($cloned->attachments->first()->display_name)->toBe('spec.pdf')
         ->and(Storage::disk('local')->exists($cloned->attachments->first()->file_path))->toBeTrue();
+});
+
+it('unapproved source endpoint returns complete detail and alignment payload for creation form prefill', function () {
+    $this->be($this->admin);
+
+    $sourceNeed = Need::factory()->create([
+        'need_group_id' => $this->group1->id,
+        'organizational_unit_id' => $this->unit1->id,
+        'need_type_id' => $this->needType->id,
+        'title' => 'Proposal for prefill',
+        'description' => 'Original description',
+        'volume' => 10,
+        'unit_price' => 50000,
+        'total_price' => 500000,
+        'approved_by_director_at' => null,
+    ]);
+
+    NeedDetail::factory()->create([
+        'need_id' => $sourceNeed->id,
+        'kldi' => Kldi::UkpbjKabDonggala,
+        'satker_skpd' => SatkerSkpd::RsudKabelotaDonggala,
+        'kpa_id' => $this->admin->id,
+        'background' => 'Historical context',
+        'purpose_and_objectives' => 'Fulfill mandate',
+        'target_objective' => 'All personnel',
+    ]);
+
+    $response = $this->getJson(route('needs.unapproved-source', $sourceNeed));
+
+    $response->assertOk()
+        ->assertJsonPath('data.id', $sourceNeed->id)
+        ->assertJsonPath('data.title', 'Proposal for prefill')
+        ->assertJsonPath('data.detail.kldi', Kldi::UkpbjKabDonggala->value)
+        ->assertJsonPath('data.detail.satker_skpd', SatkerSkpd::RsudKabelotaDonggala->value)
+        ->assertJsonPath('data.detail.kpa_id', $this->admin->id)
+        ->assertJsonPath('data.detail.background', 'Historical context')
+        ->assertJsonPath('data.detail.purpose_and_objectives', 'Fulfill mandate');
 });

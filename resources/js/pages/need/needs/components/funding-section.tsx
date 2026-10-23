@@ -33,9 +33,16 @@ export function FundingSection({
 }) {
   const [sourceSearch, setSourceSearch] = useState('');
   const [sourceOpen, setSourceOpen] = useState(false);
+  const [prevInitialFundingSourceIds, setPrevInitialFundingSourceIds] =
+    useState(initialFundingSourceIds);
   const [fundingSourceIds, setFundingSourceIds] = useState<(string | number)[]>(
     initialFundingSourceIds || [],
   );
+
+  if (initialFundingSourceIds !== prevInitialFundingSourceIds) {
+    setPrevInitialFundingSourceIds(initialFundingSourceIds);
+    setFundingSourceIds(initialFundingSourceIds || []);
+  }
 
   const selectedSourcesLabel = useMemo(() => {
     if (fundingSourceIds.length === 0) {

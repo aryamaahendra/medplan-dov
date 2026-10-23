@@ -308,6 +308,11 @@ export function NeedForm({
                   <div className={cn(activeSection !== 'detail' && 'hidden')}>
                     {hasPermission('update need tab detail') && (
                       <NeedDetailSection
+                        key={
+                          data.source_need_id
+                            ? `source-${data.source_need_id}`
+                            : 'default'
+                        }
                         initialValues={data.detail}
                         detailValuesRef={detailValuesRef}
                         errors={errors}

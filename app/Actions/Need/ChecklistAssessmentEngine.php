@@ -7,6 +7,7 @@ namespace App\Actions\Need;
 use App\Enums\ChecklistAnswer;
 use App\Models\Need;
 use App\Models\NeedChecklistAnswer;
+use App\Models\NeedGroup;
 use Illuminate\Support\Facades\DB;
 
 class ChecklistAssessmentEngine
@@ -43,7 +44,12 @@ class ChecklistAssessmentEngine
             ->get();
 
         $yesCount = $answers->where('answer', ChecklistAnswer::Yes)->count();
-        $totalRelevant = $answers->count();
+        $needGroup = $need->needGroup;
+        $groupActiveCount = $needGroup instanceof NeedGroup
+            ? $needGroup->checklistQuestions()->wherePivot('is_active', true)->count()
+            : 0;
+
+        $totalRelevant = $groupActiveCount > 0 ? $groupActiveCount : $answers->count();
 
         $percentage = $totalRelevant > 0
             ? round(($yesCount / $totalRelevant) * 100, 2)

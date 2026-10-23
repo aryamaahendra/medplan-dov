@@ -204,3 +204,29 @@ it('updates checklist score atomically without firing observer cycles', function
     $this->need->refresh();
     expect((float) $this->need->checklist_percentage)->toBe(75.0);
 });
+
+it('evaluates checklist completion against total active questions in need group', function () {
+    $engine = app(ChecklistAssessmentEngine::class);
+    $group = $this->need->needGroup;
+
+    $questions = ChecklistQuestion::factory()->count(4)->create();
+    foreach ($questions as $index => $q) {
+        $group->checklistQuestions()->attach($q->id, [
+            'is_active' => true,
+            'order_column' => $index + 1,
+        ]);
+    }
+
+    // Answering 1 out of 4 active group questions with Yes
+    $answers = [
+        ['checklist_question_id' => $questions[0]->id, 'answer' => ChecklistAnswer::Yes->value],
+    ];
+
+    $percentage = $engine->evaluate($this->need, $answers);
+
+    // 1 Yes out of 4 active group questions = 25.0%, not 100.0%
+    expect($percentage)->toBe(25.0);
+
+    $this->need->refresh();
+    expect((float) $this->need->checklist_percentage)->toBe(25.0);
+});

@@ -36,8 +36,12 @@ export function useNeedShow({ need, existingAnswers }: UseNeedShowProps) {
   const [isSubmitDialogOpen, setIsSubmitDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isLocked = Boolean(need.is_locked);
-  const canManageLock =
-    hasPermission('lock need') || hasPermission('unlock need');
+  const canManageLock = Boolean(
+    need.can?.lock ||
+    need.can?.unlock ||
+    hasPermission('lock needs') ||
+    hasPermission('unlock needs'),
+  );
   const canReviewDirector =
     Boolean(need.can?.approve ?? hasPermission('review need director')) &&
     need.status === 'submitted';

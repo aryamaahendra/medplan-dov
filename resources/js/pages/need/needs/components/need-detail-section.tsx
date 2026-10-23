@@ -88,12 +88,23 @@ export function NeedDetailSection({
   satkerOptions = [],
   totalPrice,
 }: NeedDetailSectionProps) {
-  const [initialValues] = useState(providedInitialValues);
+  const [prevInitialValues, setPrevInitialValues] = useState(
+    providedInitialValues,
+  );
+  const [initialValues, setInitialValues] = useState(providedInitialValues);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [kldi, setKldi] = useState(initialValues?.kldi ?? '');
   const [satker, setSatker] = useState(initialValues?.satker_skpd ?? '');
-  const [kpaId, setKpaId] = useState(initialValues?.kpa_id ?? '');
+  const [kpaId, setKpaId] = useState(initialValues?.kpa_id?.toString() ?? '');
+
+  if (providedInitialValues !== prevInitialValues) {
+    setPrevInitialValues(providedInitialValues);
+    setInitialValues(providedInitialValues);
+    setKldi(providedInitialValues?.kldi ?? '');
+    setSatker(providedInitialValues?.satker_skpd ?? '');
+    setKpaId(providedInitialValues?.kpa_id?.toString() ?? '');
+  }
 
   const handleChange = useCallback(
     (key: string, value: any) => {

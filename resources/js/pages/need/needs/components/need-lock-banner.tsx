@@ -117,12 +117,12 @@ export function NeedLockBanner({ need, className }: NeedLockBannerProps) {
             'Usulan ini dikunci sehingga tidak dapat diubah atau dihapus.'}
         </p>
         {need.group_submission_end_at && (
-          <p className="text-xss opacity-80">
+          <p className="text-xs opacity-80">
             Batas akhir: {formatDateTime(need.group_submission_end_at)}
           </p>
         )}
         {need.locked_at && (
-          <p className="text-xss opacity-80">
+          <p className="text-xs opacity-80">
             Waktu kunci: {formatDateTime(need.locked_at)}
           </p>
         )}

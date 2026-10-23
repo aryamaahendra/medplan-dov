@@ -11,7 +11,7 @@ interface NeedShowBannersProps {
 
 export function NeedShowBanners({ need, isOrphaned }: NeedShowBannersProps) {
   return (
-    <div className="space-y-4">
+    <div className="m-0! space-y-4 [&>*:last-child]:mb-12">
       <NeedLockBanner need={need} />
 
       {need.status === 'revision' && need.notes && (

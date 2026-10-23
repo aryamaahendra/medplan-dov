@@ -2,7 +2,6 @@ import { formatIDR } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import type { Need } from '@/types';
 
-import { NeedFinancialComparisonCards } from '../need-financial-comparison-cards';
 import { resolveNeedFinancialFigures } from '../need-financial-utils';
 
 interface NeedGeneralSectionProps {
@@ -38,7 +37,7 @@ export function NeedGeneralSection({ need }: NeedGeneralSectionProps) {
       </div>
 
       {/* Financial Determinations Comparison Cards */}
-      <NeedFinancialComparisonCards need={need} />
+      {/* <NeedFinancialComparisonCards need={need} /> */}
       {/* Horizontal Data Strip Rows */}
       <div className="divide-y divide-border/60">
         <DatasheetRow

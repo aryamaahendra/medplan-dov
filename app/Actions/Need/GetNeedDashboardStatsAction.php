@@ -52,7 +52,8 @@ class GetNeedDashboardStatsAction
 
         $userId = $user ? $user->id : 0;
         $roleScopeKey = $this->scopeResolver->resolveScopeKey($user);
-        $cacheKey = "needs_dashboard_{$groupId}_{$userId}_{$roleScopeKey}_comp_{$compareGroupId}";
+        $version = Cache::get('needs_dashboard_cache_version', 1);
+        $cacheKey = "needs_dashboard_v{$version}_{$groupId}_{$userId}_{$roleScopeKey}_comp_{$compareGroupId}";
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($groupId, $user, $compareGroupId) {
             return $this->computeDashboardPayload((int) $groupId, $user, $compareGroupId);
@@ -64,7 +65,11 @@ class GetNeedDashboardStatsAction
      */
     public static function clearCacheForGroup(?int $groupId = null): void
     {
-        Cache::increment('needs_dashboard_cache_version');
+        if (! Cache::has('needs_dashboard_cache_version')) {
+            Cache::forever('needs_dashboard_cache_version', 2);
+        } else {
+            Cache::increment('needs_dashboard_cache_version');
+        }
     }
 
     /**

@@ -137,8 +137,13 @@ class OperationsDashboardCalculator
         /** @var object{c1?: int|string, b1?: int|float|string, c2?: int|string, b2?: int|float|string, c3?: int|string, b3?: int|float|string, c4?: int|string, b4?: int|float|string}|null $rAging */
         $rAging = (clone $baseQuery)
             ->toBase()
-            ->where('status', 'approved')
-            ->whereNull('approved_by_director_at')
+            ->where(function ($q) {
+                $q->where('status', Need::STATUS_SUBMITTED)
+                    ->orWhere(function ($legacy) {
+                        $legacy->where('status', Need::STATUS_APPROVED)
+                            ->whereNull('approved_by_director_at');
+                    });
+            })
             ->selectRaw('
                 COUNT(CASE WHEN updated_at > ? THEN 1 END) as c1,
                 COALESCE(SUM(CASE WHEN updated_at > ? THEN total_price ELSE 0 END), 0) as b1,
@@ -184,13 +189,13 @@ class OperationsDashboardCalculator
 
         $unitNeedsStats = (clone $baseQuery)
             ->toBase()
-            ->selectRaw('
+            ->selectRaw("
                 organizational_unit_id,
                 AVG(CASE WHEN checklist_percentage > 0 THEN checklist_percentage ELSE 0 END) as avg_readiness,
-                COUNT(CASE WHEN (status = \'draft\' AND updated_at <= \''.$sevenDaysAgo->toDateTimeString().'\')
-                    OR (status = \'approved\' AND approved_by_director_at IS NULL AND updated_at <= \''.$fiveDaysAgo->toDateTimeString().'\')
+                COUNT(CASE WHEN (status = 'draft' AND updated_at <= '{$sevenDaysAgo->toDateTimeString()}')
+                    OR ((status = 'submitted' OR (status = 'approved' AND approved_by_director_at IS NULL)) AND updated_at <= '{$fiveDaysAgo->toDateTimeString()}')
                     OR (checklist_percentage > 0 AND checklist_percentage < 85) THEN 1 END) as exception_count
-            ')
+            ")
             ->groupBy('organizational_unit_id')
             ->get()
             ->keyBy('organizational_unit_id');

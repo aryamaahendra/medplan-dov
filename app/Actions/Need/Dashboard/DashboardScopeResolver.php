@@ -77,7 +77,7 @@ class DashboardScopeResolver
      * Derived Stage:
      * - 'rejected': status = 'rejected'
      * - 'approved': approved_by_director_at IS NOT NULL
-     * - 'under_review': status = 'approved' AND approved_by_director_at IS NULL
+     * - 'under_review': status = 'submitted' OR (status = 'approved' AND approved_by_director_at IS NULL)
      * - 'draft': everything else
      */
     public function stageCaseSql(): string
@@ -85,7 +85,7 @@ class DashboardScopeResolver
         return "CASE
             WHEN status = 'rejected' THEN 'rejected'
             WHEN approved_by_director_at IS NOT NULL THEN 'approved'
-            WHEN status = 'approved' THEN 'under_review'
+            WHEN status = 'submitted' OR (status = 'approved' AND approved_by_director_at IS NULL) THEN 'under_review'
             ELSE 'draft'
         END";
     }

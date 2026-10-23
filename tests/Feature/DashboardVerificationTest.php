@@ -663,20 +663,22 @@ test('case 18: cache lifecycle and invalidation on clearCacheForGroup', function
     $payload1 = $action->getDashboardPayload($this->group->id, $this->superAdmin);
     expect($payload1['stats']['total_needs'])->toBe(1);
 
-    // Add a second need
-    Need::factory()->create([
-        'need_group_id' => $this->group->id,
-        'organizational_unit_id' => $this->unitA->id,
-        'status' => 'draft',
-        'total_price' => 20_000_000,
-    ]);
+    // Add a second need without model events to simulate no cache clearing
+    Need::withoutEvents(function () {
+        Need::factory()->create([
+            'need_group_id' => $this->group->id,
+            'organizational_unit_id' => $this->unitA->id,
+            'status' => 'draft',
+            'total_price' => 20_000_000,
+        ]);
+    });
 
     // Without cache clearing, cached version is returned
     $cachedPayload = $action->getDashboardPayload($this->group->id, $this->superAdmin);
     expect($cachedPayload['stats']['total_needs'])->toBe(1);
 
-    // Clear cache
-    Cache::flush();
+    // Clear cache via clearCacheForGroup
+    GetNeedDashboardStatsAction::clearCacheForGroup($this->group->id);
     $freshPayload = $action->getDashboardPayload($this->group->id, $this->superAdmin);
     expect($freshPayload['stats']['total_needs'])->toBe(2);
 });

@@ -298,3 +298,133 @@ test('GetNeedDashboardStatsAction and GetFilteredNeedsAction are in lockstep for
 
     expect($filteredNeeds->count())->toBe($e2StatsItem['count']);
 });
+
+test('E4 detects modern submitted proposals with zero checklist score', function () {
+    $unassessedSubmitted = Need::factory()->create([
+        'need_group_id' => $this->group->id,
+        'organizational_unit_id' => $this->unit->id,
+        'status' => Need::STATUS_SUBMITTED,
+        'checklist_percentage' => 0,
+    ]);
+
+    $assessedSubmitted = Need::factory()->create([
+        'need_group_id' => $this->group->id,
+        'organizational_unit_id' => $this->unit->id,
+        'status' => Need::STATUS_SUBMITTED,
+        'checklist_percentage' => 95,
+    ]);
+
+    $query = Need::query();
+    $this->catalog->applyAttentionScope($query, ['E4'], $this->now);
+
+    $ids = $query->pluck('id')->all();
+    expect($ids)->toContain($unassessedSubmitted->id)
+        ->and($ids)->not->toContain($assessedSubmitted->id);
+
+    // Also test buildExceptionItems aggregation
+    $items = $this->catalog->buildExceptionItems(Need::query()->where('need_group_id', $this->group->id), $this->group, 4, [], $this->now);
+    $e4Item = collect($items)->firstWhere('code', 'E4');
+    expect($e4Item['count'])->toBeGreaterThanOrEqual(1);
+    expect(collect($e4Item['needs'])->pluck('id')->all())->toContain($unassessedSubmitted->id);
+});
+
+test('E5 detects modern submitted proposals idle for more than 5 days', function () {
+    $idleSubmitted = Need::factory()->create([
+        'need_group_id' => $this->group->id,
+        'organizational_unit_id' => $this->unit->id,
+        'status' => Need::STATUS_SUBMITTED,
+        'updated_at' => $this->now->subDays(6),
+    ]);
+
+    $freshSubmitted = Need::factory()->create([
+        'need_group_id' => $this->group->id,
+        'organizational_unit_id' => $this->unit->id,
+        'status' => Need::STATUS_SUBMITTED,
+        'updated_at' => $this->now->subDays(2),
+    ]);
+
+    $query = Need::query();
+    $this->catalog->applyAttentionScope($query, ['E5'], $this->now);
+
+    $ids = $query->pluck('id')->all();
+    expect($ids)->toContain($idleSubmitted->id)
+        ->and($ids)->not->toContain($freshSubmitted->id);
+
+    // Also test buildExceptionItems aggregation
+    $items = $this->catalog->buildExceptionItems(Need::query()->where('need_group_id', $this->group->id), $this->group, 4, [], $this->now);
+    $e5Item = collect($items)->firstWhere('code', 'E5');
+    expect($e5Item['count'])->toBeGreaterThanOrEqual(1);
+    expect(collect($e5Item['needs'])->pluck('id')->all())->toContain($idleSubmitted->id);
+});
+
+test('E6 detects modern submitted proposals missing mandatory linkages', function () {
+    $unlinkedSubmitted = Need::factory()->create([
+        'need_group_id' => $this->group->id,
+        'organizational_unit_id' => $this->unit->id,
+        'status' => Need::STATUS_SUBMITTED,
+    ]);
+
+    $linkedSubmitted = Need::factory()->create([
+        'need_group_id' => $this->group->id,
+        'organizational_unit_id' => $this->unit->id,
+        'status' => Need::STATUS_SUBMITTED,
+    ]);
+    NeedAttachment::factory()->create(['need_id' => $linkedSubmitted->id]);
+    $linkedSubmitted->sasarans()->attach(Sasaran::factory()->create()->id);
+    $linkedSubmitted->indicators()->attach(Indicator::factory()->create()->id);
+    $linkedSubmitted->kpiIndicators()->attach(KpiIndicator::factory()->create()->id);
+    $linkedSubmitted->strategicServicePlans()->attach(StrategicServicePlan::factory()->create()->id);
+
+    $query = Need::query();
+    $this->catalog->applyAttentionScope($query, ['E6'], $this->now);
+
+    $ids = $query->pluck('id')->all();
+    expect($ids)->toContain($unlinkedSubmitted->id)
+        ->and($ids)->not->toContain($linkedSubmitted->id);
+
+    // Also test buildExceptionItems aggregation
+    $items = $this->catalog->buildExceptionItems(Need::query()->where('need_group_id', $this->group->id), $this->group, 4, [], $this->now);
+    $e6Item = collect($items)->firstWhere('code', 'E6');
+    expect($e6Item['count'])->toBeGreaterThanOrEqual(1);
+    expect(collect($e6Item['needs'])->pluck('id')->all())->toContain($unlinkedSubmitted->id);
+});
+
+test('proposal mutations immediately invalidate dashboard cache version and payload', function () {
+    $statsAction = app(GetNeedDashboardStatsAction::class);
+
+    // 1. Initial dashboard payload populates cache
+    $initialPayload = $statsAction->getDashboardPayload($this->group->id, $this->admin);
+    expect($initialPayload)->not->toBeEmpty();
+    $initialTotal = $initialPayload['stats']['total_needs'] ?? 0;
+
+    // 2. Create a need: NeedObserver fires created -> bustDashboardCache
+    $newNeed = Need::factory()->create([
+        'need_group_id' => $this->group->id,
+        'organizational_unit_id' => $this->unit->id,
+        'status' => Need::STATUS_SUBMITTED,
+        'total_price' => 5000000,
+    ]);
+
+    $payloadAfterCreate = $statsAction->getDashboardPayload($this->group->id, $this->admin);
+    expect($payloadAfterCreate['stats']['total_needs'])->toBe($initialTotal + 1);
+
+    // 3. Update the need: NeedObserver fires updated -> bustDashboardCache
+    $newNeed->update([
+        'total_price' => 10000000,
+    ]);
+
+    $payloadAfterUpdate = $statsAction->getDashboardPayload($this->group->id, $this->admin);
+    expect((float) $payloadAfterUpdate['stats']['total_budget'])->toBe((float) $payloadAfterCreate['stats']['total_budget'] + 5000000);
+
+    // 4. Delete the need: NeedObserver fires deleted -> bustDashboardCache
+    $newNeed->delete();
+
+    $payloadAfterDelete = $statsAction->getDashboardPayload($this->group->id, $this->admin);
+    expect($payloadAfterDelete['stats']['total_needs'])->toBe($initialTotal);
+
+    // 5. Restore the need: NeedObserver fires restored -> bustDashboardCache
+    $newNeed->restore();
+
+    $payloadAfterRestore = $statsAction->getDashboardPayload($this->group->id, $this->admin);
+    expect($payloadAfterRestore['stats']['total_needs'])->toBe($initialTotal + 1);
+});

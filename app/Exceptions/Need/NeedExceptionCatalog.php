@@ -80,30 +80,42 @@ class NeedExceptionCatalog
                     });
                 } elseif ($key === 'E4' || $key === 'unassessed_review') {
                     $sub->orWhere(function (Builder $s) {
-                        $s->where('status', 'approved')
-                            ->whereNull('approved_by_director_at')
-                            ->where(function (Builder $subCheck) {
-                                $subCheck->where('checklist_percentage', 0)
-                                    ->orWhereNull('checklist_percentage');
-                            });
+                        $s->where(function (Builder $q) {
+                            $q->where('status', Need::STATUS_SUBMITTED)
+                                ->orWhere(function (Builder $legacy) {
+                                    $legacy->where('status', Need::STATUS_APPROVED)
+                                        ->whereNull('approved_by_director_at');
+                                });
+                        })->where(function (Builder $subCheck) {
+                            $subCheck->where('checklist_percentage', 0)
+                                ->orWhereNull('checklist_percentage');
+                        });
                     });
                 } elseif ($key === 'E5' || $key === 'review_idle') {
                     $sub->orWhere(function (Builder $s) use ($fiveDaysAgo) {
-                        $s->where('status', 'approved')
-                            ->whereNull('approved_by_director_at')
-                            ->where('updated_at', '<=', $fiveDaysAgo);
+                        $s->where(function (Builder $q) {
+                            $q->where('status', Need::STATUS_SUBMITTED)
+                                ->orWhere(function (Builder $legacy) {
+                                    $legacy->where('status', Need::STATUS_APPROVED)
+                                        ->whereNull('approved_by_director_at');
+                                });
+                        })->where('updated_at', '<=', $fiveDaysAgo);
                     });
                 } elseif ($key === 'E6' || $key === 'missing_linkage') {
                     $sub->orWhere(function (Builder $s) {
-                        $s->where('status', 'approved')
-                            ->whereNull('approved_by_director_at')
-                            ->where(function (Builder $linkSub) {
-                                $linkSub->doesntHave('attachments')
-                                    ->orDoesntHave('sasarans')
-                                    ->orDoesntHave('indicators')
-                                    ->orDoesntHave('kpiIndicators')
-                                    ->orDoesntHave('strategicServicePlans');
-                            });
+                        $s->where(function (Builder $q) {
+                            $q->where('status', Need::STATUS_SUBMITTED)
+                                ->orWhere(function (Builder $legacy) {
+                                    $legacy->where('status', Need::STATUS_APPROVED)
+                                        ->whereNull('approved_by_director_at');
+                                });
+                        })->where(function (Builder $linkSub) {
+                            $linkSub->doesntHave('attachments')
+                                ->orDoesntHave('sasarans')
+                                ->orDoesntHave('indicators')
+                                ->orDoesntHave('kpiIndicators')
+                                ->orDoesntHave('strategicServicePlans');
+                        });
                     });
                 } elseif ($key === 'E7' || $key === 'rejected_idle') {
                     $sub->orWhere(function (Builder $s) use ($sevenDaysAgo) {
@@ -151,7 +163,7 @@ class NeedExceptionCatalog
     public function getPositiveQueue(Builder $baseQuery, CarbonImmutable $now): array
     {
         $readyQuery = (clone $baseQuery)
-            ->where('status', 'draft')
+            ->where('status', Need::STATUS_DRAFT)
             ->whereNull('approved_by_director_at')
             ->where('checklist_percentage', '>=', self::MIN_CHECKLIST_PERCENTAGE)
             ->has('attachments')
@@ -222,7 +234,12 @@ class NeedExceptionCatalog
         $e3Needs = (clone $e3Query)->with('organizationalUnit:id,name')->orderBy('checklist_percentage')->limit(10)->get()->map(fn (Need $n): array => $this->formatNeedForDrawer($n, $now))->all();
 
         // E4: Under review with 0% checklist
-        $e4Query = (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where(function (Builder $q) {
+        $e4Query = (clone $baseQuery)->where(function (Builder $q) {
+            $q->where('status', Need::STATUS_SUBMITTED)
+                ->orWhere(function (Builder $legacy) {
+                    $legacy->where('status', Need::STATUS_APPROVED)->whereNull('approved_by_director_at');
+                });
+        })->where(function (Builder $q) {
             $q->whereNull('checklist_percentage')->orWhere('checklist_percentage', 0);
         });
         $e4Stat = (clone $e4Query)->toBase()->selectRaw('COUNT(*) as count, COALESCE(SUM(total_price), 0) as budget')->first();
@@ -231,16 +248,31 @@ class NeedExceptionCatalog
         $e4Needs = (clone $e4Query)->with('organizationalUnit:id,name')->orderByDesc('total_price')->limit(10)->get()->map(fn (Need $n): array => $this->formatNeedForDrawer($n, $now))->all();
 
         // E5: Under review idle >= 5 days (Critical at >= 10 days)
-        $e5Query = (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '<=', $fiveDaysAgo);
+        $e5Query = (clone $baseQuery)->where(function (Builder $q) {
+            $q->where('status', Need::STATUS_SUBMITTED)
+                ->orWhere(function (Builder $legacy) {
+                    $legacy->where('status', Need::STATUS_APPROVED)->whereNull('approved_by_director_at');
+                });
+        })->where('updated_at', '<=', $fiveDaysAgo);
         $e5Stat = (clone $e5Query)->toBase()->selectRaw('COUNT(*) as count, COALESCE(SUM(total_price), 0) as budget')->first();
         $e5Count = (int) ($e5Stat->count ?? 0);
         $e5Budget = (float) ($e5Stat->budget ?? 0.0);
-        $e5CriticalCount = (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where('updated_at', '<=', $tenDaysAgo)->count();
+        $e5CriticalCount = (clone $baseQuery)->where(function (Builder $q) {
+            $q->where('status', Need::STATUS_SUBMITTED)
+                ->orWhere(function (Builder $legacy) {
+                    $legacy->where('status', Need::STATUS_APPROVED)->whereNull('approved_by_director_at');
+                });
+        })->where('updated_at', '<=', $tenDaysAgo)->count();
         $e5Severity = $e5CriticalCount > 0 ? 'critical' : 'warning';
         $e5Needs = (clone $e5Query)->with('organizationalUnit:id,name')->orderBy('updated_at')->limit(10)->get()->map(fn (Need $n): array => $this->formatNeedForDrawer($n, $now))->all();
 
         // E6: Under review missing mandatory linkages
-        $e6Query = (clone $baseQuery)->where('status', 'approved')->whereNull('approved_by_director_at')->where(function (Builder $q) {
+        $e6Query = (clone $baseQuery)->where(function (Builder $q) {
+            $q->where('status', Need::STATUS_SUBMITTED)
+                ->orWhere(function (Builder $legacy) {
+                    $legacy->where('status', Need::STATUS_APPROVED)->whereNull('approved_by_director_at');
+                });
+        })->where(function (Builder $q) {
             $q->doesntHave('attachments')
                 ->orDoesntHave('sasarans')
                 ->orDoesntHave('indicators')

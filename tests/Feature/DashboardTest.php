@@ -22,16 +22,7 @@ test('guests are redirected to the login page from dashboard routes', function (
     $this->get(route('dashboard.workspace'))->assertRedirect(route('login'));
 });
 
-test('authenticated users are redirected from /dashboard to executive dashboard', function () {
-    $user = User::factory()->create();
-    $user->assignRole('super-admin');
-
-    $this->actingAs($user)
-        ->get(route('dashboard'))
-        ->assertRedirect(route('dashboard.executive'));
-});
-
-test('authenticated users can visit executive dashboard and receive deferred payload', function () {
+test('authenticated users can visit unified dashboard directly and receive deferred payload', function () {
     $user = User::factory()->create();
     $user->assignRole('super-admin');
     $group = NeedGroup::factory()->create(['year' => 2026, 'is_active' => true]);
@@ -39,18 +30,18 @@ test('authenticated users can visit executive dashboard and receive deferred pay
 
     $this->actingAs($user);
 
-    $response = $this->get(route('dashboard.executive'));
+    $response = $this->get(route('dashboard'));
     $response->assertOk();
     $response->assertInertia(fn (Assert $page) => $page
-        ->component('dashboard/executive')
+        ->component('dashboard/index')
     );
 
     $version = $response->inertiaPage()['version'] ?? '';
 
-    $partialResponse = $this->get(route('dashboard.executive'), [
+    $partialResponse = $this->get(route('dashboard'), [
         'X-Inertia' => 'true',
         'X-Inertia-Version' => (string) $version,
-        'X-Inertia-Partial-Component' => 'dashboard/executive',
+        'X-Inertia-Partial-Component' => 'dashboard/index',
         'X-Inertia-Partial-Data' => 'dashboardPayload',
     ]);
     $partialResponse->assertOk();
@@ -60,18 +51,18 @@ test('authenticated users can visit executive dashboard and receive deferred pay
     );
 });
 
-test('authenticated users can visit operations and workspace dashboard pages', function () {
+test('legacy dashboard routes redirect to unified dashboard preserving query parameters', function () {
     $user = User::factory()->create();
     $user->assignRole('super-admin');
-    $group = NeedGroup::factory()->create(['year' => 2026, 'is_active' => true]);
 
     $this->actingAs($user);
 
-    $this->get(route('dashboard.operations'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page->component('dashboard/operations'));
+    $this->get(route('dashboard.executive', ['need_group_id' => 99]))
+        ->assertRedirect(route('dashboard', ['need_group_id' => 99]));
 
-    $this->get(route('dashboard.workspace'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page->component('dashboard/workspace'));
+    $this->get(route('dashboard.operations', ['need_group_id' => 88]))
+        ->assertRedirect(route('dashboard', ['need_group_id' => 88]));
+
+    $this->get(route('dashboard.workspace', ['need_group_id' => 77]))
+        ->assertRedirect(route('dashboard', ['need_group_id' => 77]));
 });

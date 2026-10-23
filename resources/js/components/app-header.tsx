@@ -1,9 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
   RiBookOpenLine,
-  RiBriefcaseLine,
   RiDashboardLine,
-  RiFilterLine,
   RiFolderLine,
   RiMenuLine,
   RiSearchLine,
@@ -49,19 +47,9 @@ type Props = {
 
 const mainNavItems: NavItem[] = [
   {
-    title: 'Executive',
-    href: '/dashboard/executive',
-    icon: RiBriefcaseLine,
-  },
-  {
-    title: 'Operations',
-    href: '/dashboard/operations',
+    title: 'Dashboard',
+    href: '/dashboard',
     icon: RiDashboardLine,
-  },
-  {
-    title: 'Workspace',
-    href: '/dashboard/workspace',
-    icon: RiFilterLine,
   },
 ];
 
@@ -142,7 +130,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
           </div>
 
           <Link
-            href="/dashboard/executive"
+            href="/dashboard"
             prefetch
             className="flex items-center space-x-2"
           >

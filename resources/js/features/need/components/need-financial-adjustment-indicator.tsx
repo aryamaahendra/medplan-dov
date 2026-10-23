@@ -9,11 +9,8 @@ import {
 import { formatIDR } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import type { Need } from '@/types';
-import {
-  resolveNeedFinancialFigures
-  
-} from '../utils/need-financial-utils';
-import type {NeedFinancialFigures} from '../utils/need-financial-utils';
+import { resolveNeedFinancialFigures } from '../utils/need-financial-utils';
+import type { NeedFinancialFigures } from '../utils/need-financial-utils';
 
 export interface NeedFinancialAdjustmentIndicatorProps {
   need?: Need | null;

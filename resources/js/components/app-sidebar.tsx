@@ -1,6 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
-  RiBriefcaseLine,
   RiBuilding2Line,
   RiClipboardLine,
   RiDashboardLine,
@@ -13,7 +12,6 @@ import {
   RiListCheck3,
   RiShieldUserLine,
   RiKey2Line,
-  RiLineChartLine,
   RiCodeSSlashLine,
 } from '@remixicon/react';
 import AppLogo from '@/components/app-logo';
@@ -44,19 +42,9 @@ import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
   {
-    title: 'Kebijakan & Anggaran',
-    href: '/dashboard/executive',
-    icon: RiBriefcaseLine,
-  },
-  {
-    title: 'Pantauan Pengusulan',
-    href: '/dashboard/operations',
+    title: 'Dashboard',
+    href: '/dashboard',
     icon: RiDashboardLine,
-  },
-  {
-    title: 'Analisis & Renstra',
-    href: '/dashboard/workspace',
-    icon: RiLineChartLine,
   },
 ];
 
@@ -193,7 +181,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
-              render={<Link href="/dashboard/executive" prefetch />}
+              render={<Link href="/dashboard" prefetch />}
             >
               <AppLogo />
             </SidebarMenuButton>

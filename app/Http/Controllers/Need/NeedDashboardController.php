@@ -8,6 +8,7 @@ use App\Actions\Need\GetNeedDashboardStatsAction;
 use App\Http\Controllers\Controller;
 use App\Models\Need;
 use App\Models\NeedGroup;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -32,68 +33,46 @@ final class NeedDashboardController extends Controller
     }
 
     /**
-     * Executive Dashboard page.
+     * Unified Dashboard page.
      */
-    public function executive(Request $request, GetNeedDashboardStatsAction $statsAction): Response
+    public function index(Request $request, GetNeedDashboardStatsAction $statsAction): Response
     {
         $this->authorize('viewAny', Need::class);
 
         $groupId = $this->resolveGroupId($request);
         if (! $groupId) {
-            return Inertia::render('dashboard/executive', [
+            return Inertia::render('dashboard/index', [
                 'dashboardPayload' => null,
             ]);
         }
 
-        $compareGroupId = $request->integer('compare_group_id') ?: null;
         $user = $request->user();
 
-        return Inertia::render('dashboard/executive', [
-            'dashboardPayload' => Inertia::defer(fn () => $statsAction->getDashboardPayload($groupId, $user, $compareGroupId), 'dashboardPayload'),
+        return Inertia::render('dashboard/index', [
+            'dashboardPayload' => Inertia::defer(fn () => $statsAction->getDashboardPayload($groupId, $user), 'dashboardPayload'),
         ]);
     }
 
     /**
-     * Operations Dashboard page.
+     * Redirect legacy dashboard variants to unified dashboard.
      */
-    public function operations(Request $request, GetNeedDashboardStatsAction $statsAction): Response
+    public function redirectOld(Request $request): RedirectResponse
     {
-        $this->authorize('viewAny', Need::class);
-
-        $groupId = $this->resolveGroupId($request);
-        if (! $groupId) {
-            return Inertia::render('dashboard/operations', [
-                'dashboardPayload' => null,
-            ]);
-        }
-
-        $compareGroupId = $request->integer('compare_group_id') ?: null;
-        $user = $request->user();
-
-        return Inertia::render('dashboard/operations', [
-            'dashboardPayload' => Inertia::defer(fn () => $statsAction->getDashboardPayload($groupId, $user, $compareGroupId), 'dashboardPayload'),
-        ]);
+        return redirect()->route('dashboard', $request->query());
     }
 
-    /**
-     * Analytical Workspace Dashboard page.
-     */
-    public function workspace(Request $request, GetNeedDashboardStatsAction $statsAction): Response
+    public function executive(Request $request): RedirectResponse
     {
-        $this->authorize('viewAny', Need::class);
+        return $this->redirectOld($request);
+    }
 
-        $groupId = $this->resolveGroupId($request);
-        if (! $groupId) {
-            return Inertia::render('dashboard/workspace', [
-                'dashboardPayload' => null,
-            ]);
-        }
+    public function operations(Request $request): RedirectResponse
+    {
+        return $this->redirectOld($request);
+    }
 
-        $compareGroupId = $request->integer('compare_group_id') ?: null;
-        $user = $request->user();
-
-        return Inertia::render('dashboard/workspace', [
-            'dashboardPayload' => Inertia::defer(fn () => $statsAction->getDashboardPayload($groupId, $user, $compareGroupId), 'dashboardPayload'),
-        ]);
+    public function workspace(Request $request): RedirectResponse
+    {
+        return $this->redirectOld($request);
     }
 }

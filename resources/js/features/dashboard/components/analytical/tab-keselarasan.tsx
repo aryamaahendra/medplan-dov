@@ -42,11 +42,12 @@ interface TabKeselarasanProps {
   payload: NeedsDashboardPayload;
   slice?: SliceState;
   onSliceChange?: (updater: (prev: SliceState) => SliceState) => void;
-  metrics: SlicedMetrics;
+  metrics?: SlicedMetrics;
 }
 
 export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
-  const { currentGroup, dataReadiness, exceptions, sasaranOverview } = payload;
+  const { currentGroup, dataReadiness, exceptions, sasaranOverview, stats } =
+    payload;
   const groupId = currentGroup?.id;
 
   const [sasaranSearch, setSasaranSearch] = useState('');
@@ -73,11 +74,11 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
   const supportedCount = sasaranOverview.length - zeroSupportCount;
 
   // Unaligned / Orphan Needs Estimate
+  const totalCount = metrics?.totalCount ?? stats.total_needs;
+  const totalBudget = metrics?.totalBudget ?? stats.total_budget;
   const orphanCount = exceptions.unaligned_needs ?? 0;
   const orphanBudgetEstimate =
-    metrics.totalCount > 0
-      ? Math.round((orphanCount / metrics.totalCount) * metrics.totalBudget)
-      : 0;
+    totalCount > 0 ? Math.round((orphanCount / totalCount) * totalBudget) : 0;
 
   return (
     <div className="flex flex-col gap-6">
@@ -125,6 +126,7 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
         title="Cakupan Penyelarasan Strategis & Dokumen"
         subtitle="Proporsi usulan perencanaan yang memiliki keterkaitan dengan dokumen arahan strategis rumah sakit."
         infoTooltip="Menampilkan persentase usulan yang memenuhi keterhubungan Renstra, IKU, KAK, dan berkas lampiran."
+        borderless
         tableView={
           <Table>
             <TableHeader>
@@ -291,6 +293,7 @@ export function TabKeselarasan({ payload, metrics }: TabKeselarasanProps) {
       <AnalyticalWidgetFrame
         title="Penyelarasan Sasaran Strategis (Katalog Renstra)"
         subtitle="Distribusi dukungan usulan kebutuhan terhadap seluruh sasaran strategis, termasuk sasaran dengan 0 usulan pendukung."
+        borderless
         headerActions={
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex items-center gap-1.5 rounded-lg border border-border/80 bg-muted/40 px-2 py-1 text-xs">

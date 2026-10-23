@@ -37,11 +37,14 @@ final class NeedAttachmentController extends Controller
     {
         $this->authorize('create', [NeedAttachment::class, $need]);
 
+        $file = $request->file('file');
+
         $engine->addAttachment($need, [
-            'file' => $request->file('file'),
+            'file' => $file,
+            'category' => $request->input('category', 'general'),
             'display_name' => $request->input('display_name'),
-            'extension' => $request->input('extension'),
-            'file_size' => $request->input('file_size'),
+            'extension' => $file->getClientOriginalExtension(),
+            'file_size' => $file->getSize(),
         ]);
 
         return back()->with('success', 'Lampiran berhasil diunggah.');

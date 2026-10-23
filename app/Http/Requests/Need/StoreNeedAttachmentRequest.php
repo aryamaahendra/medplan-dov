@@ -6,6 +6,7 @@ namespace App\Http\Requests\Need;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 final class StoreNeedAttachmentRequest extends FormRequest
 {
@@ -39,9 +40,10 @@ final class StoreNeedAttachmentRequest extends FormRequest
                 'max:'.self::MAX_FILE_SIZE_KB,
                 'mimes:'.implode(',', self::ALLOWED_MIMES),
             ],
+            'category' => ['sometimes', 'string', Rule::in(['general', 'technical_specifications'])],
             'display_name' => ['nullable', 'string', 'max:255'],
-            'extension' => ['required', 'string'],
-            'file_size' => ['required', 'integer'],
+            'extension' => ['sometimes', 'nullable', 'string'],
+            'file_size' => ['sometimes', 'nullable', 'integer'],
         ];
     }
 }

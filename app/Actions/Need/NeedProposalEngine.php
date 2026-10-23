@@ -48,7 +48,7 @@ class NeedProposalEngine
             $need = Need::query()->create($attributes);
 
             $this->alignmentEngine->syncForNeed($need, $payload, isPartialUpdate: false);
-            $this->saveDetail($need, $payload->detail, $payload->fundingSources);
+            $this->saveDetail($need, $payload->detail, $payload->fundingSources, $actor);
             $this->storeAttachments($need, $payload);
             if ($payload->shouldSubmit) {
                 $this->lockLifecycle->lockForExecutiveReview($need, $actor);
@@ -81,7 +81,7 @@ class NeedProposalEngine
             $this->alignmentEngine->syncForNeed($need, $payload, isPartialUpdate: true);
 
             if ($payload->detail !== null) {
-                $this->saveDetail($need, $payload->detail, $payload->fundingSources);
+                $this->saveDetail($need, $payload->detail, $payload->fundingSources, $actor);
             }
 
             if (! empty($payload->deletedAttachmentIds)) {
@@ -112,11 +112,12 @@ class NeedProposalEngine
     public function addAttachment(Need $need, array $data): NeedAttachment
     {
         $file = $data['file'];
-        $category = $data['category'] ?? 'general';
+        $category = in_array($data['category'] ?? 'general', ['general', 'technical_specifications'], true)
+            ? ($data['category'] ?? 'general')
+            : 'general';
         $displayName = $data['display_name'] ?? $file->getClientOriginalName();
-        $extension = $data['extension'] ?? $file->getClientOriginalExtension();
-        $fileSize = $data['file_size'] ?? $file->getSize();
-
+        $extension = $file->getClientOriginalExtension();
+        $fileSize = $file->getSize();
         $disk = (string) config('filesystems.attachments_disk', config('filesystems.default', 'local'));
 
         $folder = $category === 'technical_specifications'
@@ -158,13 +159,13 @@ class NeedProposalEngine
      * @param  array<string, mixed>|null  $detailData
      * @param  array<int|string>|null  $fundingSourceIds
      */
-    protected function saveDetail(Need $need, ?array $detailData, ?array $fundingSourceIds): void
+    protected function saveDetail(Need $need, ?array $detailData, ?array $fundingSourceIds, ?User $actor = null): void
     {
         if ($detailData === null && $fundingSourceIds === null) {
             return;
         }
 
-        $resolvedIds = $this->resolveFundingSourceIds($fundingSourceIds);
+        $resolvedIds = $this->resolveFundingSourceIds($fundingSourceIds, $actor);
 
         /** @var NeedDetail $detail */
         $detail = $need->detail()->updateOrCreate(
@@ -183,23 +184,32 @@ class NeedProposalEngine
      * @param  array<int|string>|null  $fundingSourceIds
      * @return array<int, int>
      */
-    protected function resolveFundingSourceIds(?array $fundingSourceIds): array
+    public function resolveFundingSourceIds(?array $fundingSourceIds, ?User $actor = null): array
     {
         if (empty($fundingSourceIds)) {
             return [];
         }
 
+        $canManageMasterFundingSources = $actor !== null && (
+            $actor->hasRole('super-admin') || $actor->can('manage funding sources')
+        );
+
         $resolvedIds = [];
         foreach ($fundingSourceIds as $idOrName) {
             if (! is_numeric($idOrName) && ! empty($idOrName)) {
-                $source = FundingSource::query()->firstOrCreate(['name' => (string) $idOrName]);
-                $resolvedIds[] = $source->id;
+                if ($canManageMasterFundingSources) {
+                    $source = FundingSource::query()->firstOrCreate(['name' => (string) $idOrName]);
+                    $resolvedIds[] = $source->id;
+                }
             } elseif (! empty($idOrName)) {
-                $resolvedIds[] = (int) $idOrName;
+                $id = (int) $idOrName;
+                if (FundingSource::query()->where('id', $id)->exists()) {
+                    $resolvedIds[] = $id;
+                }
             }
         }
 
-        return $resolvedIds;
+        return array_values(array_unique($resolvedIds));
     }
 
     /**

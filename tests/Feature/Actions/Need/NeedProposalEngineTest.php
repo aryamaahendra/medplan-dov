@@ -13,10 +13,12 @@ use App\Models\PlanningActivityIndicator;
 use App\Models\PlanningActivityVersion;
 use App\Models\Sasaran;
 use App\Models\StrategicServicePlan;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
@@ -24,7 +26,9 @@ it('submits a new proposal with alignments, dynamic funding sources, and derived
     $group = NeedGroup::factory()->create();
     $unit = OrganizationalUnit::factory()->create();
     $type = NeedType::factory()->create();
-
+    Role::firstOrCreate(['name' => 'super-admin']);
+    $admin = User::factory()->create();
+    $admin->assignRole('super-admin');
     $sasaran = Sasaran::factory()->create();
     $indicator = Indicator::factory()->create();
     $kpi = KpiIndicator::factory()->create();
@@ -61,8 +65,7 @@ it('submits a new proposal with alignments, dynamic funding sources, and derived
         ],
     ]);
 
-    $need = $engine->submit($payload);
-
+    $need = $engine->submit($payload, $admin);
     expect($need->exists)->toBeTrue()
         ->and($need->title)->toBe('Pengadaan Server Baru')
         ->and($need->is_priority)->toBeTrue()

@@ -9,6 +9,7 @@ use App\Models\Need;
 use App\Models\OrganizationalUnit;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class UpdateNeedRequest extends FormRequest
@@ -44,10 +45,13 @@ class UpdateNeedRequest extends FormRequest
             'update need tab ikk' => ['kpi_indicator_ids'],
             'update need tab rls' => ['strategic_service_plan_ids'],
             'update need tab planning' => ['planning_activity_version_ids', 'planning_activity_indicator_ids'],
-            'update need tab detail' => ['detail'],
+            'update need tab detail' => [
+                'detail',
+                'technical_specification_attachments',
+                'technical_specification_attachment_names',
+            ],
             'update need tab lampiran' => [
-                'attachments', 'attachment_names', 'technical_specification_attachments',
-                'technical_specification_attachment_names', 'deleted_attachment_ids',
+                'attachments', 'attachment_names', 'deleted_attachment_ids',
             ],
         ];
 
@@ -73,6 +77,21 @@ class UpdateNeedRequest extends FormRequest
     {
         $user = $this->user();
         $isSuperAdmin = $user && $user->hasRole('super-admin');
+        $canManageFundingSources = $isSuperAdmin || ($user && $user->can('manage funding sources'));
+
+        $fundingSourceItemRules = $canManageFundingSources
+            ? [
+                function ($attribute, $value, $fail) {
+                    if (is_numeric($value)) {
+                        if (! DB::table('funding_sources')->where('id', (int) $value)->exists()) {
+                            $fail(__('Sumber dana yang dipilih tidak valid.'));
+                        }
+                    } elseif (! is_string($value) || trim($value) === '') {
+                        $fail(__('Sumber dana tidak valid.'));
+                    }
+                },
+            ]
+            : ['integer', 'exists:funding_sources,id'];
 
         $rules = [];
 
@@ -198,6 +217,7 @@ class UpdateNeedRequest extends FormRequest
                 'detail.satker_skpd' => ['nullable', 'string'],
                 'detail.kpa_id' => ['nullable', 'exists:users,id'],
                 'detail.funding_source_ids' => ['nullable', 'array'],
+                'detail.funding_source_ids.*' => $fundingSourceItemRules,
                 'detail.estimated_cost' => ['nullable', 'string'],
                 'detail.implementation_period' => ['nullable', 'string'],
                 'detail.expert_or_skilled_personnel' => ['nullable', 'string'],

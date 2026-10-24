@@ -136,14 +136,8 @@ class OperationsDashboardCalculator
 
         /** @var object{c1?: int|string, b1?: int|float|string, c2?: int|string, b2?: int|float|string, c3?: int|string, b3?: int|float|string, c4?: int|string, b4?: int|float|string}|null $rAging */
         $rAging = (clone $baseQuery)
+            ->underReview()
             ->toBase()
-            ->where(function ($q) {
-                $q->where('status', Need::STATUS_SUBMITTED)
-                    ->orWhere(function ($legacy) {
-                        $legacy->where('status', Need::STATUS_APPROVED)
-                            ->whereNull('approved_by_director_at');
-                    });
-            })
             ->selectRaw('
                 COUNT(CASE WHEN updated_at > ? THEN 1 END) as c1,
                 COALESCE(SUM(CASE WHEN updated_at > ? THEN total_price ELSE 0 END), 0) as b1,

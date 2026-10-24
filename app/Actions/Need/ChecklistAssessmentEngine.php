@@ -45,12 +45,11 @@ class ChecklistAssessmentEngine
 
         $yesCount = $answers->where('answer', ChecklistAnswer::Yes)->count();
         $needGroup = $need->needGroup;
-        $groupActiveCount = $needGroup instanceof NeedGroup
+        $hasConfiguredQuestions = $needGroup instanceof NeedGroup && $needGroup->checklistQuestions()->exists();
+
+        $totalRelevant = $hasConfiguredQuestions
             ? $needGroup->checklistQuestions()->wherePivot('is_active', true)->count()
-            : 0;
-
-        $totalRelevant = $groupActiveCount > 0 ? $groupActiveCount : $answers->count();
-
+            : $answers->count();
         $percentage = $totalRelevant > 0
             ? round(($yesCount / $totalRelevant) * 100, 2)
             : 0.0;

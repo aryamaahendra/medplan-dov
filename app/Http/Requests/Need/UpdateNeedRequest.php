@@ -81,7 +81,7 @@ class UpdateNeedRequest extends FormRequest
 
         $fundingSourceItemRules = $canManageFundingSources
             ? [
-                function ($attribute, $value, $fail) {
+                function (string $attribute, mixed $value, \Closure $fail): void {
                     if (is_numeric($value)) {
                         if (! DB::table('funding_sources')->where('id', (int) $value)->exists()) {
                             $fail(__('Sumber dana yang dipilih tidak valid.'));
@@ -102,7 +102,7 @@ class UpdateNeedRequest extends FormRequest
                     'required',
                     'integer',
                     Rule::exists('organizational_units', 'id')->whereNull('deleted_at'),
-                    function ($attribute, $value, $fail) use ($user) {
+                    function (string $attribute, mixed $value, \Closure $fail) use ($user): void {
                         if (! $user) {
                             return;
                         }
@@ -136,7 +136,7 @@ class UpdateNeedRequest extends FormRequest
                     'required',
                     'numeric',
                     'min:0',
-                    function ($attribute, $value, $fail) {
+                    function (string $attribute, mixed $value, \Closure $fail): void {
                         $need = $this->route('need');
                         if (! $need instanceof Need && $need) {
                             $need = Need::find($need);

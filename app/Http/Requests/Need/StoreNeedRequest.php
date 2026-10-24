@@ -89,7 +89,7 @@ class StoreNeedRequest extends FormRequest
 
         $fundingSourceItemRules = $canManageFundingSources
             ? [
-                function ($attribute, $value, $fail) {
+                function (string $attribute, mixed $value, \Closure $fail): void {
                     if (is_numeric($value)) {
                         if (! DB::table('funding_sources')->where('id', (int) $value)->exists()) {
                             $fail(__('Sumber dana yang dipilih tidak valid.'));
@@ -108,8 +108,10 @@ class StoreNeedRequest extends FormRequest
                 'required',
                 'integer',
                 Rule::exists('organizational_units', 'id')->whereNull('deleted_at'),
-                function ($attribute, $value, $fail) {
-                    $user = $this->user();
+                function (string $attribute, mixed $value, \Closure $fail) use ($user): void {
+                    if (! $user) {
+                        return;
+                    }
                     if ($user->hasRole('super-admin') || $user->hasPermissionTo('create any needs')) {
                         return;
                     }
@@ -140,7 +142,7 @@ class StoreNeedRequest extends FormRequest
                 'required',
                 'numeric',
                 'min:0',
-                function ($attribute, $value, $fail) {
+                function (string $attribute, mixed $value, \Closure $fail): void {
                     $volume = $this->input('volume');
                     $unitPrice = $this->input('unit_price');
                     if (is_numeric($volume) && is_numeric($unitPrice)) {

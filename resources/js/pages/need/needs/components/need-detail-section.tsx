@@ -107,7 +107,7 @@ export function NeedDetailSection({
   }
 
   const handleChange = useCallback(
-    (key: string, value: any) => {
+    (key: string, value: unknown) => {
       detailValuesRef.current = {
         ...detailValuesRef.current,
         [key]: value,

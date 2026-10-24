@@ -347,6 +347,21 @@ class Need extends Model
     }
 
     /**
+     * Scope a query to include proposals currently under review (unified status submitted,
+     * or legacy approved with null director timestamp).
+     */
+    public function scopeUnderReview(Builder $query): Builder
+    {
+        return $query->where(function (Builder $q): void {
+            $q->where('status', self::STATUS_SUBMITTED)
+                ->orWhere(function (Builder $legacy): void {
+                    $legacy->where('status', self::STATUS_APPROVED)
+                        ->whereNull('approved_by_director_at');
+                });
+        });
+    }
+
+    /**
      * Scope a query to include proposals eligible for rollover into a target group.
      */
     public function scopeEligibleForRollover(Builder $query, ?int $targetGroupId = null): Builder

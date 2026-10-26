@@ -62,7 +62,11 @@ final class NeedController extends Controller
             }
         }
 
-        $currentGroup = $groupId ? NeedGroup::query()->find($groupId) : null;
+        $currentGroup = $groupId
+            ? NeedGroup::query()
+                ->withSum('needs as total_budget', 'total_price')
+                ->find($groupId)
+            : null;
 
         $filters = [
             'year' => $request->input('year'),

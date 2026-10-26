@@ -9,7 +9,7 @@ import {
 } from '@/components/badges';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { formatCompactIDR, formatIDR } from '@/lib/formatters';
+import { formatIDR } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import type { Need } from '@/types';
 import { resolveNeedFinancialFigures } from './need-financial-utils';
@@ -107,11 +107,8 @@ export function NeedShowCompactStats({ need }: NeedShowCompactStatsProps) {
             </div>
 
             <div className="my-3">
-              <div
-                className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
-                title={formatIDR(displayTotalPrice)}
-              >
-                {formatCompactIDR(displayTotalPrice)}
+              <div className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                {formatIDR(displayTotalPrice)}
               </div>
               <div className="mt-2 flex flex-wrap items-center gap-1.5 text-xs text-foreground/80">
                 <span className="font-semibold text-foreground">
@@ -119,12 +116,10 @@ export function NeedShowCompactStats({ need }: NeedShowCompactStatsProps) {
                   {need.unit}
                 </span>
                 <span>x</span>
-                <span title={formatIDR(displayUnitPrice)}>
-                  {formatCompactIDR(displayUnitPrice)}
-                </span>
+                <span>{formatIDR(displayUnitPrice)}</span>
                 {isApproved && (
                   <span className="ml-1 text-muted-foreground">
-                    (Awal: {formatCompactIDR(requestedTotalPrice)})
+                    (Awal: {formatIDR(requestedTotalPrice)})
                   </span>
                 )}
               </div>

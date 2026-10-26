@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { TreeSelect } from '@/components/ui/tree-select';
+import { normalizeVolume } from '@/lib/formatters';
 
 const formatIDR = (value: string | number) => {
   if (value === undefined || value === null || value === '') {
@@ -196,9 +197,9 @@ export function GeneralInfoSection({
                 type="number"
                 min="0"
                 step="0.0001"
-                placeholder="Volume"
                 value={data.volume}
                 onChange={(e) => handleVolumeChange(e.target.value)}
+                onBlur={() => handleVolumeChange(normalizeVolume(data.volume))}
                 required
                 className="bg-background text-center font-medium"
               />

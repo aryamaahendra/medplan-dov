@@ -18,7 +18,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { formatIDR } from '@/lib/formatters';
+import { formatIDR, normalizeVolume } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import type { Need } from '@/types';
 import { useDirectorReviewDetermination } from './use-director-review-determination';
@@ -244,12 +244,17 @@ export function DirectorReviewDialog({
                       label={`Volume Disetujui (${need.unit})`}
                       required
                       type="number"
-                      step="any"
-                      min="0.0001"
+                      min="0"
+                      step="0.0001"
                       max={determination.requestedVolume}
                       value={determination.approvedVolume}
                       onChange={(e) =>
                         determination.setApprovedVolume(e.target.value)
+                      }
+                      onBlur={() =>
+                        determination.setApprovedVolume(
+                          normalizeVolume(determination.approvedVolume),
+                        )
                       }
                       description={`Maks: ${determination.requestedVolume.toLocaleString(
                         'id-ID',

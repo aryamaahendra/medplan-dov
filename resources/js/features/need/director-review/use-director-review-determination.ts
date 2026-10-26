@@ -3,6 +3,7 @@ import type { SyntheticEvent } from 'react';
 import { toast } from 'sonner';
 
 import NeedController from '@/actions/App/Http/Controllers/Need/NeedController';
+import { normalizeVolume } from '@/lib/formatters';
 import type { Need } from '@/types';
 import { resolveNeedFinancialFigures } from '../utils/need-financial-utils';
 
@@ -62,10 +63,11 @@ export function useDirectorReviewDetermination(
         ? 'revision'
         : 'approved';
 
-  const initialVolumeStr =
+  const initialVolumeStr = normalizeVolume(
     need.approved_volume !== null && need.approved_volume !== undefined
-      ? String(need.approved_volume)
-      : String(need.volume ?? '');
+      ? need.approved_volume
+      : (need.volume ?? ''),
+  );
 
   const initialUnitPriceStr =
     need.approved_unit_price !== null && need.approved_unit_price !== undefined

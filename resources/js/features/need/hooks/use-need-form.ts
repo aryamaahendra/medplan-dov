@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 
 import NeedController from '@/actions/App/Http/Controllers/Need/NeedController';
 import { usePermission } from '@/hooks/use-permission';
+import { normalizeVolume } from '@/lib/formatters';
 import needRoutes from '@/routes/needs';
 import type {
   KpiGroup,
@@ -161,7 +162,7 @@ export function useNeedForm({
     current_condition: need?.current_condition ?? '',
     required_condition: need?.required_condition ?? '',
     unit: need?.unit ?? '',
-    volume: need?.volume ?? '',
+    volume: normalizeVolume(need?.volume),
     unit_price: need?.unit_price ?? '',
     total_price: need?.total_price ?? '',
     urgency: need?.urgency ?? 'medium',

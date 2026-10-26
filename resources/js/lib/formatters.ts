@@ -17,6 +17,30 @@ export const formatNumber = (value: number | string) => {
   return new Intl.NumberFormat('id-ID').format(Number(value));
 };
 
+/**
+ * Normalizes number/string representation to display decimals only when needed,
+ * stripping trailing zeros and trailing decimal point (e.g., "1.0000" -> "1", "1.2500" -> "1.25").
+ */
+export const normalizeVolume = (
+  value: string | number | null | undefined,
+): string => {
+  if (value === null || value === undefined || value === '') {
+    return '';
+  }
+
+  const str = String(value).trim();
+
+  if (str === '' || isNaN(Number(str))) {
+    return str;
+  }
+
+  if (!str.includes('.')) {
+    return str;
+  }
+
+  return str.replace(/\.?0+$/, '');
+};
+
 export const formatCompactIDR = (value: number | string) => {
   const num = Number(value);
 

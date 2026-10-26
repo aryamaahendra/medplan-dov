@@ -1,8 +1,8 @@
 import {
-  RiDoorOpenLine,
-  RiLockLine,
-  RiCalendarEventLine,
-  RiTimeLine,
+  RiVerifiedBadgeFill,
+  RiLockFill,
+  RiCalendarEventFill,
+  RiTimeFill,
 } from '@remixicon/react';
 import type * as React from 'react';
 
@@ -26,22 +26,22 @@ export const SUBMISSION_WINDOW_MAP: Record<
   open: {
     label: 'Buka Pengajuan',
     tone: 'success',
-    icon: RiDoorOpenLine,
+    icon: RiVerifiedBadgeFill,
   },
   closed: {
     label: 'Pengajuan Ditutup',
     tone: 'destructive',
-    icon: RiLockLine,
+    icon: RiLockFill,
   },
   upcoming: {
     label: 'Mendatang',
     tone: 'warning',
-    icon: RiCalendarEventLine,
+    icon: RiCalendarEventFill,
   },
   indefinite: {
     label: 'Jadwal Fleksibel',
     tone: 'muted',
-    icon: RiTimeLine,
+    icon: RiTimeFill,
   },
 };
 

@@ -9,6 +9,7 @@ import type {
   PaginatedNeeds,
   StageCounts,
 } from '@/features/need/types/need.types';
+import type { NeedGroup } from '@/features/need-group/types/need-group.types';
 import needRoutes from '@/routes/needs';
 
 import { NeedsHeader } from './components/needs-header';
@@ -17,7 +18,7 @@ export type { NeedsIndexFilters };
 
 export interface NeedsIndexProps {
   needs: PaginatedNeeds;
-  currentGroup: { id: number; name: string; year: number };
+  currentGroup: NeedGroup;
   stageCounts: StageCounts;
   attentionCounts: AttentionCounts;
   organizationalUnits: { id: number; name: string; parent_id: number | null }[];

@@ -3,8 +3,8 @@ import {
   RiArrowDownSLine,
   RiCalendarLine,
   RiCheckLine,
-  RiLockLine,
-  RiTimeLine,
+  RiLockFill,
+  RiTimeFill,
 } from '@remixicon/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -255,25 +255,25 @@ export function DashboardGroupSelector({
         {isLocked ? (
           <Badge
             variant="outline"
-            className="h-8 gap-1.5 border-border/80 bg-muted/30 px-3 text-xs text-muted-foreground"
+            className="h-8 gap-1.5 rounded-lg! border-border/80 bg-muted/30 px-3 text-xs text-muted-foreground"
           >
-            <RiLockLine className="size-3.5" />
+            <RiLockFill className="size-3.5" />
             <span>Terkunci / Selesai</span>
           </Badge>
         ) : timerText ? (
           <Badge
             variant="secondary"
-            className="h-8 gap-1.5 bg-success/15 px-3 font-mono text-xs font-semibold text-success dark:bg-success/20"
+            className="h-8 gap-1.5 rounded-lg! bg-success/15 px-3 font-mono text-xs font-semibold text-success-foreground dark:bg-success/20"
           >
-            <RiTimeLine className="size-3.5" />
-            <span>Sisa Waktu: {timerText}</span>
+            <RiTimeFill className="size-3.5" />
+            <p className="mt-px">Sisa Waktu: {timerText}</p>
           </Badge>
         ) : (
           <Badge
             variant="outline"
-            className="h-8 gap-1.5 border-dashed border-border/80 px-3 text-xs text-muted-foreground"
+            className="h-8 gap-1.5 rounded-lg! border-dashed border-border/80 px-3 text-xs text-muted-foreground"
           >
-            <RiTimeLine className="size-3.5" />
+            <RiTimeFill className="size-3.5" />
             <span>Bebas Waktu (Tanpa Batas)</span>
           </Badge>
         )}

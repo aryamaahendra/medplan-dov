@@ -1,4 +1,3 @@
-import { Card, CardContent } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -112,62 +111,58 @@ export function NeedStrategicSection({
 
 function RlsTable({ rlsPlans }: { rlsPlans: StrategicServicePlan[] }) {
   return (
-    <Card>
-      <CardContent className="p-0 sm:p-2">
-        <div className="overflow-x-auto">
-          <Table className="border-collapse [&_td]:border [&_td]:p-2.5 [&_td:first-child]:border-l-0 [&_td:last-child]:border-r-0 [&_th]:border [&_th]:p-2.5 [&_th:first-child]:border-l-0 [&_th:last-child]:border-r-0">
-            <TableHeader className="bg-muted/50">
-              <TableRow>
-                <TableHead className="w-[50px] border-r text-center font-semibold">
-                  No
-                </TableHead>
-                <TableHead className="min-w-[240px] border-r font-semibold">
-                  Program Strategis
-                </TableHead>
-                <TableHead className="min-w-[240px] border-r font-semibold">
-                  Rencana Layanan
-                </TableHead>
-                <TableHead className="w-[100px] border-r text-center font-semibold">
-                  Tahun
-                </TableHead>
-                <TableHead className="w-[120px] border-r text-center font-semibold">
-                  Target
-                </TableHead>
-                <TableHead className="min-w-[200px] font-semibold">
-                  Arah Kebijakan
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rlsPlans.map((plan, index) => (
-                <TableRow
-                  key={plan.id}
-                  className="transition-colors hover:bg-muted/30"
-                >
-                  <TableCell className="border-r text-center font-mono text-xs text-muted-foreground">
-                    {index + 1}
-                  </TableCell>
-                  <TableCell className="border-r text-xs font-medium sm:text-sm">
-                    {plan.strategic_program}
-                  </TableCell>
-                  <TableCell className="border-r text-xs text-muted-foreground sm:text-sm">
-                    {plan.service_plan}
-                  </TableCell>
-                  <TableCell className="border-r text-center font-mono text-xs sm:text-sm">
-                    {plan.year}
-                  </TableCell>
-                  <TableCell className="border-r text-center font-mono text-xs sm:text-sm">
-                    {plan.target || '-'}
-                  </TableCell>
-                  <TableCell className="text-xs text-muted-foreground sm:text-sm">
-                    {plan.policy_direction || '-'}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="overflow-x-auto">
+      <Table className="border-collapse [&_td]:border [&_td]:p-2.5 [&_td:first-child]:border-l-0 [&_td:last-child]:border-r-0 [&_th]:border [&_th]:p-2.5 [&_th:first-child]:border-l-0 [&_th:last-child]:border-r-0">
+        <TableHeader className="bg-muted/50">
+          <TableRow>
+            <TableHead className="w-[50px] border-r text-center font-semibold">
+              No
+            </TableHead>
+            <TableHead className="min-w-[240px] border-r font-semibold">
+              Program Strategis
+            </TableHead>
+            <TableHead className="min-w-[240px] border-r font-semibold">
+              Rencana Layanan
+            </TableHead>
+            <TableHead className="w-[100px] border-r text-center font-semibold">
+              Tahun
+            </TableHead>
+            <TableHead className="w-[120px] border-r text-center font-semibold">
+              Target
+            </TableHead>
+            <TableHead className="min-w-[200px] font-semibold">
+              Arah Kebijakan
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {rlsPlans.map((plan, index) => (
+            <TableRow
+              key={plan.id}
+              className="transition-colors hover:bg-muted/30"
+            >
+              <TableCell className="border-r text-center font-mono text-xs text-muted-foreground">
+                {index + 1}
+              </TableCell>
+              <TableCell className="border-r text-xs font-medium sm:text-sm">
+                {plan.strategic_program}
+              </TableCell>
+              <TableCell className="border-r text-xs text-muted-foreground sm:text-sm">
+                {plan.service_plan}
+              </TableCell>
+              <TableCell className="border-r text-center font-mono text-xs sm:text-sm">
+                {plan.year}
+              </TableCell>
+              <TableCell className="border-r text-center font-mono text-xs sm:text-sm">
+                {plan.target || '-'}
+              </TableCell>
+              <TableCell className="text-xs text-muted-foreground sm:text-sm">
+                {plan.policy_direction || '-'}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 }

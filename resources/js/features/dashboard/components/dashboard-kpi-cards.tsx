@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { usePermission } from '@/hooks/use-permission';
 import {
   formatCompactIDR,
+  formatIDR,
   formatNumber,
   formatPercent,
 } from '@/lib/formatters';
@@ -107,21 +108,30 @@ export function DashboardKpiCards({
             <RiMoneyDollarCircleFill className="size-4 text-muted-foreground transition-colors group-hover:text-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="font-mono text-xl font-bold tracking-tight text-foreground">
+            <div
+              className="font-mono text-xl font-bold tracking-tight text-foreground"
+              title={formatIDR(stats.total_budget)}
+            >
               {formatCompactIDR(stats.total_budget)}
             </div>
-            <div className="mt-1 flex items-center justify-between text-xss text-muted-foreground">
-              <span>{formatNumber(activeCount)} usulan aktif</span>
-              {totalBudgetDelta !== null && (
-                <span className="flex items-center gap-0.5 font-mono text-muted-foreground">
-                  {totalBudgetDelta >= 0 ? (
-                    <RiArrowUpLine className="size-3" />
-                  ) : (
-                    <RiArrowDownLine className="size-3" />
-                  )}
-                  {Math.abs(totalBudgetDelta)}% vs {stats.prev_group?.year}
-                </span>
-              )}
+
+            <div className="mt-2">
+              <div className="truncate font-mono text-xs text-muted-foreground">
+                {formatIDR(stats.total_budget)}
+              </div>
+              <div className="flex items-center justify-between text-xss text-muted-foreground">
+                <span>{formatNumber(activeCount)} usulan aktif</span>
+                {totalBudgetDelta !== null && (
+                  <span className="flex items-center gap-0.5 font-mono text-muted-foreground">
+                    {totalBudgetDelta >= 0 ? (
+                      <RiArrowUpLine className="size-3" />
+                    ) : (
+                      <RiArrowDownLine className="size-3" />
+                    )}
+                    {Math.abs(totalBudgetDelta)}% vs {stats.prev_group?.year}
+                  </span>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -147,7 +157,7 @@ export function DashboardKpiCards({
             </span>
             <RiCheckboxCircleFill className="size-4 text-success" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex h-full flex-col justify-between">
             <div className="font-mono text-xl font-bold tracking-tight text-success-foreground dark:text-success">
               {formatCompactIDR(stats.approved_budget)}
             </div>
@@ -186,16 +196,16 @@ export function DashboardKpiCards({
               : 'border-border/70 hover:border-foreground/30',
           )}
         >
-          <CardHeader className="flex flex-row items-center justify-between pb-1">
+          <CardHeader className="flex flex-row items-center justify-between">
             <span
               className={cn(
-                'text-xss font-semibold tracking-wider uppercase',
+                'text-xs font-semibold tracking-wider uppercase',
                 canApprove
                   ? 'text-warning-foreground dark:text-warning'
                   : 'text-muted-foreground',
               )}
             >
-              {canApprove ? 'MENUNGGU PERSETUJUAN ANDA' : 'MENUNGGU DIREKTUR'}
+              {canApprove ? 'MENUNGGU ANDA' : 'MENUNGGU DIREKTUR'}
             </span>
             <RiTimeFill
               className={cn(
@@ -204,7 +214,7 @@ export function DashboardKpiCards({
               )}
             />
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex h-full flex-col justify-between">
             <div
               className={cn(
                 'font-mono text-xl font-bold tracking-tight',
@@ -217,7 +227,7 @@ export function DashboardKpiCards({
             </div>
             <p
               className={cn(
-                'mt-1 truncate font-mono text-xss',
+                'mt-1 truncate font-mono text-xs',
                 canApprove
                   ? 'text-warning-foreground/80 dark:text-warning/80'
                   : 'text-muted-foreground',
@@ -250,14 +260,14 @@ export function DashboardKpiCards({
             </span>
             <RiAlertFill className="size-4 text-warning" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex h-full flex-col justify-between">
             <div className="font-mono text-xl font-bold tracking-tight text-warning-foreground dark:text-warning">
               {formatNumber(stats.priority_needs)} Usulan
             </div>
             <div className="mt-1 flex items-center justify-between text-xss text-muted-foreground">
               <span>
-                {priorityPct}% dari usulan (
-                {stats.unapproved_priority_count ?? 0} belum acc)
+                {priorityPct}% ({stats.unapproved_priority_count ?? 0} Belum
+                Acc)
               </span>
               {priorityDelta !== null && (
                 <span className="flex items-center gap-0.5 font-mono text-muted-foreground">
@@ -291,13 +301,13 @@ export function DashboardKpiCards({
             </span>
             <RiFileList3Fill className="size-4 text-muted-foreground transition-colors group-hover:text-foreground" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex h-full flex-col justify-between">
             <div className="font-mono text-xl font-bold tracking-tight text-foreground">
               {formatPercent(stats.avg_completeness)}
             </div>
             <div className="mt-1 flex items-center justify-between text-xss text-muted-foreground">
               <span>
-                terisi {stats.assessed_needs_count ?? 0}/{activeCount} usulan
+                Terisi {stats.assessed_needs_count ?? 0}/{activeCount} Usulan
               </span>
               {readinessDelta !== null && (
                 <span

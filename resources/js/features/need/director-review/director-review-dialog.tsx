@@ -5,6 +5,7 @@ import {
   FormCol,
   FormGrid,
   InputField,
+  MoneyInputField,
   SwitchField,
   TextareaField,
 } from '@/components/form';
@@ -263,16 +264,13 @@ export function DirectorReviewDialog({
                     />
                   </FormCol>
                   <FormCol>
-                    <InputField
+                    <MoneyInputField
                       id="approved_unit_price"
                       label="Harga Satuan Disetujui (Rp)"
                       required
-                      type="number"
-                      step="any"
-                      min="0"
                       value={determination.approvedUnitPrice}
-                      onChange={(e) =>
-                        determination.setApprovedUnitPrice(e.target.value)
+                      onValueChange={(val) =>
+                        determination.setApprovedUnitPrice(val)
                       }
                       description={`Usulan awal: ${formatIDR(
                         determination.requestedUnitPrice,

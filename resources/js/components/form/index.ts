@@ -35,6 +35,11 @@ export {
 
 export { PasswordField, type PasswordFieldProps } from './password-field';
 
+export {
+  MoneyInputField,
+  type MoneyInputFieldProps,
+} from './money-input-field';
+
 export { FormField, type FormFieldProps } from './form-field';
 
 export {

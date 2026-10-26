@@ -6,27 +6,12 @@ import {
   TextareaField,
 } from '@/components/form';
 import InputError from '@/components/input-error';
+import MoneyInput from '@/components/money-input';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { TreeSelect } from '@/components/ui/tree-select';
 import { normalizeVolume } from '@/lib/formatters';
-
-const formatIDR = (value: string | number) => {
-  if (value === undefined || value === null || value === '') {
-    return '';
-  }
-
-  const strValue = value.toString().replace(',', '.');
-  const [intPart, decPart] = strValue.split('.');
-  const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-
-  return decPart !== undefined ? `${formattedInt},${decPart}` : formattedInt;
-};
-
-const parseIDR = (value: string) => {
-  return value.replace(/\./g, '').replace(',', '.');
-};
 
 const UNIT_OPTIONS = [
   'pcs',
@@ -216,23 +201,14 @@ export function GeneralInfoSection({
             >
               Harga Satuan (Rp)
             </Label>
-            <div className="relative">
-              <span className="absolute top-1/2 left-3 -translate-y-1/2 text-xs font-semibold text-muted-foreground">
-                Rp
-              </span>
-              <Input
-                id="unit_price"
-                name="unit_price"
-                type="text"
-                placeholder="0"
-                value={formatIDR(data.unit_price)}
-                onChange={(e) =>
-                  handleUnitPriceChange(parseIDR(e.target.value))
-                }
-                required
-                className="bg-background pl-9 font-mono"
-              />
-            </div>
+            <MoneyInput
+              id="unit_price"
+              name="unit_price"
+              value={data.unit_price}
+              onValueChange={handleUnitPriceChange}
+              required
+              className="bg-background"
+            />
             <InputError message={errors.unit_price} />
           </div>
 
@@ -240,20 +216,15 @@ export function GeneralInfoSection({
             <Label htmlFor="total_price" className="text-xs font-semibold">
               Estimasi Total (Rp)
             </Label>
-            <div className="relative">
-              <span className="absolute top-1/2 left-3 -translate-y-1/2 text-xs font-bold">
-                Rp
-              </span>
-              <Input
-                id="total_price"
-                name="total_price"
-                type="text"
-                value={formatIDR(data.total_price)}
-                readOnly
-                className="pl-9 font-mono font-bold"
-                tabIndex={-1}
-              />
-            </div>
+            <MoneyInput
+              id="total_price"
+              name="total_price"
+              value={data.total_price}
+              readOnly
+              className="font-bold"
+              prefixClassName="font-bold text-foreground"
+              tabIndex={-1}
+            />
           </div>
         </div>
       </div>

@@ -43,6 +43,10 @@ export function ActionDropdown({
   className,
   modal = false,
 }: ActionDropdownProps) {
+  if (!actions || actions.length === 0) {
+    return null;
+  }
+
   return (
     <DropdownMenu modal={modal}>
       <DropdownMenuTrigger

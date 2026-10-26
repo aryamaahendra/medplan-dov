@@ -118,13 +118,15 @@ export const getNeedGroupColumns = (
     cell: ({ row }) => {
       const group = row.original;
 
-      const actions: (ActionItem | 'separator')[] = [
-        {
+      const actions: (ActionItem | 'separator')[] = [];
+
+      if (hasPermission('update need-groups')) {
+        actions.push({
           label: 'Kelola Checklist',
           icon: RiListCheck3,
           href: groupRoutes.checklists.index.url({ need_group: group.id }),
-        },
-      ];
+        });
+      }
 
       if (onRollover && hasPermission('update need-groups')) {
         actions.push({

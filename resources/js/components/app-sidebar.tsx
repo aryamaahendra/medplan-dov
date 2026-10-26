@@ -118,13 +118,19 @@ const masterNavItems: NavItem[] = [
 // ];
 
 export function AppSidebar() {
-  const { hasPermission } = usePermission();
+  const { hasPermission, hasAnyPermission } = usePermission();
   const { activeNeedGroups, enableDevTools } = usePage<{
     activeNeedGroups?: { id: number; name: string; year: number }[];
     enableDevTools?: boolean;
   }>().props;
 
-  const dynamicNeedNavItems: NavItem[] = hasPermission('view any needs')
+  const canViewNeeds = hasAnyPermission([
+    'view any needs',
+    'view descendant needs',
+    'view needs',
+  ]);
+
+  const dynamicNeedNavItems: NavItem[] = canViewNeeds
     ? (activeNeedGroups || []).map((group) => ({
         title: `${group.name} (${group.year})`,
         href: needs.index.url({ query: { need_group_id: group.id } }),
@@ -132,9 +138,9 @@ export function AppSidebar() {
       }))
     : [];
 
-  if (hasPermission('view any needs')) {
+  if (hasPermission('view any need-groups')) {
     dynamicNeedNavItems.push({
-      title: 'Semua Usulan',
+      title: 'Kelompok Usulan',
       href: needGroups.index.url(),
       icon: RiDatabase2Line,
     });

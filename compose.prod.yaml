@@ -102,6 +102,8 @@ services:
       REDIS_PORT: 6379
       CACHE_STORE: redis
       QUEUE_CONNECTION: redis
+    volumes:
+      - storage-data:/app/storage/app
     depends_on:
       db:
         condition: service_healthy
@@ -131,6 +133,9 @@ services:
   redis:
     image: redis:alpine
     restart: unless-stopped
+    command: ['redis-server', '--appendonly', 'yes']
+    volumes:
+      - redis-data:/data
     healthcheck:
       test: ['CMD', 'redis-cli', 'ping']
       retries: 3
@@ -145,3 +150,4 @@ networks:
 volumes:
   db-data:
   storage-data:
+  redis-data:

@@ -1,8 +1,14 @@
-export interface Permission {
+export interface PermissionItem {
   id: number;
   name: string;
-  guard_name: string;
-  created_at: string;
+  description: string | null;
+}
+
+export interface PermissionGroup {
+  key: string;
+  title: string;
+  description: string;
+  permissions: PermissionItem[];
 }
 
 export interface Role {
@@ -10,5 +16,12 @@ export interface Role {
   name: string;
   guard_name: string;
   created_at: string;
-  permissions?: Permission[];
+  users_count?: number;
+  permissions?: { id: number; name: string }[];
+}
+
+export interface RoleMatrixProps {
+  roles: Role[];
+  groupedPermissions: PermissionGroup[];
+  currentUserRoleIds: number[];
 }

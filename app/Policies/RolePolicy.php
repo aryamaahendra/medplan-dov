@@ -40,9 +40,17 @@ final class RolePolicy
     }
 
     /**
+     * Determine whether the user can update any models.
+     */
+    public function updateAny(User $user): bool
+    {
+        return $user->hasPermissionTo('update roles');
+    }
+
+    /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Role $role): bool
+    public function update(User $user, ?Role $role = null): bool
     {
         return $user->hasPermissionTo('update roles');
     }

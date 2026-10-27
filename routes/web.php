@@ -17,6 +17,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Management
     Route::namespace('App\Http\Controllers\Management')->group(function () {
         Route::resource('users', 'UserController')->except(['create', 'edit', 'show']);
+        Route::put('roles/matrix', 'RoleController@updateMatrix')->name('roles.matrix.update');
         Route::resource('roles', 'RoleController')->except(['show']);
         Route::resource('permissions', 'PermissionController')->only(['index']);
         Route::post('organizational-units/{id}/restore', 'OrganizationalUnitController@restore')

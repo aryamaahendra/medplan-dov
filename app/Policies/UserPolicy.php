@@ -4,7 +4,7 @@ namespace App\Policies;
 
 use App\Models\User;
 
-class UserPolicy
+final class UserPolicy
 {
     /**
      * Perform pre-authorization checks.

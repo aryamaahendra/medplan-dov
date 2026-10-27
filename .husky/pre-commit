@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -e
+
+echo "Running pre-commit quality gate..."
+
+# 1. Lint-staged: formatting and linting on staged files (with auto-fix)
+# Auto-fixed files are automatically re-staged by lint-staged
+echo "→ Running lint-staged (prettier, eslint, pint)..."
+npx lint-staged
+
+# 2. Whole-project TypeScript type check
+echo "→ Running TypeScript check (tsc --noEmit --incremental)..."
+npx tsc --noEmit --incremental
+
+# 3. Whole-project PHP static analysis (phpstan / larastan)
+echo "→ Running PHPStan analysis..."
+if [ -f vendor/bin/sail ] && docker compose ps --services --filter status=running 2>/dev/null | grep -q laravel.test; then
+  vendor/bin/sail php ./vendor/bin/phpstan analyse --memory-limit=2G
+else
+  ./vendor/bin/phpstan analyse --memory-limit=2G
+fi
+
+echo "✔ Pre-commit quality gate passed."

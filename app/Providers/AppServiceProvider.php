@@ -6,6 +6,8 @@ use App\Models\Need;
 use App\Models\PlanningActivityVersion;
 use App\Observers\NeedObserver;
 use App\Observers\PlanningActivityVersionObserver;
+use App\Policies\PermissionPolicy;
+use App\Policies\RolePolicy;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +15,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -36,6 +40,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(function ($user, $ability) {
             return $user->hasRole('super-admin') ? true : null;
         });
+        Gate::policy(Role::class, RolePolicy::class);
+        Gate::policy(Permission::class, PermissionPolicy::class);
 
         $this->configureDefaults();
         Need::observe(NeedObserver::class);

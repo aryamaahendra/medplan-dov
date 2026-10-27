@@ -234,3 +234,60 @@ it('recalculates both old and new parent chains when activity moves', function (
     expect(yearValue($program1, 2025, 'budget'))->toBeNull()
         ->and(yearValue($program2, 2025, 'budget'))->toEqual(5000);
 });
+
+it('reconciles multi-year and dual-lane budgets on reconcileActivityMove directly', function () {
+    $version = PlanningVersion::factory()->create(['year_start' => 2025, 'year_end' => 2026]);
+    $vId = $version->id;
+
+    $program1 = PlanningActivityVersion::factory()->create([
+        'planning_version_id' => $vId, 'parent_id' => null, 'type' => PlanningActivityType::Program,
+    ]);
+    $program2 = PlanningActivityVersion::factory()->create([
+        'planning_version_id' => $vId, 'parent_id' => null, 'type' => PlanningActivityType::Program,
+    ]);
+    $kegiatan = PlanningActivityVersion::factory()->create([
+        'planning_version_id' => $vId, 'parent_id' => $program1->id, 'type' => PlanningActivityType::Kegiatan,
+    ]);
+    $subkegiatan = PlanningActivityVersion::factory()->create([
+        'planning_version_id' => $vId, 'parent_id' => $kegiatan->id, 'type' => PlanningActivityType::Subkegiatan,
+    ]);
+    $output = PlanningActivityVersion::factory()->create([
+        'planning_version_id' => $vId, 'parent_id' => $subkegiatan->id, 'type' => PlanningActivityType::Output,
+    ]);
+
+    // Set multi-year budgets on both lanes
+    // 2025: manual budget = 1000, computed output = 400
+    PlanningActivityYear::withoutEvents(fn () => $subkegiatan->activityYears()->create(['year' => 2025, 'budget' => 1000]));
+    PlanningActivityYear::withoutEvents(fn () => $output->activityYears()->create(['year' => 2025, 'budget' => 400]));
+    // 2026: manual budget = 2000, computed output = 800
+    PlanningActivityYear::withoutEvents(fn () => $subkegiatan->activityYears()->create(['year' => 2026, 'budget' => 2000]));
+    PlanningActivityYear::withoutEvents(fn () => $output->activityYears()->create(['year' => 2026, 'budget' => 800]));
+
+    $action = app(CalculateActivityBudgetAction::class);
+    $action->reconcile($subkegiatan, 2025);
+    $action->reconcile($output, 2025);
+    $action->reconcile($subkegiatan, 2026);
+    $action->reconcile($output, 2026);
+
+    // Initial Program 1 verification
+    expect(yearValue($program1, 2025, 'budget'))->toEqual(1000)
+        ->and(yearValue($program1, 2025, 'total_budget'))->toEqual(400)
+        ->and(yearValue($program1, 2026, 'budget'))->toEqual(2000)
+        ->and(yearValue($program1, 2026, 'total_budget'))->toEqual(800);
+
+    // Move kegiatan from program1 to program2 without triggering observer
+    $kegiatan->updateQuietly(['parent_id' => $program2->id]);
+    $action->reconcileActivityMove($kegiatan, $program1->id, $program2->id);
+
+    // Old program1 cleared for both years and lanes
+    expect(yearValue($program1, 2025, 'budget'))->toBeNull()
+        ->and(yearValue($program1, 2025, 'total_budget'))->toBeNull()
+        ->and(yearValue($program1, 2026, 'budget'))->toBeNull()
+        ->and(yearValue($program1, 2026, 'total_budget'))->toBeNull();
+
+    // New program2 received values for both years and lanes
+    expect(yearValue($program2, 2025, 'budget'))->toEqual(1000)
+        ->and(yearValue($program2, 2025, 'total_budget'))->toEqual(400)
+        ->and(yearValue($program2, 2026, 'budget'))->toEqual(2000)
+        ->and(yearValue($program2, 2026, 'total_budget'))->toEqual(800);
+});

@@ -1,18 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Planning;
 
+use App\Actions\Planning\ClonePlanningVersionAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Planning\StorePlanningVersionRequest;
 use App\Http\Requests\Planning\UpdatePlanningVersionRequest;
 use App\Models\PlanningVersion;
 use App\Traits\HasDataTable;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class PlanningVersionController extends Controller
+final class PlanningVersionController extends Controller
 {
     use HasDataTable;
 
@@ -32,12 +36,13 @@ class PlanningVersionController extends Controller
      */
     public function index(Request $request): Response
     {
-        $versions = $this->applyDataTable(
-            PlanningVersion::query(),
-            $request,
-            self::SEARCH_COLUMNS,
-            self::SORTABLE_COLUMNS,
-        );
+        $query = PlanningVersion::query()->withCount('activityVersions');
+
+        if (! $request->has('sort')) {
+            $query->orderBy('year_start', 'desc')->orderBy('revision_no', 'desc');
+        }
+
+        $versions = $this->applyDataTable($query, $request, self::SEARCH_COLUMNS, self::SORTABLE_COLUMNS);
 
         return Inertia::render('planning/versions/index', [
             'versions' => $versions,
@@ -48,7 +53,7 @@ class PlanningVersionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePlanningVersionRequest $request)
+    public function store(StorePlanningVersionRequest $request): RedirectResponse
     {
         PlanningVersion::create([
             'name' => $request->name,
@@ -66,7 +71,7 @@ class PlanningVersionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePlanningVersionRequest $request, PlanningVersion $planningVersion)
+    public function update(UpdatePlanningVersionRequest $request, PlanningVersion $planningVersion): RedirectResponse
     {
         $planningVersion->update($request->validated());
 
@@ -76,54 +81,9 @@ class PlanningVersionController extends Controller
     /**
      * Create a new revision from an existing version.
      */
-    public function createRevision(PlanningVersion $planningVersion)
+    public function createRevision(PlanningVersion $planningVersion, ClonePlanningVersionAction $action): RedirectResponse
     {
-        DB::transaction(function () use ($planningVersion) {
-            $newVersion = PlanningVersion::create([
-                'name' => $planningVersion->name.' Revision '.($planningVersion->revision_no + 1),
-                'year_start' => $planningVersion->year_start,
-                'year_end' => $planningVersion->year_end,
-                'revision_no' => $planningVersion->revision_no + 1,
-                'status' => 'draft',
-                'is_current' => false,
-                'notes' => 'Revision from '.$planningVersion->name,
-            ]);
-
-            $oldActivities = $planningVersion->activityVersions()->orderBy('id')->get();
-            $idMapping = [];
-
-            foreach ($oldActivities as $oldActivity) {
-                $newActivity = $oldActivity->replicate();
-                $newActivity->planning_version_id = $newVersion->id;
-                $newActivity->parent_id = $oldActivity->parent_id ? ($idMapping[$oldActivity->parent_id] ?? null) : null;
-                $newActivity->save();
-
-                $idMapping[$oldActivity->id] = $newActivity->id;
-
-                // Clone activity yearly data (budget)
-                foreach ($oldActivity->activityYears as $oldYear) {
-                    $newYear = $oldYear->replicate();
-                    $newYear->yearable_id = $newActivity->id;
-                    $newYear->yearable_type = PlanningActivityVersion::class;
-                    $newYear->save();
-                }
-
-                // Clone indicators
-                foreach ($oldActivity->indicators as $oldIndicator) {
-                    $newIndicator = $oldIndicator->replicate();
-                    $newIndicator->planning_activity_version_id = $newActivity->id;
-                    $newIndicator->save();
-
-                    // Clone indicator yearly data (target)
-                    foreach ($oldIndicator->activityYears as $oldIndicatorYear) {
-                        $newIndicatorYear = $oldIndicatorYear->replicate();
-                        $newIndicatorYear->yearable_id = $newIndicator->id;
-                        $newIndicatorYear->yearable_type = PlanningActivityIndicator::class;
-                        $newIndicatorYear->save();
-                    }
-                }
-            }
-        });
+        $action->execute($planningVersion);
 
         return redirect()->back()->with('success', 'New planning revision created.');
     }
@@ -131,9 +91,9 @@ class PlanningVersionController extends Controller
     /**
      * Set the specified version as the current one.
      */
-    public function setCurrent(PlanningVersion $planningVersion)
+    public function setCurrent(PlanningVersion $planningVersion): RedirectResponse
     {
-        DB::transaction(function () use ($planningVersion) {
+        DB::transaction(function () use ($planningVersion): void {
             PlanningVersion::where('year_start', $planningVersion->year_start)
                 ->where('year_end', $planningVersion->year_end)
                 ->where('is_current', true)
@@ -148,7 +108,7 @@ class PlanningVersionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(PlanningVersion $planningVersion)
+    public function destroy(PlanningVersion $planningVersion): RedirectResponse
     {
         $planningVersion->delete();
 

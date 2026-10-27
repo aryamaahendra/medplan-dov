@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { Edit, Plus, Trash2 } from 'lucide-react';
+import { RiEditLine, RiAddLine, RiDeleteBinLine } from '@remixicon/react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -99,7 +99,7 @@ export function IndicatorCard({
                   variant="outline"
                   onClick={() => onCreateChild(indicator)}
                 >
-                  <Plus /> Tambah Sub
+                  <RiAddLine data-icon="inline-start" /> Tambah Sub
                 </Button>
               )}
               {onEdit && hasPermission('update kpi-indicators') && (
@@ -108,7 +108,7 @@ export function IndicatorCard({
                   variant="ghost"
                   onClick={() => onEdit(indicator)}
                 >
-                  <Edit className="h-4 w-4" />
+                  <RiEditLine />
                 </Button>
               )}
               {onDelete && hasPermission('delete kpi-indicators') && (
@@ -118,7 +118,7 @@ export function IndicatorCard({
                   className="text-destructive"
                   onClick={() => setDeletingIndicator(indicator)}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <RiDeleteBinLine />
                 </Button>
               )}
             </CardAction>
@@ -182,8 +182,8 @@ export function IndicatorCard({
     <Card className="overflow-hidden border-l-2 shadow-sm">
       <div className="flex items-center justify-between border-b bg-muted/10 p-3">
         <div>
-          <h4 className="font-medium text-primary/90">{indicator.name}</h4>
-          <span className="text-[10px] font-bold text-muted-foreground uppercase">
+          <h4 className="font-semibold text-foreground">{indicator.name}</h4>
+          <span className="text-xss font-bold text-muted-foreground uppercase">
             Indikator
           </span>
         </div>
@@ -195,7 +195,7 @@ export function IndicatorCard({
                 variant="ghost"
                 onClick={() => onEdit(indicator)}
               >
-                <Edit className="h-3 w-3" />
+                <RiEditLine />
               </Button>
             )}
             {onDelete && hasPermission('delete kpi-indicators') && (
@@ -205,7 +205,7 @@ export function IndicatorCard({
                 className="text-destructive"
                 onClick={() => setDeletingIndicator(indicator)}
               >
-                <Trash2 className="h-3 w-3" />
+                <RiDeleteBinLine />
               </Button>
             )}
           </div>

@@ -1,4 +1,4 @@
-import { Trash2Icon, UploadIcon } from 'lucide-react';
+import { RiDeleteBinLine, RiUploadLine } from '@remixicon/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -22,15 +22,15 @@ export function NewAttachmentItem({
   return (
     <div className="flex items-center gap-3 rounded-lg border border-primary/20 bg-primary/5 p-2.5">
       <div className="flex shrink-0 items-center justify-center">
-        <UploadIcon className="h-4 w-4" />
+        <RiUploadLine className="h-4 w-4" />
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <Input
           value={name}
           onChange={(e) => onNameChange(index, e.target.value)}
-          className="h-7 h-auto border-none bg-transparent p-0 py-0 text-[13px] font-medium shadow-none focus-visible:ring-0 focus-visible:ring-1"
+          className="border-none bg-transparent p-0 shadow-none focus-visible:ring-1"
         />
-        <p className="text-[10px] leading-none text-muted-foreground uppercase">
+        <p className="text-xss leading-none text-muted-foreground uppercase">
           {file.name.split('.').pop()} • {formatFileSize(file.size)}
         </p>
       </div>
@@ -38,10 +38,10 @@ export function NewAttachmentItem({
         type="button"
         variant="ghost"
         size="icon"
-        className="h-8 w-8 text-destructive"
+        className="text-destructive"
         onClick={() => onRemove(index)}
       >
-        <Trash2Icon className="h-4 w-4" />
+        <RiDeleteBinLine />
       </Button>
     </div>
   );

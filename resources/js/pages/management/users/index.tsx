@@ -1,32 +1,20 @@
-import { Head, router } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import { toast } from 'sonner';
+import { Head } from '@inertiajs/react';
+import { RiAddLine } from '@remixicon/react';
 
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
-
-import { useDataTable } from '@/hooks/use-data-table';
+import { getColumns } from '@/features/user/components/user-columns';
+import type { User } from '@/features/user/components/user-columns';
+import { UserDialog } from '@/features/user/components/user-dialog';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import { usePermission } from '@/hooks/use-permission';
+import { useResourceIndexController } from '@/hooks/use-resource-index-controller';
+import type { PaginatedData } from '@/hooks/use-resource-index-controller';
 import userRoutes from '@/routes/users';
-import { getColumns } from './columns';
-import type { User } from './columns';
-import { UserDialog } from './user-dialog';
 
-interface PaginatedUsers {
-  data: User[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-  from: number | null;
-  to: number | null;
-}
-
-interface UsersIndexProps {
-  users: PaginatedUsers;
+export interface UsersIndexProps {
+  users: PaginatedData<User>;
   roles: { id: number; name: string }[];
   organizationalUnits: { id: number; name: string; parent_id: number | null }[];
   filters: DataTableFilters;
@@ -39,52 +27,17 @@ export default function UsersIndex({
   filters,
 }: UsersIndexProps) {
   const { hasPermission } = usePermission();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [deletingUser, setDeletingUser] = useState<User | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
 
-  // Use useDataTable to handle server-side state via Inertia URL updates
-  const { onSearch, onSort, onPageChange, onPerPageChange, onReset } =
-    useDataTable({
-      only: ['users', 'filters'],
-    });
-
-  const onEdit = (user: User) => {
-    setEditingUser(user);
-    setDialogOpen(true);
-  };
-
-  const onCreate = () => {
-    setEditingUser(null);
-    setDialogOpen(true);
-  };
-
-  const onDelete = (user: User) => {
-    setDeletingUser(user);
-  };
-
-  const handleConfirmDelete = () => {
-    if (!deletingUser) {
-      return;
-    }
-
-    setIsDeleting(true);
-
-    router.delete(userRoutes.destroy.url({ user: deletingUser.id }), {
-      onSuccess: () => {
-        toast.success('User deleted successfully.');
-        setDeletingUser(null);
-      },
-      onFinish: () => setIsDeleting(false),
-    });
-  };
-
-  // Safe to memoize columns
-  const stableColumns = useMemo(
-    () => getColumns(onEdit, onDelete, hasPermission),
-    [hasPermission],
-  );
+  const controller = useResourceIndexController<User>({
+    data: users,
+    filters,
+    only: ['users', 'filters'],
+    resourceName: 'User',
+    deleteUrl: (user) => userRoutes.destroy.url({ user: user.id }),
+    getColumns: ({ onEdit, onDelete }) =>
+      getColumns(onEdit, onDelete, hasPermission),
+    searchPlaceholder: 'Search by name or email...',
+  });
 
   return (
     <>
@@ -99,44 +52,33 @@ export default function UsersIndex({
             </p>
           </div>
           {hasPermission('create users') && (
-            <Button onClick={onCreate}>
-              <Plus />
+            <Button onClick={controller.dialog.openCreate}>
+              <RiAddLine data-icon="inline-start" />
               Tambah User
             </Button>
           )}
         </div>
 
-        <DataTable
-          columns={stableColumns}
-          data={users.data}
-          meta={users} // The whole paginated object usually matches our PaginationMeta
-          filters={filters}
-          onSearch={onSearch}
-          onSort={onSort}
-          onPageChange={onPageChange}
-          onPerPageChange={onPerPageChange}
-          onReset={onReset}
-          searchPlaceholder="Search by name or email..."
-        />
+        <DataTable {...controller.tableProps} />
       </div>
 
       <UserDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        user={editingUser}
+        open={controller.dialog.isOpen}
+        onOpenChange={controller.dialog.setIsOpen}
+        user={controller.dialog.editingItem}
         roles={roles}
         organizationalUnits={organizationalUnits}
       />
 
       <ConfirmDialog
-        open={!!deletingUser}
-        onOpenChange={(open) => !open && setDeletingUser(null)}
-        onConfirm={handleConfirmDelete}
+        open={controller.deleteDialog.isOpen}
+        onOpenChange={controller.deleteDialog.setIsOpen}
+        onConfirm={controller.deleteDialog.confirmDelete}
         title="Delete User"
-        description={`Are you sure you want to delete ${deletingUser?.name}? This action cannot be undone.`}
+        description={`Are you sure you want to delete ${controller.deleteDialog.deletingItem?.name}? This action cannot be undone.`}
         confirmText="Delete User"
         variant="destructive"
-        loading={isDeleting}
+        loading={controller.deleteDialog.isDeleting}
       />
     </>
   );

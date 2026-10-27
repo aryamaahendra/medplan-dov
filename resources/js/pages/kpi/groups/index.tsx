@@ -1,19 +1,17 @@
-import { Head, router } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import { toast } from 'sonner';
+import { Head } from '@inertiajs/react';
+import { RiAddLine } from '@remixicon/react';
+import { useMemo } from 'react';
 
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
-import { useDataTable } from '@/hooks/use-data-table';
+import { getColumns } from '@/features/kpi-group/components/kpi-group-columns';
+import { KpiGroupDialog } from '@/features/kpi-group/components/kpi-group-dialog';
+import { useKpiGroupsIndex } from '@/features/kpi-group/hooks/use-kpi-groups-index';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import { usePermission } from '@/hooks/use-permission';
 import groupRoutes from '@/routes/kpis/groups';
 import type { KpiGroup } from '@/types';
-
-import { getColumns } from './columns';
-import { KpiGroupDialog } from './components/kpi-group-dialog';
 
 interface PaginatedKpiGroups {
   data: KpiGroup[];
@@ -35,58 +33,19 @@ export default function KpiGroupsIndex({
   filters,
 }: KpiGroupsIndexProps) {
   const { hasPermission } = usePermission();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingGroup, setEditingGroup] = useState<KpiGroup | null>(null);
-  const [deletingGroup, setDeletingGroup] = useState<KpiGroup | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isActivating, setIsActivating] = useState(false);
+  const { state, handlers, dataTable } = useKpiGroupsIndex();
 
-  const { onSearch, onSort, onPageChange, onPerPageChange, onReset } =
-    useDataTable({ only: ['groups', 'filters'] });
-
-  const onEdit = (group: KpiGroup) => {
-    setEditingGroup(group);
-    setDialogOpen(true);
-  };
-
-  const onCreate = () => {
-    setEditingGroup(null);
-    setDialogOpen(true);
-  };
-
-  const onDelete = (group: KpiGroup) => {
-    setDeletingGroup(group);
-  };
-
-  const onActivate = (group: KpiGroup) => {
-    setIsActivating(true);
-    router.post(
-      groupRoutes.activate.url({ group: group.id }),
-      {},
-      {
-        onSuccess: () => {
-          toast.success(`Periode KPI "${group.name}" diaktifkan.`);
-        },
-        onFinish: () => setIsActivating(false),
-      },
-    );
-  };
-
-  const handleConfirmDelete = () => {
-    if (!deletingGroup) {
-      return;
-    }
-
-    setIsDeleting(true);
-
-    router.delete(groupRoutes.destroy.url({ group: deletingGroup.id }), {
-      onSuccess: () => {
-        toast.success('Periode KPI berhasil dihapus.');
-        setDeletingGroup(null);
-      },
-      onFinish: () => setIsDeleting(false),
-    });
-  };
+  const columns = useMemo(
+    () =>
+      getColumns(
+        handlers.onEdit,
+        handlers.onDelete,
+        handlers.onActivate,
+        state.isActivating,
+        hasPermission,
+      ),
+    [handlers, state.isActivating, hasPermission],
+  );
 
   return (
     <>
@@ -104,53 +63,43 @@ export default function KpiGroupsIndex({
             </p>
           </div>
           {hasPermission('create kpi-groups') && (
-            <Button onClick={onCreate}>
-              <Plus className="h-4 w-4" />
+            <Button onClick={handlers.onCreate}>
+              <RiAddLine data-icon="inline-start" />
               Tambah Periode
             </Button>
           )}
         </div>
 
         <DataTable
-          columns={useMemo(
-            () =>
-              getColumns(
-                onEdit,
-                onDelete,
-                onActivate,
-                isActivating,
-                hasPermission,
-              ),
-            [isActivating, hasPermission],
-          )}
+          columns={columns}
           data={groups.data}
           meta={groups}
           filters={filters}
-          onSearch={onSearch}
-          onSort={onSort}
-          onPageChange={onPageChange}
-          onPerPageChange={onPerPageChange}
-          onReset={onReset}
+          onSearch={dataTable.onSearch}
+          onSort={dataTable.onSort}
+          onPageChange={dataTable.onPageChange}
+          onPerPageChange={dataTable.onPerPageChange}
+          onReset={dataTable.onReset}
           searchPlaceholder="Cari periode..."
         />
       </div>
 
       <KpiGroupDialog
-        key={editingGroup?.id ?? 'new'}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        group={editingGroup}
+        key={state.editingGroup?.id ?? 'new'}
+        open={state.dialogOpen}
+        onOpenChange={handlers.setDialogOpen}
+        group={state.editingGroup}
       />
 
       <ConfirmDialog
-        open={!!deletingGroup}
-        onOpenChange={(open) => !open && setDeletingGroup(null)}
-        onConfirm={handleConfirmDelete}
+        open={!!state.deletingGroup}
+        onOpenChange={(open) => !open && handlers.setDeletingGroup(null)}
+        onConfirm={handlers.handleConfirmDelete}
         title="Hapus Periode KPI"
-        description={`Apakah Anda yakin ingin menghapus "${deletingGroup?.name}"? Seluruh indikator di dalamnya juga akan terhapus.`}
+        description={`Apakah Anda yakin ingin menghapus "${state.deletingGroup?.name}"? Seluruh indikator di dalamnya juga akan terhapus.`}
         confirmText="Hapus"
         variant="destructive"
-        loading={isDeleting}
+        loading={state.isDeleting}
       />
     </>
   );

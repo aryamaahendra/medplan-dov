@@ -9,6 +9,7 @@ use function Pest\Laravel\assertSoftDeleted;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
+    $this->user->assignRole('super-admin');
 });
 
 it('can list all checklist questions', function () {

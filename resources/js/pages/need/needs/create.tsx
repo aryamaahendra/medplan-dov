@@ -1,6 +1,11 @@
 import { Head } from '@inertiajs/react';
 import needRoutes from '@/routes/needs';
-import type { PlanningActivityVersion, Tujuan } from '@/types';
+import type {
+  KpiGroup,
+  PlanningActivityVersion,
+  StrategicServicePlan,
+  Tujuan,
+} from '@/types';
 
 import { NeedForm } from './components/need-form';
 
@@ -9,8 +14,8 @@ interface CreateProps {
   currentGroup: { id: number; name: string; year: number };
   needTypes: { id: number; name: string }[];
   tujuans: Tujuan[];
-  kpiGroups: any[];
-  strategicServicePlans: any[];
+  kpiGroups: KpiGroup[];
+  strategicServicePlans: StrategicServicePlan[];
   planningActivities: PlanningActivityVersion[];
   fundingSources: { id: number; name: string }[];
   users: { id: number; name: string; nip: string | null }[];
@@ -67,11 +72,7 @@ export default function Create({
 Create.layout = (props: CreateProps) => ({
   breadcrumbs: [
     {
-      title: 'Usulan Kebutuhan',
-      href: '#',
-    },
-    {
-      title: props.currentGroup?.name || 'Kelompok',
+      title: props.currentGroup?.name || 'Kelompok Usulan',
       href: props.currentGroup
         ? needRoutes.index.url({
             query: { need_group_id: props.currentGroup.id },

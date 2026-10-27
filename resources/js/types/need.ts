@@ -60,12 +60,16 @@ export interface NeedDetail {
   training: string | null;
 }
 
-export type NeedStatus = 'draft' | 'approved' | 'rejected';
+export type NeedStatus =
+  'draft' | 'submitted' | 'approved' | 'rejected' | 'revision';
 export type NeedPriority = 'high' | 'medium' | 'low';
+export type NeedWorkflowStage =
+  'draft' | 'under_review' | 'approved' | 'rejected';
 
 export interface Need {
   id: number;
   need_group_id: number;
+  source_need_id?: number | null;
   needGroup?: {
     id: number;
     name: string;
@@ -96,17 +100,35 @@ export interface Need {
   indicators_count?: number;
   kpi_indicators_count?: number;
   strategic_service_plans_count?: number;
+  attachments_count?: number;
+  stage?: NeedWorkflowStage;
   detail?: NeedDetail | null;
   checklist_percentage?: number | string;
   attachments?: Attachment[];
   notes?: string | null;
   approved_by_director_at?: string | null;
+  approved_volume?: string | number | null;
+  approved_unit_price?: string | number | null;
+  approved_total_price?: string | number | null;
+  is_recommended_for_next_cycle?: boolean;
+  recommended_volume?: string | number | null;
+  is_locked?: boolean;
+  locked_at?: string | null;
+  locked_by_user_id?: number | null;
+  lock_reason?: string | null;
+  unlocked_until?: string | null;
+  submission_window_status?: 'upcoming' | 'open' | 'closed' | 'indefinite';
+  group_submission_end_at?: string | null;
   planning_activity_versions?: PlanningActivityVersion[];
   planning_activity_indicators?: PlanningActivityIndicator[];
   can?: {
     update: boolean;
     delete: boolean;
     approve: boolean;
+    submit?: boolean;
+    performChecklist?: boolean;
+    lock?: boolean;
+    unlock?: boolean;
   };
 }
 
@@ -118,4 +140,21 @@ export interface PaginatedNeeds {
   total: number;
   from: number | null;
   to: number | null;
+}
+
+export interface StageCounts {
+  all: number;
+  draft: number;
+  under_review: number;
+  approved: number;
+  rejected: number;
+  locked: number;
+}
+
+export interface AttentionCounts {
+  low_checklist: number;
+  revision_closing: number;
+  submission_closing: number;
+  has_notes: number;
+  priority_only: number;
 }

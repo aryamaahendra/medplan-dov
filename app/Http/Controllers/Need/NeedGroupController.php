@@ -1,17 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Need;
 
+use App\Actions\Need\RolloverNeedAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Need\StoreNeedGroupRequest;
 use App\Http\Requests\Need\UpdateNeedGroupRequest;
+use App\Models\Need;
 use App\Models\NeedGroup;
 use App\Traits\HasDataTable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class NeedGroupController extends Controller
+final class NeedGroupController extends Controller
 {
     use HasDataTable;
 
@@ -22,11 +29,81 @@ class NeedGroupController extends Controller
 
     private const array SEARCH_COLUMNS = ['name', 'description'];
 
-    private const array SORTABLE_COLUMNS = ['name', 'year', 'is_active', 'need_count', 'total_budget', 'approved_count', 'priority_count', 'created_at'];
+    private const array SORTABLE_COLUMNS = ['name', 'year', 'is_active', 'need_count', 'total_budget', 'approved_count', 'priority_count', 'submission_start_at', 'submission_end_at', 'created_at'];
 
     public function index(Request $request): Response
     {
         $this->authorize('viewAny', NeedGroup::class);
+        $baseQuery = NeedGroup::query();
+        $search = $request->string('search')->trim()->value();
+        if ($search !== '') {
+            $baseQuery->where(function (Builder $q) use ($search): void {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        /** @var object{total_groups?: int|string, active_groups?: int|string}|null $groupsAggregate */
+        $groupsAggregate = (clone $baseQuery)
+            ->toBase()
+            ->selectRaw('
+                COUNT(*) as total_groups,
+                COUNT(CASE WHEN is_active = true THEN 1 END) as active_groups
+            ')
+            ->first();
+
+        $matchingGroupIds = (clone $baseQuery)->select('id');
+
+        /** @var object{total_needs?: int|string, total_approved?: int|string, total_budget?: int|float|string}|null $needsAggregate */
+        $needsAggregate = Need::query()
+            ->whereIn('need_group_id', $matchingGroupIds)
+            ->toBase()
+            ->selectRaw('
+                COUNT(*) as total_needs,
+                COUNT(CASE WHEN approved_by_director_at IS NOT NULL THEN 1 END) as total_approved,
+                COALESCE(SUM(total_price), 0) as total_budget
+            ')
+            ->first();
+
+        $recentGroups = DB::table('need_groups as ng')
+            ->whereIn('ng.id', (clone $baseQuery)->select('id'))
+            ->leftJoin('needs as n', function ($join): void {
+                $join->on('n.need_group_id', '=', 'ng.id')
+                    ->whereNull('n.deleted_at');
+            })
+            ->groupBy('ng.id', 'ng.name', 'ng.year')
+            ->orderBy('ng.year')
+            ->orderBy('ng.id')
+            ->selectRaw('
+                ng.id,
+                ng.name,
+                ng.year,
+                COUNT(n.id) as total_needs,
+                COALESCE(SUM(n.total_price), 0) as total_budget
+            ')
+            ->get();
+
+        // Take the 5 most recent groups in chronological order
+        $groupTrends = $recentGroups->slice(-5)->map(function ($row): array {
+            return [
+                'id' => (int) $row->id,
+                'name' => (string) $row->name,
+                'year' => (int) $row->year,
+                'total_needs' => (int) ($row->total_needs ?? 0),
+                'total_budget' => (float) ($row->total_budget ?? 0),
+            ];
+        })->values()->all();
+
+        $summaryStats = [
+            'total_groups' => (int) ($groupsAggregate->total_groups ?? 0),
+            'active_groups' => (int) ($groupsAggregate->active_groups ?? 0),
+            'total_needs' => (int) ($needsAggregate->total_needs ?? 0),
+            'total_approved' => (int) ($needsAggregate->total_approved ?? 0),
+            'total_budget' => (float) ($needsAggregate->total_budget ?? 0),
+            'group_trends' => $groupTrends,
+            'yearly_trends' => $groupTrends,
+        ];
+
         $needGroups = $this->applyDataTable(
             NeedGroup::query()
                 ->withSum('needs as total_budget', 'total_price')
@@ -41,20 +118,29 @@ class NeedGroupController extends Controller
 
         return Inertia::render('need/groups/index', [
             'needGroups' => $needGroups,
+            'summaryStats' => $summaryStats,
             'filters' => $this->dataTableFilters($request),
         ]);
     }
 
-    public function store(StoreNeedGroupRequest $request)
+    public function store(StoreNeedGroupRequest $request, RolloverNeedAction $rolloverAction): RedirectResponse
     {
         $this->authorize('create', NeedGroup::class);
-        NeedGroup::create($request->validated());
+        $validated = $request->validated();
+        $carryOverIds = $validated['carry_over_need_ids'] ?? [];
+        unset($validated['carry_over_need_ids']);
+
+        $needGroup = NeedGroup::create($validated);
+
+        if (! empty($carryOverIds)) {
+            $rolloverAction->executeMany($carryOverIds, $needGroup, $request->user());
+        }
 
         return redirect()->back()
             ->with('success', 'Kelompok usulan berhasil dibuat.');
     }
 
-    public function update(UpdateNeedGroupRequest $request, NeedGroup $needGroup)
+    public function update(UpdateNeedGroupRequest $request, NeedGroup $needGroup): RedirectResponse
     {
         $this->authorize('update', $needGroup);
         $needGroup->update($request->validated());
@@ -63,7 +149,7 @@ class NeedGroupController extends Controller
             ->with('success', 'Kelompok usulan berhasil diperbarui.');
     }
 
-    public function destroy(NeedGroup $needGroup)
+    public function destroy(NeedGroup $needGroup): RedirectResponse
     {
         $this->authorize('delete', $needGroup);
         $needGroup->delete();

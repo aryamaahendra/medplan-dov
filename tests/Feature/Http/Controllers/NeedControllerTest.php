@@ -8,16 +8,16 @@ use App\Models\NeedType;
 use App\Models\OrganizationalUnit;
 use App\Models\Sasaran;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
     app(PermissionRegistrar::class)->forgetCachedPermissions();
-    Role::firstOrCreate(['name' => 'super-admin']);
+    $this->seed(RolesAndPermissionsSeeder::class);
 });
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -77,6 +77,9 @@ test('index renders the correct component and props', function () {
             ->has('organizationalUnits')
             ->has('needTypes')
             ->has('filters')
+            ->has('stageCounts')
+            ->has('attentionCounts')
+            ->where('stageCounts.all', 3)
         );
 });
 
@@ -308,6 +311,51 @@ test('store validations on numeric fields ensuring values cannot be negative', f
         ->post(route('needs.store'), $payload)
         ->assertSessionHasErrors(['volume', 'unit_price', 'total_price']);
 });
+test('staff without urgency permission can store a need with default urgency and impact', function () {
+    $unit = OrganizationalUnit::factory()->create();
+    $staff = User::factory()->create(['organizational_unit_id' => $unit->id]);
+    $staff->assignRole('staff');
+
+    $group = NeedGroup::factory()->create(['is_active' => true]);
+    $needType = NeedType::factory()->create();
+
+    $payload = validNeedPayload($group, $unit, $needType, [
+        'title' => 'Usulan dari Staff',
+        'organizational_unit_id' => $unit->id,
+    ]);
+    // Staff cannot update urgency tab, so urgency/impact shouldn't be required from user
+    unset($payload['urgency'], $payload['impact']);
+
+    $this->actingAs($staff)
+        ->post(route('needs.store'), $payload)
+        ->assertRedirect(route('needs.index', ['need_group_id' => $group->id]))
+        ->assertSessionHas('success', 'Usulan kebutuhan berhasil dibuat.');
+
+    $this->assertDatabaseHas('needs', [
+        'need_group_id' => $group->id,
+        'title' => 'Usulan dari Staff',
+        'urgency' => 'medium',
+        'impact' => 'medium',
+    ]);
+});
+
+test('store validates total_price matches volume multiplied by unit_price', function () {
+    $user = User::factory()->create();
+    $user->assignRole('super-admin');
+    $group = NeedGroup::factory()->create(['is_active' => true]);
+    $unit = OrganizationalUnit::factory()->create();
+    $needType = NeedType::factory()->create();
+
+    $payload = validNeedPayload($group, $unit, $needType, [
+        'volume' => 5,
+        'unit_price' => 10000,
+        'total_price' => 99999,
+    ]);
+
+    $this->actingAs($user)
+        ->post(route('needs.store'), $payload)
+        ->assertSessionHasErrors(['total_price']);
+});
 
 // ─── Update ───────────────────────────────────────────────────────────────────
 
@@ -381,6 +429,74 @@ test('update numerical fields cannot be negative', function () {
         ->assertSessionHasErrors(['volume', 'unit_price', 'total_price']);
 });
 
+test('update validates total_price matches volume multiplied by unit_price', function () {
+    $user = User::factory()->create();
+    $user->assignRole('super-admin');
+    $group = NeedGroup::factory()->create(['is_active' => true]);
+    $unit = OrganizationalUnit::factory()->create();
+    $needType = NeedType::factory()->create();
+    $need = Need::factory()->create([
+        'need_group_id' => $group->id,
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $needType->id,
+    ]);
+
+    $payload = validNeedPayload($group, $unit, $needType, [
+        'volume' => 10,
+        'unit_price' => 5000,
+        'total_price' => 12345,
+    ]);
+
+    $this->actingAs($user)
+        ->put(route('needs.update', $need), $payload)
+        ->assertSessionHasErrors(['total_price']);
+});
+test('staff without urgency permission can update general fields without urgency validation error and without wiping relations', function () {
+    $unit = OrganizationalUnit::factory()->create();
+    $staff = User::factory()->create(['organizational_unit_id' => $unit->id]);
+    $staff->assignRole('staff');
+
+    $group = NeedGroup::factory()->create(['is_active' => true]);
+    $needType = NeedType::factory()->create();
+    $sasaran = Sasaran::factory()->create();
+
+    $need = Need::factory()->create([
+        'need_group_id' => $group->id,
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $needType->id,
+        'title' => 'Judul Awal Staff',
+        'urgency' => 'high',
+        'impact' => 'high',
+        'is_priority' => true,
+    ]);
+    $need->sasarans()->attach($sasaran->id);
+
+    // Staff payload only sends general info, does not send urgency or strategic tabs
+    $payload = [
+        'need_group_id' => $group->id,
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $needType->id,
+        'year' => 2025,
+        'title' => 'Judul Baru Staff',
+        'volume' => 10,
+        'unit' => 'unit',
+        'unit_price' => 1000,
+        'total_price' => 10000,
+    ];
+
+    $this->actingAs($staff)
+        ->put(route('needs.update', $need), $payload)
+        ->assertRedirect(route('needs.index', ['need_group_id' => $group->id]))
+        ->assertSessionHas('success', 'Usulan kebutuhan berhasil diperbarui.');
+
+    $refreshed = $need->fresh();
+    expect($refreshed->title)->toBe('Judul Baru Staff')
+        ->and($refreshed->urgency->value)->toBe('high')
+        ->and($refreshed->impact->value)->toBe('high')
+        ->and($refreshed->is_priority)->toBeTrue()
+        ->and($refreshed->sasarans)->toHaveCount(1);
+});
+
 // ─── Destroy ─────────────────────────────────────────────────────────────────
 
 test('destroy soft-deletes a need', function () {
@@ -395,4 +511,83 @@ test('destroy soft-deletes a need', function () {
         ->assertSessionHas('success', 'Usulan kebutuhan berhasil dihapus.');
 
     $this->assertSoftDeleted($need);
+});
+
+test('index calculates stage and attention counts across all items, not just current page', function () {
+    $user = User::factory()->create();
+    $user->assignRole('super-admin');
+    $group = NeedGroup::factory()->create(['is_active' => true]);
+    $unit = OrganizationalUnit::factory()->create();
+    $needType = NeedType::factory()->create();
+
+    // Create 20 items: 10 draft, 5 approved by director, 5 rejected
+    Need::factory()->count(10)->create([
+        'need_group_id' => $group->id,
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $needType->id,
+        'status' => 'draft',
+        'approved_by_director_at' => null,
+        'is_locked' => false,
+    ]);
+    Need::factory()->count(5)->create([
+        'need_group_id' => $group->id,
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $needType->id,
+        'status' => 'approved',
+        'approved_by_director_at' => now(),
+        'is_locked' => true,
+    ]);
+    Need::factory()->count(5)->create([
+        'need_group_id' => $group->id,
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $needType->id,
+        'status' => 'rejected',
+        'approved_by_director_at' => null,
+        'is_locked' => false,
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('needs.index', ['need_group_id' => $group->id]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('need/needs/index')
+            ->has('needs.data', 15) // default 15 items on page 1
+            ->where('stageCounts.all', 20) // total across ALL pages
+            ->where('stageCounts.draft', 10)
+            ->where('stageCounts.approved', 5)
+            ->where('stageCounts.rejected', 5)
+            ->where('stageCounts.locked', 5)
+        );
+});
+
+test('index can filter by locked stage', function () {
+    $user = User::factory()->create();
+    $user->assignRole('super-admin');
+    $group = NeedGroup::factory()->create(['is_active' => true]);
+    $unit = OrganizationalUnit::factory()->create();
+    $needType = NeedType::factory()->create();
+
+    Need::factory()->create([
+        'need_group_id' => $group->id,
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $needType->id,
+        'is_locked' => true,
+    ]);
+    Need::factory()->create([
+        'need_group_id' => $group->id,
+        'organizational_unit_id' => $unit->id,
+        'need_type_id' => $needType->id,
+        'is_locked' => false,
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('needs.index', ['need_group_id' => $group->id, 'stage' => 'locked']))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('need/needs/index')
+            ->has('needs.data', 1)
+            ->where('needs.data.0.is_locked', true)
+            ->where('stageCounts.all', 2)
+            ->where('stageCounts.locked', 1)
+        );
 });

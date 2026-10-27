@@ -18,6 +18,8 @@ class UpdateNeedGroupRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'year' => ['required', 'integer', 'min:2020', 'max:2030'],
             'is_active' => ['boolean'],
+            'submission_start_at' => ['nullable', 'date'],
+            'submission_end_at' => ['nullable', 'date', 'after_or_equal:submission_start_at'],
         ];
     }
 }

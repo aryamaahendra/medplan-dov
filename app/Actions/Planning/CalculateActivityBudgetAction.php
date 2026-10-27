@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Planning;
 
 use App\Enums\PlanningActivityType;
@@ -11,6 +13,14 @@ use Illuminate\Support\Facades\DB;
 
 class CalculateActivityBudgetAction
 {
+    /**
+     * Synchronize all budgets for the given version asynchronously.
+     */
+    public function handle(PlanningVersion $version): void
+    {
+        $this->recalculateVersion($version);
+    }
+
     /**
      * Synchronize all budgets for the given version asynchronously.
      */
@@ -44,7 +54,7 @@ class CalculateActivityBudgetAction
         // 4. Dispatch jobs for each source and year
         foreach ($sources as $source) {
             for ($year = $startYear; $year <= $endYear; $year++) {
-                CalculateActivityBudgetJob::dispatch($source, $year);
+                CalculateActivityBudgetJob::dispatch($source, $year)->afterCommit();
             }
         }
     }
@@ -79,7 +89,54 @@ class CalculateActivityBudgetAction
     }
 
     /**
-     * Recalculate both budget lanes from a given node upward.
+     * Canonical entry point to reconcile budget rollups for a given activity and year.
+     */
+    public function reconcile(PlanningActivityVersion $activity, int $year): void
+    {
+        $this->execute($activity, $year);
+    }
+
+    /**
+     * Reconcile budget rollups across all active years when an activity is moved within the hierarchy.
+     */
+    public function reconcileActivityMove(
+        PlanningActivityVersion $activity,
+        ?int $originalParentId,
+        ?int $newParentId
+    ): void {
+        if ($originalParentId === $newParentId) {
+            return;
+        }
+
+        $years = $activity->activityYears()->pluck('year');
+
+        if ($years->isEmpty()) {
+            return;
+        }
+
+        // Recalculate old parent chain
+        if ($originalParentId) {
+            $oldParent = PlanningActivityVersion::find($originalParentId);
+            if ($oldParent) {
+                foreach ($years as $year) {
+                    $this->recalculateParent($oldParent, $year);
+                }
+            }
+        }
+
+        // Recalculate new parent chain
+        if ($newParentId) {
+            $newParent = PlanningActivityVersion::find($newParentId);
+            if ($newParent) {
+                foreach ($years as $year) {
+                    $this->recalculateParent($newParent, $year);
+                }
+            }
+        }
+    }
+
+    /**
+     * Recalculate both budget lanes from a given node upward in a single atomic pass.
      * Used for structural changes (parent_id moves) where type-routing doesn't apply.
      */
     public function recalculateParent(PlanningActivityVersion $activity, int $year): void
@@ -87,8 +144,7 @@ class CalculateActivityBudgetAction
         $targetId = $activity->id;
 
         while ($targetId) {
-            $this->recalculateNode($targetId, $year, 'budget');
-            $targetId = $this->recalculateNode($targetId, $year, 'total_budget');
+            $targetId = $this->recalculateNodeDual($targetId, $year);
         }
     }
 
@@ -130,9 +186,7 @@ class CalculateActivityBudgetAction
      */
     private function recalculateNode(int $activityId, int $year, string $field): ?int
     {
-        $parentId = null;
-
-        DB::transaction(function () use ($activityId, $year, $field, &$parentId) {
+        DB::transaction(function () use ($activityId, $year, $field) {
             $yearRecord = PlanningActivityYear::where('yearable_id', $activityId)
                 ->where('yearable_type', PlanningActivityVersion::class)
                 ->where('year', $year)
@@ -176,6 +230,67 @@ class CalculateActivityBudgetAction
 
             if ((float) $yearRecord->{$field} !== $total) {
                 $yearRecord->{$field} = $total == 0 ? null : $total;
+
+                PlanningActivityYear::withoutEvents(function () use ($yearRecord) {
+                    $yearRecord->save();
+                });
+            }
+        });
+
+        $activity = PlanningActivityVersion::find($activityId);
+        $parentId = $activity?->parent_id;
+
+        return $parentId;
+    }
+
+    /**
+     * Recalculate both manual and computed budgets for a node in a single atomic transaction.
+     *
+     * @return int|null The parent_id to continue walking upward, or null to stop.
+     */
+    private function recalculateNodeDual(int $activityId, int $year): ?int
+    {
+        DB::transaction(function () use ($activityId, $year) {
+            $yearRecord = PlanningActivityYear::where('yearable_id', $activityId)
+                ->where('yearable_type', PlanningActivityVersion::class)
+                ->where('year', $year)
+                ->lockForUpdate()
+                ->first();
+
+            $childYears = PlanningActivityYear::where('yearable_type', PlanningActivityVersion::class)
+                ->where('year', $year)
+                ->whereHasMorph('yearable', [PlanningActivityVersion::class], function ($query) use ($activityId) {
+                    $query->where('parent_id', $activityId);
+                })
+                ->get(['budget', 'total_budget']);
+
+            if ($childYears->isEmpty()) {
+                if ($yearRecord && ($yearRecord->budget !== null || $yearRecord->total_budget !== null)) {
+                    $yearRecord->budget = null;
+                    $yearRecord->total_budget = null;
+                    PlanningActivityYear::withoutEvents(fn () => $yearRecord->save());
+                }
+
+                return;
+            }
+
+            $totalManual = $childYears->sum(fn ($child) => (float) ($child->budget ?? 0));
+            $totalComputed = $childYears->sum(fn ($child) => (float) ($child->total_budget ?? $child->budget ?? 0));
+
+            if (! $yearRecord) {
+                $yearRecord = new PlanningActivityYear([
+                    'yearable_id' => $activityId,
+                    'yearable_type' => PlanningActivityVersion::class,
+                    'year' => $year,
+                ]);
+            }
+
+            $newBudget = $totalManual == 0 ? null : $totalManual;
+            $newTotalBudget = $totalComputed == 0 ? null : $totalComputed;
+
+            if ((float) $yearRecord->budget !== (float) $newBudget || (float) $yearRecord->total_budget !== (float) $newTotalBudget) {
+                $yearRecord->budget = $newBudget;
+                $yearRecord->total_budget = $newTotalBudget;
 
                 PlanningActivityYear::withoutEvents(function () use ($yearRecord) {
                     $yearRecord->save();

@@ -1,5 +1,10 @@
 import { Form } from '@inertiajs/react';
-import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
+import {
+  RiEyeLine,
+  RiEyeOffLine,
+  RiLockLine,
+  RiRefreshLine,
+} from '@remixicon/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import AlertError from '@/components/alert-error';
 import { Button } from '@/components/ui/button';
@@ -50,14 +55,16 @@ export default function TwoFactorRecoveryCodes({
     }
   }, [recoveryCodesList.length, fetchRecoveryCodes]);
 
-  const RecoveryCodeIconComponent = codesAreVisible ? EyeOff : Eye;
+  const RecoveryCodeIconComponent = codesAreVisible ? RiEyeOffLine : RiEyeLine;
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex gap-3">
-          <LockKeyhole className="size-4" aria-hidden="true" />
-          2FA recovery codes
+        <CardTitle>
+          <span className="flex items-center gap-3">
+            <RiLockLine className="size-4" aria-hidden="true" />
+            2FA recovery codes
+          </span>
         </CardTitle>
         <CardDescription>
           Recovery codes let you regain access if you lose your 2FA device.
@@ -72,7 +79,10 @@ export default function TwoFactorRecoveryCodes({
             aria-expanded={codesAreVisible}
             aria-controls="recovery-codes-section"
           >
-            <RecoveryCodeIconComponent className="size-4" aria-hidden="true" />
+            <RecoveryCodeIconComponent
+              data-icon="inline-start"
+              aria-hidden="true"
+            />
             {codesAreVisible ? 'Hide' : 'View'} recovery codes
           </Button>
 
@@ -89,7 +99,7 @@ export default function TwoFactorRecoveryCodes({
                   disabled={processing}
                   aria-describedby="regenerate-warning"
                 >
-                  <RefreshCw /> Regenerate codes
+                  <RiRefreshLine /> Regenerate codes
                 </Button>
               )}
             </Form>

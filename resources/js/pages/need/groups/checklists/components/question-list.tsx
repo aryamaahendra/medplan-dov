@@ -8,7 +8,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { AlertCircle } from 'lucide-react';
+import { RiErrorWarningLine } from '@remixicon/react';
 
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -67,7 +67,7 @@ export function QuestionList({
       </Card>
 
       <div className="flex items-center justify-end gap-2 text-sm text-muted-foreground italic">
-        <AlertCircle className="size-4" />
+        <RiErrorWarningLine className="size-4" />
         <span>
           Tarik dan lepas (drag & drop) untuk mengatur urutan pertanyaan.
         </span>

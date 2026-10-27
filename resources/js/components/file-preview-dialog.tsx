@@ -1,4 +1,4 @@
-import { DownloadIcon, Loader2Icon } from 'lucide-react';
+import { RiDownloadLine, RiLoaderLine } from '@remixicon/react';
 import { lazy, Suspense, useSyncExternalStore } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -86,7 +86,7 @@ export function FilePreviewDialog({
               <Suspense
                 fallback={
                   <div className="flex flex-col items-center">
-                    <Loader2Icon className="h-8 w-8 animate-spin text-primary" />
+                    <RiLoaderLine className="h-8 w-8 animate-spin text-foreground" />
                     <p className="mt-2 text-sm text-muted-foreground">
                       Menyiapkan viewer...
                     </p>
@@ -106,9 +106,7 @@ export function FilePreviewDialog({
                 <p className="mb-4 text-muted-foreground">
                   Preview tidak tersedia untuk tipe file ini.
                 </p>
-                <Button asChild>
-                  <a href={downloadUrl}>Unduh File</a>
-                </Button>
+                <Button render={<a href={downloadUrl}>Unduh File</a>} />
               </div>
             )}
           </div>
@@ -119,14 +117,14 @@ export function FilePreviewDialog({
             <Button
               variant="default"
               size="lg"
-              className="rounded-full shadow-2xl transition-transform hover:scale-105"
-              asChild
-            >
-              <a href={downloadUrl} download={fileName}>
-                <DownloadIcon />
-                Download File
-              </a>
-            </Button>
+              className="shadow-2xl transition-transform hover:scale-105"
+              render={
+                <a href={downloadUrl} download={fileName}>
+                  <RiDownloadLine data-icon="inline-start" />
+                  Download File
+                </a>
+              }
+            />
           </div>
         )}
       </DialogContent>

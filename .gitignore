@@ -30,6 +30,9 @@ yarn-error.log
 **/caddy
 frankenphp
 frankenphp-worker.php
-
 .scratch
+*.tsbuildinfo
 docs/tmp
+/docs/tmp
+/database/*.sqlite
+/database/*.sql

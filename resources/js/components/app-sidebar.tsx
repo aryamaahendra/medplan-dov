@@ -1,18 +1,19 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
-  Building2,
-  ClipboardList,
-  FileText,
-  LayoutGrid,
-  Layers,
-  Users,
-  BookKey,
-  Database,
-  Pin,
-  ListChecks,
-  ShieldUser,
-  UserKey,
-} from 'lucide-react';
+  RiBuilding2Line,
+  RiClipboardLine,
+  RiDashboardLine,
+  RiFileTextLine,
+  RiStackLine,
+  RiGroupLine,
+  RiBookMarkedLine,
+  RiDatabase2Line,
+  RiPushpinLine,
+  RiListCheck3,
+  RiShieldUserLine,
+  RiKey2Line,
+  RiCodeSSlashLine,
+} from '@remixicon/react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -26,7 +27,6 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { usePermission } from '@/hooks/use-permission';
-import { dashboard } from '@/routes';
 import checklistQuestions from '@/routes/checklist-questions';
 import kpis from '@/routes/kpis';
 import needGroups from '@/routes/need-groups';
@@ -43,26 +43,26 @@ import type { NavItem } from '@/types';
 const mainNavItems: NavItem[] = [
   {
     title: 'Dashboard',
-    href: dashboard(),
-    icon: LayoutGrid,
+    href: '/dashboard',
+    icon: RiDashboardLine,
   },
 ];
 
 const userRole: NavItem[] = [
   {
-    title: 'Users',
+    title: 'Pengguna',
     href: users.index.url(),
-    icon: Users,
+    icon: RiGroupLine,
   },
   {
     title: 'Roles',
     href: roles.index.url(),
-    icon: ShieldUser,
+    icon: RiShieldUserLine,
   },
   {
     title: 'Permissions',
     href: permissions.index.url(),
-    icon: UserKey,
+    icon: RiKey2Line,
   },
 ];
 
@@ -70,37 +70,37 @@ const masterNavItems: NavItem[] = [
   {
     title: 'Unit Kerja',
     href: organizationalUnits.index.url(),
-    icon: Building2,
+    icon: RiBuilding2Line,
   },
   {
     title: 'Kategori Kebutuhan',
     href: needTypes.index.url(),
-    icon: Layers,
+    icon: RiStackLine,
   },
   {
     title: 'Manajemen Renstra',
     href: renstras.index.url(),
-    icon: FileText,
+    icon: RiFileTextLine,
   },
   {
     title: 'Manajemen IKK',
     href: kpis.groups.index.url(),
-    icon: BookKey,
+    icon: RiBookMarkedLine,
   },
   {
     title: 'Rencana Pengembangan Layanan Strategis',
     href: strategicServicePlans.index.url(),
-    icon: ListChecks,
+    icon: RiListCheck3,
   },
   {
     title: 'Bank Pertanyaan Checklist',
     href: checklistQuestions.index.url(),
-    icon: ClipboardList,
+    icon: RiClipboardLine,
   },
   // {
   //   title: 'Versi Perencanaan',
   //   href: planningVersions.index.url(),
-  //   icon: ClipboardList,
+  //   icon: RiClipboardLine,
   // },
 ];
 
@@ -118,24 +118,31 @@ const masterNavItems: NavItem[] = [
 // ];
 
 export function AppSidebar() {
-  const { hasPermission } = usePermission();
-  const { activeNeedGroups } = usePage<{
-    activeNeedGroups: { id: number; name: string; year: number }[];
+  const { hasPermission, hasAnyPermission } = usePermission();
+  const { activeNeedGroups, enableDevTools } = usePage<{
+    activeNeedGroups?: { id: number; name: string; year: number }[];
+    enableDevTools?: boolean;
   }>().props;
 
-  const dynamicNeedNavItems: NavItem[] = hasPermission('view any needs')
+  const canViewNeeds = hasAnyPermission([
+    'view any needs',
+    'view descendant needs',
+    'view needs',
+  ]);
+
+  const dynamicNeedNavItems: NavItem[] = canViewNeeds
     ? (activeNeedGroups || []).map((group) => ({
         title: `${group.name} (${group.year})`,
         href: needs.index.url({ query: { need_group_id: group.id } }),
-        icon: Pin,
+        icon: RiPushpinLine,
       }))
     : [];
 
-  if (hasPermission('view any needs')) {
+  if (hasPermission('view any need-groups')) {
     dynamicNeedNavItems.push({
-      title: 'Semua Usulan',
+      title: 'Kelompok Usulan',
       href: needGroups.index.url(),
-      icon: Database,
+      icon: RiDatabase2Line,
     });
   }
 
@@ -162,7 +169,7 @@ export function AppSidebar() {
 
   const filteredUserRole = userRole.filter((item) => {
     switch (item.title) {
-      case 'Users':
+      case 'RiGroupLine':
         return hasPermission('view any users');
       case 'Roles':
         return hasPermission('view any roles');
@@ -178,17 +185,18 @@ export function AppSidebar() {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <Link href={dashboard()} prefetch>
-                <AppLogo />
-              </Link>
+            <SidebarMenuButton
+              size="lg"
+              render={<Link href="/dashboard" prefetch />}
+            >
+              <AppLogo />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
 
       <SidebarContent>
-        <NavMain items={mainNavItems} title="Main Menu" />
+        <NavMain items={mainNavItems} title="Dashboard" />
         {dynamicNeedNavItems.length > 0 && (
           <NavMain items={dynamicNeedNavItems} title="Usulan Kebutuhan" />
         )}
@@ -197,6 +205,18 @@ export function AppSidebar() {
         )}
         {filteredUserRole.length > 0 && (
           <NavMain items={filteredUserRole} title="User & Role" />
+        )}
+        {enableDevTools && (
+          <NavMain
+            items={[
+              {
+                title: 'Form Components',
+                href: '/dev/form-components',
+                icon: RiCodeSSlashLine,
+              },
+            ]}
+            title="Development"
+          />
         )}
       </SidebarContent>
 

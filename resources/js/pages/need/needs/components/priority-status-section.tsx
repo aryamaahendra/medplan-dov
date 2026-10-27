@@ -1,17 +1,7 @@
 import { useEffect } from 'react';
+import { RadioField } from '@/components/form';
 import InputError from '@/components/input-error';
-import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldLabel,
-  FieldTitle,
-} from '@/components/ui/field';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-
-import { PRIORITY_LEVELS, STATUS_OPTIONS } from '@/constants/need';
-import { usePermission } from '@/hooks/use-permission';
+import { PRIORITY_LEVELS } from '@/constants/need';
 import { cn } from '@/lib/utils';
 import type { Need } from '@/types';
 
@@ -26,107 +16,40 @@ export function PriorityStatusSection({
   setData,
   errors,
 }: PriorityStatusSectionProps) {
-  const { hasPermission } = usePermission();
-  const canUpdateStatus = hasPermission('update need status');
-
   useEffect(() => {
     setData('is_priority', data.urgency === 'high' && data.impact === 'high');
   }, [data.urgency, data.impact, setData]);
 
   return (
-    <div className="space-y-6 py-6">
-      {canUpdateStatus && (
-        <div className="space-y-3">
-          <Label>Status Usulan</Label>
-          <RadioGroup
-            value={data.status}
-            onValueChange={(v) => setData('status', v as Need['status'])}
-            className="grid grid-cols-1 gap-3 md:grid-cols-2"
-          >
-            {STATUS_OPTIONS.map((s) => (
-              <FieldLabel
-                key={s.value}
-                htmlFor={`status-${s.value}`}
-                className="cursor-pointer"
-              >
-                <Field orientation="horizontal" className="p-3">
-                  <FieldContent>
-                    <FieldTitle>{s.label}</FieldTitle>
-                    <FieldDescription className="text-xs">
-                      {s.description}
-                    </FieldDescription>
-                  </FieldContent>
-                  <RadioGroupItem value={s.value} id={`status-${s.value}`} />
-                </Field>
-              </FieldLabel>
-            ))}
-          </RadioGroup>
-          <InputError message={errors.status} />
-        </div>
-      )}
-
+    <div className="space-y-6">
       <div className="grid grid-cols-1 gap-6">
-        <div className="space-y-3">
-          <Label>Tingkat Urgensi</Label>
-          <RadioGroup
-            value={data.urgency}
-            onValueChange={(v) => setData('urgency', v as Need['urgency'])}
-            className="g-cols-1 grid gap-3 space-y-2 md:grid-cols-2"
-          >
-            {PRIORITY_LEVELS.map((level) => (
-              <FieldLabel
-                key={level.value}
-                htmlFor={`urgency-${level.value}`}
-                className="cursor-pointer"
-              >
-                <Field orientation="horizontal" className="p-2.5">
-                  <FieldContent>
-                    <FieldTitle>{level.label}</FieldTitle>
-                    <FieldDescription className="text-xs">
-                      {level.description.urgency}
-                    </FieldDescription>
-                  </FieldContent>
-                  <RadioGroupItem
-                    value={level.value}
-                    id={`urgency-${level.value}`}
-                  />
-                </Field>
-              </FieldLabel>
-            ))}
-          </RadioGroup>
-          <InputError message={errors.urgency} />
-        </div>
+        <RadioField
+          label="Tingkat Urgensi"
+          value={data.urgency}
+          onValueChange={(v) => setData('urgency', v as Need['urgency'])}
+          variant="choice-card"
+          cols={2}
+          options={PRIORITY_LEVELS.map((level) => ({
+            label: level.label,
+            value: level.value,
+            description: level.description.urgency,
+          }))}
+          error={errors.urgency}
+        />
 
-        <div className="space-y-3">
-          <Label>Tingkat Dampak</Label>
-          <RadioGroup
-            value={data.impact}
-            onValueChange={(v) => setData('impact', v as Need['impact'])}
-            className="g-cols-1 grid gap-3 space-y-2 md:grid-cols-2"
-          >
-            {PRIORITY_LEVELS.map((level) => (
-              <FieldLabel
-                key={level.value}
-                htmlFor={`impact-${level.value}`}
-                className="cursor-pointer"
-              >
-                <Field orientation="horizontal" className="p-2.5">
-                  <FieldContent>
-                    <FieldTitle>{level.label}</FieldTitle>
-                    <FieldDescription className="text-xs">
-                      {level.description.impact}
-                    </FieldDescription>
-                  </FieldContent>
-                  <RadioGroupItem
-                    value={level.value}
-                    id={`impact-${level.value}`}
-                  />
-                </Field>
-              </FieldLabel>
-            ))}
-          </RadioGroup>
-          <InputError message={errors.impact} />
-        </div>
+        <RadioField
+          label="Tingkat Dampak"
+          value={data.impact}
+          onValueChange={(v) => setData('impact', v as Need['impact'])}
+          variant="choice-card"
+          cols={2}
+          options={PRIORITY_LEVELS.map((level) => ({
+            label: level.label,
+            value: level.value,
+            description: level.description.impact,
+          }))}
+          error={errors.impact}
+        />
       </div>
 
       <div className="pt-2">
@@ -134,7 +57,7 @@ export function PriorityStatusSection({
           className={cn(
             'overflow-hidden rounded-lg border transition-all duration-200',
             data.is_priority
-              ? 'border-red-500/30! bg-red-500/10! dark:border-red-500/20! dark:bg-red-500/5!'
+              ? 'border-destructive/30! bg-destructive/10! dark:border-destructive/20! dark:bg-destructive/10!'
               : 'border-muted! bg-muted/30! dark:bg-muted/10!',
           )}
         >
@@ -145,14 +68,14 @@ export function PriorityStatusSection({
                   className={cn(
                     'h-2 w-2 rounded-full',
                     data.is_priority
-                      ? 'animate-pulse bg-red-500'
+                      ? 'animate-pulse bg-destructive'
                       : 'bg-muted-foreground/30',
                   )}
                 />
                 <span
                   className={cn(
                     'text-base font-semibold',
-                    data.is_priority ? 'text-red-700 dark:text-red-400' : '',
+                    data.is_priority ? 'text-destructive' : '',
                   )}
                 >
                   {data.is_priority

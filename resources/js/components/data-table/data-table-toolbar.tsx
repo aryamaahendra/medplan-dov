@@ -1,4 +1,4 @@
-import { Search as SearchIcon, XIcon } from 'lucide-react';
+import { RiSearchLine as SearchIcon, RiCloseLine } from '@remixicon/react';
 import type { ReactNode } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,8 @@ interface DataTableToolbarProps {
   toolbarPosition?: 'beside-search' | 'between-search-and-table';
   /** Optional extra filter controls */
   children?: ReactNode;
+  /** Optional action controls aligned on the other side with justify-between */
+  actions?: ReactNode;
 }
 
 export function DataTableToolbar({
@@ -28,6 +30,7 @@ export function DataTableToolbar({
   searchPlaceholder = 'Search...',
   toolbarPosition = 'beside-search',
   children,
+  actions,
 }: DataTableToolbarProps) {
   const isFiltered =
     Object.keys(filters).some((key) => {
@@ -45,7 +48,7 @@ export function DataTableToolbar({
     }) || Boolean(filters.sort);
 
   return (
-    <div className="flex items-center justify-between gap-4">
+    <div className="flex flex-wrap items-center justify-between gap-4">
       <div className="flex flex-1 flex-wrap items-center gap-2">
         <InputGroup className="max-w-xs">
           <InputGroupInput
@@ -64,18 +67,21 @@ export function DataTableToolbar({
             variant="ghost"
             size="sm"
             onClick={onReset}
-            className="h-8 px-2 lg:px-3"
+            className="px-2 lg:px-3"
           >
             Reset
-            <XIcon className="ml-1 size-4" />
+            <RiCloseLine data-icon="inline-end" />
           </Button>
         )}
 
         {toolbarPosition === 'beside-search' && children}
       </div>
 
-      {toolbarPosition !== 'beside-search' && children && (
-        <div className="flex items-center gap-2">{children}</div>
+      {actions ? (
+        <div className="flex flex-wrap items-center gap-2">{actions}</div>
+      ) : (
+        toolbarPosition !== 'beside-search' &&
+        children && <div className="flex items-center gap-2">{children}</div>
       )}
     </div>
   );

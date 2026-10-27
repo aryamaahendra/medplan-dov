@@ -1,0 +1,83 @@
+import { RiEdit2Line, RiAddLine, RiDeleteBinLine } from '@remixicon/react';
+
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { usePermission } from '@/hooks/use-permission';
+import type { Indicator, Sasaran } from '@/types';
+
+import { IndicatorTable } from './indicator-table';
+
+interface SasaranCardProps {
+  sasaran: Sasaran;
+  yearStart: number;
+  yearEnd: number;
+  onCreateIndicator: (sasaran: Sasaran) => void;
+  onEditSasaran: (sasaran: Sasaran) => void;
+  onDeleteSasaran: (sasaran: Sasaran) => void;
+  onEditIndicator: (indicator: Indicator, sasaran: Sasaran) => void;
+}
+
+export function SasaranCard({
+  sasaran,
+  yearStart,
+  yearEnd,
+  onCreateIndicator,
+  onEditSasaran,
+  onDeleteSasaran,
+  onEditIndicator,
+}: SasaranCardProps) {
+  const { hasPermission } = usePermission();
+
+  return (
+    <Card className="gap-0 overflow-hidden rounded-none py-0 ring-0 last:border-b-0">
+      <div className="flex flex-col border-b bg-muted/30 p-4 md:flex-row">
+        <div className="flex-1">
+          <h4 className="font-semibold">Sasaran: {sasaran.name}</h4>
+          {sasaran.description && (
+            <p className="mt-1 max-w-[75ch] text-sm whitespace-normal text-muted-foreground">
+              {sasaran.description}
+            </p>
+          )}
+        </div>
+        <div className="mt-4 flex items-start justify-end gap-2 md:mt-0">
+          {hasPermission('create indicators') && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onCreateIndicator(sasaran)}
+            >
+              <RiAddLine data-icon="inline-start" />
+              Indikator
+            </Button>
+          )}
+          {hasPermission('update sasarans') && (
+            <Button
+              size="icon-sm"
+              variant="outline"
+              onClick={() => onEditSasaran(sasaran)}
+            >
+              <RiEdit2Line />
+            </Button>
+          )}
+          {hasPermission('delete sasarans') && (
+            <Button
+              size="icon-sm"
+              variant="destructive"
+              onClick={() => onDeleteSasaran(sasaran)}
+            >
+              <RiDeleteBinLine />
+            </Button>
+          )}
+        </div>
+      </div>
+      <div className="p-0">
+        <IndicatorTable
+          indicators={sasaran.indicators || []}
+          onEdit={(indicator) => onEditIndicator(indicator, sasaran)}
+          yearStart={yearStart}
+          yearEnd={yearEnd}
+        />
+      </div>
+    </Card>
+  );
+}

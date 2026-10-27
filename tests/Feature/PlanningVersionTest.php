@@ -10,30 +10,31 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->user = User::factory()->create();
+    $this->user->assignRole('super-admin');
+    $this->actingAs($this->user);
 });
 
 test('can list planning versions', function () {
     PlanningVersion::factory()->count(3)->create();
 
-    $response = $this->actingAs($this->user)
-        ->get(route('planning-versions.index'));
+    $response = $this->get(route('planning-versions.index'));
 
-    $response->assertStatus(200);
+    $response->assertOk();
 });
 
 test('can create planning version empty', function () {
     // 1. Perform store
-    $response = $this->actingAs($this->user)
-        ->post(route('planning-versions.store'), [
-            'name' => 'Original 2026',
-            'fiscal_year' => 2026,
-            'notes' => 'Test notes',
-        ]);
+    $response = $this->post(route('planning-versions.store'), [
+        'name' => 'Original 2026',
+        'year_start' => 2026,
+        'year_end' => 2030,
+        'notes' => 'Test notes',
+    ]);
 
     $response->assertRedirect();
 
     // 2. Verify version created
-    $version = PlanningVersion::where('fiscal_year', 2026)->first();
+    $version = PlanningVersion::where('year_start', 2026)->first();
     expect($version)->not->toBeNull()
         ->and($version->name)->toBe('Original 2026');
 
@@ -43,13 +44,21 @@ test('can create planning version empty', function () {
 
 test('can create revision from existing version', function () {
     // 1. Setup version 0 with activities and years
-    $v0 = PlanningVersion::factory()->create(['revision_no' => 0]);
+    $v0 = PlanningVersion::factory()->create([
+        'revision_no' => 0,
+        'year_start' => 2026,
+        'year_end' => 2030,
+    ]);
     $av0 = PlanningActivityVersion::factory()->create(['planning_version_id' => $v0->id, 'code' => 'ACT1']);
-    PlanningActivityYear::factory()->create(['planning_activity_version_id' => $av0->id, 'year' => 2026, 'budget' => 1000]);
+    PlanningActivityYear::create([
+        'yearable_id' => $av0->id,
+        'yearable_type' => PlanningActivityVersion::class,
+        'year' => 2026,
+        'budget' => 1000,
+    ]);
 
     // 2. Perform create revision
-    $response = $this->actingAs($this->user)
-        ->post(route('planning-versions.create-revision', $v0));
+    $response = $this->post(route('planning-versions.create-revision', $v0));
 
     $response->assertRedirect();
 
@@ -61,7 +70,10 @@ test('can create revision from existing version', function () {
     $av1 = PlanningActivityVersion::where('planning_version_id', $v1->id)->where('code', 'ACT1')->first();
     expect($av1)->not->toBeNull();
 
-    $year1 = PlanningActivityYear::where('planning_activity_version_id', $av1->id)->where('year', 2026)->first();
+    $year1 = PlanningActivityYear::where('yearable_id', $av1->id)
+        ->where('yearable_type', PlanningActivityVersion::class)
+        ->where('year', 2026)
+        ->first();
     expect($year1)->not->toBeNull()
         ->and($year1->budget)->toBe('1000.00');
 });
@@ -70,17 +82,17 @@ test('can update yearly data', function () {
     $version = PlanningVersion::factory()->create();
     $activityVersion = PlanningActivityVersion::factory()->create(['planning_version_id' => $version->id]);
 
-    $response = $this->actingAs($this->user)
-        ->post(route('planning-versions.activities.update-yearly-data', $activityVersion), [
-            'year' => 2026,
-            'target' => '100%',
-            'budget' => 5000000,
-        ]);
+    $response = $this->post(route('planning-versions.activities.update-yearly-data', $activityVersion), [
+        'year' => 2026,
+        'target' => '100%',
+        'budget' => 5000000,
+    ]);
 
     $response->assertRedirect();
 
     $this->assertDatabaseHas('planning_activity_years', [
-        'planning_activity_version_id' => $activityVersion->id,
+        'yearable_id' => $activityVersion->id,
+        'yearable_type' => PlanningActivityVersion::class,
         'year' => 2026,
         'target' => '100%',
         'budget' => 5000000,
@@ -88,11 +100,18 @@ test('can update yearly data', function () {
 });
 
 test('can set current version', function () {
-    $v1 = PlanningVersion::factory()->create(['fiscal_year' => 2026, 'is_current' => true]);
-    $v2 = PlanningVersion::factory()->create(['fiscal_year' => 2026, 'is_current' => false]);
+    $v1 = PlanningVersion::factory()->create([
+        'year_start' => 2026,
+        'year_end' => 2030,
+        'is_current' => true,
+    ]);
+    $v2 = PlanningVersion::factory()->create([
+        'year_start' => 2026,
+        'year_end' => 2030,
+        'is_current' => false,
+    ]);
 
-    $response = $this->actingAs($this->user)
-        ->post(route('planning-versions.set-current', $v2));
+    $response = $this->post(route('planning-versions.set-current', $v2));
 
     $response->assertRedirect();
 

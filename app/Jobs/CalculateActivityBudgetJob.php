@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Jobs;
 
 use App\Actions\Planning\CalculateActivityBudgetAction;
@@ -14,6 +16,12 @@ class CalculateActivityBudgetJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public int $tries = 3;
+
+    public int $timeout = 120;
+
+    public array $backoff = [60, 120, 300];
+
     public function __construct(
         public PlanningActivityVersion $activity,
         public int $year
@@ -25,5 +33,14 @@ class CalculateActivityBudgetJob implements ShouldQueue
             $this->activity,
             $this->year
         );
+    }
+
+    public function failed(\Throwable $e): void
+    {
+        logger()->error('CalculateActivityBudgetJob failed', [
+            'activity' => $this->activity->id,
+            'year' => $this->year,
+            'error' => $e->getMessage(),
+        ]);
     }
 }

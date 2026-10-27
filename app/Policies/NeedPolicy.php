@@ -1,12 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
+use App\Enums\UserRole;
 use App\Models\Need;
-use App\Models\OrganizationalUnit;
+use App\Models\NeedGroup;
 use App\Models\User;
+use Illuminate\Auth\Access\Response;
 
-class NeedPolicy
+final class NeedPolicy
 {
     /**
      * Perform pre-authorization checks.
@@ -37,27 +41,131 @@ class NeedPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user, ?NeedGroup $needGroup = null): Response|bool
     {
-        return $user->hasPermissionTo('create any needs')
+        $hasPermission = $user->hasPermissionTo('create any needs')
             || $user->hasPermissionTo('create descendant needs')
             || $user->hasPermissionTo('create needs');
+
+        if (! $hasPermission) {
+            return false;
+        }
+
+        if (! $needGroup) {
+            $groupId = request()->input('need_group_id');
+            if ($groupId) {
+                $needGroup = NeedGroup::query()->find($groupId);
+            }
+        }
+
+        if ($needGroup && ! $this->canBypassSubmissionWindow($user)) {
+            if (! $needGroup->isOpenForSubmission()) {
+                return Response::deny('Periode pengajuan usulan kebutuhan untuk kelompok ini sedang ditutup.');
+            }
+        }
+
+        return true;
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Need $need): bool
+    public function update(User $user, Need $need): Response|bool
     {
-        return $this->checkTieredPermission($user, $need, 'update');
+        if (! $this->checkTieredPermission($user, $need, 'update')) {
+            return false;
+        }
+
+        if ($need->status === Need::STATUS_SUBMITTED && ! $this->canBypassSubmissionWindow($user)) {
+            return Response::deny($need->getEffectiveLockReason($user) ?: 'Usulan kebutuhan sedang dalam proses review dan tidak dapat diubah.');
+        }
+
+        if ($need->status === Need::STATUS_REVISION) {
+            if ($need->isLocked($user)) {
+                return Response::deny($need->getEffectiveLockReason($user) ?: 'Usulan kebutuhan terkunci dan tidak dapat diubah.');
+            }
+
+            return true;
+        }
+        if ($need->isLocked($user)) {
+            $isPrivilegedSubmitted = $need->status === Need::STATUS_SUBMITTED
+                && $this->canBypassSubmissionWindow($user);
+
+            $isLockedByGroupOnly = ! $need->isExplicitlyLocked()
+                && $need->approved_by_director_at === null
+                && $this->canBypassSubmissionWindow($user);
+
+            if (! $isLockedByGroupOnly && ! $isPrivilegedSubmitted) {
+                $needGroup = $need->relationLoaded('needGroup') ? $need->needGroup : null;
+                if ($needGroup && ! $needGroup->isOpenForSubmission() && ! ($need->unlocked_until !== null && $need->unlocked_until->isFuture()) && $need->is_locked !== false) {
+                    return Response::deny('Periode pengajuan usulan kebutuhan untuk kelompok ini sedang ditutup.');
+                }
+
+                $reason = $need->getEffectiveLockReason($user) ?: 'Usulan kebutuhan terkunci dan tidak dapat diubah.';
+
+                return Response::deny($reason);
+            }
+        }
+
+        return true;
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Need $need): bool
+    public function delete(User $user, Need $need): Response|bool
     {
-        return $this->checkTieredPermission($user, $need, 'delete');
+        if (! $this->checkTieredPermission($user, $need, 'delete')) {
+            return false;
+        }
+
+        if ($need->status === Need::STATUS_SUBMITTED && ! $this->canBypassSubmissionWindow($user)) {
+            return Response::deny('Usulan kebutuhan sedang dalam proses review dan tidak dapat dihapus.');
+        }
+
+        if ($need->isLocked($user) && ! ($need->status === Need::STATUS_SUBMITTED && $this->canBypassSubmissionWindow($user))) {
+            return Response::deny('Usulan kebutuhan terkunci dan tidak dapat dihapus.');
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine whether the user can submit the model for executive review.
+     */
+    public function submit(User $user, Need $need): Response|bool
+    {
+        $isPrivileged = $this->canBypassSubmissionWindow($user)
+            || $user->hasPermissionTo('update any needs')
+            || $user->hasPermissionTo('create any needs');
+
+        $isOriginatingUnitMember = $user->organizational_unit_id !== null
+            && $user->organizational_unit_id === $need->organizational_unit_id;
+
+        $hasTieredPermission = $this->checkTieredPermission($user, $need, 'update')
+            || $this->checkTieredPermission($user, $need, 'create');
+
+        if (! $isPrivileged && ! $isOriginatingUnitMember && ! $hasTieredPermission) {
+            return Response::deny('Anda tidak memiliki izin untuk mengajukan usulan kebutuhan ini.');
+        }
+
+        if (! in_array($need->status, [Need::STATUS_DRAFT, Need::STATUS_REVISION], true)) {
+            return Response::deny('Hanya usulan berstatus draft atau revisi yang dapat diajukan.');
+        }
+
+        if ($need->status === Need::STATUS_DRAFT && ! $this->canBypassSubmissionWindow($user)) {
+            if ($need->isLocked($user)) {
+                return Response::deny($need->getEffectiveLockReason($user) ?: 'Periode pengajuan usulan kebutuhan untuk kelompok ini sedang ditutup.');
+            }
+        }
+
+        if ($need->status === Need::STATUS_REVISION && ! $this->canBypassSubmissionWindow($user)) {
+            if ($need->isLocked($user)) {
+                return Response::deny($need->getEffectiveLockReason($user) ?: 'Usulan kebutuhan terkunci dan tidak dapat diajukan.');
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -71,17 +179,57 @@ class NeedPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Need $need): bool
+    public function restore(User $user, Need $need): Response|bool
     {
-        return $this->checkTieredPermission($user, $need, 'restore');
+        if (! $this->checkTieredPermission($user, $need, 'restore')) {
+            return false;
+        }
+
+        if ($need->isLocked($user)) {
+            return Response::deny('Usulan kebutuhan terkunci dan tidak dapat dipulihkan.');
+        }
+
+        return true;
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Need $need): bool
+    public function forceDelete(User $user, Need $need): Response|bool
     {
-        return $this->checkTieredPermission($user, $need, 'force-delete');
+        if (! $this->checkTieredPermission($user, $need, 'force-delete')) {
+            return false;
+        }
+
+        if ($need->isLocked($user)) {
+            return Response::deny('Usulan kebutuhan terkunci dan tidak dapat dihapus permanen.');
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine whether the user can perform checklist evaluations on the model.
+     */
+    public function performChecklist(User $user, Need $need): bool
+    {
+        return $user->hasPermissionTo('perform checklist');
+    }
+
+    /**
+     * Determine whether the user can lock the model.
+     */
+    public function lock(User $user, Need $need): bool
+    {
+        return $user->hasPermissionTo('lock needs');
+    }
+
+    /**
+     * Determine whether the user can unlock the model.
+     */
+    public function unlock(User $user, Need $need): bool
+    {
+        return $user->hasPermissionTo('unlock needs');
     }
 
     /**
@@ -89,6 +237,7 @@ class NeedPolicy
      */
     private function checkTieredPermission(User $user, Need $need, string $action): bool
     {
+        $need->loadMissing(['needGroup', 'organizationalUnit']);
         if ($user->hasPermissionTo("{$action} any needs")) {
             return true;
         }
@@ -99,7 +248,7 @@ class NeedPolicy
             }
 
             if ($need->organizational_unit_id !== null && $user->organizational_unit_id !== null) {
-                $needUnit = $need->organizationalUnit ?? OrganizationalUnit::find($need->organizational_unit_id);
+                $needUnit = $need->relationLoaded('organizationalUnit') ? $need->organizationalUnit : null;
                 if ($needUnit && $needUnit->isDescendantOf($user->organizational_unit_id)) {
                     return true;
                 }
@@ -108,5 +257,13 @@ class NeedPolicy
 
         return $user->hasPermissionTo("{$action} needs")
             && $user->organizational_unit_id === $need->organizational_unit_id;
+    }
+
+    /**
+     * Determine whether the user can bypass the submission window restrictions on creation.
+     */
+    private function canBypassSubmissionWindow(User $user): bool
+    {
+        return $user->hasRole(UserRole::SuperAdmin->value) || $user->hasRole(UserRole::Planner->value);
     }
 }

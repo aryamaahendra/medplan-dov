@@ -9,6 +9,7 @@ use App\Models\Need;
 use App\Models\OrganizationalUnit;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class StoreNeedRequest extends FormRequest
@@ -35,7 +36,7 @@ class StoreNeedRequest extends FormRequest
 
         $permissionMap = [
             'update need tab general' => [
-                'need_group_id', 'organizational_unit_id', 'need_type_id', 'year',
+                'need_group_id', 'source_need_id', 'organizational_unit_id', 'need_type_id', 'year',
                 'title', 'description', 'current_condition', 'required_condition',
                 'volume', 'unit', 'unit_price', 'total_price',
             ],
@@ -44,10 +45,13 @@ class StoreNeedRequest extends FormRequest
             'update need tab ikk' => ['kpi_indicator_ids'],
             'update need tab rls' => ['strategic_service_plan_ids'],
             'update need tab planning' => ['planning_activity_version_ids', 'planning_activity_indicator_ids'],
-            'update need tab detail' => ['detail'],
-            'update need tab lampiran' => [
-                'attachments', 'attachment_names', 'technical_specification_attachments',
+            'update need tab detail' => [
+                'detail',
+                'technical_specification_attachments',
                 'technical_specification_attachment_names',
+            ],
+            'update need tab lampiran' => [
+                'attachments', 'attachment_names',
             ],
         ];
 
@@ -62,20 +66,52 @@ class StoreNeedRequest extends FormRequest
             $allowedFields[] = 'status';
         }
 
+        $allowedFields[] = 'submit';
+        $allowedFields[] = 'is_submitted';
+
+        if (! $user->hasPermissionTo('update need tab urgency')) {
+            $this->merge([
+                'urgency' => Urgency::Medium->value,
+                'impact' => Impact::Medium->value,
+                'is_priority' => false,
+            ]);
+            $allowedFields = array_merge($allowedFields, ['urgency', 'impact', 'is_priority']);
+        }
+
         // Only keep allowed fields in the request
         $this->replace($this->only($allowedFields));
     }
 
     public function rules(): array
     {
+        $user = $this->user();
+        $canManageFundingSources = $user && ($user->hasRole('super-admin') || $user->can('manage funding sources'));
+
+        $fundingSourceItemRules = $canManageFundingSources
+            ? [
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if (is_numeric($value)) {
+                        if (! DB::table('funding_sources')->where('id', (int) $value)->exists()) {
+                            $fail(__('Sumber dana yang dipilih tidak valid.'));
+                        }
+                    } elseif (! is_string($value) || trim($value) === '') {
+                        $fail(__('Sumber dana tidak valid.'));
+                    }
+                },
+            ]
+            : ['integer', 'exists:funding_sources,id'];
+
         return [
             'need_group_id' => ['required', 'integer', 'exists:need_groups,id'],
+            'source_need_id' => ['nullable', 'integer', 'exists:needs,id'],
             'organizational_unit_id' => [
                 'required',
                 'integer',
-                'exists:organizational_units,id',
-                function ($attribute, $value, $fail) {
-                    $user = $this->user();
+                Rule::exists('organizational_units', 'id')->whereNull('deleted_at'),
+                function (string $attribute, mixed $value, \Closure $fail) use ($user): void {
+                    if (! $user) {
+                        return;
+                    }
                     if ($user->hasRole('super-admin') || $user->hasPermissionTo('create any needs')) {
                         return;
                     }
@@ -102,7 +138,21 @@ class StoreNeedRequest extends FormRequest
             'volume' => ['required', 'numeric', 'min:0'],
             'unit' => ['required', 'string', Rule::in(['pcs', 'unit', 'orang', 'paket', 'set', 'buah', 'lembar', 'kg', 'liter', 'meter'])],
             'unit_price' => ['required', 'numeric', 'min:0'],
-            'total_price' => ['required', 'numeric', 'min:0'],
+            'total_price' => [
+                'required',
+                'numeric',
+                'min:0',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    $volume = $this->input('volume');
+                    $unitPrice = $this->input('unit_price');
+                    if (is_numeric($volume) && is_numeric($unitPrice)) {
+                        $expected = round((float) $volume * (float) $unitPrice, 2);
+                        if (abs((float) $value - $expected) > 0.05) {
+                            $fail(__('Total harga tidak sesuai dengan perkalian volume dan harga satuan.'));
+                        }
+                    }
+                },
+            ],
             'urgency' => ['required', Rule::enum(Urgency::class)],
             'impact' => ['required', Rule::enum(Impact::class)],
             'is_priority' => ['boolean'],
@@ -134,6 +184,7 @@ class StoreNeedRequest extends FormRequest
             'detail.satker_skpd' => ['nullable', 'string'],
             'detail.kpa_id' => ['nullable', 'exists:users,id'],
             'detail.funding_source_ids' => ['nullable', 'array'],
+            'detail.funding_source_ids.*' => $fundingSourceItemRules,
             'detail.estimated_cost' => ['nullable', 'string'],
             'detail.implementation_period' => ['nullable', 'string'],
             'detail.expert_or_skilled_personnel' => ['nullable', 'string'],
@@ -147,6 +198,8 @@ class StoreNeedRequest extends FormRequest
             'technical_specification_attachments.*' => ['file', 'max:10240', 'mimes:jpg,jpeg,png,pdf,doc,docx'],
             'technical_specification_attachment_names' => ['nullable', 'array'],
             'technical_specification_attachment_names.*' => ['string', 'max:255'],
+            'submit' => ['sometimes', 'boolean'],
+            'is_submitted' => ['sometimes', 'boolean'],
         ];
     }
 }

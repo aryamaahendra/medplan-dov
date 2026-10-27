@@ -1,7 +1,12 @@
 <?php
 
-test('example', function () {
-    $response = $this->get('/');
+use App\Models\Tujuan;
 
-    $response->assertStatus(200);
+test('tujuan can be created via factory', function () {
+    $tujuan = Tujuan::factory()->create([
+        'name' => 'Meningkatkan Tata Kelola',
+    ]);
+
+    expect($tujuan->name)->toBe('Meningkatkan Tata Kelola');
+    $this->assertModelExists($tujuan);
 });

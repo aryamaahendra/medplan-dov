@@ -1,4 +1,4 @@
-import type { LucideIcon } from 'lucide-react';
+import type { RemixiconComponentType } from '@remixicon/react';
 import type { ReactNode } from 'react';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 interface StatsCardProps {
   title: string;
   value: string | number;
-  icon: LucideIcon;
+  icon: RemixiconComponentType;
   description?: ReactNode;
   className?: string;
   iconClassName?: string;

@@ -1,8 +1,7 @@
-import { Eye } from 'lucide-react';
+import { RiEyeLine } from '@remixicon/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { EditorRenderer } from '@/components/ui/editor-renderer';
-import { Label } from '@/components/ui/label';
 
 import type { Attachment, NeedDetail } from '@/types';
 
@@ -49,7 +48,7 @@ export function NeedDetailView({
               users={users}
               trigger={
                 <Button variant="destructive" size="icon-sm">
-                  <Eye />
+                  <RiEyeLine />
                 </Button>
               }
             />
@@ -62,9 +61,9 @@ export function NeedDetailView({
 
             return (
               <div key={key} className="space-y-1.5">
-                <Label className="mb-0 border-t bg-muted/40 px-4 py-3">
+                <div className="mb-0 border-t bg-muted/40 px-4 py-3 text-sm font-medium">
                   {label}
-                </Label>
+                </div>
                 <div className="mb-0 min-h-[120px] w-full border-y border-input bg-background px-4 py-2 text-base md:text-sm">
                   {key === ('funding_source_id' as any) ? (
                     <ul className="list-inside space-y-4 py-2">

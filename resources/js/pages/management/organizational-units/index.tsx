@@ -1,91 +1,21 @@
-import { Head, router } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import { toast } from 'sonner';
+import { Head } from '@inertiajs/react';
+import { RiAddLine, RiAlertLine, RiDeleteBinLine } from '@remixicon/react';
 
-import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-
-import { useDataTable } from '@/hooks/use-data-table';
-import type { DataTableFilters } from '@/hooks/use-data-table';
-import { usePermission } from '@/hooks/use-permission';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { OrganizationalUnitModals } from '@/features/organizational-unit/components/organizational-unit-modals';
+import { useOrganizationalUnitsIndex } from '@/features/organizational-unit/hooks/use-organizational-units-index';
+import type { OrganizationalUnitsIndexProps } from '@/features/organizational-unit/hooks/use-organizational-units-index';
 import organizationalUnitRoutes from '@/routes/organizational-units';
-import { getColumns } from './columns';
-import type { OrganizationalUnit } from './columns';
-import { OrganizationalUnitDialog } from './organizational-unit-dialog';
 
-interface PaginatedUnits {
-  data: OrganizationalUnit[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-  from: number | null;
-  to: number | null;
-}
-
-interface OrganizationalUnitsIndexProps {
-  units: PaginatedUnits;
-  allUnits: { id: number; name: string }[];
-  filters: DataTableFilters;
-}
-
-export default function OrganizationalUnitsIndex({
-  units,
-  allUnits,
-  filters,
-}: OrganizationalUnitsIndexProps) {
-  const { hasPermission } = usePermission();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingUnit, setEditingUnit] = useState<OrganizationalUnit | null>(
-    null,
-  );
-  const [deletingUnit, setDeletingUnit] = useState<OrganizationalUnit | null>(
-    null,
-  );
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  // Use useDataTable to handle server-side state via Inertia URL updates
-  const { onSearch, onSort, onPageChange, onPerPageChange, onReset } =
-    useDataTable({
-      only: ['units', 'filters'],
-    });
-
-  const onEdit = (unit: OrganizationalUnit) => {
-    setEditingUnit(unit);
-    setDialogOpen(true);
-  };
-
-  const onCreate = () => {
-    setEditingUnit(null);
-    setDialogOpen(true);
-  };
-
-  const onDelete = (unit: OrganizationalUnit) => {
-    setDeletingUnit(unit);
-  };
-
-  const handleConfirmDelete = () => {
-    if (!deletingUnit) {
-      return;
-    }
-
-    setIsDeleting(true);
-
-    router.delete(
-      organizationalUnitRoutes.destroy.url({
-        organizational_unit: deletingUnit.id,
-      }),
-      {
-        onSuccess: () => {
-          toast.success('Unit organisasi berhasil dihapus.');
-          setDeletingUnit(null);
-        },
-        onFinish: () => setIsDeleting(false),
-      },
-    );
-  };
+export default function OrganizationalUnitsIndex(
+  props: OrganizationalUnitsIndexProps,
+) {
+  const { state, handlers, table, hasPermission, units, allUnits, filters } =
+    useOrganizationalUnitsIndex(props);
 
   return (
     <>
@@ -101,48 +31,63 @@ export default function OrganizationalUnitsIndex({
               Kelola struktur organisasi, bidang, dan subbagian.
             </p>
           </div>
-          {hasPermission('create organizational-units') && (
-            <Button onClick={onCreate}>
-              <Plus />
+          {!state.isTrash && hasPermission('create organizational-units') && (
+            <Button onClick={handlers.onCreate}>
+              <RiAddLine data-icon="inline-start" />
               Tambah Unit
             </Button>
           )}
         </div>
 
+        {state.isTrash && (
+          <Alert>
+            <RiAlertLine />
+            <AlertTitle className="font-semibold">
+              Mode Tempat Sampah
+            </AlertTitle>
+            <AlertDescription className="text-sm">
+              Anda sedang melihat unit organisasi yang telah dihapus (soft
+              delete). Data di sini tidak aktif dalam operasional sistem.
+            </AlertDescription>
+          </Alert>
+        )}
+
         <DataTable
-          columns={useMemo(
-            () => getColumns(onEdit, onDelete, hasPermission),
-            [hasPermission],
-          )}
+          columns={table.columns}
           data={units.data}
           meta={units}
           filters={filters}
-          onSearch={onSearch}
-          onSort={onSort}
-          onPageChange={onPageChange}
-          onPerPageChange={onPerPageChange}
-          onReset={onReset}
+          onSearch={table.onSearch}
+          onSort={table.onSort}
+          onPageChange={table.onPageChange}
+          onPerPageChange={table.onPerPageChange}
+          onReset={table.onReset}
           searchPlaceholder="Cari berdasarkan nama atau kode..."
+          toolbarChildren={
+            <div className="flex items-center gap-2 rounded-lg border border-border/80 bg-background/50 px-3 py-1.5 shadow-xs">
+              <RiDeleteBinLine className="size-4 text-muted-foreground" />
+              <Label
+                htmlFor="trash-mode-switch"
+                className="cursor-pointer text-xs font-medium text-foreground select-none"
+              >
+                Lihat Tempat Sampah
+              </Label>
+              <Switch
+                id="trash-mode-switch"
+                size="sm"
+                checked={state.isTrash}
+                onCheckedChange={handlers.onToggleTrash}
+                aria-label="Tampilkan unit organisasi yang dihapus"
+              />
+            </div>
+          }
         />
       </div>
 
-      <OrganizationalUnitDialog
-        key={editingUnit?.id ?? 'new'}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        unit={editingUnit}
+      <OrganizationalUnitModals
+        state={state}
+        handlers={handlers}
         allUnits={allUnits}
-      />
-
-      <ConfirmDialog
-        open={!!deletingUnit}
-        onOpenChange={(open) => !open && setDeletingUnit(null)}
-        onConfirm={handleConfirmDelete}
-        title="Hapus Unit Organisasi"
-        description={`Apakah Anda yakin ingin menghapus "${deletingUnit?.name}"? Data yang dihapus akan dipindahkan ke tempat sampah (Soft Delete).`}
-        confirmText="Hapus Unit"
-        variant="destructive"
-        loading={isDeleting}
       />
     </>
   );

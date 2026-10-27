@@ -49,6 +49,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'create org-units' => 'Menambah unit organisasi baru',
             'update org-units' => 'Mengubah data unit organisasi',
             'delete org-units' => 'Menghapus unit organisasi',
+            'restore org-units' => 'Memulihkan unit organisasi yang dihapus',
+            'force-delete org-units' => 'Menghapus permanen unit organisasi',
 
             // Needs
             'view any needs' => 'Melihat daftar semua usulan kebutuhan',
@@ -100,6 +102,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'update need tab detail' => 'Mengubah data pada tab Detail KAK',
             'update need tab lampiran' => 'Mengubah data pada tab Lampiran',
             'update need status' => 'Mengubah status usulan kebutuhan',
+            'lock needs' => 'Mengunci usulan kebutuhan',
+            'unlock needs' => 'Membuka kunci usulan kebutuhan',
 
             // Need Configuration
             'view any need-groups' => 'Melihat daftar semua grup usulan',
@@ -180,17 +184,17 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Create roles and assign permissions
 
-        // Super Admin - gets all permissions via Gate::before in a policy or AuthServiceProvider
-        Role::firstOrCreate(['name' => UserRole::SuperAdmin->value, 'guard_name' => 'web']);
-
+        // Super Admin - gets all permissions via Gate::before as well as direct role sync
+        $superAdminRole = Role::firstOrCreate(['name' => UserRole::SuperAdmin->value, 'guard_name' => 'web']);
+        $superAdminRole->syncPermissions(array_keys($permissions));
         // Director
         $directorRole = Role::firstOrCreate(['name' => UserRole::Director->value, 'guard_name' => 'web']);
         $directorPermissions = array_filter(array_keys($permissions), function ($permission) {
-            // Read-only everything except user, role, permissions
+            // Read-only everything except user, role, permissions, plus executive approval
             $isRead = str_starts_with($permission, 'view');
             $isAuthRelated = str_contains($permission, 'user') || str_contains($permission, 'role') || str_contains($permission, 'permission');
 
-            return $isRead && ! $isAuthRelated;
+            return ($isRead && ! $isAuthRelated) || $permission === 'approve any needs';
         });
         $directorRole->syncPermissions($directorPermissions);
 

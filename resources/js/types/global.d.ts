@@ -6,6 +6,8 @@ declare module '@inertiajs/core' {
       name: string;
       auth: Auth;
       sidebarOpen: boolean;
+      enableDevTools?: boolean;
+      activeNeedGroups?: Array<{ id: number; name: string; year: number }>;
       [key: string]: unknown;
     };
   }

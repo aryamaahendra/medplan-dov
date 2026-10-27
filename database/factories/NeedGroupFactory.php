@@ -25,4 +25,28 @@ class NeedGroupFactory extends Factory
             'need_count' => 0,
         ];
     }
+
+    /**
+     * Indicate that the need group has an open submission window.
+     */
+    public function openWindow(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => true,
+            'submission_start_at' => now()->subDays(5),
+            'submission_end_at' => now()->addDays(5),
+        ]);
+    }
+
+    /**
+     * Indicate that the need group has a closed submission window.
+     */
+    public function closedWindow(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => true,
+            'submission_start_at' => now()->subDays(10),
+            'submission_end_at' => now()->subDay(),
+        ]);
+    }
 }

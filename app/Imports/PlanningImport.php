@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Imports;
 
 use App\Enums\PlanningActivityType;
@@ -14,6 +16,13 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithLimit;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 
+/**
+ * Note: WithChunkReading / WithBatchInserts are intentionally omitted here.
+ * The import algorithm relies on stateful hierarchical parsing across sequential rows
+ * (maintaining $this->stack for parent-child ancestry, $lastActivity for continuation rows,
+ * and cross-row validation). Splitting into isolated chunks or batch inserts would break
+ * hierarchy reconstruction. Execution is already strictly bounded via WithLimit and WithStartRow.
+ */
 class PlanningImport implements ToCollection, WithLimit, WithStartRow
 {
     protected int $versionId;
@@ -57,7 +66,7 @@ class PlanningImport implements ToCollection, WithLimit, WithStartRow
         return $this->endRow - $this->startRow + 1;
     }
 
-    public function collection(Collection $rows)
+    public function collection(Collection $rows): void
     {
         DB::transaction(function () use ($rows) {
             $lastActivity = null;

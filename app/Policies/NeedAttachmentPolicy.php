@@ -2,10 +2,11 @@
 
 namespace App\Policies;
 
+use App\Models\Need;
 use App\Models\NeedAttachment;
 use App\Models\User;
 
-class NeedAttachmentPolicy
+final class NeedAttachmentPolicy
 {
     public function before(User $user): ?bool
     {
@@ -23,20 +24,47 @@ class NeedAttachmentPolicy
             && $user->can('view', $needAttachment->need);
     }
 
-    public function create(User $user): bool
+    public function create(User $user, ?Need $need = null): bool
     {
-        return $user->hasPermissionTo('create need-attachments');
+        if (! $user->hasPermissionTo('create need-attachments')) {
+            return false;
+        }
+
+        if ($need) {
+            // Planners and Super Admins can attach review notes and evaluation documentation to locked Needs
+            if ($user->hasRole('planner') || $user->hasRole('super-admin')) {
+                return $user->can('view', $need);
+            }
+
+            return $user->can('update', $need);
+        }
+
+        return true;
     }
 
     public function update(User $user, NeedAttachment $needAttachment): bool
     {
-        return $user->hasPermissionTo('create need-attachments')
-            && $user->can('update', $needAttachment->need);
+        if (! $user->hasPermissionTo('create need-attachments')) {
+            return false;
+        }
+
+        if ($user->hasRole('planner') || $user->hasRole('super-admin')) {
+            return $user->can('view', $needAttachment->need);
+        }
+
+        return $user->can('update', $needAttachment->need);
     }
 
     public function delete(User $user, NeedAttachment $needAttachment): bool
     {
-        return $user->hasPermissionTo('delete need-attachments')
-            && $user->can('update', $needAttachment->need);
+        if (! $user->hasPermissionTo('delete need-attachments')) {
+            return false;
+        }
+
+        if ($user->hasRole('planner') || $user->hasRole('super-admin')) {
+            return $user->can('view', $needAttachment->need);
+        }
+
+        return $user->can('update', $needAttachment->need);
     }
 }

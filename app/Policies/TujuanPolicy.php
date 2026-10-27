@@ -5,7 +5,7 @@ namespace App\Policies;
 use App\Models\Tujuan;
 use App\Models\User;
 
-class TujuanPolicy
+final class TujuanPolicy
 {
     /**
      * Perform pre-authorization checks.

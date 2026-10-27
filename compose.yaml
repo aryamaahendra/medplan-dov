@@ -26,6 +26,7 @@ services:
       - redis
   pgsql:
     image: 'postgres:18-alpine'
+    command: ['postgres', '-c', 'max_locks_per_transaction=256']
     environment:
       PGPASSWORD: '${DB_PASSWORD:-secret}'
       POSTGRES_DB: '${DB_DATABASE}'

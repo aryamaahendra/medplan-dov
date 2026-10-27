@@ -41,7 +41,7 @@ it('clears derivative budgets before recalculating', function () {
         'total_budget' => 1000,
     ]);
 
-    Queue::fake();
+    Queue::fake([CalculateActivityBudgetJob::class]);
 
     app(CalculateActivityBudgetAction::class)->recalculateVersion($version);
 
@@ -66,7 +66,7 @@ it('dispatches jobs for all source activities across all years', function () {
     // Computed source: Output under Subkegiatan
     $out = PlanningActivityVersion::factory()->create(['planning_version_id' => $version->id, 'parent_id' => $sub->id, 'type' => PlanningActivityType::Output]);
 
-    Queue::fake();
+    Queue::fake([CalculateActivityBudgetJob::class]);
 
     app(CalculateActivityBudgetAction::class)->recalculateVersion($version);
 

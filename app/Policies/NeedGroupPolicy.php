@@ -5,7 +5,7 @@ namespace App\Policies;
 use App\Models\NeedGroup;
 use App\Models\User;
 
-class NeedGroupPolicy
+final class NeedGroupPolicy
 {
     public function before(User $user): ?bool
     {

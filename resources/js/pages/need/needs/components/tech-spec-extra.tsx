@@ -1,4 +1,4 @@
-import { UploadCloud } from 'lucide-react';
+import { RiUploadCloudLine } from '@remixicon/react';
 import type { MutableRefObject } from 'react';
 import { Button } from '@/components/ui/button';
 import { formatFileSize } from '@/lib/formatters';
@@ -50,7 +50,7 @@ export function TechSpecExtra({
           size="sm"
           onClick={() => fileInputRef.current?.click()}
         >
-          <UploadCloud className="h-4 w-4" />
+          <RiUploadCloudLine data-icon="inline-start" />
           Unggah Dokumen
         </Button>
         <input
@@ -64,7 +64,7 @@ export function TechSpecExtra({
       </div>
 
       {hasAttachments && (
-        <div className="grid grid-cols-1 gap-2 border-b p-2 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-2 pt-2 md:grid-cols-2">
           {existingAttachments.map((att) => (
             <AttachmentCard
               key={att.id}

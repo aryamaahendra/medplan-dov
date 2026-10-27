@@ -1,49 +1,19 @@
 import { Head } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
-import { useState } from 'react';
 
-import { KpiIndicatorTree } from '@/components/kpis/kpi-indicator-tree';
-import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { usePermission } from '@/hooks/use-permission';
+import { KpiGroupInfo } from '@/features/kpi-group/components/kpi-group-info';
+import { KpiIndicatorDialog } from '@/features/kpi-group/components/kpi-indicator-dialog';
+import { KpiIndicatorsSection } from '@/features/kpi-group/components/kpi-indicators-section';
+import { useKpiGroupShow } from '@/features/kpi-group/hooks/use-kpi-group-show';
 import groupRoutes from '@/routes/kpis/groups';
-import type { KpiGroup, KpiIndicator } from '@/types';
-
-import { KpiGroupInfo } from './components/kpi-group-info';
-import { KpiIndicatorDialog } from './components/kpi-indicator-dialog';
+import type { KpiGroup } from '@/types';
 
 interface KpiGroupShowProps {
   group: KpiGroup;
 }
 
 export default function KpiGroupShow({ group }: KpiGroupShowProps) {
-  const { hasPermission } = usePermission();
-  const [indicatorDialogOpen, setIndicatorDialogOpen] = useState(false);
-  const [editingIndicator, setEditingIndicator] = useState<KpiIndicator | null>(
-    null,
-  );
-  const [parentIndicator, setParentIndicator] = useState<KpiIndicator | null>(
-    null,
-  );
-
-  const onCreateIndicator = () => {
-    setParentIndicator(null);
-    setEditingIndicator(null);
-    setIndicatorDialogOpen(true);
-  };
-
-  const onCreateChildIndicator = (parent: KpiIndicator) => {
-    setParentIndicator(parent);
-    setEditingIndicator(null);
-    setIndicatorDialogOpen(true);
-  };
-
-  const onEditIndicator = (indicator: KpiIndicator) => {
-    setParentIndicator(null);
-    setEditingIndicator(indicator);
-    setIndicatorDialogOpen(true);
-  };
-
+  const { state, handlers } = useKpiGroupShow();
   const indicators = group.indicators || [];
 
   return (
@@ -66,54 +36,23 @@ export default function KpiGroupShow({ group }: KpiGroupShowProps) {
 
         <Separator />
 
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between px-0.5">
-            <div>
-              <h2 className="text-lg font-semibold tracking-tight">
-                Struktur Indikator
-              </h2>
-              <p className="text-xs text-muted-foreground italic">
-                {indicators.length} indikator/kategori ditemukan.
-              </p>
-            </div>
-            {hasPermission('create kpi-indicators') && (
-              <Button onClick={onCreateIndicator}>
-                <Plus />
-                Tambah Indikator Utama
-              </Button>
-            )}
-          </div>
-
-          <KpiIndicatorTree
-            indicators={indicators}
-            yearStart={group.start_year}
-            yearEnd={group.end_year}
-            onEdit={
-              hasPermission('update kpi-indicators')
-                ? onEditIndicator
-                : undefined
-            }
-            onCreateChild={
-              hasPermission('create kpi-indicators')
-                ? onCreateChildIndicator
-                : undefined
-            }
-            onCreateFirst={
-              hasPermission('create kpi-indicators')
-                ? onCreateIndicator
-                : undefined
-            }
-            emptyMessage="Belum ada indikator atau kategori untuk periode ini."
-          />
-        </div>
+        <KpiIndicatorsSection
+          group={group}
+          indicators={indicators}
+          view={state.view}
+          onViewChange={handlers.setView}
+          onCreateIndicator={handlers.onCreateIndicator}
+          onEditIndicator={handlers.onEditIndicator}
+          onCreateChildIndicator={handlers.onCreateChildIndicator}
+        />
       </div>
 
       <KpiIndicatorDialog
-        open={indicatorDialogOpen}
-        onOpenChange={setIndicatorDialogOpen}
+        open={state.indicatorDialogOpen}
+        onOpenChange={handlers.setIndicatorDialogOpen}
         group={group}
-        parentIndicator={parentIndicator}
-        indicator={editingIndicator}
+        parentIndicator={state.parentIndicator}
+        indicator={state.editingIndicator}
       />
     </>
   );

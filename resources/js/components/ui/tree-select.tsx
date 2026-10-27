@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronDown, ChevronRight, Dot, Search } from "lucide-react";
+import { RiCheckLine, RiArrowDownSLine, RiArrowRightSLine, RiFocusLine, RiSearchLine } from '@remixicon/react';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,6 +26,7 @@ interface TreeItem {
 }
 
 interface TreeSelectProps {
+  id?: string;
   items: { id: number; name: string; parent_id: number | null }[];
   value?: string | number;
   onValueChange: (value: string) => void;
@@ -35,6 +36,7 @@ interface TreeSelectProps {
 }
 
 export function TreeSelect({
+  id,
   items,
   value,
   onValueChange,
@@ -154,14 +156,14 @@ export function TreeSelect({
             >
               {hasChildren ? (
                 isExpanded ? (
-                  <ChevronDown className="size-3" />
+                  <RiArrowDownSLine className="size-3" />
                 ) : (
-                  <ChevronRight className="size-3" />
+                  <RiArrowRightSLine className="size-3" />
                 )
-              ) : <Dot className="size-3"/>}
+              ) : <RiFocusLine className="size-3"/>}
             </div>
             <span className="flex-1 whitespace-normal">{node.name}</span>
-            {isSelected && <Check className="size-3 opacity-70" />}
+            {isSelected && <RiCheckLine className="size-3 opacity-70" />}
           </div>
           {hasChildren && isExpanded && (
             <div className="w-full pl-4 border-muted/50">
@@ -175,19 +177,22 @@ export function TreeSelect({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className={cn("w-full h-9 justify-between font-normal", className)}
-          disabled={disabled}
-        >
-          <span className="truncate">
-            {selectedItem ? selectedItem.name : placeholder}
-          </span>
-          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
+      <DialogTrigger
+        render={
+          <Button
+            id={id}
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className={cn("w-full h-9 justify-between font-normal", className)}
+            disabled={disabled}
+          />
+        }
+      >
+        <span className="truncate">
+          {selectedItem ? selectedItem.name : placeholder}
+        </span>
+        <RiArrowDownSLine className="ml-2 h-4 w-4 shrink-0 opacity-50" />
       </DialogTrigger>
       <DialogContent className="max-w-md p-0 flex flex-col gap-0 max-h-[85vh]">
         <DialogHeader className="p-4 border-b">
@@ -196,7 +201,7 @@ export function TreeSelect({
         <div className="p-3 border-b">
           <InputGroup>
             <InputGroupAddon>
-              <Search className="h-4 w-4 opacity-50" />
+              <RiSearchLine className="h-4 w-4 opacity-50" />
             </InputGroupAddon>
             <InputGroupInput
               placeholder="Cari unit kerja..."

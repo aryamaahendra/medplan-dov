@@ -1,11 +1,11 @@
 import {
-  DownloadIcon,
-  EyeIcon,
-  PaperclipIcon,
-  Trash2Icon,
-  UploadIcon,
-  XIcon,
-} from 'lucide-react';
+  RiDownloadLine,
+  RiEyeLine,
+  RiAttachmentLine,
+  RiDeleteBinLine,
+  RiUploadLine,
+  RiCloseLine,
+} from '@remixicon/react';
 import React, { useRef } from 'react';
 import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
 import { ActionDropdown } from '@/components/action-dropdown';
@@ -96,7 +96,7 @@ export function FileSection({
   };
 
   return (
-    <div className="space-y-6 py-4">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-medium">Bukti Dukung</h3>
@@ -111,7 +111,7 @@ export function FileSection({
           size="sm"
           onClick={() => fileInputRef.current?.click()}
         >
-          <PaperclipIcon className="mr-2 h-4 w-4" />
+          <RiAttachmentLine data-icon="inline-start" />
           Pilih File
         </Button>
         <input
@@ -136,14 +136,14 @@ export function FileSection({
                   'bg-muted/50 line-through opacity-50',
               )}
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                <UploadIcon className="h-5 w-5" />
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-foreground">
+                <RiUploadLine className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1 text-left">
                 <p className="truncate text-sm leading-tight font-medium text-foreground">
                   {att.display_name}
                 </p>
-                <p className="mt-1 text-[10px] leading-none text-muted-foreground uppercase">
+                <p className="mt-1 text-xss leading-none text-muted-foreground uppercase">
                   {att.extension || 'FILE'} • {formatFileSize(att.file_size)}
                 </p>
               </div>
@@ -155,7 +155,7 @@ export function FileSection({
                     ? [
                         {
                           label: 'Pratinjau',
-                          icon: EyeIcon,
+                          icon: RiEyeLine,
                           href: NeedAttachmentController.view.url({
                             attachment: att.id,
                           }),
@@ -164,7 +164,7 @@ export function FileSection({
                     : []),
                   {
                     label: 'Unduh',
-                    icon: DownloadIcon,
+                    icon: RiDownloadLine,
                     href: NeedAttachmentController.download.url({
                       attachment: att.id,
                     }),
@@ -175,8 +175,8 @@ export function FileSection({
                       ? 'Batal Hapus'
                       : 'Hapus',
                     icon: deletedAttachmentIds.includes(att.id)
-                      ? XIcon
-                      : Trash2Icon,
+                      ? RiCloseLine
+                      : RiDeleteBinLine,
                     variant: 'destructive',
                     onClick: () => toggleExistingDeletion(att.id),
                   },
@@ -191,8 +191,8 @@ export function FileSection({
               key={index}
               className="group flex items-center gap-3 rounded-lg border border-primary/20 bg-primary/5 p-3"
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                <UploadIcon className="h-5 w-5" />
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-foreground">
+                <RiUploadLine className="h-5 w-5" />
               </div>
               <div className="flex min-w-0 flex-1 flex-col gap-1">
                 <div className="flex items-center gap-1">
@@ -202,7 +202,7 @@ export function FileSection({
                     className="h-6 border-none bg-transparent p-0 py-0 text-sm font-medium text-foreground shadow-none focus-visible:ring-0 focus-visible:ring-1"
                   />
                 </div>
-                <p className="text-[10px] leading-none text-muted-foreground uppercase">
+                <p className="text-xss leading-none text-muted-foreground uppercase">
                   {file.name.split('.').pop()} • {formatFileSize(file.size)}
                 </p>
                 {errors?.[`attachments.${index}`] && (
@@ -215,10 +215,10 @@ export function FileSection({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-destructive"
+                className="text-destructive"
                 onClick={() => removeNewFile(index)}
               >
-                <Trash2Icon className="h-4 w-4" />
+                <RiDeleteBinLine />
               </Button>
             </div>
           ))}
@@ -227,7 +227,7 @@ export function FileSection({
 
       {files.length === 0 && existingAttachments.length === 0 && (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-10 text-center">
-          <PaperclipIcon className="mb-2 h-10 w-10 text-muted-foreground/50" />
+          <RiAttachmentLine className="mb-2 h-10 w-10 text-muted-foreground/50" />
           <p className="text-sm text-muted-foreground">
             Belum ada lampiran. Klik "Pilih File" untuk mengunggah.
           </p>

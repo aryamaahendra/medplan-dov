@@ -1,5 +1,7 @@
 import { useSyncExternalStore } from 'react';
 
+export type ViewMode = 'table' | 'grid' | 'list';
+
 const viewModeStore = {
   subscribe(callback: () => void) {
     window.addEventListener('storage', callback);
@@ -10,15 +12,19 @@ const viewModeStore = {
       window.removeEventListener('view-mode-change', callback);
     };
   },
-  getSnapshot() {
-    return (
-      (localStorage.getItem('needs-view-mode') as 'table' | 'grid') || 'table'
-    );
+  getSnapshot(): ViewMode {
+    const stored = localStorage.getItem('needs-view-mode');
+
+    if (stored === 'table' || stored === 'grid' || stored === 'list') {
+      return stored;
+    }
+
+    return 'table';
   },
   getServerSnapshot() {
     return 'loading' as const;
   },
-  set(mode: 'table' | 'grid') {
+  set(mode: ViewMode) {
     localStorage.setItem('needs-view-mode', mode);
     window.dispatchEvent(new Event('view-mode-change'));
   },

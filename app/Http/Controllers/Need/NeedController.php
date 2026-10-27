@@ -1,35 +1,39 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Need;
 
 use App\Actions\Need\GetFilteredNeedsAction;
-use App\Actions\Need\StoreNeedAction;
-use App\Actions\Need\UpdateNeedAction;
+use App\Actions\Need\NeedLockLifecycle;
+use App\Actions\Need\NeedProposalEngine;
+use App\Actions\Need\NeedStrategicAlignmentEngine;
+use App\DTOs\Need\DirectorDetermination;
+use App\DTOs\Need\NeedProposalPayload;
 use App\Enums\Kldi;
 use App\Enums\SatkerSkpd;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Need\StoreNeedRequest;
+use App\Http\Requests\Need\UpdateDirectorReviewRequest;
 use App\Http\Requests\Need\UpdateNeedRequest;
 use App\Http\Resources\ChecklistQuestionResource;
 use App\Http\Resources\NeedChecklistAnswerResource;
 use App\Http\Resources\NeedResource;
 use App\Models\FundingSource;
-use App\Models\KpiGroup;
 use App\Models\Need;
 use App\Models\NeedGroup;
 use App\Models\NeedType;
 use App\Models\OrganizationalUnit;
-use App\Models\PlanningActivityVersion;
-use App\Models\StrategicServicePlan;
-use App\Models\Tujuan;
 use App\Models\User;
 use App\Traits\HasDataTable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class NeedController extends Controller
+final class NeedController extends Controller
 {
     use HasDataTable;
 
@@ -42,10 +46,12 @@ class NeedController extends Controller
     private const array SEARCH_COLUMNS = ['title', 'description'];
 
     /** Columns sortable by */
-    private const array SORTABLE_COLUMNS = ['title', 'year', 'status', 'total_price', 'created_at'];
+    private const array SORTABLE_COLUMNS = ['title', 'year', 'status', 'total_price', 'checklist_percentage', 'created_at'];
 
-    public function index(Request $request, GetFilteredNeedsAction $action): Response|RedirectResponse
-    {
+    public function index(
+        Request $request,
+        GetFilteredNeedsAction $action
+    ): Response|RedirectResponse {
         $this->authorize('viewAny', Need::class);
         $groupId = $request->input('need_group_id');
 
@@ -56,7 +62,11 @@ class NeedController extends Controller
             }
         }
 
-        $currentGroup = $groupId ? NeedGroup::find($groupId) : null;
+        $currentGroup = $groupId
+            ? NeedGroup::query()
+                ->withSum('needs as total_budget', 'total_price')
+                ->find($groupId)
+            : null;
 
         $filters = [
             'year' => $request->input('year'),
@@ -67,9 +77,19 @@ class NeedController extends Controller
             'impact' => $request->input('impact'),
             'is_priority' => $request->input('is_priority'),
             'is_approved_by_director' => $request->input('is_approved_by_director'),
+            'is_recommended_for_next_cycle' => $request->input('is_recommended_for_next_cycle'),
             'min_checklist_score' => $request->input('min_checklist_score'),
+            'stage' => $request->input('stage'),
             'need_group_id' => $groupId,
+            'attention' => $request->input('attention'),
+            'include_descendants' => $request->boolean('include_descendants'),
         ];
+        $counts = $action->getIndexCounts(
+            $filters,
+            $request->user(),
+            $currentGroup,
+            $request->string('search')->trim()->value() ?: null
+        );
 
         $query = $action->execute($filters, $request->user());
 
@@ -85,143 +105,53 @@ class NeedController extends Controller
         return Inertia::render('need/needs/index', [
             'needs' => $needs,
             'currentGroup' => $currentGroup,
-            'stats' => Inertia::defer(function () use ($groupId, $currentGroup) {
-                $prevGroup = $currentGroup
-                    ? NeedGroup::query()
-                        ->where('id', '!=', $groupId)
-                        ->where('year', '<=', $currentGroup->year)
-                        ->orderByDesc('year')
-                        ->orderByDesc('id')
-                        ->first()
-                    : null;
-
-                $prevGroupId = $prevGroup?->id;
-
-                return [
-                    'total_needs' => Need::where('need_group_id', $groupId)->count(),
-                    'total_budget' => Need::where('need_group_id', $groupId)->sum('total_price'),
-                    'priority_needs' => Need::where('need_group_id', $groupId)->where('is_priority', true)->count(),
-                    'avg_completeness' => Need::where('need_group_id', $groupId)->avg('checklist_percentage') ?? 0,
-                    'approved_by_director' => Need::where('need_group_id', $groupId)->whereNotNull('approved_by_director_at')->count(),
-                    'prev_group' => $prevGroup ? ['id' => $prevGroup->id, 'name' => $prevGroup->name] : null,
-                    'prev_total_needs' => $prevGroupId ? Need::where('need_group_id', $prevGroupId)->count() : null,
-                    'prev_total_budget' => $prevGroupId ? Need::where('need_group_id', $prevGroupId)->sum('total_price') : null,
-                    'prev_priority_needs' => $prevGroupId ? Need::where('need_group_id', $prevGroupId)->where('is_priority', true)->count() : null,
-                    'prev_avg_completeness' => $prevGroupId ? (Need::where('need_group_id', $prevGroupId)->avg('checklist_percentage') ?? 0) : null,
-                    'prev_approved_by_director' => $prevGroupId ? Need::where('need_group_id', $prevGroupId)->whereNotNull('approved_by_director_at')->count() : null,
-                ];
-            }, 'dashboard'),
-            'statusDistribution' => Inertia::defer(fn () => Need::where('need_group_id', $groupId)
-                ->selectRaw('status, count(*) as count')
-                ->groupBy('status')
-                ->get()
-                ->pluck('count', 'status')
-                ->toArray(), 'dashboard'),
-            'needsByUnit' => Inertia::defer(function () use ($groupId) {
-                $aggregates = Need::where('need_group_id', $groupId)
-                    ->selectRaw('organizational_unit_id, count(*) as count, sum(total_price) as total_budget, sum(case when is_priority then 1 else 0 end) as priority_count, sum(case when approved_by_director_at is not null then 1 else 0 end) as approved_count')
-                    ->groupBy('organizational_unit_id')
-                    ->orderByDesc('count')
-                    ->get();
-
-                $unitIds = $aggregates->pluck('organizational_unit_id')->filter()->unique();
-                $units = OrganizationalUnit::with('parentsRecursive')->whereIn('id', $unitIds)->get()->keyBy('id');
-
-                return $aggregates->map(function ($item) use ($units) {
-                    $unit = $units->get($item->organizational_unit_id);
-                    $parents = [];
-                    $cursor = $unit?->parentsRecursive;
-                    while ($cursor) {
-                        array_unshift($parents, $cursor->name);
-                        $cursor = $cursor->parentsRecursive;
-                    }
-
-                    return [
-                        'unit_id' => $item->organizational_unit_id,
-                        'name' => $unit?->name ?? 'Unknown',
-                        'parents' => $parents,
-                        'count' => (int) $item->count,
-                        'total_budget' => (float) $item->total_budget,
-                        'priority_count' => (int) $item->priority_count,
-                        'approved_count' => (int) $item->approved_count,
-                    ];
-                })->values()->all();
-            }, 'dashboard'),
-            'needsByType' => Inertia::defer(fn () => Need::with('needType:id,name')
-                ->where('need_group_id', $groupId)
-                ->selectRaw('need_type_id, count(*) as count')
-                ->groupBy('need_type_id')
-                ->orderByDesc('count')
-                ->get()
-                ->map(fn ($item) => [
-                    'name' => $item->needType->name ?? 'Unknown',
-                    'count' => $item->count,
-                ])
-                ->all(), 'dashboard'),
-            'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name', 'parent_id'])->get(),
+            'stageCounts' => $counts['stageCounts'],
+            'attentionCounts' => $counts['attentionCounts'],
+            'organizationalUnits' => $this->activeOrganizationalUnits(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
             'filters' => array_merge($this->dataTableFilters($request), $filters),
         ]);
     }
 
-    public function store(StoreNeedRequest $request, StoreNeedAction $action): RedirectResponse
+    public function store(StoreNeedRequest $request, NeedProposalEngine $engine): RedirectResponse
     {
-        $this->authorize('create', Need::class);
-        $need = $action->execute(
-            $request->validated(),
-            $request->file('attachments'),
-            $request->input('attachment_names', []),
-            $request->file('technical_specification_attachments'),
-            $request->input('technical_specification_attachment_names', [])
+        $needGroup = NeedGroup::query()->find($request->input('need_group_id'));
+        $this->authorize('create', [Need::class, $needGroup]);
+
+        $payload = NeedProposalPayload::fromArray(
+            data: $request->validated(),
+            attachments: $request->file('attachments') ?? [],
+            attachmentNames: (array) $request->input('attachment_names', []),
+            technicalSpecificationAttachments: $request->file('technical_specification_attachments') ?? [],
+            technicalSpecificationAttachmentNames: (array) $request->input('technical_specification_attachment_names', []),
         );
+        if ($payload->shouldSubmit) {
+            $prototypeNeed = new Need($payload->attributes);
+            $prototypeNeed->status = Need::STATUS_DRAFT;
+            $prototypeNeed->setRelation('needGroup', $needGroup);
+            $this->authorize('submit', $prototypeNeed);
+        }
+
+        $need = $engine->submit($payload, $request->user());
+        $message = $payload->shouldSubmit
+            ? 'Usulan kebutuhan berhasil dibuat dan diajukan.'
+            : 'Usulan kebutuhan berhasil dibuat.';
 
         return redirect()->route('needs.index', ['need_group_id' => $need->need_group_id])
-            ->with('success', 'Usulan kebutuhan berhasil dibuat.');
+            ->with('success', $message);
     }
 
-    public function create(Request $request): Response|RedirectResponse
+    public function create(Request $request, NeedStrategicAlignmentEngine $alignmentEngine): Response
     {
-        $this->authorize('create', Need::class);
         $groupId = $request->input('need_group_id');
         $currentGroup = $groupId ? NeedGroup::findOrFail($groupId) : null;
+        $this->authorize('create', [Need::class, $currentGroup]);
 
         return Inertia::render('need/needs/create', [
             'currentGroup' => $currentGroup,
-            'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name', 'parent_id'])->get(),
+            'organizationalUnits' => $this->activeOrganizationalUnits(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
-            'tujuans' => Tujuan::query()
-                ->whereHas('renstra', fn ($q) => $q->where('is_active', true))
-                ->select(['id', 'renstra_id', 'name'])
-                ->with([
-                    'renstra:id,year_start,year_end',
-                    'sasarans' => fn ($q) => $q->select(['id', 'tujuan_id', 'name']),
-                    'sasarans.indicators' => fn ($q) => $q->select(['id', 'sasaran_id', 'name']),
-                    'sasarans.indicators.targets' => fn ($q) => $q->select(['id', 'indicator_id', 'year', 'target']),
-                ])
-                ->get(),
-            'kpiGroups' => KpiGroup::query()
-                ->where('is_active', true)
-                ->with([
-                    'indicators' => fn ($q) => $q->select(['id', 'group_id', 'parent_indicator_id', 'name', 'unit', 'is_category']),
-                    'indicators.annualTargets' => fn ($q) => $q->select(['id', 'indicator_id', 'year', 'target_value']),
-                ])
-                ->get(),
-            'strategicServicePlans' => StrategicServicePlan::query()
-                ->select(['id', 'strategic_program', 'service_plan', 'year'])
-                ->get(),
-            'planningActivities' => PlanningActivityVersion::query()
-                ->whereHas('planningVersion', fn ($q) => $q->where('is_current', true))
-                ->whereNull('parent_id')
-                ->with([
-                    'planningVersion:id,year_start,year_end',
-                    'activityYears',
-                    'indicators.activityYears',
-                    'children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
-                    'children.children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
-                    'children.children.children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
-                    'children.children.children.children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
-                ])
-                ->get(),
+            ...$alignmentEngine->loadFormOptions(),
             'fundingSources' => FundingSource::query()->select(['id', 'name'])->orderBy('name')->get(),
             'users' => User::query()->select(['id', 'name', 'nip'])->orderBy('name')->get(),
             'kldiOptions' => collect(Kldi::cases())->map(fn ($case) => ['name' => $case->value, 'value' => $case->value])->values()->all(),
@@ -229,12 +159,14 @@ class NeedController extends Controller
         ]);
     }
 
-    public function edit(Need $need): Response
+    public function edit(Need $need, NeedStrategicAlignmentEngine $alignmentEngine): Response
     {
-        $this->authorize('update', $need);
+        $this->authorize('view', $need);
 
         return Inertia::render('need/needs/edit', [
             'need' => NeedResource::make($need->load([
+                'needGroup',
+                'organizationalUnit:id,name,parent_id',
                 'sasarans:id',
                 'indicators:id',
                 'kpiIndicators:id',
@@ -246,41 +178,9 @@ class NeedController extends Controller
                 'attachments',
             ]))->resolve(),
             'currentGroup' => $need->needGroup,
-            'organizationalUnits' => OrganizationalUnit::query()->select(['id', 'name', 'parent_id'])->get(),
+            'organizationalUnits' => $this->activeOrganizationalUnits(),
             'needTypes' => NeedType::query()->where('is_active', true)->select(['id', 'name'])->orderBy('order_column')->get(),
-            'tujuans' => Tujuan::query()
-                ->whereHas('renstra', fn ($q) => $q->where('is_active', true))
-                ->select(['id', 'renstra_id', 'name'])
-                ->with([
-                    'renstra:id,year_start,year_end',
-                    'sasarans' => fn ($q) => $q->select(['id', 'tujuan_id', 'name']),
-                    'sasarans.indicators' => fn ($q) => $q->select(['id', 'sasaran_id', 'name']),
-                    'sasarans.indicators.targets' => fn ($q) => $q->select(['id', 'indicator_id', 'year', 'target']),
-                ])
-                ->get(),
-            'kpiGroups' => KpiGroup::query()
-                ->where('is_active', true)
-                ->with([
-                    'indicators' => fn ($q) => $q->select(['id', 'group_id', 'parent_indicator_id', 'name', 'unit', 'is_category']),
-                    'indicators.annualTargets' => fn ($q) => $q->select(['id', 'indicator_id', 'year', 'target_value']),
-                ])
-                ->get(),
-            'strategicServicePlans' => StrategicServicePlan::query()
-                ->select(['id', 'strategic_program', 'service_plan', 'year'])
-                ->get(),
-            'planningActivities' => PlanningActivityVersion::query()
-                ->whereHas('planningVersion', fn ($q) => $q->where('is_current', true))
-                ->whereNull('parent_id')
-                ->with([
-                    'planningVersion:id,year_start,year_end',
-                    'activityYears',
-                    'indicators.activityYears',
-                    'children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
-                    'children.children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
-                    'children.children.children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
-                    'children.children.children.children' => fn ($q) => $q->with(['activityYears', 'indicators.activityYears']),
-                ])
-                ->get(),
+            ...$alignmentEngine->loadFormOptions(),
             'fundingSources' => FundingSource::query()->select(['id', 'name'])->orderBy('name')->get(),
             'users' => User::query()->select(['id', 'name', 'nip'])->orderBy('name')->get(),
             'kldiOptions' => collect(Kldi::cases())->map(fn ($case) => ['name' => $case->value, 'value' => $case->value])->values()->all(),
@@ -288,20 +188,36 @@ class NeedController extends Controller
         ]);
     }
 
-    public function update(UpdateNeedRequest $request, Need $need, UpdateNeedAction $action): RedirectResponse
+    public function update(UpdateNeedRequest $request, Need $need, NeedProposalEngine $engine): RedirectResponse
     {
         $this->authorize('update', $need);
-        $action->execute(
-            $need,
-            $request->validated(),
-            $request->file('attachments'),
-            $request->input('attachment_names', []),
-            $request->file('technical_specification_attachments'),
-            $request->input('technical_specification_attachment_names', [])
+
+        $payload = NeedProposalPayload::fromArray(
+            data: $request->validated(),
+            attachments: $request->file('attachments') ?? [],
+            attachmentNames: (array) $request->input('attachment_names', []),
+            technicalSpecificationAttachments: $request->file('technical_specification_attachments') ?? [],
+            technicalSpecificationAttachmentNames: (array) $request->input('technical_specification_attachment_names', []),
         );
 
+        if ($payload->shouldSubmit) {
+            if (! in_array($need->status, [Need::STATUS_DRAFT, Need::STATUS_REVISION], true)) {
+                throw ValidationException::withMessages([
+                    'status' => 'Hanya usulan berstatus draft atau revisi yang dapat diajukan.',
+                ]);
+            }
+
+            $this->authorize('submit', $need);
+        }
+
+        $engine->update($need, $payload, $request->user());
+
+        $message = $payload->shouldSubmit
+            ? 'Usulan kebutuhan berhasil diperbarui dan diajukan.'
+            : 'Usulan kebutuhan berhasil diperbarui.';
+
         return redirect()->route('needs.index', ['need_group_id' => $need->need_group_id])
-            ->with('success', 'Usulan kebutuhan berhasil diperbarui.');
+            ->with('success', $message);
     }
 
     public function show(Need $need): Response
@@ -310,6 +226,7 @@ class NeedController extends Controller
 
         return Inertia::render('need/needs/show', [
             'need' => NeedResource::make($need->load([
+                'needGroup',
                 'organizationalUnit:id,name,parent_id',
                 'organizationalUnit.parentsRecursive',
                 'needType:id,name',
@@ -352,20 +269,67 @@ class NeedController extends Controller
             ->with('success', 'Usulan kebutuhan berhasil dihapus.');
     }
 
-    public function updateDirectorReview(Request $request, Need $need): RedirectResponse
-    {
+    public function updateDirectorReview(
+        UpdateDirectorReviewRequest $request,
+        Need $need,
+        NeedLockLifecycle $lifecycle
+    ): RedirectResponse {
         $this->authorize('approve', $need);
 
-        $validated = $request->validate([
-            'notes' => 'nullable|string',
-            'is_approved' => 'required|boolean',
-        ]);
+        $validated = $request->validated();
 
-        $need->update([
-            'notes' => $validated['notes'],
-            'approved_by_director_at' => $validated['is_approved'] ? now() : null,
-        ]);
+        $decision = $validated['decision'];
+
+        if ($decision === Need::STATUS_APPROVED) {
+            $lifecycle->approveByDirector(
+                need: $need,
+                notes: $validated['notes'] ?? null,
+                approver: $request->user(),
+                determination: DirectorDetermination::fromArray($validated),
+            );
+        } elseif ($decision === Need::STATUS_REJECTED) {
+            $lifecycle->rejectByDirector(
+                need: $need,
+                notes: $validated['notes'] ?? null,
+                actor: $request->user(),
+                isRecommendedForNextCycle: (bool) ($validated['is_recommended_for_next_cycle'] ?? false),
+            );
+        } else {
+            $lifecycle->revisionByDirector(
+                need: $need,
+                notes: (string) $validated['notes'],
+                actor: $request->user(),
+            );
+        }
 
         return back()->with('success', 'Review direktur berhasil diperbarui.');
+    }
+
+    public function submit(Request $request, Need $need, NeedLockLifecycle $lifecycle): RedirectResponse
+    {
+        if (! in_array($need->status, [Need::STATUS_DRAFT, Need::STATUS_REVISION], true)) {
+            throw ValidationException::withMessages([
+                'status' => 'Hanya usulan dengan status draft atau revisi yang dapat diajukan.',
+            ]);
+        }
+
+        $this->authorize('submit', $need);
+
+        $lifecycle->submit($need, $request->user());
+
+        return back()->with('success', 'Usulan kebutuhan berhasil diajukan.');
+    }
+
+    /**
+     * Get active organizational units for form dropdowns.
+     *
+     * @return Collection<int, OrganizationalUnit>
+     */
+    private function activeOrganizationalUnits()
+    {
+        return OrganizationalUnit::query()
+            ->whereNull('deleted_at')
+            ->select(['id', 'name', 'parent_id'])
+            ->get();
     }
 }

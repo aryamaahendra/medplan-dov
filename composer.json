@@ -17,20 +17,21 @@
         "laravel/octane": "^2.17",
         "laravel/tinker": "^3.0",
         "laravel/wayfinder": "^0.1.14",
-        "maatwebsite/excel": "^3.1",
+        "maatwebsite/excel": "^4.0",
         "orangehill/iseed": "^3.8",
-        "spatie/laravel-permission": "^7.3"
+        "spatie/laravel-permission": "^8.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.24",
+        "larastan/larastan": "^3.12",
         "laravel/boost": "^2.0",
         "laravel/pail": "^1.2.5",
         "laravel/pint": "^1.27",
         "laravel/sail": "^1.55",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.9",
-        "pestphp/pest": "^4.4",
-        "pestphp/pest-plugin-laravel": "^4.1"
+        "pestphp/pest": "^5.0",
+        "pestphp/pest-plugin-laravel": "^5.0"
     },
     "autoload": {
         "psr-4": {
@@ -62,6 +63,13 @@
         ],
         "lint:check": [
             "pint --parallel --test"
+        ],
+        "phpstan": [
+            "phpstan analyse --memory-limit=2G"
+        ],
+        "check": [
+            "@lint:check",
+            "@phpstan"
         ],
         "ci:check": [
             "Composer\\Config::disableProcessTimeout",
@@ -107,6 +115,9 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
+        },
+        "platform": {
+            "php": "8.4.99"
         }
     },
     "minimum-stability": "stable"

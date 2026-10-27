@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Need;
 
 use App\Actions\Need\GetFilteredNeedsAction;
@@ -8,13 +10,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Need;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-class NeedExportController extends Controller
+final class NeedExportController extends Controller
 {
     /**
      * Handle the export of filtered needs.
      */
-    public function __invoke(Request $request, GetFilteredNeedsAction $action)
+    public function __invoke(Request $request, GetFilteredNeedsAction $action): BinaryFileResponse
     {
         $this->authorize('viewAny', Need::class);
 
@@ -27,6 +30,7 @@ class NeedExportController extends Controller
             'impact' => $request->input('impact'),
             'is_priority' => $request->input('is_priority'),
             'is_approved_by_director' => $request->input('is_approved_by_director'),
+            'is_recommended_for_next_cycle' => $request->input('is_recommended_for_next_cycle'),
             'min_checklist_score' => $request->input('min_checklist_score'),
             'need_group_id' => $request->input('need_group_id'),
         ];
@@ -43,10 +47,26 @@ class NeedExportController extends Controller
             });
         }
 
-        // Apply sorting to match default or current view
+        // Apply sorting to match default or current view with allowlist
+        $allowedSorts = ['title', 'year', 'status', 'total_price', 'created_at'];
+        $allowedDirections = ['asc', 'desc'];
+
         $sort = $request->string('sort', 'created_at')->value();
+        if (! in_array($sort, $allowedSorts, true)) {
+            $sort = 'created_at';
+        }
+
         $direction = $request->string('direction', 'desc')->lower()->value();
-        $query->orderBy($sort, $direction);
+        if (! in_array($direction, $allowedDirections, true)) {
+            $direction = 'desc';
+        }
+
+        $query->orderBy($sort, $direction)
+            ->with([
+                'organizationalUnit:id,name',
+                'needType:id,name',
+                'needGroup:id,name',
+            ]);
 
         return Excel::download(new NeedExport($query), 'daftar-usulan-kebutuhan.xlsx');
     }

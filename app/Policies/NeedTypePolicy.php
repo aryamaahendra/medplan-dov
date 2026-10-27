@@ -5,7 +5,7 @@ namespace App\Policies;
 use App\Models\NeedType;
 use App\Models\User;
 
-class NeedTypePolicy
+final class NeedTypePolicy
 {
     /**
      * Perform pre-authorization checks.

@@ -8,7 +8,7 @@ export default function AppLogo() {
         <span className="mb-0.5 truncate leading-tight font-semibold">
           MEDPLAN ─ GOV
         </span>
-        <span className="text-[10px]">RSUD KABELOTA DONGGALA</span>
+        <span className="text-xss">RSUD KABELOTA DONGGALA</span>
       </div>
     </>
   );

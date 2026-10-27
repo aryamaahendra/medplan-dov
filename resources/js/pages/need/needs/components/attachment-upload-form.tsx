@@ -1,5 +1,5 @@
 import { useForm } from '@inertiajs/react';
-import { Upload } from 'lucide-react';
+import { RiUploadLine } from '@remixicon/react';
 import { useRef } from 'react';
 import { toast } from 'sonner';
 
@@ -95,10 +95,14 @@ export function AttachmentUploadForm({ needId }: AttachmentUploadFormProps) {
           {data.file && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-2">
-                <Label className="text-xs text-muted-foreground">
+                <Label
+                  htmlFor="display_name"
+                  className="text-xs text-muted-foreground"
+                >
                   Ubah Nama
                 </Label>
                 <Input
+                  id="display_name"
                   placeholder="Nama tampilan (opsional)"
                   value={data.display_name}
                   onChange={(e) => setData('display_name', e.target.value)}
@@ -122,7 +126,7 @@ export function AttachmentUploadForm({ needId }: AttachmentUploadFormProps) {
             className="w-full"
             disabled={processing || !data.file}
           >
-            <Upload />
+            <RiUploadLine data-icon="inline-start" />
             Unggah Berkas
           </Button>
         </form>

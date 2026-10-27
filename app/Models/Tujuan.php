@@ -1,33 +1,41 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Database\Factories\TujuanFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[Fillable([
+    'renstra_id',
+    'name',
+    'description',
+])]
 class Tujuan extends Model
 {
     /** @use HasFactory<TujuanFactory> */
     use HasFactory;
 
-    protected $fillable = [
-        'renstra_id',
-        'name',
-        'description',
+    protected $casts = [
+        'renstra_id' => 'integer',
     ];
 
-    public function renstra()
+    public function renstra(): BelongsTo
     {
         return $this->belongsTo(Renstra::class);
     }
 
-    public function indicators()
+    public function indicators(): HasMany
     {
         return $this->hasMany(Indicator::class);
     }
 
-    public function sasarans()
+    public function sasarans(): HasMany
     {
         return $this->hasMany(Sasaran::class);
     }

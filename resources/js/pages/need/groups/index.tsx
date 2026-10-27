@@ -1,135 +1,115 @@
-import { Head, router } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import { toast } from 'sonner';
+import { Head } from '@inertiajs/react';
+import { RiAddLine } from '@remixicon/react';
 
-import { ConfirmDialog } from '@/components/confirm-dialog';
-import { DataTable } from '@/components/data-table/data-table';
+import { DataTablePagination } from '@/components/data-table/data-table-pagination';
+import { DataTableToolbar } from '@/components/data-table/data-table-toolbar';
 import { Button } from '@/components/ui/button';
-import { useDataTable } from '@/hooks/use-data-table';
+import { NeedGroupCardList } from '@/features/need-group/components/need-group-card-list';
+import { NeedGroupIndexDialogs } from '@/features/need-group/components/need-group-index-dialogs';
+import { NeedGroupsSummaryStats } from '@/features/need-group/components/need-groups-summary-stats';
+import { useNeedGroupsIndex } from '@/features/need-group/hooks/use-need-groups-index';
+import type {
+  NeedGroupsSummaryStatsData,
+  PaginatedNeedGroups,
+} from '@/features/need-group/types/need-group.types';
 import type { DataTableFilters } from '@/hooks/use-data-table';
-import { usePermission } from '@/hooks/use-permission';
 import needGroupRoutes from '@/routes/need-groups';
-
-import { getColumns } from './columns';
-import type { NeedGroup } from './columns';
-import { NeedGroupDialog } from './need-group-dialog';
-
-interface PaginatedNeedGroups {
-  data: NeedGroup[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-  from: number | null;
-  to: number | null;
-}
 
 interface NeedGroupsIndexProps {
   needGroups: PaginatedNeedGroups;
+  summaryStats: NeedGroupsSummaryStatsData;
   filters: DataTableFilters;
 }
 
 export default function NeedGroupsIndex({
   needGroups,
+  summaryStats,
   filters,
 }: NeedGroupsIndexProps) {
-  const { hasPermission } = usePermission();
-  const [editingGroup, setEditingGroup] = useState<NeedGroup | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [deletingGroup, setDeletingGroup] = useState<NeedGroup | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const { state, actions, hasPermission, dataTable } = useNeedGroupsIndex();
 
-  const { onSearch, onSort, onPageChange, onPerPageChange, onReset } =
-    useDataTable({ only: ['needGroups', 'filters'] });
-
-  const onEdit = (group: NeedGroup) => {
-    setEditingGroup(group);
-    setIsDialogOpen(true);
-  };
-
-  const onDelete = (group: NeedGroup) => {
-    setDeletingGroup(group);
-  };
-
-  const onCreate = () => {
-    setEditingGroup(null);
-    setIsDialogOpen(true);
-  };
-
-  const handleConfirmDelete = () => {
-    if (!deletingGroup) {
-      return;
-    }
-
-    setIsDeleting(true);
-
-    router.delete(
-      needGroupRoutes.destroy.url({ need_group: deletingGroup.id }),
-      {
-        onSuccess: () => {
-          toast.success('Kelompok usulan berhasil dihapus.');
-          setDeletingGroup(null);
-        },
-        onFinish: () => setIsDeleting(false),
-      },
-    );
-  };
+  const hasItems = needGroups.data.length > 0;
 
   return (
     <>
       <Head title="Kelompok Usulan" />
 
-      <div className="flex flex-col gap-6 p-4">
-        <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-6 p-4 pb-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-foreground">
+            <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               Kelompok Usulan
             </h1>
-            <p className="text-sm text-muted-foreground">
-              Kelola kelompok usulan kebutuhan per tahun anggaran.
+            <p className="mt-1 text-sm text-muted-foreground">
+              Kelola daftar kelompok usulan kebutuhan tahun anggaran dan siklus
+              pengajuan.
             </p>
           </div>
-          {hasPermission('create need-groups') && (
-            <Button onClick={onCreate}>
-              <Plus className="mr-2 h-4 w-4" />
-              Tambah Kelompok
-            </Button>
-          )}
+
+          <div className="flex items-center gap-3">
+            {hasPermission('create need-groups') && (
+              <Button onClick={actions.onCreate}>
+                <RiAddLine data-icon="inline-start" />
+                Tambah Kelompok
+              </Button>
+            )}
+          </div>
         </div>
 
-        <DataTable
-          columns={useMemo(
-            () => getColumns(onEdit, onDelete, hasPermission),
-            [hasPermission],
-          )}
-          data={needGroups.data}
-          meta={needGroups}
-          filters={filters}
-          onSearch={onSearch}
-          onSort={onSort}
-          onPageChange={onPageChange}
-          onPerPageChange={onPerPageChange}
-          onReset={onReset}
-          searchPlaceholder="Cari berdasarkan nama atau deskripsi..."
+        <NeedGroupsSummaryStats
+          stats={
+            summaryStats ?? {
+              total_groups: needGroups.total,
+              active_groups: 0,
+              total_needs: 0,
+              total_approved: 0,
+              total_budget: 0,
+              yearly_trends: [],
+            }
+          }
         />
+
+        <div className="flex flex-col gap-4">
+          <DataTableToolbar
+            filters={filters}
+            onSearch={dataTable.onSearch}
+            onReset={dataTable.onReset}
+            searchPlaceholder="Cari berdasarkan nama kelompok atau deskripsi..."
+          />
+        </div>
+
+        <NeedGroupCardList
+          needGroups={needGroups.data}
+          hasPermission={hasPermission}
+          onEdit={actions.onEdit}
+          onDelete={actions.onDelete}
+          onRollover={actions.onRollover}
+          onCreate={actions.onCreate}
+          search={filters.search}
+          onReset={dataTable.onReset}
+        />
+
+        {hasItems && (
+          <div className="pt-2">
+            <DataTablePagination
+              meta={needGroups}
+              onPageChange={dataTable.onPageChange}
+              onPerPageChange={dataTable.onPerPageChange}
+            />
+          </div>
+        )}
       </div>
 
-      <NeedGroupDialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        needGroup={editingGroup}
-      />
-
-      <ConfirmDialog
-        open={!!deletingGroup}
-        onOpenChange={(open) => !open && setDeletingGroup(null)}
-        onConfirm={handleConfirmDelete}
-        title="Hapus Kelompok Usulan"
-        description={`Apakah Anda yakin ingin menghapus "${deletingGroup?.name}"? Data usulan di dalam kelompok ini juga akan terdampak.`}
-        confirmText="Hapus"
-        variant="destructive"
-        loading={isDeleting}
+      <NeedGroupIndexDialogs
+        isDialogOpen={state.isDialogOpen}
+        onDialogOpenChange={actions.setIsDialogOpen}
+        editingGroup={state.editingGroup}
+        rolloverGroup={state.rolloverGroup}
+        onRolloverGroupChange={actions.setRolloverGroup}
+        deletingGroup={state.deletingGroup}
+        onDeletingGroupChange={actions.setDeletingGroup}
+        onConfirmDelete={actions.handleConfirmDelete}
+        isDeleting={state.isDeleting}
       />
     </>
   );

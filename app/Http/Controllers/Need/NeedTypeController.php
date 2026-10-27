@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Need;
 
 use App\Http\Controllers\Controller;
@@ -7,11 +9,12 @@ use App\Http\Requests\Need\StoreNeedTypeRequest;
 use App\Http\Requests\Need\UpdateNeedTypeRequest;
 use App\Models\NeedType;
 use App\Traits\HasDataTable;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class NeedTypeController extends Controller
+final class NeedTypeController extends Controller
 {
     use HasDataTable;
 
@@ -44,7 +47,7 @@ class NeedTypeController extends Controller
         ]);
     }
 
-    public function store(StoreNeedTypeRequest $request)
+    public function store(StoreNeedTypeRequest $request): RedirectResponse
     {
         $this->authorize('create', NeedType::class);
         NeedType::create($request->validated());
@@ -53,7 +56,7 @@ class NeedTypeController extends Controller
             ->with('success', 'Kategori kebutuhan berhasil dibuat.');
     }
 
-    public function update(UpdateNeedTypeRequest $request, NeedType $needType)
+    public function update(UpdateNeedTypeRequest $request, NeedType $needType): RedirectResponse
     {
         $this->authorize('update', $needType);
         $needType->update($request->validated());
@@ -62,7 +65,7 @@ class NeedTypeController extends Controller
             ->with('success', 'Kategori kebutuhan berhasil diperbarui.');
     }
 
-    public function destroy(NeedType $needType)
+    public function destroy(NeedType $needType): RedirectResponse
     {
         $this->authorize('delete', $needType);
         $needType->delete();

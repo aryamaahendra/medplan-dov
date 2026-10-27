@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { Edit, MoreHorizontal, Trash2 } from 'lucide-react';
+import { RiEditLine, RiMoreFill, RiDeleteBinLine } from '@remixicon/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -23,6 +23,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { usePermission } from '@/hooks/use-permission';
+import { cn } from '@/lib/utils';
 import type { KpiIndicator } from '@/types';
 
 interface IndicatorTableProps {
@@ -47,11 +48,11 @@ export function IndicatorTable({
     useState<KpiIndicator | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const currentYear = new Date().getFullYear();
   const years =
     yearStart && yearEnd
       ? Array.from({ length: yearEnd - yearStart + 1 }, (_, i) => yearStart + i)
       : [];
-
   const handleDelete = () => {
     if (!deletingIndicator) {
       return;
@@ -124,11 +125,29 @@ export function IndicatorTable({
               </TableRow>
               {years.length > 0 && (
                 <TableRow className="hover:bg-background">
-                  {years.map((year) => (
-                    <TableHead key={year} className="w-1 border-r text-center">
-                      {year}
-                    </TableHead>
-                  ))}
+                  {years.map((year) => {
+                    const isCurrent = year === currentYear;
+
+                    return (
+                      <TableHead
+                        key={year}
+                        className={cn(
+                          'w-1 border-r text-center transition-colors',
+                          isCurrent &&
+                            'bg-muted/60 font-bold text-foreground ring-1 ring-border ring-inset',
+                        )}
+                      >
+                        <div className="flex flex-col items-center gap-0.5">
+                          <span>{year}</span>
+                          {isCurrent && (
+                            <span className="py-0.2 rounded-full bg-foreground/10 px-1.5 text-xss font-semibold text-foreground">
+                              Saat ini
+                            </span>
+                          )}
+                        </div>
+                      </TableHead>
+                    );
+                  })}
                 </TableRow>
               )}
             </TableHeader>
@@ -174,13 +193,29 @@ export function IndicatorTable({
                     const target = indicator.annual_targets?.find(
                       (t) => t.year === year,
                     );
+                    const isCurrent = year === currentYear;
 
                     return (
                       <TableCell
                         key={year}
-                        className="border-r py-2 text-center font-mono text-sm"
+                        className={cn(
+                          'border-r py-2 text-center font-mono text-sm transition-colors',
+                          isCurrent &&
+                            'bg-muted/40 font-bold text-foreground ring-1 ring-border ring-inset',
+                        )}
                       >
-                        {target?.target_value || '-'}
+                        {target?.target_value ? (
+                          <span
+                            className={cn(
+                              isCurrent &&
+                                'inline-block rounded bg-foreground/10 px-1.5 py-0.5 font-semibold text-foreground',
+                            )}
+                          >
+                            {target.target_value}
+                          </span>
+                        ) : (
+                          '-'
+                        )}
                       </TableCell>
                     );
                   })}
@@ -188,16 +223,16 @@ export function IndicatorTable({
                   {showActions && (
                     <TableCell className="text-center">
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
+                        <DropdownMenuTrigger
+                          render={<Button variant="ghost" size="icon" />}
+                        >
+                          <RiMoreFill />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                           {onEdit && hasPermission('update kpi-indicators') && (
                             <DropdownMenuItem onClick={() => onEdit(indicator)}>
-                              <Edit className="mr-2 h-4 w-4" />
+                              <RiEditLine />
                               Edit
                             </DropdownMenuItem>
                           )}
@@ -207,7 +242,7 @@ export function IndicatorTable({
                               className="text-destructive"
                               onClick={() => setDeletingIndicator(indicator)}
                             >
-                              <Trash2 className="mr-2 h-4 w-4" />
+                              <RiDeleteBinLine />
                               Hapus
                             </DropdownMenuItem>
                           )}

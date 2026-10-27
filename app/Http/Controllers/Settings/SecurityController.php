@@ -10,7 +10,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Fortify\Features;
 
-class SecurityController extends Controller
+final class SecurityController extends Controller
 {
     public function __construct()
     {

@@ -5,6 +5,7 @@ use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
+    $this->user->assignRole('super-admin');
     $this->actingAs($this->user);
 });
 
@@ -182,15 +183,15 @@ describe('DELETE /users/{user}', function () {
             ->assertRedirect('/users')
             ->assertSessionHas('success');
 
-        $this->assertDatabaseMissing('users', ['id' => $user->id]);
+        $this->assertModelMissing($user);
     });
 
-    it('prevents deleting oneself', function () {
-        // Optional: Implement self-deletion prevention if needed
-        // For now, let's just test that it works as implemented
-        $this->delete("/users/{$this->user->id}")
-            ->assertRedirect('/users');
+    it('prevents deleting oneself or superadmin', function () {
+        $this->from('/users')
+            ->delete("/users/{$this->user->id}")
+            ->assertRedirect('/users')
+            ->assertSessionHas('error', 'Cannot delete Superadmin user.');
 
-        $this->assertDatabaseMissing('users', ['id' => $this->user->id]);
+        $this->assertModelExists($this->user);
     });
 });

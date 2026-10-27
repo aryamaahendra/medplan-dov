@@ -1,17 +1,22 @@
 import { Head } from '@inertiajs/react';
 import needRoutes from '@/routes/needs';
-import type { Need, PlanningActivityVersion, Tujuan } from '@/types';
+import type {
+  KpiGroup,
+  Need,
+  PlanningActivityVersion,
+  StrategicServicePlan,
+  Tujuan,
+} from '@/types';
 
 import { NeedForm } from './components/need-form';
-
 interface EditProps {
   need: Need;
   currentGroup: { id: number; name: string; year: number };
   organizationalUnits: { id: number; name: string; parent_id: number | null }[];
   needTypes: { id: number; name: string }[];
   tujuans: Tujuan[];
-  kpiGroups: any[];
-  strategicServicePlans: any[];
+  kpiGroups: KpiGroup[];
+  strategicServicePlans: StrategicServicePlan[];
   planningActivities: PlanningActivityVersion[];
   fundingSources: { id: number; name: string }[];
   users: { id: number; name: string; nip: string | null }[];
@@ -36,9 +41,9 @@ export default function Edit({
   return (
     <>
       <Head title={`${currentGroup.name}: Edit Usulan`} />
-      <div className="flex h-full flex-1 flex-col gap-4 p-4 md:p-8">
+      <div className="flex h-full flex-1 flex-col gap-8 p-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold tracking-tight">
+          <h1 className="text-2xl font-semibold tracking-tight">
             Edit Usulan: {currentGroup.name}
           </h1>
           <p className="text-muted-foreground">
@@ -70,11 +75,7 @@ export default function Edit({
 Edit.layout = (props: EditProps) => ({
   breadcrumbs: [
     {
-      title: 'Usulan Kebutuhan',
-      href: '#',
-    },
-    {
-      title: props.currentGroup?.name || 'Kelompok',
+      title: props.currentGroup?.name || 'Kelompok Usulan',
       href: props.currentGroup
         ? needRoutes.index.url({
             query: { need_group_id: props.currentGroup.id },

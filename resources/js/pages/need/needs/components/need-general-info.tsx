@@ -63,6 +63,14 @@ export function NeedGeneralInfo({ need }: NeedGeneralInfoProps) {
               };
 
               if (!need.organizational_unit) {
+                if (need.organizational_unit_id) {
+                  return (
+                    <p className="text-sm font-medium text-destructive">
+                      Unit Tidak Aktif
+                    </p>
+                  );
+                }
+
                 return <p className="text-sm">-</p>;
               }
 
@@ -74,7 +82,7 @@ export function NeedGeneralInfo({ need }: NeedGeneralInfoProps) {
 
               return (
                 <>
-                  <div className="flex flex-wrap items-center gap-1 text-[10px] text-muted-foreground">
+                  <div className="flex flex-wrap items-center gap-1 text-xss text-muted-foreground">
                     {paths.slice(0, -1).map((name, i) => (
                       <Fragment key={i}>
                         <span>{name}</span>
@@ -129,10 +137,10 @@ export function NeedGeneralInfo({ need }: NeedGeneralInfoProps) {
 
         <InfoRow
           label="Total Kebutuhan Biaya"
-          className="bg-primary/5"
-          labelClassName="text-primary/70 font-bold"
+          className="bg-muted/40"
+          labelClassName="text-foreground/80 font-bold"
         >
-          <p className="font-mono text-lg font-bold text-primary">
+          <p className="font-mono text-lg font-bold text-foreground">
             {formatIDR(need.total_price)}
           </p>
         </InfoRow>

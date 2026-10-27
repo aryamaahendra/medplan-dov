@@ -1,18 +1,29 @@
 <?php
 
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Need\NeedDashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/login')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('dashboard', [NeedDashboardController::class, 'index'])->name('dashboard');
 
+    // Legacy Dashboard Redirects
+    Route::prefix('dashboard')->name('dashboard.')->controller(NeedDashboardController::class)->group(function () {
+        Route::get('executive', 'redirectOld')->name('executive');
+        Route::get('operations', 'redirectOld')->name('operations');
+        Route::get('workspace', 'redirectOld')->name('workspace');
+    });
     // Management
     Route::namespace('App\Http\Controllers\Management')->group(function () {
         Route::resource('users', 'UserController')->except(['create', 'edit', 'show']);
+        Route::put('roles/matrix', 'RoleController@updateMatrix')->name('roles.matrix.update');
         Route::resource('roles', 'RoleController')->except(['show']);
         Route::resource('permissions', 'PermissionController')->only(['index']);
+        Route::post('organizational-units/{id}/restore', 'OrganizationalUnitController@restore')
+            ->name('organizational-units.restore');
+        Route::delete('organizational-units/{id}/force', 'OrganizationalUnitController@forceDelete')
+            ->name('organizational-units.force-delete');
         Route::resource('organizational-units', 'OrganizationalUnitController')
             ->except(['create', 'edit', 'show']);
     });
@@ -21,6 +32,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::namespace('App\Http\Controllers\Need')->group(function () {
         Route::resource('need-types', 'NeedTypeController')->except(['create', 'edit', 'show']);
         Route::resource('need-groups', 'NeedGroupController')->except(['create', 'edit', 'show']);
+        Route::post('need-groups/{need_group}/rollover', 'NeedRolloverController@bulkRollover')->name('need-groups.rollover');
         Route::resource('checklist-questions', 'ChecklistQuestionController')->except(['show']);
 
         Route::controller('NeedGroupChecklistController')
@@ -35,8 +47,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
             });
 
         Route::prefix('needs')->name('needs.')->group(function () {
+            Route::controller('NeedRolloverController')->group(function () {
+                Route::get('unapproved-candidates', 'candidates')->name('unapproved-candidates');
+                Route::get('{need}/unapproved-source', 'sourceDetail')->name('unapproved-source');
+            });
             Route::controller('NeedController')->group(function () {
                 Route::patch('{need}/director-review', 'updateDirectorReview')->name('director-review');
+                Route::post('{need}/submit', 'submit')->name('submit');
+            });
+            Route::controller('NeedLockController')->group(function () {
+                Route::post('{need}/lock', 'lock')->name('lock');
+                Route::post('{need}/unlock', 'unlock')->name('unlock');
             });
             Route::get('export', 'NeedExportController')->name('export');
             Route::get('{need}/export-pdf', 'ExportNeedPdfController')->name('export-pdf');
@@ -98,6 +119,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::post('set-current', 'setCurrent')->name('set-current');
             });
 
+        Route::post('planning-versions/{planning_version}/activities/recalculate', 'PlanningRecalculateController')
+            ->name('planning-versions.activities.recalculate');
+
         Route::controller('PlanningActivityVersionController')->group(function () {
             Route::prefix('planning-versions/{planning_version}/activities')
                 ->name('planning-versions.activities.')
@@ -108,10 +132,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     Route::get('create', 'create')->name('create');
                     Route::post('/', 'store')->name('store');
                     Route::get('check-code', 'checkCode')->name('check-code');
-                    Route::post('recalculate', 'PlanningRecalculateController')
-                        ->name('recalculate');
                 });
-
             Route::prefix('planning-versions/activities/{planning_activity_version}')
                 ->name('planning-versions.activities.')
                 ->group(function () {
@@ -122,6 +143,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
                         ->name('update-yearly-data');
                 });
         });
+    });
+
+    // Developer & Design System Showcase (prefixed with dev/)
+    Route::prefix('dev')->name('dev.')->group(function () {
+        Route::inertia('form-components', 'dev/form-components')->name('form-components');
     });
 });
 

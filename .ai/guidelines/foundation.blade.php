@@ -1,47 +1,42 @@
-# Project Guidelines
+# Laravel Boost Guidelines
 
-## Laravel Boost Guidelines
+Follow Laravel maintainer guidelines closely.
 
-### Foundational Context
+## Foundational Context
 
-- php - 8.5
-- inertiajs/inertia-laravel - v3
-- laravel/fortify - v1
-- laravel/framework - v13
-- laravel/octane - v2
-- laravel/prompts - v0
-- laravel/wayfinder - v0
-- laravel/boost - v2
-- laravel/mcp - v0
-- laravel/pail - v1
-- laravel/pint - v1
-- laravel/sail - v1
-- pestphp/pest - v4
-- phpunit/phpunit - v12
-- @inertiajs/react - v3
-- react - v19
-- tailwindcss - v4
-- @laravel/vite-plugin-wayfinder - v0
-- eslint - v9
-- prettier - v3
+PHP 8.5 Laravel app. Match installed major version; never assume.
 
-### Skills Activation
+Check versions before using package API:
+- PHP: `composer show --direct` or `composer show <vendor/package>`.
+- JS: check `package.json`.
 
-This project has domain-specific skills available. You MUST activate the relevant skill whenever you work in that domain—don't wait until you're stuck.
+## Skills Activation
 
-- `fortify-development` — ACTIVATE when working on authentication, login, registration, 2FA, profile updates, or `app/Actions/Fortify/`.
-- `laravel-best-practices` — Apply whenever writing or refactoring Laravel PHP code (controllers, models, migrations, etc.).
-- `wayfinder-development` — Use when frontend calls backend routes or imports from `@/actions` or `@/routes`.
-- `pest-testing` — Use for writing or fixing tests in `tests/`.
-- `inertia-react-development` — Use for React pages, forms, or navigation using Inertia v3 hooks.
-- `tailwindcss-development` — Invoke when styling UI components or fixing layouts with Tailwind.
+Skills in `**/skills/**`. Must activate matching domain skill immediately.
 
-### Conventions
+## Conventions
 
-- Follow existing code conventions. Check sibling files.
-- Use descriptive names for variables and methods.
-- Check for existing components to reuse before writing a new one.
-- Unit and feature tests are more important than verification scripts.
-- Stick to existing directory structure.
-- Do not change the application's dependencies without approval.
-- Be concise in your explanations.
+- Match sibling files for structure, approach, naming.
+- Descriptive names: `isRegisteredForDiscounts`, not `discount()`.
+- Reuse existing components first.
+
+## Verification Scripts
+
+- No verification scripts or tinker when unit/feature tests prove work. Tests priority.
+
+## Application Structure & Architecture
+
+- Keep existing directories; no new base folders without approval.
+- No dependency changes without approval.
+
+## Frontend Bundling
+
+- Missing UI changes: suggest `vendor/bin/sail npm run build`, `vendor/bin/sail npm run dev`, or `vendor/bin/sail composer run dev`.
+
+## Documentation Files
+
+- Create docs only if user explicitly asks.
+
+## Replies
+
+- Ultra-terse. Key facts only; skip obvious.

@@ -1,16 +1,32 @@
-import { router, useForm, usePage } from '@inertiajs/react';
-import { useRef } from 'react';
-import { toast } from 'sonner';
+import {
+  RiAlertLine,
+  RiAttachmentLine,
+  RiBarChartLine,
+  RiBriefcaseLine,
+  RiCalendarLine,
+  RiCheckLine,
+  RiCloseLine,
+  RiCompass3Line,
+  RiFileTextLine,
+  RiFireLine,
+  RiHistoryLine,
+  RiInformationLine,
+  RiSendPlaneLine,
+} from '@remixicon/react';
+import React, { useMemo, useState } from 'react';
 
-import NeedController from '@/actions/App/Http/Controllers/Need/NeedController';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useNeedForm } from '@/features/need/hooks/use-need-form';
+import {
+  StrategicAlignmentEditor,
+  useStrategicAlignment,
+} from '@/features/need/strategic-alignment';
 import { usePermission } from '@/hooks/use-permission';
 import { cn } from '@/lib/utils';
-import needRoutes from '@/routes/needs';
-
 import type {
+  KpiGroup,
   Need,
   PlanningActivityVersion,
   StrategicServicePlan,
@@ -19,20 +35,18 @@ import type {
 
 import { FileSection } from './file-section';
 import { GeneralInfoSection } from './general-info-section';
-import { IkkAlignmentSection } from './ikk-alignment-section';
 import { NeedDetailSection } from './need-detail-section';
-import { PlanningAlignmentSection } from './planning-alignment-section';
+import { NeedLockBanner } from './need-lock-banner';
 import { PriorityStatusSection } from './priority-status-section';
-import { RenstraAlignmentSection } from './renstra-alignment-section';
-import { RlsAlignmentSection } from './rls-alignment-section';
+import { UnapprovedNeedPickerDialog } from './unapproved-need-picker-dialog';
 
-interface NeedFormProps {
+export interface NeedFormProps {
   need?: Need | null;
   currentGroup?: { id: number; name: string; year: number } | null;
   organizationalUnits: { id: number; name: string; parent_id: number | null }[];
   needTypes: { id: number; name: string }[];
   tujuans: Tujuan[];
-  kpiGroups: any[];
+  kpiGroups: KpiGroup[];
   strategicServicePlans: StrategicServicePlan[];
   planningActivities: PlanningActivityVersion[];
   fundingSources: { id: number; name: string }[];
@@ -57,428 +71,548 @@ export function NeedForm({
   satkerOptions,
   className,
 }: NeedFormProps) {
-  const isEditing = !!need;
+  const { hasPermission } = usePermission();
 
-  const { auth } = usePage().props;
-  const user = auth.user;
-  const { hasRole, hasPermission } = usePermission();
-
-  const isRestricted =
-    !hasRole('super-admin') && !hasRole('admin') && !hasRole('planner');
-
-  const tabs = [
-    {
-      value: 'usulan',
-      label: 'Data Usulan',
-      permission: 'update need tab general',
-    },
-    {
-      value: 'urgency',
-      label: 'Urgensi & Status',
-      permission: 'update need tab urgency',
-    },
-    {
-      value: 'renstra',
-      label: 'Renstra',
-      permission: 'update need tab strategic',
-    },
-    { value: 'ikk', label: 'IKK', permission: 'update need tab ikk' },
-    { value: 'rls', label: 'RLS', permission: 'update need tab rls' },
-    {
-      value: 'perencanaan',
-      label: 'Perencanaan',
-      permission: 'update need tab planning',
-    },
-    {
-      value: 'detail',
-      label: 'Detail KAK',
-      permission: 'update need tab detail',
-    },
-    {
-      value: 'lampiran',
-      label: 'Lampiran',
-      permission: 'update need tab lampiran',
-    },
-  ];
-
-  const visibleTabs = tabs.filter((tab) => hasPermission(tab.permission));
-
-  const filteredOrganizationalUnits =
-    isRestricted && user?.organizational_unit_id
-      ? organizationalUnits.filter(
-          (unit) => unit.id === user.organizational_unit_id,
-        )
-      : organizationalUnits;
-
-  const { data, setData, post, processing, errors, transform } = useForm({
-    need_group_id:
-      need?.need_group_id?.toString() ?? currentGroup?.id?.toString() ?? '',
-    organizational_unit_id:
-      need?.organizational_unit_id?.toString() ??
-      (isRestricted ? user?.organizational_unit_id?.toString() : '') ??
-      '',
-    need_type_id: need?.need_type_id?.toString() ?? '',
-    year:
-      need?.year?.toString() ??
-      currentGroup?.year?.toString() ??
-      new Date().getFullYear().toString(),
-    title: need?.title ?? '',
-    description: need?.description ?? '',
-    current_condition: need?.current_condition ?? '',
-    required_condition: need?.required_condition ?? '',
-    unit: need?.unit ?? '',
-    volume: need?.volume ?? '',
-    unit_price: need?.unit_price ?? '',
-    total_price: need?.total_price ?? '',
-    urgency: need?.urgency ?? 'medium',
-    impact: need?.impact ?? 'medium',
-    is_priority: need?.is_priority ?? false,
-    status: need?.status ?? 'draft',
-    sasaran_ids:
-      need?.sasarans?.map((s) => s.id.toString()) ?? ([] as string[]),
-    indicator_ids:
-      need?.indicators?.map((i) => i.id.toString()) ?? ([] as string[]),
-    kpi_indicator_ids:
-      need?.kpi_indicators?.map((i) => i.id.toString()) ?? ([] as string[]),
-    strategic_service_plan_ids:
-      need?.strategic_service_plans?.map((i) => i.id.toString()) ??
-      ([] as string[]),
-    planning_activity_version_ids:
-      need?.planning_activity_versions?.map((i) => i.id.toString()) ??
-      ([] as string[]),
-    planning_activity_indicator_ids:
-      need?.planning_activity_indicators?.map((i) => i.id.toString()) ??
-      ([] as string[]),
-    detail: {
-      background: need?.detail?.background ?? '',
-      purpose_and_objectives: need?.detail?.purpose_and_objectives ?? '',
-      target_objective: need?.detail?.target_objective ?? '',
-      kldi: need?.detail?.kldi ?? '',
-      satker_skpd: need?.detail?.satker_skpd ?? '',
-      kpa_id: need?.detail?.kpa_id?.toString() ?? '',
-      funding_source_ids:
-        need?.detail?.funding_sources?.map((s) => s.id.toString()) ??
-        ([] as string[]),
-      estimated_cost: need?.detail?.estimated_cost ?? '',
-      implementation_period: need?.detail?.implementation_period ?? '',
-      expert_or_skilled_personnel:
-        need?.detail?.expert_or_skilled_personnel ?? '',
-      technical_specifications: need?.detail?.technical_specifications ?? '',
-      training: need?.detail?.training ?? '',
-    },
-    attachments: [] as File[],
-    attachment_names: [] as string[],
-    technical_specification_attachments: [] as File[],
-    technical_specification_attachment_names: [] as string[],
-    deleted_attachment_ids: [] as number[],
+  const { form, state, handlers } = useNeedForm({
+    need,
+    currentGroup,
+    organizationalUnits,
+    needTypes,
+    tujuans,
+    kpiGroups,
+    strategicServicePlans,
+    planningActivities,
+    fundingSources,
+    users,
+    kldiOptions,
+    satkerOptions,
   });
 
-  const detailValuesRef = useRef(data.detail);
+  const { data, setData, errors, processing } = form;
+  const alignmentController = useStrategicAlignment({
+    data,
+    setData,
+    options: {
+      tujuans,
+      kpiGroups,
+      strategicServicePlans,
+      planningActivities,
+    },
+  });
+  const {
+    isEditing,
+    isLocked,
+    isOrphaned,
+    filteredOrganizationalUnits,
+    visibleTabs,
+    detailValuesRef,
+    pickerOpen,
+    sourceTitle,
+  } = state;
+  const {
+    setPickerOpen,
+    handleSelectSource,
+    handleResetSource,
+    getTabErrors,
+    handleSubmit,
+    handleVolumeChange,
+    handleUnitPriceChange,
+    onCancel,
+  } = handlers;
 
-  const getTabErrors = (tabValue: string) => {
-    const fieldMapping: Record<string, string[]> = {
-      usulan: [
-        'need_group_id',
-        'organizational_unit_id',
-        'need_type_id',
-        'year',
-        'title',
-        'description',
-        'current_condition',
-        'required_condition',
-        'unit',
-        'volume',
-        'unit_price',
-        'total_price',
-      ],
-      urgency: ['urgency', 'impact', 'is_priority', 'status'],
-      renstra: ['sasaran_ids', 'indicator_ids'],
-      ikk: ['kpi_indicator_ids'],
-      rls: ['strategic_service_plan_ids'],
-      perencanaan: [
-        'planning_activity_version_ids',
-        'planning_activity_indicator_ids',
-      ],
-      detail: [
-        'detail.background',
-        'detail.purpose_and_objectives',
-        'detail.target_objective',
-        'detail.kldi',
-        'detail.satker_skpd',
-        'detail.kpa_id',
-        'detail.funding_source_ids',
-        'detail.estimated_cost',
-        'detail.implementation_period',
-        'detail.expert_or_skilled_personnel',
-        'detail.technical_specifications',
-        'detail.training',
-        'technical_specification_attachments',
-      ],
-      lampiran: ['attachments'],
-    };
+  const [activeSection, setActiveSection] = useState<string>(
+    visibleTabs[0]?.value ?? 'usulan',
+  );
 
-    const tabFields = fieldMapping[tabValue] || [];
-
-    return Object.keys(errors).filter((key) =>
-      tabFields.some((field) => key === field || key.startsWith(`${field}.`)),
-    );
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const options = {
-      onSuccess: () => {
-        toast.success(
-          isEditing
-            ? 'Usulan kebutuhan berhasil diperbarui.'
-            : 'Usulan kebutuhan berhasil dibuat.',
-        );
+  const sections = useMemo(() => {
+    return [
+      {
+        value: 'usulan',
+        label: 'Data Usulan',
+        subtitle: 'Judul, unit, volume, harga',
+        icon: RiInformationLine,
+        permission: 'update need tab general',
+        isFilled: !!data.title && !!data.unit_price,
       },
-      onError: () => {
-        const errorTabs = visibleTabs.filter(
-          (tab) => getTabErrors(tab.value).length > 0,
-        );
-
-        if (errorTabs.length > 0) {
-          errorTabs.forEach((tab) => {
-            toast.error(`Ada kesalahan pada tab ${tab.label}`);
-          });
-        }
+      {
+        value: 'urgency',
+        label: 'Urgensi & Status',
+        subtitle: 'Tingkat urgensi & prioritas',
+        icon: RiFireLine,
+        permission: 'update need tab urgency',
+        isFilled: !!data.urgency,
       },
-    };
+      {
+        value: 'renstra',
+        label: 'Renstra',
+        subtitle: 'Sasaran & indikator renstra',
+        icon: RiCompass3Line,
+        permission: 'update need tab strategic',
+        isFilled: (data.sasaran_ids?.length ?? 0) > 0,
+      },
+      {
+        value: 'ikk',
+        label: 'IKK',
+        subtitle: 'Indikator kinerja kunci',
+        icon: RiBarChartLine,
+        permission: 'update need tab ikk',
+        isFilled: (data.kpi_indicator_ids?.length ?? 0) > 0,
+      },
+      {
+        value: 'rls',
+        label: 'RLS',
+        subtitle: 'Rencana layanan strategis',
+        icon: RiBriefcaseLine,
+        permission: 'update need tab rls',
+        isFilled: (data.strategic_service_plan_ids?.length ?? 0) > 0,
+      },
+      {
+        value: 'perencanaan',
+        label: 'Perencanaan',
+        subtitle: 'Program & sub-kegiatan',
+        icon: RiCalendarLine,
+        permission: 'update need tab planning',
+        isFilled: (data.planning_activity_version_ids?.length ?? 0) > 0,
+      },
+      {
+        value: 'detail',
+        label: 'Kerangka Acuan Kerja (KAK)',
+        subtitle: 'Spesifikasi teknis & uraian KAK',
+        icon: RiFileTextLine,
+        permission: 'update need tab detail',
+        isFilled:
+          !!data.detail?.background || !!data.detail?.purpose_and_objectives,
+      },
+      {
+        value: 'lampiran',
+        label: 'Lampiran',
+        subtitle: 'Berkas bukti pendukung',
+        icon: RiAttachmentLine,
+        permission: 'update need tab lampiran',
+        isFilled: (data.attachments?.length ?? 0) > 0,
+      },
+    ].filter((s) => hasPermission(s.permission));
+  }, [data, hasPermission]);
 
-    transform((data) => ({
-      ...data,
-      detail: detailValuesRef.current,
-      ...(isEditing ? { _method: 'PATCH' } : {}),
-    }));
-
-    if (isEditing) {
-      post(NeedController.update.url({ need: need.id }), options);
-    } else {
-      post(NeedController.store.url(), options);
-    }
-  };
-
-  const handleVolumeChange = (value: string) => {
-    const vol = parseFloat(value) || 0;
-    const price = parseFloat(data.unit_price) || 0;
-    setData((d: typeof data) => ({
-      ...d,
-      volume: value,
-      total_price: (vol * price).toFixed(2),
-    }));
-  };
-
-  const handleUnitPriceChange = (value: string) => {
-    const price = parseFloat(value) || 0;
-    const vol = parseFloat(data.volume) || 0;
-    setData((d: typeof data) => ({
-      ...d,
-      unit_price: value,
-      total_price: (vol * price).toFixed(2),
-    }));
-  };
+  const activeIndex = sections.findIndex((s) => s.value === activeSection);
+  const currentSectionMeta = sections[activeIndex] ?? sections[0];
 
   return (
-    <Card className={cn('w-full max-w-3xl overflow-hidden', className)}>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="">
-          <Tabs
-            defaultValue={visibleTabs[0]?.value ?? 'usulan'}
-            className="w-full"
-          >
-            <TabsList className="">
-              {visibleTabs.map((tab) => {
-                const tabErrors = getTabErrors(tab.value);
-                const hasError = tabErrors.length > 0;
+    <>
+      <form onSubmit={handleSubmit} className={cn('w-full', className)}>
+        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
+          {/* Left Main Content Canvas (8 cols on lg) */}
+          <div className="space-y-4 lg:col-span-8">
+            <div>
+              {/* Header of Active Section */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-bold tracking-tight text-foreground md:text-xl">
+                    {currentSectionMeta?.label}
+                  </h2>
+                  <p className="mt-1 text-xs text-muted-foreground uppercase">
+                    {currentSectionMeta?.subtitle}
+                  </p>
+                </div>
 
-                return (
-                  <TabsTrigger
-                    key={tab.value}
-                    value={tab.value}
-                    className={cn(
-                      hasError &&
-                        'text-destructive data-[state=active]:text-destructive',
-                    )}
+                {getTabErrors(activeSection).length > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="h-5 gap-1 px-2 text-xs"
                   >
-                    {tab.label}
-                    {hasError && (
-                      <span className="ml-1.5 flex h-2 w-2 rounded-full bg-destructive" />
+                    Ada {getTabErrors(activeSection).length} field perlu
+                    diperbaiki
+                  </Badge>
+                )}
+              </div>
+
+              {/* Active Content - Sections kept mounted in DOM */}
+              <div className="pt-4 md:pt-6">
+                <fieldset
+                  disabled={isLocked}
+                  className="contents disabled:pointer-events-none disabled:opacity-80"
+                >
+                  <div className={cn(activeSection !== 'usulan' && 'hidden')}>
+                    {hasPermission('update need tab general') && (
+                      <GeneralInfoSection
+                        data={data}
+                        setData={setData}
+                        errors={errors}
+                        organizationalUnits={filteredOrganizationalUnits}
+                        needTypes={needTypes}
+                        handleVolumeChange={handleVolumeChange}
+                        handleUnitPriceChange={handleUnitPriceChange}
+                      />
                     )}
-                  </TabsTrigger>
-                );
-              })}
-            </TabsList>
+                  </div>
 
-            {hasPermission('update need tab general') && (
-              <TabsContent
-                value="usulan"
-                className="mt-0 focus-visible:outline-none"
-              >
-                <GeneralInfoSection
-                  data={data}
-                  setData={setData}
-                  errors={errors}
-                  organizationalUnits={filteredOrganizationalUnits}
-                  needTypes={needTypes}
-                  handleVolumeChange={handleVolumeChange}
-                  handleUnitPriceChange={handleUnitPriceChange}
-                />
-              </TabsContent>
+                  <div className={cn(activeSection !== 'urgency' && 'hidden')}>
+                    {hasPermission('update need tab urgency') && (
+                      <PriorityStatusSection
+                        data={data}
+                        setData={setData}
+                        errors={errors}
+                      />
+                    )}
+                  </div>
+
+                  <div className={cn(activeSection !== 'renstra' && 'hidden')}>
+                    {hasPermission('update need tab strategic') && (
+                      <StrategicAlignmentEditor
+                        framework="renstra"
+                        controller={alignmentController}
+                        year={parseInt(data.year)}
+                        errors={errors}
+                        disabled={isLocked}
+                      />
+                    )}
+                  </div>
+
+                  <div className={cn(activeSection !== 'ikk' && 'hidden')}>
+                    {hasPermission('update need tab ikk') && (
+                      <StrategicAlignmentEditor
+                        framework="ikk"
+                        controller={alignmentController}
+                        year={parseInt(data.year)}
+                        errors={errors}
+                        disabled={isLocked}
+                      />
+                    )}
+                  </div>
+
+                  <div className={cn(activeSection !== 'rls' && 'hidden')}>
+                    {hasPermission('update need tab rls') && (
+                      <StrategicAlignmentEditor
+                        framework="rls"
+                        controller={alignmentController}
+                        errors={errors}
+                        disabled={isLocked}
+                      />
+                    )}
+                  </div>
+
+                  <div
+                    className={cn(activeSection !== 'perencanaan' && 'hidden')}
+                  >
+                    {hasPermission('update need tab planning') && (
+                      <StrategicAlignmentEditor
+                        framework="planning"
+                        controller={alignmentController}
+                        year={parseInt(data.year)}
+                        errors={errors}
+                        disabled={isLocked}
+                      />
+                    )}
+                  </div>
+
+                  <div className={cn(activeSection !== 'detail' && 'hidden')}>
+                    {hasPermission('update need tab detail') && (
+                      <NeedDetailSection
+                        key={
+                          data.source_need_id
+                            ? `source-${data.source_need_id}`
+                            : 'default'
+                        }
+                        initialValues={data.detail}
+                        detailValuesRef={detailValuesRef}
+                        errors={errors}
+                        technicalSpecificationAttachments={
+                          data.technical_specification_attachments
+                        }
+                        technicalSpecificationAttachmentNames={
+                          data.technical_specification_attachment_names
+                        }
+                        setTechnicalSpecificationAttachments={(files) =>
+                          setData('technical_specification_attachments', files)
+                        }
+                        setTechnicalSpecificationAttachmentNames={(names) =>
+                          setData(
+                            'technical_specification_attachment_names',
+                            names,
+                          )
+                        }
+                        existingTechnicalSpecificationAttachments={
+                          need?.attachments?.filter(
+                            (a) => a.category === 'technical_specifications',
+                          ) ?? []
+                        }
+                        deletedAttachmentIds={data.deleted_attachment_ids}
+                        setDeletedAttachmentIds={(ids) =>
+                          setData('deleted_attachment_ids', ids)
+                        }
+                        fundingSources={fundingSources}
+                        users={users}
+                        kldiOptions={kldiOptions}
+                        satkerOptions={satkerOptions}
+                        totalPrice={data.total_price}
+                      />
+                    )}
+                  </div>
+
+                  <div className={cn(activeSection !== 'lampiran' && 'hidden')}>
+                    {hasPermission('update need tab lampiran') && (
+                      <FileSection
+                        files={data.attachments}
+                        fileNames={data.attachment_names}
+                        setFiles={(files) => setData('attachments', files)}
+                        setFileNames={(names) =>
+                          setData('attachment_names', names)
+                        }
+                        existingAttachments={
+                          need?.attachments?.filter(
+                            (a) => a.category === 'general',
+                          ) ?? []
+                        }
+                        deletedAttachmentIds={data.deleted_attachment_ids}
+                        setDeletedAttachmentIds={(ids) =>
+                          setData('deleted_attachment_ids', ids)
+                        }
+                        errors={errors}
+                      />
+                    )}
+                  </div>
+                </fieldset>
+
+                {/* Step Navigation Glide Buttons */}
+                <div className="flex items-center justify-between pt-6">
+                  {activeIndex > 0 ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() =>
+                        setActiveSection(sections[activeIndex - 1].value)
+                      }
+                    >
+                      <span>Ke: {sections[activeIndex - 1]?.label}</span>
+                    </Button>
+                  ) : (
+                    <div />
+                  )}
+
+                  {activeIndex < sections.length - 1 ? (
+                    <div className="flex flex-wrap items-center gap-2">
+                      {!isLocked && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={processing}
+                          onClick={(e) =>
+                            handleSubmit(e, { shouldSubmit: false })
+                          }
+                        >
+                          Simpan sebagai Draft
+                        </Button>
+                      )}
+                      <Button
+                        type="button"
+                        variant="default"
+                        onClick={() =>
+                          setActiveSection(sections[activeIndex + 1].value)
+                        }
+                      >
+                        <span>
+                          Lanjut ke: {sections[activeIndex + 1]?.label}
+                        </span>
+                      </Button>
+                    </div>
+                  ) : (
+                    !isLocked && (
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={processing}
+                          onClick={(e) =>
+                            handleSubmit(e, { shouldSubmit: false })
+                          }
+                        >
+                          Simpan sebagai Draft
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="default"
+                          disabled={
+                            processing ||
+                            (isEditing && need?.can?.submit === false)
+                          }
+                          onClick={(e) =>
+                            handleSubmit(e, { shouldSubmit: true })
+                          }
+                        >
+                          <RiSendPlaneLine data-icon="inline-start" />
+                          <span>Simpan & Ajukan</span>
+                        </Button>
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Sticky Navigation Rail (4 cols on lg) */}
+          <div className="space-y-4 lg:sticky lg:top-4 lg:z-10 lg:col-span-4">
+            {need && <NeedLockBanner need={need} />}
+
+            {isOrphaned && (
+              <Alert variant="destructive" className="p-2.5">
+                <RiAlertLine className="h-4 w-4" />
+                <AlertTitle className="text-xs font-semibold">
+                  Unit Kerja Tidak Aktif
+                </AlertTitle>
+                <AlertDescription className="text-xs">
+                  Unit kerja sebelumnya tidak aktif. Silakan pilih unit kerja
+                  aktif.
+                </AlertDescription>
+              </Alert>
             )}
 
-            {hasPermission('update need tab urgency') && (
-              <TabsContent
-                value="urgency"
-                className="mt-0 focus-visible:outline-none"
-              >
-                <PriorityStatusSection
-                  data={data}
-                  setData={setData}
-                  errors={errors}
-                />
-              </TabsContent>
-            )}
+            <div className="space-y-4">
+              {/* Sidebar Summary & Save Card */}
+              <div>
+                <div className="mt-3 flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={onCancel}
+                      className="flex-1"
+                    >
+                      {isLocked ? 'KEMBALI' : 'BATAL'}
+                    </Button>
+                    {!isLocked && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={processing}
+                        onClick={(e) =>
+                          handleSubmit(e, { shouldSubmit: false })
+                        }
+                        className="flex-1"
+                      >
+                        Simpan sebagai Draft
+                      </Button>
+                    )}
+                  </div>
+                  {!isLocked && (
+                    <Button
+                      type="button"
+                      variant="default"
+                      size="sm"
+                      disabled={
+                        processing || (isEditing && need?.can?.submit === false)
+                      }
+                      onClick={(e) => handleSubmit(e, { shouldSubmit: true })}
+                      className="w-full"
+                    >
+                      <RiSendPlaneLine data-icon="inline-start" />
+                      <span>Simpan & Ajukan</span>
+                    </Button>
+                  )}
+                </div>
+              </div>
 
-            {hasPermission('update need tab strategic') && (
-              <TabsContent
-                value="renstra"
-                className="mt-0 focus-visible:outline-none"
-              >
-                <RenstraAlignmentSection
-                  data={data}
-                  setData={setData}
-                  errors={errors}
-                  tujuans={tujuans}
-                  year={parseInt(data.year)}
-                />
-              </TabsContent>
-            )}
+              <div>
+                {!isEditing && (
+                  <div className="mt-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPickerOpen(true)}
+                      className="w-full gap-1.5 text-xs"
+                    >
+                      <RiHistoryLine className="h-3.5 w-3.5" />
+                      Salin Usulan Sebelumnya
+                    </Button>
+                  </div>
+                )}
 
-            {hasPermission('update need tab ikk') && (
-              <TabsContent
-                value="ikk"
-                className="mt-0 focus-visible:outline-none"
-              >
-                <IkkAlignmentSection
-                  data={data}
-                  setData={setData}
-                  errors={errors}
-                  kpiGroups={kpiGroups}
-                  year={parseInt(data.year)}
-                />
-              </TabsContent>
-            )}
+                {sourceTitle && (
+                  <div className="mt-2 flex items-center justify-between rounded-md border border-border/70 bg-muted/50 px-2.5 py-1.5 text-xs text-foreground">
+                    <span className="line-clamp-1 text-xss">
+                      Draf: <strong>{sourceTitle}</strong>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleResetSource}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      <RiCloseLine className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                )}
+              </div>
 
-            {hasPermission('update need tab rls') && (
-              <TabsContent
-                value="rls"
-                className="mt-0 focus-visible:outline-none"
-              >
-                <RlsAlignmentSection
-                  data={data}
-                  setData={setData}
-                  errors={errors}
-                  strategicServicePlans={strategicServicePlans}
-                />
-              </TabsContent>
-            )}
+              {/* Section List */}
+              <div className="space-y-1 py-1">
+                {sections.map((section) => {
+                  const isSelected = section.value === activeSection;
+                  const errCount = getTabErrors(section.value).length;
+                  const IconComp = section.icon;
 
-            {hasPermission('update need tab planning') && (
-              <TabsContent
-                value="perencanaan"
-                className="mt-0 focus-visible:outline-none"
-              >
-                <PlanningAlignmentSection
-                  data={data}
-                  setData={setData}
-                  errors={errors}
-                  planningActivities={planningActivities}
-                  year={parseInt(data.year)}
-                />
-              </TabsContent>
-            )}
+                  return (
+                    <button
+                      key={section.value}
+                      type="button"
+                      onClick={() => setActiveSection(section.value)}
+                      className={cn(
+                        'group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all',
+                        isSelected
+                          ? 'bg-muted font-semibold text-foreground dark:bg-muted'
+                          : 'text-foreground/80 hover:bg-muted/60 hover:text-foreground',
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          'flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs transition-colors',
+                          isSelected
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted text-muted-foreground group-hover:text-foreground',
+                        )}
+                      >
+                        <IconComp className="h-4 w-4" />
+                      </div>
 
-            {hasPermission('update need tab detail') && (
-              <TabsContent
-                value="detail"
-                className="mt-0 focus-visible:outline-none data-[state=inactive]:hidden"
-                forceMount
-              >
-                <NeedDetailSection
-                  initialValues={data.detail}
-                  detailValuesRef={detailValuesRef}
-                  errors={errors}
-                  technicalSpecificationAttachments={
-                    data.technical_specification_attachments
-                  }
-                  technicalSpecificationAttachmentNames={
-                    data.technical_specification_attachment_names
-                  }
-                  setTechnicalSpecificationAttachments={(files) =>
-                    setData('technical_specification_attachments', files)
-                  }
-                  setTechnicalSpecificationAttachmentNames={(names) =>
-                    setData('technical_specification_attachment_names', names)
-                  }
-                  existingTechnicalSpecificationAttachments={
-                    need?.attachments?.filter(
-                      (a) => a.category === 'technical_specifications',
-                    ) ?? []
-                  }
-                  deletedAttachmentIds={data.deleted_attachment_ids}
-                  setDeletedAttachmentIds={(ids) =>
-                    setData('deleted_attachment_ids', ids)
-                  }
-                  fundingSources={fundingSources}
-                  users={users}
-                  kldiOptions={kldiOptions}
-                  satkerOptions={satkerOptions}
-                  totalPrice={data.total_price}
-                />
-              </TabsContent>
-            )}
-
-            {hasPermission('update need tab lampiran') && (
-              <TabsContent
-                value="lampiran"
-                className="mt-0 focus-visible:outline-none"
-              >
-                <FileSection
-                  files={data.attachments}
-                  fileNames={data.attachment_names}
-                  setFiles={(files) => setData('attachments', files)}
-                  setFileNames={(names) => setData('attachment_names', names)}
-                  existingAttachments={
-                    need?.attachments?.filter(
-                      (a) => a.category === 'general',
-                    ) ?? []
-                  }
-                  deletedAttachmentIds={data.deleted_attachment_ids}
-                  setDeletedAttachmentIds={(ids) =>
-                    setData('deleted_attachment_ids', ids)
-                  }
-                  errors={errors}
-                />
-              </TabsContent>
-            )}
-          </Tabs>
-        </CardContent>
-        <CardFooter className="justify-end gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.visit(needRoutes.index.url())}
-          >
-            Batal
-          </Button>
-          <Button type="submit" disabled={processing}>
-            {isEditing ? 'Simpan Perubahan' : 'Tambah Usulan'}
-          </Button>
-        </CardFooter>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="text-xs font-semibold uppercase">
+                            {section.label}
+                          </span>
+                          {errCount > 0 ? (
+                            <Badge
+                              variant="destructive"
+                              className="h-4 px-1 text-xss font-bold"
+                            >
+                              {errCount}
+                            </Badge>
+                          ) : section.isFilled ? (
+                            <RiCheckLine className="h-3.5 w-3.5 text-success" />
+                          ) : null}
+                        </div>
+                        <p className="line-clamp-1 text-xs text-muted-foreground">
+                          {section.subtitle}
+                        </p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
       </form>
-    </Card>
+
+      {!isEditing && currentGroup && (
+        <UnapprovedNeedPickerDialog
+          open={pickerOpen}
+          onOpenChange={setPickerOpen}
+          targetGroupId={currentGroup.id}
+          onSelect={handleSelectSource}
+        />
+      )}
+    </>
   );
 }

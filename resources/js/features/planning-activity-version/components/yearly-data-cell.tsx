@@ -1,0 +1,354 @@
+import { router } from '@inertiajs/react';
+import { useState, useEffect, useRef } from 'react';
+import { toast } from 'sonner';
+
+import PlanningActivityVersionController from '@/actions/App/Http/Controllers/Planning/PlanningActivityVersionController';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import type {
+  PlanningActivityVersion,
+  PlanningActivityYear,
+} from '@/types/planning-version';
+
+interface YearlyDataCellProps {
+  activityId: number;
+  yearableId: number;
+  yearableType: 'activity' | 'indicator';
+  items: PlanningActivityYear[];
+  year: number;
+  field: 'target' | 'budget';
+  disabled?: boolean;
+  /** Year rows from the nearest parent activity — used as fallback when own value is null */
+  parentItems?: PlanningActivityYear[];
+  /** Code of the parent activity — shown as a reference in the inherited value display */
+  parentCode?: string;
+}
+
+export function YearlyDataCell({
+  activityId,
+  yearableId,
+  yearableType,
+  items,
+  year,
+  field,
+  disabled,
+  parentItems,
+  parentCode,
+}: YearlyDataCellProps) {
+  const yearlyData = items.find((y) => y.year === year);
+
+  /** True when this cell has no own value — will display inherited value */
+  const isInherited =
+    !disabled &&
+    (yearlyData == null ||
+      yearlyData[field] == null ||
+      yearlyData[field] === '' ||
+      yearlyData[field] === '0' ||
+      yearlyData[field] === 0);
+
+  const parentYearlyData = parentItems?.find((y) => y.year === year);
+  const inheritedValue =
+    isInherited && parentYearlyData ? parentYearlyData[field] : null;
+
+  const initialValue = yearlyData
+    ? yearlyData[field]
+    : field === 'budget'
+      ? '0'
+      : '';
+
+  const [isEditing, setIsEditing] = useState(false);
+  const formatBudget = (val: string | number | null) => {
+    if (!val || val === '0' || val === 0) {
+      return 'Rp 0';
+    }
+
+    let numeric: number;
+
+    if (typeof val === 'number') {
+      numeric = Math.round(val);
+    } else {
+      const cleanValue = val.toString().trim();
+
+      if (/[.,]\d{2}$/.test(cleanValue)) {
+        const withoutDecimal = cleanValue.slice(0, -3);
+        numeric = parseInt(withoutDecimal.replace(/[^0-9]/g, '')) || 0;
+      } else {
+        numeric = parseInt(cleanValue.replace(/[^0-9]/g, '')) || 0;
+      }
+    }
+
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      maximumFractionDigits: 0,
+    }).format(numeric);
+  };
+
+  const [value, setValue] = useState(
+    field === 'budget'
+      ? formatBudget(initialValue)
+      : (initialValue ?? '').toString(),
+  );
+  const [prevInitialValue, setPrevInitialValue] = useState(initialValue);
+  const [prevField, setPrevField] = useState(field);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  if (initialValue !== prevInitialValue || field !== prevField) {
+    setPrevInitialValue(initialValue);
+    setPrevField(field);
+    setValue(
+      field === 'budget'
+        ? formatBudget(initialValue)
+        : (initialValue ?? '').toString(),
+    );
+  }
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+
+  const handleUpdate = () => {
+    if (value === (initialValue ?? '').toString()) {
+      setIsEditing(false);
+
+      return;
+    }
+
+    if (disabled || !yearableId) {
+      setIsEditing(false);
+
+      return;
+    }
+
+    let saveValue: any = value;
+
+    if (field === 'budget') {
+      const numeric = parseInt(value.replace(/[^0-9]/g, '')) || 0;
+      saveValue = numeric === 0 ? null : numeric;
+    } else {
+      saveValue = value === '' || value === '-' ? null : value;
+    }
+
+    router
+      .optimistic((props: any) => ({
+        activities: {
+          ...props.activities,
+          data: props.activities.data.map((a: PlanningActivityVersion) => {
+            if (a.id !== activityId) {
+              return a;
+            }
+
+            if (yearableType === 'activity') {
+              const existingYears = a.activity_years ?? [];
+              const yearExists = existingYears.some((y) => y.year === year);
+              const newYears = yearExists
+                ? existingYears.map((y) =>
+                    y.year === year ? { ...y, [field]: saveValue } : y,
+                  )
+                : [
+                    ...existingYears,
+                    {
+                      id: 0,
+                      yearable_id: yearableId,
+                      yearable_type: 'App\\Models\\PlanningActivityVersion',
+                      year,
+                      target: null,
+                      budget: saveValue,
+                    } as PlanningActivityYear,
+                  ];
+
+              return { ...a, activity_years: newYears };
+            } else {
+              // Update target in indicators
+              const newIndicators = (a.indicators ?? []).map((ind) => {
+                if (ind.id !== yearableId) {
+                  return ind;
+                }
+
+                const existingYears = ind.activity_years ?? [];
+                const yearExists = existingYears.some((y) => y.year === year);
+                const newYears = yearExists
+                  ? existingYears.map((y) =>
+                      y.year === year ? { ...y, [field]: saveValue } : y,
+                    )
+                  : [
+                      ...existingYears,
+                      {
+                        id: 0,
+                        yearable_id: yearableId,
+                        yearable_type: 'App\\Models\\PlanningActivityIndicator',
+                        year,
+                        target: saveValue as string,
+                        budget: null,
+                      } as PlanningActivityYear,
+                    ];
+
+                return { ...ind, activity_years: newYears };
+              });
+
+              return { ...a, indicators: newIndicators };
+            }
+          }),
+        },
+      }))
+      .post(
+        PlanningActivityVersionController.updateYearlyData.url({
+          planning_activity_version: activityId,
+        }),
+        {
+          yearable_id: yearableId,
+          yearable_type: yearableType,
+          year,
+          target: field === 'target' ? saveValue : (yearlyData?.target ?? ''),
+          budget: field === 'budget' ? saveValue : (yearlyData?.budget ?? 0),
+        },
+        {
+          onSuccess: () => {
+            setIsEditing(false);
+            toast.success('Data berhasil diperbarui');
+          },
+          onError: (errors) => {
+            setIsEditing(false);
+            setValue(
+              field === 'budget'
+                ? formatBudget(initialValue)
+                : (initialValue ?? '').toString(),
+            );
+            const firstError = Object.values(errors)[0];
+            toast.error(firstError || 'Gagal memperbarui data');
+          },
+          preserveScroll: true,
+          showProgress: false,
+        },
+      );
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleUpdate();
+    } else if (e.key === 'Escape') {
+      setIsEditing(false);
+      setValue(
+        field === 'budget'
+          ? formatBudget(initialValue)
+          : (initialValue ?? '').toString(),
+      );
+    }
+  };
+
+  if (disabled) {
+    return <div className="text-center text-muted-foreground">-</div>;
+  }
+
+  if (isEditing) {
+    return (
+      <Input
+        ref={inputRef}
+        value={value}
+        onChange={(e) => {
+          if (field === 'budget') {
+            setValue(formatBudget(e.target.value));
+          } else {
+            setValue(e.target.value);
+          }
+        }}
+        onBlur={handleUpdate}
+        onKeyDown={handleKeyDown}
+        className={cn({
+          'min-w-20!': field !== 'budget',
+          'min-w-40!': field === 'budget',
+        })}
+        type="text"
+      />
+    );
+  }
+
+  // Inherited value display — shown when own value is null but parent has one
+  if (isInherited && inheritedValue != null) {
+    const inheritedDisplay =
+      field === 'budget'
+        ? formatBudget(inheritedValue)
+        : inheritedValue.toString();
+
+    return (
+      <div
+        onClick={() => setIsEditing(true)}
+        title={`Nilai diwarisi dari aktivitas induk${parentCode ? ` (${parentCode})` : ''}. Klik untuk mengatur nilai sendiri.`}
+        className="cursor-pointer items-center rounded font-mono text-muted-foreground italic transition-colors hover:bg-muted/50"
+      >
+        <div className="">{inheritedDisplay}</div>
+        <div className="-mt-1 inline-flex items-center gap-0.5 text-xs text-muted-foreground/60 not-italic">
+          ↑{parentCode && <p className="font-mono">{parentCode}</p>}
+        </div>
+      </div>
+    );
+  }
+
+  if (field === 'target') {
+    return (
+      <div
+        onClick={() => setIsEditing(true)}
+        className="cursor-pointer rounded font-mono transition-colors hover:bg-muted/50"
+      >
+        {value || '-'}
+      </div>
+    );
+  }
+
+  const hasBudget = yearlyData?.budget != null && yearlyData.budget != 0;
+  const hasTotal =
+    yearlyData?.total_budget != null && yearlyData.total_budget != 0;
+
+  return (
+    <div
+      onClick={() => setIsEditing(true)}
+      className="group flex cursor-pointer flex-col items-center justify-center rounded p-1 transition-colors hover:bg-muted/50"
+    >
+      <div
+        className={cn('font-mono', {
+          'font-bold': hasBudget,
+          'text-muted-foreground/50': !hasBudget,
+        })}
+      >
+        {formatBudget(yearlyData?.budget ?? 0)}
+      </div>
+      {hasTotal && (
+        <div
+          title={
+            hasBudget &&
+            Number(yearlyData.total_budget) > Number(yearlyData.budget)
+              ? 'Total terhitung (Rp ' +
+                formatBudget(yearlyData.total_budget ?? 0) +
+                ') lebih besar dari nilai yang diinputkan'
+              : hasBudget &&
+                  Number(yearlyData.total_budget) < Number(yearlyData.budget)
+                ? 'Total terhitung (Rp ' +
+                  formatBudget(yearlyData.total_budget ?? 0) +
+                  ') lebih kecil dari nilai yang diinputkan'
+                : 'Total terhitung dari sub-aktivitas'
+          }
+          className={cn(
+            'mt-1 flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-xss font-bold',
+            {
+              'bg-destructive/10 text-destructive':
+                hasBudget &&
+                Number(yearlyData.total_budget) > Number(yearlyData.budget),
+              'bg-success/15 text-success-foreground dark:text-success':
+                hasBudget &&
+                Number(yearlyData.total_budget) < Number(yearlyData.budget),
+              'bg-muted text-foreground':
+                !hasBudget ||
+                Number(yearlyData.total_budget) === Number(yearlyData.budget),
+            },
+          )}
+        >
+          <span className="opacity-70">Σ</span>
+          {formatBudget(yearlyData.total_budget ?? 0)}
+        </div>
+      )}
+    </div>
+  );
+}

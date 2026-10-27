@@ -1,29 +1,92 @@
-import { CheckCircle2, FileText, XCircle } from 'lucide-react';
+import {
+  RiAlertFill,
+  RiCheckboxCircleLine,
+  RiCloseCircleLine,
+  RiFeedbackLine,
+  RiFileEditFill,
+  RiFileTextLine,
+  RiMessage3Fill,
+  RiSendInsFill,
+  RiSendPlaneLine,
+  RiVerifiedBadgeFill,
+} from '@remixicon/react';
 import type { ElementType } from 'react';
 
 import type { NeedStatus } from '@/types/need';
 
+export interface NeedStatusConfig {
+  label: string;
+  tone: 'muted' | 'info' | 'success' | 'destructive' | 'warning';
+  icon: ElementType;
+  defaultTooltip: string;
+}
+
+export const NEED_STATUS_CONFIG: Record<NeedStatus, NeedStatusConfig> = {
+  draft: {
+    label: 'Draft',
+    tone: 'muted',
+    icon: RiFileEditFill,
+    defaultTooltip: 'Draft usulan belum diajukan',
+  },
+  submitted: {
+    label: 'Diajukan',
+    tone: 'info',
+    icon: RiSendInsFill,
+    defaultTooltip: 'Menunggu Review Direktur',
+  },
+  approved: {
+    label: 'Disetujui',
+    tone: 'success',
+    icon: RiVerifiedBadgeFill,
+    defaultTooltip: 'Telah disetujui Direktur',
+  },
+  rejected: {
+    label: 'Ditolak',
+    tone: 'destructive',
+    icon: RiAlertFill,
+    defaultTooltip: 'Ditolak oleh Direktur',
+  },
+  revision: {
+    label: 'Perlu Revisi',
+    tone: 'warning',
+    icon: RiMessage3Fill,
+    defaultTooltip: 'Perlu revisi berdasarkan catatan telaah Direktur',
+  },
+};
+
 export const STATUS_LABELS: Record<NeedStatus, string> = {
-  draft: 'Draft',
-  approved: 'Disetujui',
-  rejected: 'Ditolak',
+  draft: NEED_STATUS_CONFIG.draft.label,
+  submitted: NEED_STATUS_CONFIG.submitted.label,
+  approved: NEED_STATUS_CONFIG.approved.label,
+  rejected: NEED_STATUS_CONFIG.rejected.label,
+  revision: NEED_STATUS_CONFIG.revision.label,
 };
 
 export const STATUS_OPTIONS = [
   {
     value: 'draft',
-    label: 'Draft',
-    description: 'Usulan masih dalam tahap pengerjaan.',
+    label: NEED_STATUS_CONFIG.draft.label,
+    description: 'Usulan masih dalam tahap pengerjaan dan belum diajukan.',
+  },
+  {
+    value: 'submitted',
+    label: NEED_STATUS_CONFIG.submitted.label,
+    description: 'Usulan telah diajukan dan menunggu review direktur.',
   },
   {
     value: 'approved',
-    label: 'Disetujui',
-    description: 'Usulan telah disetujui untuk diproses.',
+    label: NEED_STATUS_CONFIG.approved.label,
+    description: 'Usulan telah disetujui secara resmi oleh direktur.',
   },
   {
     value: 'rejected',
-    label: 'Ditolak',
-    description: 'Usulan tidak dapat dilanjutkan.',
+    label: NEED_STATUS_CONFIG.rejected.label,
+    description: 'Usulan tidak disetujui oleh direktur.',
+  },
+  {
+    value: 'revision',
+    label: NEED_STATUS_CONFIG.revision.label,
+    description: 'Usulan dikembalikan oleh direktur untuk perbaikan.',
   },
 ] as const;
 
@@ -32,14 +95,18 @@ export const STATUS_VARIANTS: Record<
   'secondary' | 'default' | 'destructive' | 'outline'
 > = {
   draft: 'secondary',
+  submitted: 'outline',
   approved: 'default',
   rejected: 'destructive',
+  revision: 'outline',
 };
 
 export const STATUS_ICONS: Record<NeedStatus, ElementType> = {
-  draft: FileText,
-  approved: CheckCircle2,
-  rejected: XCircle,
+  draft: RiFileTextLine,
+  submitted: RiSendPlaneLine,
+  approved: RiCheckboxCircleLine,
+  rejected: RiCloseCircleLine,
+  revision: RiFeedbackLine,
 };
 
 export const PRIORITY_LABELS: Record<string, string> = {
@@ -58,10 +125,9 @@ export const LABELED_PRIORITY_LABELS: Record<string, string> = {
 };
 
 export const LABELED_PRIORITY_CLASSES: Record<string, string> = {
-  high: 'bg-orange-50 text-orange-700 border-orange-200/50 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20',
-  medium:
-    'bg-blue-50 text-blue-700 border-blue-200/50 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
-  low: 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
+  high: 'border-warning/30 bg-warning/15 text-warning-foreground dark:bg-warning/20 dark:text-warning',
+  medium: 'border-info/30 bg-info/15 text-info dark:bg-info/20 dark:text-info',
+  low: 'border-transparent bg-muted text-muted-foreground',
 };
 
 export const PRIORITY_LEVELS = [

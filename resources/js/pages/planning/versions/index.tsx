@@ -1,33 +1,22 @@
-import { Head, router } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
-import { toast } from 'sonner';
+import { Head } from '@inertiajs/react';
+import { RiAddLine } from '@remixicon/react';
 
 import PlanningVersionController from '@/actions/App/Http/Controllers/Planning/PlanningVersionController';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
-import { useDataTable } from '@/hooks/use-data-table';
+import { getColumns } from '@/features/planning-version/components/planning-version-columns';
+import { VersionDialog } from '@/features/planning-version/components/planning-version-dialog';
+import { usePlanningVersionActions } from '@/features/planning-version/hooks/use-planning-version-actions';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import { usePermission } from '@/hooks/use-permission';
+import { useResourceIndexController } from '@/hooks/use-resource-index-controller';
+import type { PaginatedData } from '@/hooks/use-resource-index-controller';
 import planningVersions from '@/routes/planning-versions';
 import type { PlanningVersion } from '@/types/planning-version';
 
-import { getColumns } from './columns';
-import { VersionDialog } from './version-dialog';
-
-interface PaginatedVersions {
-  data: PlanningVersion[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-  from: number | null;
-  to: number | null;
-}
-
 interface PlanningVersionsIndexProps {
-  versions: PaginatedVersions;
+  versions: PaginatedData<PlanningVersion>;
   filters: DataTableFilters;
 }
 
@@ -36,104 +25,31 @@ export default function PlanningVersionsIndex({
   filters,
 }: PlanningVersionsIndexProps) {
   const { hasPermission } = usePermission();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedVersion, setSelectedVersion] =
-    useState<PlanningVersion | null>(null);
-  const [confirmConfig, setConfirmConfig] = useState<{
-    open: boolean;
-    title: string;
-    description: string;
-    onConfirm: () => void;
-    confirmText?: string;
-    variant?: 'default' | 'destructive';
-  }>({
-    open: false,
-    title: '',
-    description: '',
-    onConfirm: () => {},
+
+  const {
+    confirmConfig,
+    setConfirmConfig,
+    handleCreateRevision,
+    handleSetCurrent,
+  } = usePlanningVersionActions();
+
+  const controller = useResourceIndexController<PlanningVersion>({
+    data: versions,
+    filters,
+    only: ['versions', 'filters'],
+    resourceName: 'Versi perencanaan',
+    deleteUrl: (version) =>
+      PlanningVersionController.destroy.url({ planning_version: version.id }),
+    getColumns: ({ onEdit, onDelete }) =>
+      getColumns(
+        onEdit,
+        handleCreateRevision,
+        handleSetCurrent,
+        onDelete,
+        hasPermission,
+      ),
+    searchPlaceholder: 'Cari nama versi atau tahun...',
   });
-
-  const { onSearch, onSort, onReset, onPageChange, onPerPageChange } =
-    useDataTable({
-      only: ['versions', 'filters'],
-    });
-
-  const closeConfirm = () =>
-    setConfirmConfig((prev) => ({ ...prev, open: false }));
-
-  const onEdit = useCallback((version: PlanningVersion) => {
-    setSelectedVersion(version);
-    setDialogOpen(true);
-  }, []);
-
-  const handleCreateRevision = useCallback((version: PlanningVersion) => {
-    setConfirmConfig({
-      open: true,
-      title: 'Buat Revisi',
-      description: `Apakah Anda yakin ingin membuat revisi dari "${version.name}"?`,
-      confirmText: 'Buat Revisi',
-      onConfirm: () => {
-        router.post(
-          PlanningVersionController.createRevision.url({
-            planning_version: version.id,
-          }),
-          {},
-          {
-            onSuccess: () => {
-              toast.success('Revisi berhasil dibuat');
-              closeConfirm();
-            },
-          },
-        );
-      },
-    });
-  }, []);
-
-  const handleSetCurrent = useCallback((version: PlanningVersion) => {
-    setConfirmConfig({
-      open: true,
-      title: 'Jadikan Versi Utama',
-      description: `Jadikan "${version.name}" sebagai versi utama untuk periode ${version.year_start} - ${version.year_end}?`,
-      confirmText: 'Jadikan Utama',
-      onConfirm: () => {
-        router.post(
-          PlanningVersionController.setCurrent.url({
-            planning_version: version.id,
-          }),
-          {},
-          {
-            onSuccess: () => {
-              toast.success('Versi utama diperbarui');
-              closeConfirm();
-            },
-          },
-        );
-      },
-    });
-  }, []);
-
-  const handleDelete = useCallback((version: PlanningVersion) => {
-    setConfirmConfig({
-      open: true,
-      title: 'Hapus Versi',
-      description: `Apakah Anda yakin ingin menghapus versi "${version.name}"? Semua snapshot data dalam versi ini akan ikut terhapus.`,
-      confirmText: 'Hapus Versi',
-      variant: 'destructive',
-      onConfirm: () => {
-        router.delete(
-          PlanningVersionController.destroy.url({
-            planning_version: version.id,
-          }),
-          {
-            onSuccess: () => {
-              toast.success('Versi berhasil dihapus');
-              closeConfirm();
-            },
-          },
-        );
-      },
-    });
-  }, []);
 
   return (
     <>
@@ -150,51 +66,30 @@ export default function PlanningVersionsIndex({
             </p>
           </div>
           {hasPermission('create planning-versions') && (
-            <Button
-              onClick={() => {
-                setSelectedVersion(null);
-                setDialogOpen(true);
-              }}
-            >
-              <Plus />
+            <Button onClick={controller.dialog.openCreate}>
+              <RiAddLine data-icon="inline-start" />
               Buat Versi Baru
             </Button>
           )}
         </div>
 
-        <DataTable
-          columns={useMemo(
-            () =>
-              getColumns(
-                onEdit,
-                handleCreateRevision,
-                handleSetCurrent,
-                handleDelete,
-                hasPermission,
-              ),
-            [
-              onEdit,
-              handleCreateRevision,
-              handleSetCurrent,
-              handleDelete,
-              hasPermission,
-            ],
-          )}
-          data={versions.data}
-          meta={versions}
-          filters={filters}
-          onSearch={onSearch}
-          onSort={onSort}
-          onPageChange={onPageChange}
-          onPerPageChange={onPerPageChange}
-          onReset={onReset}
-          searchPlaceholder="Cari nama versi atau tahun..."
-        />
+        <DataTable {...controller.tableProps} />
 
         <VersionDialog
-          version={selectedVersion}
-          open={dialogOpen}
-          onOpenChange={setDialogOpen}
+          version={controller.dialog.editingItem}
+          open={controller.dialog.isOpen}
+          onOpenChange={controller.dialog.setIsOpen}
+        />
+
+        <ConfirmDialog
+          open={controller.deleteDialog.isOpen}
+          onOpenChange={controller.deleteDialog.setIsOpen}
+          onConfirm={controller.deleteDialog.confirmDelete}
+          title="Hapus Versi"
+          description={`Apakah Anda yakin ingin menghapus versi "${controller.deleteDialog.deletingItem?.name}"? Semua snapshot data dalam versi ini akan ikut terhapus.`}
+          confirmText="Hapus Versi"
+          variant="destructive"
+          loading={controller.deleteDialog.isDeleting}
         />
 
         <ConfirmDialog
@@ -202,7 +97,6 @@ export default function PlanningVersionsIndex({
           onOpenChange={(open) =>
             setConfirmConfig((prev) => ({ ...prev, open }))
           }
-          cancelText="Batal"
         />
       </div>
     </>

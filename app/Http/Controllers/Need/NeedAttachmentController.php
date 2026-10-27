@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Need;
 
-use App\Actions\Need\AddNeedAttachmentAction;
-use App\Actions\Need\DeleteNeedAttachmentAction;
+use App\Actions\Need\NeedProposalEngine;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Need\StoreNeedAttachmentRequest;
 use App\Models\Need;
 use App\Models\NeedAttachment;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class NeedAttachmentController extends Controller
+final class NeedAttachmentController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -24,29 +26,25 @@ class NeedAttachmentController extends Controller
         $this->authorize('view', $need);
 
         return Inertia::render('need/needs/attachments', [
-            'need' => $need->load('attachments'),
+            'need' => $need->load(['attachments', 'needGroup']),
         ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Need $need, AddNeedAttachmentAction $action): RedirectResponse
+    public function store(StoreNeedAttachmentRequest $request, Need $need, NeedProposalEngine $engine): RedirectResponse
     {
-        $this->authorize('update', $need);
+        $this->authorize('create', [NeedAttachment::class, $need]);
 
-        $request->validate([
-            'file' => ['required', 'file', 'max:51200', 'mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,zip,rar,mp4,webm,ogg'],
-            'display_name' => ['nullable', 'string', 'max:255'],
-            'extension' => ['required', 'string'],
-            'file_size' => ['required', 'integer'],
-        ]);
+        $file = $request->file('file');
 
-        $action->execute($need, [
-            'file' => $request->file('file'),
+        $engine->addAttachment($need, [
+            'file' => $file,
+            'category' => $request->input('category', 'general'),
             'display_name' => $request->input('display_name'),
-            'extension' => $request->input('extension'),
-            'file_size' => $request->input('file_size'),
+            'extension' => $file->getClientOriginalExtension(),
+            'file_size' => $file->getSize(),
         ]);
 
         return back()->with('success', 'Lampiran berhasil diunggah.');
@@ -59,11 +57,13 @@ class NeedAttachmentController extends Controller
     {
         $this->authorize('view', $attachment->need);
 
-        if (! Storage::disk('local')->exists($attachment->file_path)) {
+        $disk = config('filesystems.attachments_disk', config('filesystems.default', 'local'));
+
+        if (! Storage::disk($disk)->exists($attachment->file_path)) {
             abort(404);
         }
 
-        return Storage::disk('local')->download(
+        return Storage::disk($disk)->download(
             $attachment->file_path,
             $attachment->display_name
         );
@@ -72,25 +72,26 @@ class NeedAttachmentController extends Controller
     /**
      * View the attachment inline.
      */
-    public function view(NeedAttachment $attachment)
+    public function view(NeedAttachment $attachment): SymfonyResponse
     {
         $this->authorize('view', $attachment->need);
 
-        if (! Storage::disk('local')->exists($attachment->file_path)) {
+        $disk = config('filesystems.attachments_disk', config('filesystems.default', 'local'));
+
+        if (! Storage::disk($disk)->exists($attachment->file_path)) {
             abort(404);
         }
 
-        return Storage::disk('local')->response($attachment->file_path);
+        return Storage::disk($disk)->response($attachment->file_path);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(NeedAttachment $attachment, DeleteNeedAttachmentAction $action): RedirectResponse
+    public function destroy(NeedAttachment $attachment, NeedProposalEngine $engine): RedirectResponse
     {
-        $this->authorize('update', $attachment->need);
-
-        $action->execute($attachment);
+        $this->authorize('delete', $attachment);
+        $engine->deleteAttachment($attachment);
 
         return back()->with('success', 'Lampiran berhasil dihapus.');
     }

@@ -1,23 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Database\Factories\KpiGroupFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[Fillable([
+    'name',
+    'description',
+    'start_year',
+    'end_year',
+    'is_active',
+])]
 class KpiGroup extends Model
 {
     /** @use HasFactory<KpiGroupFactory> */
     use HasFactory;
-
-    protected $fillable = [
-        'name',
-        'description',
-        'start_year',
-        'end_year',
-        'is_active',
-    ];
 
     protected $casts = [
         'is_active' => 'boolean',
@@ -25,7 +28,7 @@ class KpiGroup extends Model
         'end_year' => 'integer',
     ];
 
-    public function indicators()
+    public function indicators(): HasMany
     {
         return $this->hasMany(KpiIndicator::class, 'group_id');
     }

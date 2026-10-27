@@ -1,29 +1,19 @@
-import { Head, router } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import { toast } from 'sonner';
+import { Head } from '@inertiajs/react';
+import { RiAddLine } from '@remixicon/react';
 
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
-
-import { useDataTable } from '@/hooks/use-data-table';
+import { getNeedTypeColumns } from '@/features/need-type/components/need-type-columns';
+import { NeedTypeDialog } from '@/features/need-type/components/need-type-dialog';
+import type {
+  NeedType,
+  PaginatedNeedTypes,
+} from '@/features/need-type/types/need-type.types';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import { usePermission } from '@/hooks/use-permission';
+import { useResourceIndexController } from '@/hooks/use-resource-index-controller';
 import needTypeRoutes from '@/routes/need-types';
-import { getColumns } from './columns';
-import type { NeedType } from './columns';
-import { NeedTypeDialog } from './need-type-dialog';
-
-interface PaginatedNeedTypes {
-  data: NeedType[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-  from: number | null;
-  to: number | null;
-}
 
 interface NeedTypesIndexProps {
   needTypes: PaginatedNeedTypes;
@@ -35,53 +25,18 @@ export default function NeedTypesIndex({
   filters,
 }: NeedTypesIndexProps) {
   const { hasPermission } = usePermission();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingNeedType, setEditingNeedType] = useState<NeedType | null>(null);
-  const [deletingNeedType, setDeletingNeedType] = useState<NeedType | null>(
-    null,
-  );
-  const [isDeleting, setIsDeleting] = useState(false);
 
-  // Use useDataTable to handle server-side state via Inertia URL updates
-  const { onSearch, onSort, onPageChange, onPerPageChange, onReset } =
-    useDataTable({
-      only: ['needTypes', 'filters'],
-    });
-
-  const onEdit = (needType: NeedType) => {
-    setEditingNeedType(needType);
-    setDialogOpen(true);
-  };
-
-  const onCreate = () => {
-    setEditingNeedType(null);
-    setDialogOpen(true);
-  };
-
-  const onDelete = (needType: NeedType) => {
-    setDeletingNeedType(needType);
-  };
-
-  const handleConfirmDelete = () => {
-    if (!deletingNeedType) {
-      return;
-    }
-
-    setIsDeleting(true);
-
-    router.delete(
-      needTypeRoutes.destroy.url({
-        need_type: deletingNeedType.id,
-      }),
-      {
-        onSuccess: () => {
-          toast.success('Kategori kebutuhan berhasil dihapus.');
-          setDeletingNeedType(null);
-        },
-        onFinish: () => setIsDeleting(false),
-      },
-    );
-  };
+  const controller = useResourceIndexController<NeedType>({
+    data: needTypes,
+    filters,
+    only: ['needTypes', 'filters'],
+    resourceName: 'Kategori kebutuhan',
+    deleteUrl: (needType) =>
+      needTypeRoutes.destroy.url({ need_type: needType.id }),
+    getColumns: ({ onEdit, onDelete }) =>
+      getNeedTypeColumns(onEdit, onDelete, hasPermission),
+    searchPlaceholder: 'Cari berdasarkan nama atau kode...',
+  });
 
   return (
     <>
@@ -98,46 +53,32 @@ export default function NeedTypesIndex({
             </p>
           </div>
           {hasPermission('create need-types') && (
-            <Button onClick={onCreate}>
-              <Plus className="mr-2 h-4 w-4" />
+            <Button onClick={controller.dialog.openCreate}>
+              <RiAddLine data-icon="inline-start" />
               Tambah Jenis
             </Button>
           )}
         </div>
 
-        <DataTable
-          columns={useMemo(
-            () => getColumns(onEdit, onDelete, hasPermission),
-            [hasPermission],
-          )}
-          data={needTypes.data}
-          meta={needTypes}
-          filters={filters}
-          onSearch={onSearch}
-          onSort={onSort}
-          onPageChange={onPageChange}
-          onPerPageChange={onPerPageChange}
-          onReset={onReset}
-          searchPlaceholder="Cari berdasarkan nama atau kode..."
-        />
+        <DataTable {...controller.tableProps} />
       </div>
 
       <NeedTypeDialog
-        key={editingNeedType?.id ?? 'new'}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        needType={editingNeedType}
+        key={controller.dialog.editingItem?.id ?? 'new'}
+        open={controller.dialog.isOpen}
+        onOpenChange={controller.dialog.setIsOpen}
+        needType={controller.dialog.editingItem}
       />
 
       <ConfirmDialog
-        open={!!deletingNeedType}
-        onOpenChange={(open) => !open && setDeletingNeedType(null)}
-        onConfirm={handleConfirmDelete}
+        open={controller.deleteDialog.isOpen}
+        onOpenChange={controller.deleteDialog.setIsOpen}
+        onConfirm={controller.deleteDialog.confirmDelete}
         title="Hapus Kategori Kebutuhan"
-        description={`Apakah Anda yakin ingin menghapus "${deletingNeedType?.name}"? Data yang dihapus akan dipindahkan ke tempat sampah (Soft Delete).`}
+        description={`Apakah Anda yakin ingin menghapus "${controller.deleteDialog.deletingItem?.name}"? Data yang dihapus akan dipindahkan ke tempat sampah (Soft Delete).`}
         confirmText="Hapus"
         variant="destructive"
-        loading={isDeleting}
+        loading={controller.deleteDialog.isDeleting}
       />
     </>
   );

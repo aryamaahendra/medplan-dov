@@ -59,6 +59,8 @@ class NeedDetail extends Model
 
     /**
      * Get the funding sources for this detail.
+     *
+     * @return BelongsToMany<FundingSource, $this>
      */
     public function fundingSources(): BelongsToMany
     {

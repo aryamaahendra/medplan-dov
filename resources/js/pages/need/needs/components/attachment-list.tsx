@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { PaperclipIcon } from 'lucide-react';
+import { RiAttachmentLine } from '@remixicon/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import NeedAttachmentController from '@/actions/App/Http/Controllers/Need/NeedAttachmentController';
@@ -125,7 +125,7 @@ export function AttachmentList({
         )
       ) : (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <PaperclipIcon className="mb-4 h-12 w-12 text-muted-foreground/20" />
+          <RiAttachmentLine className="mb-4 h-12 w-12 text-muted-foreground/20" />
           <p className="font-medium text-muted-foreground">
             Belum ada lampiran.
           </p>

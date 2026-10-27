@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Database\Factories\OrganizationalUnitFactory;
@@ -16,8 +18,17 @@ class OrganizationalUnit extends Model
     /** @use HasFactory<OrganizationalUnitFactory> */
     use HasFactory, SoftDeletes;
 
+    protected function casts(): array
+    {
+        return [
+            'parent_id' => 'integer',
+        ];
+    }
+
     /**
      * Get the parent unit.
+     *
+     * @return BelongsTo<OrganizationalUnit, $this>
      */
     public function parent(): BelongsTo
     {
@@ -26,6 +37,8 @@ class OrganizationalUnit extends Model
 
     /**
      * Get all parent units recursively.
+     *
+     * @return BelongsTo<OrganizationalUnit, $this>
      */
     public function parentsRecursive(): BelongsTo
     {
@@ -34,6 +47,8 @@ class OrganizationalUnit extends Model
 
     /**
      * Get the sub-units.
+     *
+     * @return HasMany<OrganizationalUnit, $this>
      */
     public function children(): HasMany
     {
@@ -42,10 +57,32 @@ class OrganizationalUnit extends Model
 
     /**
      * Get all child units recursively.
+     *
+     * @return HasMany<OrganizationalUnit, $this>
      */
     public function descendantsRecursive(): HasMany
     {
         return $this->children()->with('descendantsRecursive');
+    }
+
+    /**
+     * Get users assigned to this unit.
+     *
+     * @return HasMany<User, $this>
+     */
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class, 'organizational_unit_id');
+    }
+
+    /**
+     * Get needs assigned to this unit.
+     *
+     * @return HasMany<Need, $this>
+     */
+    public function needs(): HasMany
+    {
+        return $this->hasMany(Need::class, 'organizational_unit_id');
     }
 
     /**

@@ -22,7 +22,7 @@ export default function AuthSimpleLayout({
               </div>
               <div className="flex flex-col">
                 <span className="font-semibold">MEDPLAN ─ GOV</span>
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-xss text-muted-foreground">
                   RSUD KABELOTA DONGGALA
                 </span>
               </div>

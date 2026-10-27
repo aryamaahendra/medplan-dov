@@ -5,7 +5,7 @@ namespace App\Policies;
 use App\Models\Renstra;
 use App\Models\User;
 
-class RenstraPolicy
+final class RenstraPolicy
 {
     public function before(User $user): ?bool
     {

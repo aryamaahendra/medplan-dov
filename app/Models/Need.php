@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\Impact;
 use App\Enums\Urgency;
 use Database\Factories\NeedFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,6 +20,7 @@ use Illuminate\Support\Facades\Storage;
 
 #[Fillable([
     'need_group_id',
+    'source_need_id',
     'organizational_unit_id',
     'need_type_id',
     'year',
@@ -35,6 +39,16 @@ use Illuminate\Support\Facades\Storage;
     'checklist_percentage',
     'notes',
     'approved_by_director_at',
+    'is_locked',
+    'locked_at',
+    'locked_by_user_id',
+    'lock_reason',
+    'unlocked_until',
+    'approved_volume',
+    'approved_unit_price',
+    'approved_total_price',
+    'is_recommended_for_next_cycle',
+    'recommended_volume',
 ])]
 class Need extends Model
 {
@@ -43,14 +57,20 @@ class Need extends Model
 
     public const STATUS_DRAFT = 'draft';
 
+    public const STATUS_SUBMITTED = 'submitted';
+
     public const STATUS_APPROVED = 'approved';
 
     public const STATUS_REJECTED = 'rejected';
 
+    public const STATUS_REVISION = 'revision';
+
     public const STATUSES = [
         self::STATUS_DRAFT,
+        self::STATUS_SUBMITTED,
         self::STATUS_APPROVED,
         self::STATUS_REJECTED,
+        self::STATUS_REVISION,
     ];
 
     protected function casts(): array
@@ -65,6 +85,14 @@ class Need extends Model
             'impact' => Impact::class,
             'checklist_percentage' => 'decimal:2',
             'approved_by_director_at' => 'datetime',
+            'is_locked' => 'boolean',
+            'locked_at' => 'datetime',
+            'unlocked_until' => 'datetime',
+            'approved_volume' => 'decimal:4',
+            'approved_unit_price' => 'decimal:2',
+            'approved_total_price' => 'decimal:2',
+            'is_recommended_for_next_cycle' => 'boolean',
+            'recommended_volume' => 'decimal:4',
         ];
     }
 
@@ -82,6 +110,144 @@ class Need extends Model
     public function needGroup(): BelongsTo
     {
         return $this->belongsTo(NeedGroup::class);
+    }
+
+    /**
+     * Get the source need from which this need was rolled over.
+     */
+    public function sourceNeed(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'source_need_id');
+    }
+
+    /**
+     * Get the needs rolled over from this need.
+     */
+    public function rolloverNeeds(): HasMany
+    {
+        return $this->hasMany(self::class, 'source_need_id');
+    }
+
+    /**
+     * Get the user who locked this need.
+     */
+    public function lockedByUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'locked_by_user_id');
+    }
+
+    /**
+     * Resolve the lock status and optional reason based on the system precedence hierarchy:
+     * 1. Super Admin Bypass
+     * 2. Temporary Extension Override (unlocked_until > now())
+     * 3. Explicit Manual Override (is_locked === false or is_locked === true)
+     * 4. Director Approval Trigger (approved_by_director_at IS NOT NULL)
+     * 5. Need Group Submission Window
+     *
+     * @return array{is_locked: bool, reason: ?string}
+     */
+    public function resolveLockStatus(?User $user = null): array
+    {
+        if ($user && $user->hasRole('super-admin')) {
+            return ['is_locked' => false, 'reason' => null];
+        }
+
+        if ($this->unlocked_until !== null && $this->unlocked_until->isFuture()) {
+            return ['is_locked' => false, 'reason' => $this->lock_reason];
+        }
+
+        if ($this->is_locked === false) {
+            return ['is_locked' => false, 'reason' => $this->lock_reason];
+        }
+
+        if ($this->approved_by_director_at !== null) {
+            return [
+                'is_locked' => true,
+                'reason' => $this->lock_reason ?: 'Usulan telah disetujui oleh Direktur.',
+            ];
+        }
+
+        if ($this->status === self::STATUS_SUBMITTED) {
+            return [
+                'is_locked' => true,
+                'reason' => $this->lock_reason ?: 'Usulan sedang dalam proses review eksekutif.',
+            ];
+        }
+        if ($this->status === self::STATUS_REJECTED) {
+            return [
+                'is_locked' => true,
+                'reason' => $this->lock_reason ?: 'Usulan telah ditolak oleh Direktur.',
+            ];
+        }
+
+        if ($this->is_locked === true) {
+            return [
+                'is_locked' => true,
+                'reason' => $this->lock_reason ?: 'Usulan dikunci secara manual oleh perencana.',
+            ];
+        }
+
+        $needGroup = $this->needGroup;
+        if ($needGroup && ! $needGroup->isOpenForSubmission()) {
+            if ($this->lock_reason) {
+                return ['is_locked' => true, 'reason' => $this->lock_reason];
+            }
+
+            $status = $needGroup->getSubmissionWindowStatus();
+            $reason = $status === 'upcoming'
+                ? 'Periode pengajuan usulan kebutuhan untuk kelompok ini belum dibuka.'
+                : 'Periode pengajuan usulan kebutuhan untuk kelompok ini telah ditutup.';
+
+            return ['is_locked' => true, 'reason' => $reason];
+        }
+
+        return ['is_locked' => false, 'reason' => $this->lock_reason];
+    }
+
+    /**
+     * Determine whether the need is locked for the given user.
+     */
+    public function isLocked(?User $user = null): bool
+    {
+        return $this->resolveLockStatus($user)['is_locked'];
+    }
+
+    /**
+     * Get the descriptive lock reason for this need.
+     */
+    public function getEffectiveLockReason(?User $user = null): ?string
+    {
+        return $this->resolveLockStatus($user)['reason'];
+    }
+
+    /**
+     * Determine whether the need has an explicit manual lock override.
+     */
+    public function isExplicitlyLocked(): bool
+    {
+        return $this->is_locked === true;
+    }
+
+    /**
+     * Get the workflow stage for this need.
+     * Returns one of: 'draft' | 'submitted' | 'approved' | 'rejected' | 'revision'
+     */
+    public function getWorkflowStage(): string
+    {
+        if (in_array($this->status, [
+            self::STATUS_SUBMITTED,
+            self::STATUS_REJECTED,
+            self::STATUS_REVISION,
+            self::STATUS_APPROVED,
+        ], true)) {
+            return $this->status;
+        }
+
+        if ($this->approved_by_director_at !== null) {
+            return self::STATUS_APPROVED;
+        }
+
+        return self::STATUS_DRAFT;
     }
 
     /**
@@ -142,6 +308,8 @@ class Need extends Model
 
     /**
      * Get the detail/proposal information for this need.
+     *
+     * @return HasOne<NeedDetail, $this>
      */
     public function detail(): HasOne
     {
@@ -158,6 +326,8 @@ class Need extends Model
 
     /**
      * Get the attachments for this need.
+     *
+     * @return HasMany<NeedAttachment, $this>
      */
     public function attachments(): HasMany
     {
@@ -167,7 +337,7 @@ class Need extends Model
     /**
      * Scope a query to only include needs the user is authorized to see in index.
      */
-    public function scopeIndexScope($query, User $user)
+    public function scopeIndexScope(Builder $query, User $user): Builder
     {
         if ($user->hasAnyRole(['super-admin', 'admin', 'planner'])) {
             return $query;
@@ -177,14 +347,101 @@ class Need extends Model
     }
 
     /**
+     * Scope a query to include proposals currently under review (unified status submitted,
+     * or legacy approved with null director timestamp).
+     */
+    public function scopeUnderReview(Builder $query): Builder
+    {
+        return $query->where(function (Builder $q): void {
+            $q->where('status', self::STATUS_SUBMITTED)
+                ->orWhere(function (Builder $legacy): void {
+                    $legacy->where('status', self::STATUS_APPROVED)
+                        ->whereNull('approved_by_director_at');
+                });
+        });
+    }
+
+    /**
+     * Scope a query to include proposals eligible for rollover into a target group.
+     */
+    public function scopeEligibleForRollover(Builder $query, ?int $targetGroupId = null): Builder
+    {
+        $query->where(function (Builder $q): void {
+            $q->where(function (Builder $unapproved): void {
+                $unapproved->whereNull('approved_by_director_at')
+                    ->where('status', '!=', self::STATUS_REJECTED);
+            })->orWhere(function (Builder $sub): void {
+                $sub->where('is_recommended_for_next_cycle', true)
+                    ->where('recommended_volume', '>', 0);
+            });
+        });
+
+        if ($targetGroupId !== null && $targetGroupId > 0) {
+            $query->where('need_group_id', '!=', $targetGroupId)
+                ->whereDoesntHave('rolloverNeeds', function (Builder $q) use ($targetGroupId): void {
+                    $q->where('need_group_id', $targetGroupId);
+                });
+        }
+
+        return $query;
+    }
+
+    /**
+     * Scope a query to unapproved candidate needs eligible for rollover into a target need group.
+     */
+    public function scopeUnapprovedCandidates(Builder $query, ?int $targetGroupId, User $user): Builder
+    {
+        $this->scopeEligibleForRollover($query, $targetGroupId);
+
+        if (! $user->hasAnyRole(['super-admin', 'admin', 'planner']) && ! $user->can('view any needs') && ! $user->can('create any needs')) {
+            if (($user->can('view descendant needs') || $user->can('create descendant needs')) && $user->organizational_unit_id) {
+                /** @var OrganizationalUnit|null $unit */
+                $unit = $user->organizationalUnit;
+                if ($unit) {
+                    $unit->loadMissing('descendantsRecursive');
+                    $allowedIds = [$unit->id];
+                    $collectDescendants = function (OrganizationalUnit $u) use (&$collectDescendants, &$allowedIds): void {
+                        /** @var OrganizationalUnit $descendant */
+                        foreach ($u->descendantsRecursive as $descendant) {
+                            $allowedIds[] = $descendant->id;
+                            $collectDescendants($descendant);
+                        }
+                    };
+                    $collectDescendants($unit);
+                    $query->whereIn('organizational_unit_id', array_unique($allowedIds));
+                } else {
+                    $query->where('organizational_unit_id', $user->organizational_unit_id);
+                }
+            } else {
+                $query->where('organizational_unit_id', $user->organizational_unit_id);
+            }
+        }
+
+        return $query;
+    }
+
+    /**
+     * Get the effective requested volume for rollover into a new planning cycle.
+     */
+    public function getEffectiveRolloverVolume(): float
+    {
+        if ($this->is_recommended_for_next_cycle && $this->recommended_volume !== null && (float) $this->recommended_volume > 0) {
+            return (float) $this->recommended_volume;
+        }
+
+        return (float) $this->volume;
+    }
+
+    /**
      * The "booted" method of the model.
      */
     protected static function booted(): void
     {
         static::deleting(function (Need $need) {
             if ($need->isForceDeleting()) {
+                $disk = (string) config('filesystems.attachments_disk', config('filesystems.default', 'local'));
                 foreach ($need->attachments as $attachment) {
-                    Storage::disk('local')->delete($attachment->file_path);
+                    Storage::disk($disk)->delete($attachment->file_path);
                 }
             }
         });

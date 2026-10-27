@@ -50,6 +50,7 @@ class HandleInertiaRequests extends Middleware
                 ->select(['id', 'name', 'year'])
                 ->orderByDesc('year')
                 ->get(),
+            'enableDevTools' => (bool) config('app.enable_dev_tools', false),
         ];
     }
 }

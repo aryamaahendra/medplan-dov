@@ -1,21 +1,24 @@
 {
-    "agents": [
-        "opencode"
-    ],
+    "agents": ["opencode", "antigravity"],
+    "cloud": false,
     "guidelines": true,
     "mcp": true,
-    "nightwatch_mcp": false,
-    "packages": [
-        "spatie/laravel-permission"
-    ],
+    "nightwatch": false,
+    "packages": ["spatie/laravel-permission", "maatwebsite/excel"],
     "sail": true,
     "skills": [
+        "infer-conventions",
         "fortify-development",
         "laravel-best-practices",
+        "testing-best-practices",
+        "octane-development",
         "wayfinder-development",
-        "pest-testing",
         "inertia-react-development",
         "tailwindcss-development",
-        "laravel-permission-development"
+        "laravel-excel",
+        "laravel-permission-development",
+        "laravel-specialist",
+        "laravel-tdd",
+        "project-structure"
     ]
 }

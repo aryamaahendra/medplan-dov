@@ -7,6 +7,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
+beforeEach(function () {
+    $this->user = User::factory()->create();
+    $this->user->assignRole('super-admin');
+    $this->actingAs($this->user);
+});
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function validTujuanPayload(Renstra $renstra, array $overrides = []): array
@@ -21,6 +27,7 @@ function validTujuanPayload(Renstra $renstra, array $overrides = []): array
 // ─── Auth Guard ───────────────────────────────────────────────────────────────
 
 test('guest cannot create, update, or delete tujuans', function () {
+    auth()->logout();
     $tujuan = Tujuan::factory()->create();
 
     $this->post(route('tujuans.store'), ['name' => 'Test Tujuan'])
@@ -36,13 +43,11 @@ test('guest cannot create, update, or delete tujuans', function () {
 // ─── Store ────────────────────────────────────────────────────────────────────
 
 test('store creates a new tujuan', function () {
-    $user = User::factory()->create();
     $renstra = Renstra::factory()->create();
 
     $payload = validTujuanPayload($renstra);
 
-    $this->actingAs($user)
-        ->from(route('renstras.show', $renstra))
+    $this->from(route('renstras.show', $renstra))
         ->post(route('tujuans.store'), $payload)
         ->assertRedirect(route('renstras.show', $renstra))
         ->assertSessionHas('success', 'Tujuan berhasil dibuat.');
@@ -55,10 +60,7 @@ test('store creates a new tujuan', function () {
 });
 
 test('store validates required fields', function () {
-    $user = User::factory()->create();
-
-    $this->actingAs($user)
-        ->post(route('tujuans.store'), [])
+    $this->post(route('tujuans.store'), [])
         ->assertSessionHasErrors([
             'renstra_id',
             'name',
@@ -68,7 +70,6 @@ test('store validates required fields', function () {
 // ─── Update ───────────────────────────────────────────────────────────────────
 
 test('update modifies an existing tujuan', function () {
-    $user = User::factory()->create();
     $renstra = Renstra::factory()->create();
 
     $tujuan = Tujuan::factory()->create([
@@ -80,8 +81,7 @@ test('update modifies an existing tujuan', function () {
         'name' => 'Tujuan Baru',
     ]);
 
-    $this->actingAs($user)
-        ->from(route('renstras.show', $renstra))
+    $this->from(route('renstras.show', $renstra))
         ->put(route('tujuans.update', $tujuan), $payload)
         ->assertRedirect(route('renstras.show', $renstra))
         ->assertSessionHas('success', 'Tujuan berhasil diperbarui.');
@@ -90,11 +90,9 @@ test('update modifies an existing tujuan', function () {
 });
 
 test('update validates required fields', function () {
-    $user = User::factory()->create();
     $tujuan = Tujuan::factory()->create();
 
-    $this->actingAs($user)
-        ->put(route('tujuans.update', $tujuan), [])
+    $this->put(route('tujuans.update', $tujuan), [])
         ->assertSessionHasErrors([
             'renstra_id',
             'name',
@@ -104,16 +102,14 @@ test('update validates required fields', function () {
 // ─── Destroy ─────────────────────────────────────────────────────────────────
 
 test('destroy deletes a tujuan', function () {
-    $user = User::factory()->create();
     $tujuan = Tujuan::factory()->create();
 
-    $this->assertDatabaseHas('tujuans', ['id' => $tujuan->id]);
+    $this->assertModelExists($tujuan);
 
-    $this->actingAs($user)
-        ->from(route('renstras.show', $tujuan->renstra))
+    $this->from(route('renstras.show', $tujuan->renstra))
         ->delete(route('tujuans.destroy', $tujuan))
         ->assertRedirect(route('renstras.show', $tujuan->renstra))
         ->assertSessionHas('success', 'Tujuan berhasil dihapus.');
 
-    $this->assertDatabaseMissing('tujuans', ['id' => $tujuan->id]);
+    $this->assertModelMissing($tujuan);
 });

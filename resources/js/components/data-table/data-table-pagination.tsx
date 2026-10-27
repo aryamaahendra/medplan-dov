@@ -1,9 +1,9 @@
 import {
-  ChevronFirstIcon,
-  ChevronLastIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from 'lucide-react';
+  RiArrowLeftDoubleLine,
+  RiArrowRightDoubleLine,
+  RiArrowLeftSLine,
+  RiArrowRightSLine,
+} from '@remixicon/react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -51,7 +51,7 @@ export function DataTablePagination({
             value={String(per_page)}
             onValueChange={(value) => onPerPageChange(Number(value))}
           >
-            <SelectTrigger className="h-8 w-[70px]">
+            <SelectTrigger className="w-[70px]">
               <SelectValue placeholder={String(per_page)} />
             </SelectTrigger>
             <SelectContent side="top">
@@ -71,39 +71,41 @@ export function DataTablePagination({
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            className="hidden size-8 p-0 lg:flex"
+            size="icon"
+            className="hidden lg:flex"
             onClick={() => onPageChange(1)}
             disabled={current_page === 1}
           >
             <span className="sr-only">Go to first page</span>
-            <ChevronFirstIcon className="size-4" />
+            <RiArrowLeftDoubleLine />
           </Button>
           <Button
             variant="outline"
-            className="size-8 p-0"
+            size="icon"
             onClick={() => onPageChange(current_page - 1)}
             disabled={current_page === 1}
           >
             <span className="sr-only">Go to previous page</span>
-            <ChevronLeftIcon className="size-4" />
+            <RiArrowLeftSLine />
           </Button>
           <Button
             variant="outline"
-            className="size-8 p-0"
+            size="icon"
             onClick={() => onPageChange(current_page + 1)}
             disabled={current_page === last_page}
           >
             <span className="sr-only">Go to next page</span>
-            <ChevronRightIcon className="size-4" />
+            <RiArrowRightSLine />
           </Button>
           <Button
             variant="outline"
-            className="hidden size-8 p-0 lg:flex"
+            size="icon"
+            className="hidden lg:flex"
             onClick={() => onPageChange(last_page)}
             disabled={current_page === last_page}
           >
             <span className="sr-only">Go to last page</span>
-            <ChevronLastIcon className="size-4" />
+            <RiArrowRightDoubleLine />
           </Button>
         </div>
       </div>

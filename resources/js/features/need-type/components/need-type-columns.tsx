@@ -1,0 +1,99 @@
+import { RiEdit2Line, RiDeleteBinLine } from '@remixicon/react';
+import type { ColumnDef } from '@tanstack/react-table';
+
+import type { ActionItem } from '@/components/action-dropdown';
+import { ActionDropdown } from '@/components/action-dropdown';
+import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
+import { getIndexColumn } from '@/components/data-table/data-table-index-column';
+import { Badge } from '@/components/ui/badge';
+import { formatDate } from '@/lib/formatters';
+import type { NeedType } from '../types/need-type.types';
+
+export const getNeedTypeColumns = (
+  onEdit: (type: NeedType) => void,
+  onDelete: (type: NeedType) => void,
+  hasPermission: (permission: string) => boolean,
+): ColumnDef<NeedType>[] => [
+  getIndexColumn(),
+  {
+    accessorKey: 'name',
+    header: (props) => <DataTableColumnHeader {...props} title="Nama" />,
+    meta: {
+      cellClassName: 'font-medium',
+    },
+  },
+  {
+    accessorKey: 'code',
+    header: (props) => <DataTableColumnHeader {...props} title="Kode" />,
+    meta: {
+      cellClassName: 'font-mono text-sm',
+    },
+  },
+  {
+    accessorKey: 'description',
+    header: (props) => <DataTableColumnHeader {...props} title="Deskripsi" />,
+    cell: ({ row }) => row.original.description || '-',
+  },
+  {
+    accessorKey: 'is_active',
+    header: (props) => <DataTableColumnHeader {...props} title="Status" />,
+    cell: ({ row }) => (
+      <Badge variant={row.original.is_active ? 'default' : 'secondary'}>
+        {row.original.is_active ? 'Aktif' : 'Nonaktif'}
+      </Badge>
+    ),
+  },
+  {
+    accessorKey: 'order_column',
+    header: (props) => <DataTableColumnHeader {...props} title="Urutan" />,
+    meta: {
+      cellClassName: 'text-center',
+    },
+  },
+  {
+    accessorKey: 'created_at',
+    header: (props) => <DataTableColumnHeader {...props} title="Dibuat" />,
+    cell: ({ row }) =>
+      formatDate(row.getValue('created_at'), {
+        day: '2-digit',
+      }),
+  },
+  {
+    id: 'actions',
+    meta: {
+      cellClassName: 'w-1',
+    },
+    cell: ({ row }) => {
+      const type = row.original;
+
+      const actions: (ActionItem | 'separator')[] = [];
+
+      if (hasPermission('update need-types')) {
+        actions.push({
+          label: 'Edit',
+          icon: RiEdit2Line,
+          onClick: () => onEdit(type),
+        });
+      }
+
+      if (hasPermission('delete need-types')) {
+        if (actions.length > 0) {
+          actions.push('separator');
+        }
+
+        actions.push({
+          label: 'Hapus',
+          icon: RiDeleteBinLine,
+          onClick: () => onDelete(type),
+          variant: 'destructive',
+        });
+      }
+
+      if (actions.length === 0) {
+        return null;
+      }
+
+      return <ActionDropdown actions={actions} />;
+    },
+  },
+];

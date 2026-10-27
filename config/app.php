@@ -43,6 +43,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Developer Tools / Showcase Mode
+    |--------------------------------------------------------------------------
+    |
+    | Controls whether developer tools, showcases, and design system pages
+    | are displayed in the application sidebar and accessible.
+    |
+    */
+
+    'enable_dev_tools' => (bool) env('ENABLE_DEV_TOOLS', env('APP_ENV') === 'local'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application URL
     |--------------------------------------------------------------------------
     |
@@ -65,7 +77,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => env('APP_TIMEZONE', 'Asia/Makassar'),
 
     /*
     |--------------------------------------------------------------------------

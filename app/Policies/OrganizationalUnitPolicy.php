@@ -5,7 +5,7 @@ namespace App\Policies;
 use App\Models\OrganizationalUnit;
 use App\Models\User;
 
-class OrganizationalUnitPolicy
+final class OrganizationalUnitPolicy
 {
     /**
      * Perform pre-authorization checks.
@@ -60,7 +60,7 @@ class OrganizationalUnitPolicy
      */
     public function restore(User $user, OrganizationalUnit $organizationalUnit): bool
     {
-        return false;
+        return $user->hasPermissionTo('restore org-units');
     }
 
     /**
@@ -68,6 +68,6 @@ class OrganizationalUnitPolicy
      */
     public function forceDelete(User $user, OrganizationalUnit $organizationalUnit): bool
     {
-        return false;
+        return $user->hasPermissionTo('force-delete org-units');
     }
 }

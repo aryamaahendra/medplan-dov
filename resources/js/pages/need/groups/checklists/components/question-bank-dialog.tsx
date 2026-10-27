@@ -1,4 +1,9 @@
-import { AlertCircle, CheckCircle2, Plus, XCircle } from 'lucide-react';
+import {
+  RiErrorWarningLine,
+  RiCheckboxCircleLine,
+  RiAddLine,
+  RiCloseCircleLine,
+} from '@remixicon/react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -31,11 +36,9 @@ export function QuestionBankDialog({
 }: QuestionBankDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Plus />
-          Tambah dari Bank
-        </Button>
+      <DialogTrigger render={<Button variant="outline" size="sm" />}>
+        <RiAddLine />
+        Tambah dari Bank
       </DialogTrigger>
       <DialogContent className="flex max-h-[80vh] flex-col sm:max-w-[600px]">
         <DialogHeader>
@@ -47,7 +50,7 @@ export function QuestionBankDialog({
         <div className="flex flex-1 flex-col gap-2 overflow-y-auto py-4 pr-2">
           {availableQuestions.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-8 text-center">
-              <AlertCircle className="mb-2 h-8 w-8 text-muted-foreground" />
+              <RiErrorWarningLine className="mb-2 h-8 w-8 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">
                 Belum ada pertanyaan di bank.
               </p>
@@ -69,7 +72,7 @@ export function QuestionBankDialog({
                       {!q.is_active && (
                         <Badge
                           variant="destructive"
-                          className="h-4 px-1 text-[10px] leading-none"
+                          className="h-4 px-1 text-xss leading-none"
                         >
                           Non-aktif Global
                         </Badge>
@@ -84,14 +87,14 @@ export function QuestionBankDialog({
                   <Button
                     size="sm"
                     variant={isAssigned ? 'ghost' : 'outline'}
-                    className="ml-4 h-8 shrink-0"
+                    className="ml-4 shrink-0"
                     disabled={isAssigned || !q.is_active}
                     onClick={() => onAdd(q)}
                   >
                     {isAssigned ? (
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <RiCheckboxCircleLine className="text-success" />
                     ) : !q.is_active ? (
-                      <XCircle className="h-4 w-4 text-destructive" />
+                      <RiCloseCircleLine className="text-destructive" />
                     ) : (
                       'Pilih'
                     )}

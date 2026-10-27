@@ -1,24 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Planning;
 
 use App\Enums\PlanningActivityType;
 use App\Exports\PlanningHierarchyExport;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Planning\CheckActivityCodeRequest;
+use App\Http\Requests\Planning\ImportPlanningActivitiesRequest;
 use App\Http\Requests\Planning\StorePlanningActivityVersionRequest;
 use App\Http\Requests\Planning\UpdatePlanningActivityVersionRequest;
+use App\Http\Requests\Planning\UpdatePlanningActivityYearRequest;
 use App\Imports\PlanningImport;
 use App\Models\PlanningActivityIndicator;
 use App\Models\PlanningActivityVersion;
 use App\Models\PlanningVersion;
 use App\Traits\HasDataTable;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Throwable;
 
-class PlanningActivityVersionController extends Controller
+final class PlanningActivityVersionController extends Controller
 {
     use HasDataTable;
 
@@ -82,7 +91,7 @@ class PlanningActivityVersionController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(PlanningVersion $planningVersion)
+    public function create(PlanningVersion $planningVersion): Response
     {
         return Inertia::render('planning/activity-versions/create', [
             'version' => $planningVersion,
@@ -101,7 +110,7 @@ class PlanningActivityVersionController extends Controller
     /**
      * Store a newly created snapshot activity.
      */
-    public function store(PlanningVersion $planningVersion, StorePlanningActivityVersionRequest $request)
+    public function store(PlanningVersion $planningVersion, StorePlanningActivityVersionRequest $request): RedirectResponse
     {
         $validated = $request->validated();
         $activity = $planningVersion->activityVersions()->create($validated);
@@ -125,7 +134,7 @@ class PlanningActivityVersionController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(PlanningActivityVersion $planningActivityVersion)
+    public function edit(PlanningActivityVersion $planningActivityVersion): Response
     {
         $planningActivityVersion->load('indicators');
         $version = PlanningVersion::findOrFail($planningActivityVersion->planning_version_id);
@@ -149,38 +158,13 @@ class PlanningActivityVersionController extends Controller
     /**
      * Update the snapshot activity.
      */
-    public function update(PlanningActivityVersion $planningActivityVersion, UpdatePlanningActivityVersionRequest $request)
+    public function update(PlanningActivityVersion $planningActivityVersion, UpdatePlanningActivityVersionRequest $request): RedirectResponse
     {
         $validated = $request->validated();
         $planningActivityVersion->update($validated);
 
         if ($request->has('indicators')) {
-            $existingIndicatorIds = [];
-            foreach ($request->indicators as $indicatorData) {
-                if (empty($indicatorData['name'])) {
-                    continue;
-                }
-
-                if (! empty($indicatorData['id'])) {
-                    $indicator = $planningActivityVersion->indicators()->find($indicatorData['id']);
-                    if ($indicator) {
-                        $indicator->update([
-                            'name' => $indicatorData['name'],
-                            'baseline' => $indicatorData['baseline'] ?? null,
-                            'unit' => $indicatorData['unit'] ?? null,
-                        ]);
-                        $existingIndicatorIds[] = $indicator->id;
-                    }
-                } else {
-                    $newIndicator = $planningActivityVersion->indicators()->create([
-                        'name' => $indicatorData['name'],
-                        'baseline' => $indicatorData['baseline'] ?? null,
-                        'unit' => $indicatorData['unit'] ?? null,
-                    ]);
-                    $existingIndicatorIds[] = $newIndicator->id;
-                }
-            }
-            $planningActivityVersion->indicators()->whereNotIn('id', $existingIndicatorIds)->delete();
+            $this->syncIndicators($planningActivityVersion, (array) $request->indicators);
         } else {
             $planningActivityVersion->indicators()->delete();
         }
@@ -192,7 +176,7 @@ class PlanningActivityVersionController extends Controller
     /**
      * Check if code already exists in the version.
      */
-    public function checkCode(PlanningVersion $planningVersion, Request $request)
+    public function checkCode(PlanningVersion $planningVersion, CheckActivityCodeRequest $request): JsonResponse
     {
         $exists = PlanningActivityVersion::where('planning_version_id', $planningVersion->id)
             ->where('code', $request->code)
@@ -205,7 +189,7 @@ class PlanningActivityVersionController extends Controller
     /**
      * Remove the snapshot activity.
      */
-    public function destroy(PlanningActivityVersion $planningActivityVersion)
+    public function destroy(PlanningActivityVersion $planningActivityVersion): RedirectResponse
     {
         $planningActivityVersion->delete();
 
@@ -216,38 +200,35 @@ class PlanningActivityVersionController extends Controller
     /**
      * Update or create yearly target/budget for an activity or indicator.
      */
-    public function updateYearlyData(Request $request)
+    public function updateYearlyData(PlanningActivityVersion $planningActivityVersion, UpdatePlanningActivityYearRequest $request): RedirectResponse
     {
-        $request->validate([
-            'yearable_id' => 'required|integer',
-            'yearable_type' => 'required|string|in:activity,indicator',
-            'year' => 'required|integer',
-            'target' => 'nullable|string',
-            'budget' => 'nullable|numeric',
-        ]);
+        $validated = $request->validated();
 
-        $modelClass = $request->yearable_type === 'activity'
+        $yearableType = $validated['yearable_type'] ?? 'activity';
+        $yearableId = $validated['yearable_id'] ?? $planningActivityVersion->id;
+
+        $modelClass = $yearableType === 'activity'
             ? PlanningActivityVersion::class
             : PlanningActivityIndicator::class;
 
-        $model = $modelClass::findOrFail($request->yearable_id);
+        $model = $modelClass::findOrFail($yearableId);
 
         $model->activityYears()->updateOrCreate(
-            ['year' => $request->year],
+            ['year' => $validated['year']],
             [
-                'target' => $request->target,
-                'budget' => $request->budget,
+                'target' => $validated['target'] ?? null,
+                'budget' => $validated['budget'] ?? null,
             ]
         );
 
         return redirect()->back()
-            ->with('success', "Data tahun {$request->year} berhasil diperbarui.");
+            ->with('success', "Data tahun {$validated['year']} berhasil diperbarui.");
     }
 
     /**
      * Export planning activities to Excel.
      */
-    public function export(PlanningVersion $planningVersion)
+    public function export(PlanningVersion $planningVersion): BinaryFileResponse
     {
         $fileName = 'Perencanaan_'.str_replace(' ', '_', $planningVersion->name).'_'.date('Ymd_His').'.xlsx';
 
@@ -260,29 +241,62 @@ class PlanningActivityVersionController extends Controller
     /**
      * Import planning activities from Excel.
      */
-    public function import(Request $request, PlanningVersion $planningVersion)
+    public function import(ImportPlanningActivitiesRequest $request, PlanningVersion $planningVersion): RedirectResponse
     {
-        $request->validate([
-            'file' => ['required', 'file', 'mimes:xlsx,xls,ods'],
-            'start_cell' => ['required', 'string'],
-            'end_cell' => ['required', 'string'],
-        ]);
-
         try {
             Excel::import(
                 new PlanningImport(
                     $planningVersion->id,
-                    $request->start_cell,
-                    $request->end_cell
+                    $request->string('start_cell')->toString(),
+                    $request->string('end_cell')->toString()
                 ),
                 $request->file('file')
             );
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->errors());
-        } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['file' => 'Gagal mengimpor file: '.$e->getMessage()]);
+        } catch (Throwable $e) {
+            report($e);
+
+            return redirect()->back()->withErrors(['file' => 'Gagal mengimpor file. Silakan coba lagi atau periksa format file Anda.']);
         }
 
         return redirect()->back()->with('success', 'Data aktivitas perencanaan berhasil diimpor.');
+    }
+
+    /**
+     * Sync indicators for the planning activity version.
+     *
+     * @param  array<int, array<string, mixed>>  $indicators
+     */
+    private function syncIndicators(PlanningActivityVersion $activity, array $indicators): void
+    {
+        $existingIndicatorIds = [];
+
+        foreach ($indicators as $indicatorData) {
+            if (empty($indicatorData['name'])) {
+                continue;
+            }
+
+            if (! empty($indicatorData['id'])) {
+                $indicator = $activity->indicators()->find($indicatorData['id']);
+                if ($indicator) {
+                    $indicator->update([
+                        'name' => $indicatorData['name'],
+                        'baseline' => $indicatorData['baseline'] ?? null,
+                        'unit' => $indicatorData['unit'] ?? null,
+                    ]);
+                    $existingIndicatorIds[] = $indicator->id;
+                }
+            } else {
+                $newIndicator = $activity->indicators()->create([
+                    'name' => $indicatorData['name'],
+                    'baseline' => $indicatorData['baseline'] ?? null,
+                    'unit' => $indicatorData['unit'] ?? null,
+                ]);
+                $existingIndicatorIds[] = $newIndicator->id;
+            }
+        }
+
+        $activity->indicators()->whereNotIn('id', $existingIndicatorIds)->delete();
     }
 }

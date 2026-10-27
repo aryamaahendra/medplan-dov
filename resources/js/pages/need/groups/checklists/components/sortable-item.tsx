@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Trash2 } from 'lucide-react';
+import { RiDraggable, RiDeleteBinLine } from '@remixicon/react';
 
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -62,7 +62,7 @@ export function SortableItem({
           {...attributes}
           {...listeners}
         >
-          <GripVertical className="h-5 w-5" />
+          <RiDraggable className="h-5 w-5" />
         </button>
 
         <div className="flex items-center gap-6">
@@ -100,7 +100,7 @@ export function SortableItem({
             className="text-muted-foreground hover:text-destructive"
             onClick={() => onRemove(question.id)}
           >
-            <Trash2 className="h-4 w-4" />
+            <RiDeleteBinLine />
           </Button>
         </div>
       </div>

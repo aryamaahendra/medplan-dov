@@ -12,6 +12,7 @@ describe('KpiIndicatorController', function () {
 
     beforeEach(function () {
         $this->user = User::factory()->create();
+        $this->user->assignRole('super-admin');
         $this->actingAs($this->user);
         $this->group = KpiGroup::factory()->create([
             'start_year' => 2025,
@@ -97,6 +98,6 @@ describe('KpiIndicatorController', function () {
         $response = $this->delete(route('kpis.indicators.destroy', $indicator));
 
         $response->assertSessionHasNoErrors();
-        $this->assertDatabaseMissing('kpi_indicators', ['id' => $indicator->id]);
+        $this->assertModelMissing($indicator);
     });
 });

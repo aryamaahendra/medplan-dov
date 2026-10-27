@@ -1,32 +1,20 @@
-import { Head, router } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import { toast } from 'sonner';
+import { Head } from '@inertiajs/react';
+import { RiAddLine } from '@remixicon/react';
 
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
-import { useDataTable } from '@/hooks/use-data-table';
+import { getColumns } from '@/features/renstra/components/renstra-columns';
+import { RenstraDialog } from '@/features/renstra/components/renstra-dialog';
 import type { DataTableFilters } from '@/hooks/use-data-table';
 import { usePermission } from '@/hooks/use-permission';
+import { useResourceIndexController } from '@/hooks/use-resource-index-controller';
+import type { PaginatedData } from '@/hooks/use-resource-index-controller';
 import renstraRoutes from '@/routes/renstras';
 import type { Renstra } from '@/types';
 
-import { getColumns } from './columns';
-import { RenstraDialog } from './renstra-dialog';
-
-interface PaginatedRenstras {
-  data: Renstra[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-  from: number | null;
-  to: number | null;
-}
-
 interface RenstrasIndexProps {
-  renstras: PaginatedRenstras;
+  renstras: PaginatedData<Renstra>;
   filters: DataTableFilters;
 }
 
@@ -35,43 +23,17 @@ export default function RenstrasIndex({
   filters,
 }: RenstrasIndexProps) {
   const { hasPermission } = usePermission();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingRenstra, setEditingRenstra] = useState<Renstra | null>(null);
-  const [deletingRenstra, setDeletingRenstra] = useState<Renstra | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
 
-  const { onSearch, onSort, onPageChange, onPerPageChange, onReset } =
-    useDataTable({ only: ['renstras', 'filters'] });
-
-  const onEdit = (renstra: Renstra) => {
-    setEditingRenstra(renstra);
-    setDialogOpen(true);
-  };
-
-  const onCreate = () => {
-    setEditingRenstra(null);
-    setDialogOpen(true);
-  };
-
-  const onDelete = (renstra: Renstra) => {
-    setDeletingRenstra(renstra);
-  };
-
-  const handleConfirmDelete = () => {
-    if (!deletingRenstra) {
-      return;
-    }
-
-    setIsDeleting(true);
-
-    router.delete(renstraRoutes.destroy.url({ renstra: deletingRenstra.id }), {
-      onSuccess: () => {
-        toast.success('Renstra berhasil dihapus.');
-        setDeletingRenstra(null);
-      },
-      onFinish: () => setIsDeleting(false),
-    });
-  };
+  const controller = useResourceIndexController<Renstra>({
+    data: renstras,
+    filters,
+    only: ['renstras', 'filters'],
+    resourceName: 'Renstra',
+    deleteUrl: (renstra) => renstraRoutes.destroy.url({ renstra: renstra.id }),
+    getColumns: ({ onEdit, onDelete }) =>
+      getColumns(onEdit, onDelete, hasPermission),
+    searchPlaceholder: 'Cari renstra...',
+  });
 
   return (
     <>
@@ -89,46 +51,32 @@ export default function RenstrasIndex({
             </p>
           </div>
           {hasPermission('create renstras') && (
-            <Button onClick={onCreate}>
-              <Plus className="h-4 w-4" />
+            <Button onClick={controller.dialog.openCreate}>
+              <RiAddLine data-icon="inline-start" />
               Tambah Renstra
             </Button>
           )}
         </div>
 
-        <DataTable
-          columns={useMemo(
-            () => getColumns(onEdit, onDelete, hasPermission),
-            [hasPermission],
-          )}
-          data={renstras.data}
-          meta={renstras}
-          filters={filters}
-          onSearch={onSearch}
-          onSort={onSort}
-          onPageChange={onPageChange}
-          onPerPageChange={onPerPageChange}
-          onReset={onReset}
-          searchPlaceholder="Cari renstra..."
-        />
+        <DataTable {...controller.tableProps} />
       </div>
 
       <RenstraDialog
-        key={editingRenstra?.id ?? 'new'}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        renstra={editingRenstra}
+        key={controller.dialog.editingItem?.id ?? 'new'}
+        open={controller.dialog.isOpen}
+        onOpenChange={controller.dialog.setIsOpen}
+        renstra={controller.dialog.editingItem}
       />
 
       <ConfirmDialog
-        open={!!deletingRenstra}
-        onOpenChange={(open) => !open && setDeletingRenstra(null)}
-        onConfirm={handleConfirmDelete}
+        open={controller.deleteDialog.isOpen}
+        onOpenChange={controller.deleteDialog.setIsOpen}
+        onConfirm={controller.deleteDialog.confirmDelete}
         title="Hapus Renstra"
-        description={`Apakah Anda yakin ingin menghapus "${deletingRenstra?.name}"? Tindakan ini tidak dapat dibatalkan.`}
+        description={`Apakah Anda yakin ingin menghapus "${controller.deleteDialog.deletingItem?.name}"? Tindakan ini tidak dapat dibatalkan.`}
         confirmText="Hapus"
         variant="destructive"
-        loading={isDeleting}
+        loading={controller.deleteDialog.isDeleting}
       />
     </>
   );

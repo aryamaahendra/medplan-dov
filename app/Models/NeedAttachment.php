@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use Database\Factories\NeedAttachmentFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -17,6 +21,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 ])]
 class NeedAttachment extends Model
 {
+    /** @use HasFactory<NeedAttachmentFactory> */
+    use HasFactory;
+
+    protected function casts(): array
+    {
+        return [
+            'file_size' => 'integer',
+        ];
+    }
+
     /**
      * Get the need this attachment belongs to.
      */

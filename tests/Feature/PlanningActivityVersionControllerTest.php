@@ -8,6 +8,7 @@ use App\Models\User;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
+    $this->user->assignRole('super-admin');
     $this->actingAs($this->user);
 });
 
@@ -107,9 +108,7 @@ test('it can update an activity version and sync indicators', function () {
         'name' => 'New Included',
     ]);
 
-    $this->assertDatabaseMissing('planning_activity_indicators', [
-        'id' => $indicatorToDrop->id,
-    ]);
+    $this->assertModelMissing($indicatorToDrop);
 });
 
 test('it can delete an activity version', function () {
@@ -118,7 +117,7 @@ test('it can delete an activity version', function () {
     $response = $this->delete(route('planning-versions.activities.destroy', $activity));
 
     $response->assertRedirect();
-    $this->assertDatabaseMissing('planning_activity_versions', ['id' => $activity->id]);
+    $this->assertModelMissing($activity);
 });
 
 test('it can update yearly data for an activity version', function () {

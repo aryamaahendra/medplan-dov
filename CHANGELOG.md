@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-10-30
+
+### Added
+
+- **Rich KPA Selector**: Introduced `KpaSelectField` component rendering DiceBear avatar previews and NIP identifiers across need detail forms and the PDF export dialog.
+- **Select Value Formatting**: Added `formatSelectedValue` support to `SelectField` alongside improved text truncation on Base UI select trigger and value primitives.
+
+### Fixed
+
+- **PDF Proposal Signer Resolution**: Proposal export now defaults to the assigned KPA when `signer_id` is omitted, pre-fills the signer in the export dialog from need details, and replaces hardcoded dummy signatures with clean unassigned placeholders.
+
+### Changed
+
+- **CI Workflows**: Temporarily removed GitHub Actions workflow files.
+
+---
+
 ## [1.1.0] - 2026-10-27
 
 ### Added

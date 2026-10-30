@@ -34,6 +34,7 @@ export interface SelectFieldProps
   triggerSize?: 'sm' | 'default';
   contentProps?: ComponentProps<typeof SelectContent>;
   renderOption?: (option: FieldOption) => ReactNode;
+  formatSelectedValue?: (value: string, defaultLabel: string) => ReactNode;
 }
 
 export function SelectField({
@@ -55,6 +56,7 @@ export function SelectField({
   triggerSize,
   contentProps,
   renderOption,
+  formatSelectedValue,
   value,
   defaultValue,
   onValueChange,
@@ -90,21 +92,41 @@ export function SelectField({
           <SelectTrigger
             id={id}
             size={triggerSize}
-            className={cn('w-full min-w-0 justify-between', triggerClassName)}
+            className={cn(
+              'w-full max-w-full min-w-0 justify-between',
+              triggerClassName,
+            )}
             aria-invalid={isInvalid}
             aria-describedby={
               [descriptionId, errorId].filter(Boolean).join(' ') || undefined
             }
           >
-            <SelectValue placeholder={placeholder}>
+            <SelectValue
+              className="min-w-0 truncate text-left"
+              placeholder={placeholder}
+            >
               {(val) => {
                 if (!val) {
                   return placeholder;
                 }
 
-                const match = options.find((opt) => opt.value === val);
+                const strVal = String(val);
+                const match = options.find((opt) => opt.value === strVal);
+                const defaultLabel = match ? match.label : strVal;
 
-                return match ? match.label : val;
+                const formatted = formatSelectedValue
+                  ? formatSelectedValue(strVal, defaultLabel)
+                  : defaultLabel;
+
+                if (typeof formatted === 'string') {
+                  return (
+                    <span className="block min-w-0 flex-1 truncate text-left">
+                      {formatted}
+                    </span>
+                  );
+                }
+
+                return formatted;
               }}
             </SelectValue>
           </SelectTrigger>

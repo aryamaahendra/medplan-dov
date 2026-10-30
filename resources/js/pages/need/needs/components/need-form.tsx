@@ -474,7 +474,7 @@ export function NeedForm({
                   <div className="flex items-center gap-2">
                     <Button
                       type="button"
-                      variant="secondary"
+                      variant="ghost"
                       size="sm"
                       onClick={onCancel}
                       className="flex-1"
@@ -484,7 +484,7 @@ export function NeedForm({
                     {!isLocked && (
                       <Button
                         type="button"
-                        variant="outline"
+                        variant="secondary"
                         size="sm"
                         disabled={processing}
                         onClick={(e) =>
@@ -492,7 +492,7 @@ export function NeedForm({
                         }
                         className="flex-1"
                       >
-                        Simpan sebagai Draft
+                        Simpan Draft
                       </Button>
                     )}
                   </div>

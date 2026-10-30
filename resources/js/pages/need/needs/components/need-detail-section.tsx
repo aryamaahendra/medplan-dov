@@ -6,6 +6,7 @@ import { getFormattedCost } from '@/lib/formatters';
 import type { Attachment } from '@/types';
 import { DetailFieldItem } from './detail-field-item';
 import { FundingSection } from './funding-section';
+import { KpaSelectField } from './kpa-select-field';
 import { TechSpecExtra } from './tech-spec-extra';
 
 interface NeedDetailSectionProps {
@@ -196,7 +197,7 @@ export function NeedDetailSection({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4">
             <SelectField
               id="kldi"
               label="K/L/D/I"
@@ -229,7 +230,7 @@ export function NeedDetailSection({
               error={errors['detail.satker_skpd']}
             />
 
-            <SelectField
+            <KpaSelectField
               id="kpa_id"
               label="Kuasa Pengguna Anggaran (KPA)"
               value={kpaId.toString()}
@@ -238,10 +239,7 @@ export function NeedDetailSection({
                 handleChange('kpa_id', val);
               }}
               placeholder="Pilih KPA"
-              options={(users || []).map((u) => ({
-                label: `${u.name}${u.nip ? ` (NIP: ${u.nip})` : ''}`,
-                value: u.id.toString(),
-              }))}
+              users={users || []}
               error={errors['detail.kpa_id']}
             />
           </div>

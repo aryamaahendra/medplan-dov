@@ -12,6 +12,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import needRoutes from '@/routes/needs';
+import { KpaSelectField } from './kpa-select-field';
 
 interface User {
   id: number;
@@ -121,7 +122,7 @@ export function ExportPdfDialog({
           )
         }
       />
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Kustomisasi Ekspor PDF</DialogTitle>
           <DialogDescription>
@@ -130,7 +131,7 @@ export function ExportPdfDialog({
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="space-y-1.5">
-            <SelectField
+            <KpaSelectField
               id="signer"
               label="Penandatangan / KPA"
               value={settings.signer_id}
@@ -145,11 +146,7 @@ export function ExportPdfDialog({
                   ? 'KPA belum dipilih pada usulan ini. Silakan pilih penandatangan.'
                   : undefined
               }
-              options={users.map((user) => ({
-                label:
-                  `${user.name} ${user.nip ? `(NIP. ${user.nip})` : ''}`.trim(),
-                value: user.id.toString(),
-              }))}
+              users={users}
             />
             {!settings.signer_id && (
               <p className="text-xs font-medium text-amber-600 dark:text-amber-500">

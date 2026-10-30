@@ -22,6 +22,7 @@ interface User {
 interface ExportPdfDialogProps {
   needId: number;
   users: User[];
+  defaultSignerId?: number | string | null;
   trigger?: React.ReactNode;
 }
 
@@ -48,25 +49,40 @@ const DEFAULT_SETTINGS: ExportSettings = {
 export function ExportPdfDialog({
   needId,
   users,
+  defaultSignerId,
   trigger,
 }: ExportPdfDialogProps) {
   const [open, setOpen] = useState(false);
+  const fallbackSigner = defaultSignerId ? defaultSignerId.toString() : '';
+
   const [settings, setSettings] = useState<ExportSettings>(() => {
     if (typeof window === 'undefined') {
-      return DEFAULT_SETTINGS;
+      return { ...DEFAULT_SETTINGS, signer_id: fallbackSigner };
     }
 
     const saved = localStorage.getItem(STORAGE_KEY);
 
     if (saved) {
       try {
-        return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+        const parsed = JSON.parse(saved);
+
+        return {
+          ...DEFAULT_SETTINGS,
+          ...parsed,
+          signer_id: fallbackSigner || parsed.signer_id || '',
+        };
       } catch (e) {
         console.error('Failed to parse saved settings', e);
       }
     }
 
-    return DEFAULT_SETTINGS;
+    return { ...DEFAULT_SETTINGS, signer_id: fallbackSigner };
+  });
+
+  useState(() => {
+    if (fallbackSigner && !settings.signer_id) {
+      setSettings((s) => ({ ...s, signer_id: fallbackSigner }));
+    }
   });
 
   const handleSaveSettings = () => {
@@ -113,22 +129,35 @@ export function ExportPdfDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <SelectField
-            id="signer"
-            label="Penandatangan"
-            value={settings.signer_id}
-            onValueChange={(v) => {
-              if (v) {
-                setSettings((s) => ({ ...s, signer_id: v }));
+          <div className="space-y-1.5">
+            <SelectField
+              id="signer"
+              label="Penandatangan / KPA"
+              value={settings.signer_id}
+              onValueChange={(v) => {
+                if (v) {
+                  setSettings((s) => ({ ...s, signer_id: v }));
+                }
+              }}
+              placeholder="Pilih Penandatangan / KPA"
+              description={
+                !settings.signer_id
+                  ? 'KPA belum dipilih pada usulan ini. Silakan pilih penandatangan.'
+                  : undefined
               }
-            }}
-            placeholder="Choose a signer"
-            options={users.map((user) => ({
-              label:
-                `${user.name} ${user.nip ? `(NIP. ${user.nip})` : ''}`.trim(),
-              value: user.id.toString(),
-            }))}
-          />
+              options={users.map((user) => ({
+                label:
+                  `${user.name} ${user.nip ? `(NIP. ${user.nip})` : ''}`.trim(),
+                value: user.id.toString(),
+              }))}
+            />
+            {!settings.signer_id && (
+              <p className="text-xs font-medium text-amber-600 dark:text-amber-500">
+                [KPA belum dipilih] Silakan tentukan penandatangan untuk dokumen
+                KAK.
+              </p>
+            )}
+          </div>
 
           <SelectField
             id="paper_size"

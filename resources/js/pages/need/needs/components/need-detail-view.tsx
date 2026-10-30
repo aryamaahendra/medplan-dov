@@ -40,12 +40,17 @@ export function NeedDetailView({
     <Card className="mt-8">
       <CardContent className="p-0">
         <div className="mb-4 flex justify-end gap-1.5 px-4">
-          <ExportPdfDialog needId={needId} users={users} />
+          <ExportPdfDialog
+            needId={needId}
+            users={users}
+            defaultSignerId={detail?.kpa_id}
+          />
 
           {import.meta.env.DEV && (
             <ExportPdfDialog
               needId={needId}
               users={users}
+              defaultSignerId={detail?.kpa_id}
               trigger={
                 <Button variant="destructive" size="icon-sm">
                   <RiEyeLine />
@@ -106,7 +111,13 @@ export function NeedDetailView({
                         <p className="font-semibold text-muted-foreground">
                           c. KPA
                         </p>
-                        <p className="mt-1 ml-4">{detail?.kpa?.name ?? '-'}</p>
+                        <p className="mt-1 ml-4">
+                          {detail?.kpa?.name ?? (
+                            <span className="font-medium text-amber-600 dark:text-amber-500">
+                              [KPA belum dipilih]
+                            </span>
+                          )}
+                        </p>
                       </li>
                     </ul>
                   ) : value ? (

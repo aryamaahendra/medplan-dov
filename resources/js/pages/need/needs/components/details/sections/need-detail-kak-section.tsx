@@ -23,7 +23,11 @@ export function NeedDetailKakSection({
     return (
       <div className="space-y-4 py-8">
         <div className="flex justify-end">
-          <ExportPdfDialog needId={needId} users={users} />
+          <ExportPdfDialog
+            needId={needId}
+            users={users}
+            defaultSignerId={null}
+          />
         </div>
         <div className="py-12 text-center text-sm text-muted-foreground italic">
           Dokumen Kerangka Acuan Kerja (KAK) belum diisi.
@@ -43,7 +47,11 @@ export function NeedDetailKakSection({
             Kerangka Acuan Kerja
           </h3>
         </div>
-        <ExportPdfDialog needId={needId} users={users} />
+        <ExportPdfDialog
+          needId={needId}
+          users={users}
+          defaultSignerId={detail?.kpa_id}
+        />
       </div>
 
       <div className="divide-y divide-border/60">
@@ -63,7 +71,14 @@ export function NeedDetailKakSection({
           <div className="space-y-1 text-xs">
             <div>K/L/D/I: {detail.kldi || '-'}</div>
             <div>Satker: {detail.satker_skpd || '-'}</div>
-            <div>KPA: {detail.kpa?.name || '-'}</div>
+            <div>
+              KPA:{' '}
+              {detail.kpa?.name || (
+                <span className="font-medium text-amber-600 dark:text-amber-500">
+                  [KPA belum dipilih]
+                </span>
+              )}
+            </div>
           </div>
         </DatasheetKakRow>
 

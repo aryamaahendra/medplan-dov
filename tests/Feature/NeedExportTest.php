@@ -197,3 +197,84 @@ describe('parameter validation and sanitization', function () {
         $emptySlugResponse->assertHeader('Content-Disposition', 'attachment; filename=usulan-'.$emptyTitleNeed->id.'.pdf');
     });
 });
+
+describe('signer and KPA resolution', function () {
+    beforeEach(function () {
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        $this->seed(RolesAndPermissionsSeeder::class);
+
+        $this->unit = OrganizationalUnit::factory()->create();
+        $this->planner = User::factory()->create(['organizational_unit_id' => $this->unit->id]);
+        $this->planner->assignRole(UserRole::Planner->value);
+    });
+
+    test('planner exporting need defaults to assigned KPA when signer_id is not provided', function () {
+        $assignedKpa = User::factory()->create(['name' => 'Budi Assigned KPA', 'nip' => '999888777']);
+        $need = Need::factory()->create([
+            'title' => 'Proposal With KPA',
+            'organizational_unit_id' => $this->unit->id,
+        ]);
+        NeedDetail::factory()->create([
+            'need_id' => $need->id,
+            'kpa_id' => $assignedKpa->id,
+        ]);
+
+        $response = $this->actingAs($this->planner)
+            ->get(route('needs.export-pdf', $need));
+
+        $response->assertOk();
+        $response->assertHeader('Content-Type', 'application/pdf');
+    });
+
+    test('explicit signer_id overrides assigned KPA', function () {
+        $assignedKpa = User::factory()->create(['name' => 'Original KPA', 'nip' => '11111']);
+        $customSigner = User::factory()->create(['name' => 'Custom Delegate Signer', 'nip' => '22222']);
+        $need = Need::factory()->create([
+            'title' => 'Proposal With Overridden KPA',
+            'organizational_unit_id' => $this->unit->id,
+        ]);
+        NeedDetail::factory()->create([
+            'need_id' => $need->id,
+            'kpa_id' => $assignedKpa->id,
+        ]);
+
+        $response = $this->actingAs($this->planner)
+            ->get(route('needs.export-pdf', [
+                'need' => $need,
+                'signer_id' => $customSigner->id,
+            ]));
+
+        $response->assertOk();
+        $response->assertHeader('Content-Type', 'application/pdf');
+    });
+
+    test('unassigned KPA and no signer_id exports cleanly without hardcoded dummy name', function () {
+        $need = Need::factory()->create([
+            'title' => 'Proposal Without KPA',
+            'organizational_unit_id' => $this->unit->id,
+        ]);
+        NeedDetail::factory()->create([
+            'need_id' => $need->id,
+            'kpa_id' => null,
+        ]);
+
+        $response = $this->actingAs($this->planner)
+            ->get(route('needs.export-pdf', $need));
+
+        $response->assertOk();
+        $response->assertHeader('Content-Type', 'application/pdf');
+
+        $view = view('pdf.need-detail', [
+            'need' => $need->load('detail', 'organizationalUnit', 'needType'),
+            'detail' => $need->detail,
+            'signer' => null,
+            'marginTop' => 20,
+            'marginBottom' => 20,
+            'marginLeft' => 30,
+            'marginRight' => 20,
+        ])->render();
+
+        expect($view)->not->toContain('ARDIAN WIJAYA')
+            ->and($view)->toContain('[KPA belum dipilih]');
+    });
+});

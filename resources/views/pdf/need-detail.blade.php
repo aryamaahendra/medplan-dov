@@ -174,7 +174,7 @@
             <td style="">Nama KPA</td>
             <td>:</td>
             <td style="white-space: nowrap;">
-              {{ $signer?->name ?? 'ARDIAN WIJAYA, S.T., M.T.' }}
+              {{ $signer?->name ?? ($detail?->kpa?->name ?? '[KPA belum dipilih]') }}
             </td>
           </tr>
           <tr>
@@ -248,7 +248,7 @@
                     echo '<li style="margin-top: 4px;">b. Satker/SKPD</li>';
                     echo '<p style="margin-left: 15px; margin-bottom: 0;">' . ($detail ? e($detail->satker_skpd) : '-') . '</p>';
                     echo '<li style="margin-top: 4px;">c. KPA</li>';
-                    echo '<p style="margin-left: 15px; margin-bottom: 0;">' . ($detail && $detail->kpa ? e($detail->kpa->name) : '-') . '</p>';
+                    echo '<p style="margin-left: 15px; margin-bottom: 0;">' . ($signer ? e($signer->name) : ($detail && $detail->kpa ? e($detail->kpa->name) : '[KPA belum dipilih]')) . '</p>';
                     echo '</ul>';
                 } elseif (!$value) {
                     echo '<p>-</p>';
@@ -308,8 +308,8 @@
       <p>KUASA PENGGUNA ANGGARAN</p>
 
       <div class="signature-space"></div>
-      <p class="signature-name">{{ $signer ? $signer->name : 'ARDIAN WIJAYA, S.T., M.T.' }}</p>
-      <p>Nip. {{ $signer ? $signer->nip : '72731 0004345 1 001' }}</p>
+      <p class="signature-name">{{ $signer ? $signer->name : ($detail?->kpa?->name ?? '[KPA belum dipilih]') }}</p>
+      <p>Nip. {{ $signer ? ($signer->nip ?? '-') : ($detail?->kpa?->nip ?? '-') }}</p>
     </div>
     <div style="clear: both;"></div>
   </div>

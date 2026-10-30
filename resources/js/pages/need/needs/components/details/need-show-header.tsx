@@ -96,6 +96,7 @@ export function NeedShowHeader({
         <ExportPdfDialog
           needId={need.id}
           users={users}
+          defaultSignerId={need.detail?.kpa_id}
           trigger={
             <Button variant="outline" size="sm" className="gap-1.5">
               <RiFileDownloadLine className="h-4 w-4" />

@@ -45,8 +45,12 @@ final class ExportNeedPdfController extends Controller
         ]);
 
         $signer = null;
-        if ($request->has('signer_id')) {
+        if ($request->filled('signer_id')) {
             $signer = User::find($request->input('signer_id'));
+        }
+
+        if (! $signer && $need->detail?->kpa) {
+            $signer = $need->detail->kpa;
         }
 
         $rawPaperSize = strtolower((string) $request->input('paper_size', self::DEFAULT_PAPER_SIZE));

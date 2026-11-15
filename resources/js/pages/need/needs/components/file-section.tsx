@@ -120,7 +120,7 @@ export function FileSection({
           className="hidden"
           multiple
           onChange={handleFileChange}
-          accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.zip,.rar"
+          accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx,.csv,.zip,.rar"
         />
       </div>
 

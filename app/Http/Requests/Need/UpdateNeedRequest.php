@@ -224,7 +224,7 @@ class UpdateNeedRequest extends FormRequest
                 'detail.technical_specifications' => ['nullable', 'string'],
                 'detail.training' => ['nullable', 'string'],
                 'technical_specification_attachments' => ['nullable', 'array'],
-                'technical_specification_attachments.*' => ['file', 'max:10240', 'mimes:jpg,jpeg,png,pdf,doc,docx'],
+                'technical_specification_attachments.*' => ['file', 'max:10240', 'mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,csv'],
                 'technical_specification_attachment_names' => ['nullable', 'array'],
                 'technical_specification_attachment_names.*' => ['string', 'max:255'],
             ]);
@@ -233,7 +233,7 @@ class UpdateNeedRequest extends FormRequest
         if ($isSuperAdmin || ($user && $user->hasPermissionTo('update need tab lampiran'))) {
             $rules = array_merge($rules, [
                 'attachments' => ['nullable', 'array'],
-                'attachments.*' => ['file', 'max:10240', 'mimes:jpg,jpeg,png,pdf,doc,docx,zip,rar'],
+                'attachments.*' => ['file', 'max:10240', 'mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,csv,zip,rar'],
                 'attachment_names' => ['nullable', 'array'],
                 'attachment_names.*' => ['string', 'max:255'],
                 'deleted_attachment_ids' => ['nullable', 'array'],

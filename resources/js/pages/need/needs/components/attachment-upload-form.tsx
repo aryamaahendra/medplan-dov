@@ -85,7 +85,7 @@ export function AttachmentUploadForm({ needId }: AttachmentUploadFormProps) {
               type="file"
               ref={fileInputRef}
               onChange={handleFileChange}
-              accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.zip,.rar"
+              accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx,.csv,.zip,.rar"
             />
             {errors.file && (
               <p className="text-sm text-destructive">{errors.file}</p>

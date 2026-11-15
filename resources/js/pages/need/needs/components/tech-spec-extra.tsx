@@ -59,7 +59,7 @@ export function TechSpecExtra({
           className="hidden"
           multiple
           onChange={onFileChange}
-          accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+          accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx,.csv"
         />
       </div>
 

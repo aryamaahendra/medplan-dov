@@ -14,7 +14,7 @@ final class StoreNeedAttachmentRequest extends FormRequest
 
     private const array ALLOWED_MIMES = [
         'jpg', 'jpeg', 'png', 'gif', 'webp',
-        'pdf', 'doc', 'docx', 'zip', 'rar',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'csv', 'zip', 'rar',
         'mp4', 'webm', 'ogg',
     ];
 

@@ -117,7 +117,7 @@ export function NeedGeneralSection({ need }: NeedGeneralSectionProps) {
         />
         {need.description && (
           <DatasheetRow
-            label="Deskripsi / Justifikasi"
+            label="Detail Usulan"
             value={need.description}
             multiline
           />
